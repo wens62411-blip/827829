@@ -1,0 +1,54 @@
+{
+  "evidenceKind": "LOCAL_ONLY",
+  "generatedAt": "2026-08-27T07:36:31.066Z",
+  "contractVersion": "1.0.0",
+  "environment": {
+    "node": "v24.16.0",
+    "npm": "11.13.0"
+  },
+  "commands": [
+    {
+      "command": "npm ci --cache .npm-cache",
+      "exitCode": 0,
+      "result": "14 packages installed from the single lockfile; audit reported 0 vulnerabilities"
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "result": "miniprogram, cloudfunctions and contract type assertions passed"
+    },
+    {
+      "command": "npm run validate",
+      "exitCode": 0,
+      "result": "337 checks passed, 0 failed"
+    },
+    {
+      "command": "npm test",
+      "exitCode": 0,
+      "result": "44 tests passed, 0 failed; cloud runtime SHA-256 092cbd05d9d4edade3d6df78c796eadce40caeb5c49306c567f21dc20f06a7b1 matched 13 bundles"
+    },
+    {
+      "command": "npm run check:package",
+      "exitCode": 0,
+      "result": "28 routes complete; conservative source estimate below 2 MiB; Developer Tools package gate remains UNVERIFIED"
+    },
+    {
+      "command": "npm run build",
+      "exitCode": 0,
+      "result": "full local foundation gate passed with 337/337 validations and 44/44 tests"
+    }
+  ],
+  "resolvedDuringBuild": [
+    "Initial external npm cache access was denied; installation was repeated with a repository-local cache.",
+    "esbuild postinstall and cloud bundle generation required the approved unsandboxed child-process path.",
+    "Intermediate contract, collection-specific cloud projection and client-envelope test failures were fixed before this final evidence snapshot."
+  ],
+  "unverified": [
+    "WeChat Developer Tools npm build and preview",
+    "iOS device",
+    "Android device",
+    "CloudBase execution",
+    "development-version upload",
+    "release"
+  ]
+}

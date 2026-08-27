@@ -1,0 +1,4 @@
+<t-tag wx:if="{{visible}}" theme="success" variant="outline" size="medium" aria-label="人工审核通过标签 {{label}}">
+  {{label}}
+</t-tag>
+

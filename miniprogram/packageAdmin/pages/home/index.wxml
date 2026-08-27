@@ -1,0 +1,52 @@
+<view class="admin-page">
+<view class="admin-header">
+<view class="admin-header__topline">
+<text class="admin-header__eyebrow">AB CLUB · RESTRICTED</text>
+<ab-evidence-label mode="{{runtimeMode}}" />
+</view>
+<text class="admin-header__title">受限管理台</text>
+<text class="admin-header__description">赛事与早期运营的人工审核入口。菜单可见性不是权限控制，每个动作都会再次由云函数鉴权。</text>
+</view>
+<view wx:if="{{gateState !== 'AUTHORIZED'}}" class="admin-gate" aria-live="polite">
+<text class="admin-gate__title">{{gateTitle}}</text>
+<text class="admin-gate__copy">{{gateMessage}}</text>
+<button wx:if="{{gateState !== 'CHECKING'}}" class="admin-gate__retry ab-touch-target" bindtap="refreshAccess">重新核验</button>
+</view>
+<block wx:else>
+<view class="admin-section">
+<text class="admin-section__title">当前会话可用模块</text>
+<text class="admin-section__copy">只展示 bootstrap 返回的可用队列；直接访问子页面仍会重新鉴权。</text>
+<view class="admin-link-grid">
+<navigator wx:if="{{reviewAvailable}}" class="admin-link" url="/packageAdmin/pages/reviews/index" hover-class="none">
+标签与举报
+<text class="admin-link__copy">人工审核、补材料、撤销和最小举报处理</text>
+</navigator>
+<navigator wx:if="{{eventsAvailable}}" class="admin-link" url="/packageAdmin/pages/events/index" hover-class="none">
+主理人与活动
+<text class="admin-link__copy">审核队列、城市与节点只读状态</text>
+</navigator>
+<navigator wx:if="{{contentAvailable}}" class="admin-link" url="/packageAdmin/pages/content/index" hover-class="none">
+艺术内容
+<text class="admin-link__copy">发布、拒绝、补材料和下架</text>
+</navigator>
+<navigator wx:if="{{auditAvailable}}" class="admin-link" url="/packageAdmin/pages/audit/index" hover-class="none">
+审计日志
+<text class="admin-link__copy">脱敏只读，不提供编辑或删除</text>
+</navigator>
+</view>
+<view wx:if="{{!reviewAvailable && !eventsAvailable && !contentAvailable && !auditAvailable}}" class="admin-notice">
+<text class="admin-notice__title">没有已授权队列</text>
+<text class="admin-notice__copy">服务端未返回任何可用队列，因此不展示功能入口。</text>
+</view>
+</view>
+<view class="admin-section" aria-label="支付能力状态">
+<text class="admin-section__title">订单与退款</text>
+<text class="admin-section__copy">{{paymentReason}}</text>
+<text wx:if="{{paymentEnabled}}" class="admin-section__copy">冻结路由和 Action 尚未包含订单/退款管理，因此即使能力启用也不会生成假页面。</text>
+</view>
+<view class="admin-section" aria-label="功能开关状态">
+<text class="admin-section__title">Feature flag</text>
+<text class="admin-section__copy">冻结合同未提供 feature flag 读取或变更 Action。本客户端不猜测、不硬编码线上状态。</text>
+</view>
+</block>
+</view>

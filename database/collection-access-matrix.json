@@ -1,0 +1,21 @@
+{
+  "contractVersion": "1.0.0",
+  "rowCount": 15,
+  "rows": [
+    { "id": 1, "collections": ["users", "profiles_private", "cards_public", "card_share_tokens"], "primaryWriter": "identityApi", "stateCollaborators": ["adminApi:account-disable-only"], "readOnlyConsumers": ["socialApi:minimal-projection", "eventApi:minimal-projection", "contentApi:minimal-projection", "adminApi:minimal-projection"] },
+    { "id": 2, "collections": ["friendships", "blocks_reports"], "primaryWriter": "socialApi", "stateCollaborators": ["adminApi:report-resolution-only"], "readOnlyConsumers": ["identityApi:ViewerRelationshipProjection", "adminApi:redacted-case"] },
+    { "id": 3, "collections": ["label_catalog"], "primaryWriter": "foundation/integration", "stateCollaborators": ["adminApi:enable-disable-only"], "readOnlyConsumers": ["socialApi", "identityApi", "eventApi"] },
+    { "id": 4, "collections": ["verification_requests"], "primaryWriter": "socialApi", "stateCollaborators": ["adminApi:review-transitions-only"], "readOnlyConsumers": ["socialApi:self-only"], "explicitlyDeniedConsumers": ["identityApi:raw-request", "eventApi:raw-request"] },
+    { "id": 5, "collections": ["verification_claims"], "primaryWriter": "adminApi", "stateCollaborators": ["_shared/projections:public-projection-only"], "readOnlyConsumers": ["identityApi:active-public-claim", "eventApi:active-public-claim", "socialApi:active-public-claim"] },
+    { "id": 6, "collections": ["regions", "countries", "cities"], "primaryWriter": "foundation/integration", "stateCollaborators": ["adminApi:contract-operational-state-only"], "readOnlyConsumers": ["eventApi:public-dto", "contentApi:public-dto", "client:public-dto-via-api"] },
+    { "id": 7, "collections": ["club_nodes", "organizers", "events"], "primaryWriter": "eventApi:draft-fields", "stateCollaborators": ["adminApi:review-publish-pause-cancel"], "readOnlyConsumers": ["contentApi:PublicEventProjection", "client:public-dto-via-api"] },
+    { "id": 8, "collections": ["event_enrollments"], "primaryWriter": "eventApi", "stateCollaborators": ["adminApi:contract-operational-actions-only"], "readOnlyConsumers": ["eventApi:self", "adminApi:authorized-limited"] },
+    { "id": 9, "collections": ["art_items", "art_collections", "content_intents"], "primaryWriter": "contentApi", "stateCollaborators": ["adminApi:review-publish-unpublish"], "readOnlyConsumers": ["eventApi:public-link-only"] },
+    { "id": 10, "collections": ["media_assets"], "primaryWriter": "owning-business-api:draft-metadata", "stateCollaborators": ["adminApi:rights-review-public-state"], "readOnlyConsumers": ["public-api:approved-media-projection-only"] },
+    { "id": 11, "collections": ["orders"], "primaryWriter": "designated-server-payment-action-after-feature-enable", "stateCollaborators": ["adminApi:contract-refund-only"], "readOnlyConsumers": ["owner:self-order", "adminApi:authorized-limited"], "featureGate": "payment=DISABLED" },
+    { "id": 12, "collections": ["feature_flags"], "primaryWriter": "foundation/integration", "stateCollaborators": ["adminApi:whitelist-only"], "readOnlyConsumers": ["identityApi", "socialApi", "eventApi", "contentApi", "adminApi"] },
+    { "id": 13, "collections": ["idempotency_keys"], "primaryWriter": "calling-api-namespaced", "stateCollaborators": [], "readOnlyConsumers": ["audit:read-only"] },
+    { "id": 14, "collections": ["audit_logs"], "primaryWriter": "_shared/audit:add-only", "stateCollaborators": [], "readOnlyConsumers": ["adminApi:redacted-read"], "forbiddenOperations": ["update", "delete"] },
+    { "id": 15, "collections": ["projection_invalidations"], "primaryWriter": "_shared/projections:add-only-for-five-apis", "stateCollaborators": ["integration:evidence-backed-replay-repair"], "readOnlyConsumers": ["identityApi:contract-consumer", "socialApi:contract-consumer", "eventApi:contract-consumer", "contentApi:contract-consumer", "adminApi:contract-consumer"], "forbiddenOperations": ["update", "delete"] }
+  ]
+}

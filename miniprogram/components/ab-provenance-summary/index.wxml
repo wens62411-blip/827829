@@ -1,0 +1,7 @@
+<view class="provenance" aria-role="region" aria-label="来源、审核、图片权利与平台说明"><view class="provenance__section"><text class="provenance__index">01</text><view class="provenance__content"><text class="provenance__heading">来源 / Source</text><ab-content-source
+        source-title="{{sourceTitle}}"
+        source-url="{{sourceUrl}}"
+        record-origin="{{recordOrigin}}"
+        evidence-scope="{{evidenceScope}}"
+        bindsourcecopy="handleSourceCopy"
+      /></view></view><view class="provenance__section"><text class="provenance__index">02</text><view class="provenance__content"><text class="provenance__heading">内容审核 / Editorial Review</text><text class="provenance__value">公开状态：{{publicationState || 'UNKNOWN'}}</text><text class="provenance__note">审核记录时间：{{reviewedAt || '未提供'}}</text><text class="provenance__note">公开状态仅表示内容允许展示，不构成真伪判断。</text></view></view><view class="provenance__section"><text class="provenance__index">03</text><view class="provenance__content"><text class="provenance__heading">图片权利 / Image Rights</text><text class="provenance__value">权利状态：{{rightsStatus || 'UNKNOWN'}}</text><text class="provenance__note">权利复核时间：{{rightsReviewedAt || '未单独提供'}}</text><text class="provenance__note">未具备公开展示依据时，页面不加载作品图片。</text></view></view><view class="provenance__section provenance__section--statement"><text class="provenance__index">04</text><view class="provenance__content"><text class="provenance__heading">平台说明 / Platform Position</text><text class="provenance__statement">{{platformStatement}}</text></view></view></view>

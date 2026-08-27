@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ab-verified-tag": "../ab-verified-tag/index"
+  }
+}

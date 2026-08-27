@@ -1,0 +1,118 @@
+{
+  "module": "social-review",
+  "phase": "FEATURE_MODULE",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T11:51:17.861Z",
+  "overall": "LOCAL_TEST_PASS",
+  "gates": {
+    "local": {
+      "status": "PASS",
+      "evidence": [
+        "node --test --test-isolation=none tests/cloud/social/relationships.test.mjs tests/cloud/social/verifications.test.mjs tests/cloud/social/public-claim-audit.test.mjs tests/cloud/social/read-error-contract.test.mjs tests/cloud/social/manifest.test.mjs exited 0: 38/38 passed.",
+        "node --test --test-isolation=none tests/components/social/social-ui.test.mjs exited 0: 8/8 passed.",
+        "A strict direct TypeScript compile of cloudfunctions/socialApi/index.ts exited 0; npm run typecheck:miniprogram, npm run typecheck:cloud and npm run typecheck:contracts exited 0; npm run validate passed 337/337 checks; npm run build:test-runtime exited 0.",
+        "npm run check:cloud-runtime exited 0 and all 13 generated bundles, including socialApi/index.js, match TypeScript source SHA-256 df7d5b8fa877874e3e3c68b3f6a265d0385a9e10a515534a97d448a0cebd1972.",
+        "npm run build exited 0: 213/219 Node tests passed, 0 failed, 6 optional jsdom-dependent checks skipped, all typechecks and 337 validations passed, and the conservative static package budget passed."
+      ],
+      "note": "MODULE_SCOPED_LOCAL_PASS only. The dependency-injected in-memory implementation and full repository build are tested, while the default socialApi main, real CloudBase persistence, Developer Tools, devices, upload and release remain unverified. Six optional miniprogram-simulate checks were skipped because jsdom is unavailable."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized WeChat Developer Tools preview evidence or screenshot is recorded."
+      ]
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No iOS device run is recorded."
+      ]
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No Android device run is recorded."
+      ]
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "LOCAL_ONLY_NO_APPID and the missing authorized CloudBase adapter cannot establish development-version upload evidence."
+      ]
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No production deployment or release evidence is recorded."
+      ]
+    }
+  },
+  "artifacts": [
+    "cloudfunctions/socialApi/index.ts",
+    "cloudfunctions/socialApi/index.js",
+    "miniprogram/pages/network/",
+    "miniprogram/packageSocial/",
+    "miniprogram/components/ab-friend-request/",
+    "miniprogram/components/ab-tag-application/",
+    "miniprogram/components/ab-review-timeline/",
+    "tests/cloud/social/relationships.test.mjs",
+    "tests/cloud/social/verifications.test.mjs",
+    "tests/cloud/social/public-claim-audit.test.mjs",
+    "tests/cloud/social/read-error-contract.test.mjs",
+    "tests/cloud/social/manifest.test.mjs",
+    "tests/cloud/social/EVIDENCE.md",
+    "tests/components/social/social-ui.test.mjs",
+    "tests/components/social/fixtures/review-timeline-demo-only.json",
+    "tests/components/social/artifacts/review-timeline-demo-only.png",
+    "integration/proposals/social-review-contract-gaps.md",
+    "integration/manifests/social-review.json"
+  ],
+  "checks": [
+    {
+      "id": "relationship-state-matrix",
+      "status": "PASS",
+      "evidence": "LOCAL_TEST_PASS: relationships.test.mjs passed forged identity, normalized-pair replay, simultaneous opposite-direction request, legal and illegal transitions, ACCEPTED-only FRIENDS_ONLY access, immediate removal/block revocation, unblock without restoration, reporting and frozen invalidation assertions within the 38/38 cloud run (exit 0)."
+    },
+    {
+      "id": "tag-publication-matrix",
+      "status": "PASS",
+      "evidence": "LOCAL_TEST_PASS: public-claim-audit.test.mjs passed the fail-closed matrix for APPROVED state, matching successful HUMAN_REVIEWED ReviewLog, reviewedBy/reviewedAt/reviewScope, owner opt-in, catalog category, catalog enablement, publicEligible, expiry/revocation, P0 high-risk denial, and the future independent compliance plus two-distinct-human-reviewer gate within the 38/38 cloud run (exit 0)."
+    },
+    {
+      "id": "material-permission-negative-tests",
+      "status": "PASS",
+      "evidence": "LOCAL_TEST_PASS: verifications.test.mjs rejected forged ownership, cross-owner reads, non-whitelisted media, excessive bytes/items, expired authorization, cross-request evidence and missing uploads; owner/public projections returned no original material URL, storageFileId or cloudPath in the 38/38 cloud run (exit 0)."
+    },
+    {
+      "id": "synthetic-redacted-fixtures",
+      "status": "PASS",
+      "evidence": "LOCAL_TEST_PASS: review-timeline-demo-only.json and its PNG/SVG artifacts are visibly SYNTHETIC and DEMO_ONLY, identify a non-real redacted user, contain no real identity document, and the 8/8 UI assertions reject storageFileId, cloudPath, original/download/evidence URLs and raw OCR text (exit 0)."
+    },
+    {
+      "id": "owner-review-timeline-screenshot",
+      "status": "PASS",
+      "evidence": "LOCAL_STATIC_RENDER only: tests/components/social/artifacts/review-timeline-demo-only.png is a manually inspected synthetic, redacted owner-view layout artifact. It visibly states STATE_PATH_ONLY_NOT_REVIEW_LOG semantics and that it is not a Developer Tools preview; therefore devtoolsPreview remains UNVERIFIED."
+    },
+    {
+      "id": "projection-invalidation",
+      "status": "PASS",
+      "evidence": "LOCAL_TRANSACTION_MODEL: relationship and verification tests passed exact frozen RELATIONSHIP_CHANGED and VERIFICATION_CHANGED append assertions, including every friendship state change, separate block and friendship invalidations when blocking, withdraw tombstone reason VERIFICATION_REQUEST_WITHDRAWN, and immediate FRIENDS_ONLY/public-claim withdrawal. Real CloudBase transaction and consumer evidence remains UNVERIFIED."
+    },
+    {
+      "id": "cloud-social-tests",
+      "status": "PASS",
+      "evidence": "The explicit five-file cloud command exited 0 with 38/38 passed; a strict direct socialApi TypeScript compile exited 0; component social command exited 0 with 8/8 passed; typecheck:miniprogram, typecheck:cloud, typecheck:contracts, validate, build:test-runtime, check:cloud-runtime and the final full npm run build each exited 0."
+    }
+  ],
+  "knownGaps": [
+    "The default exported socialApi main remains the frozen safe NOT_IMPLEMENTED fallback. createSocialApiEndpoint is dependency-injected for local tests, but no authorized transactional CloudBase adapter is connected.",
+    "Frozen v1.0.0 does not encode enforceable ReviewLog provenance, reviewedBy/reviewedAt/reviewScope, label category/publicEligible and high-risk dual-review policy, or an explicit user public-opt-in action. A foundation/integration contract proposal is required; public projection must remain fail-closed until accepted.",
+    "Because the frozen action set has no owner-publication-choice mutation, this module cannot end-to-end create a public claim; it can only reject unsafe claims and consume a complete proof supplied through an accepted future contract/adminApi integration.",
+    "Administrator review decisions remain exclusively owned by Prompt 06 adminApi; this module does not implement or claim an administrator approval button.",
+    "cards_public remains exclusively written by identityApi. socialApi only supplies the frozen relationship/claim projections and projection invalidations and does not write cards_public.",
+    "Private object-storage ACL, upload digest enforcement against real stored bytes, transactional CloudBase concurrency, and withdrawal-time material retention/deletion policy are not proven by the in-memory adapter.",
+    "Six optional miniprogram-simulate checks are skipped because jsdom is unavailable; the final build has 213 passed, 0 failed and 6 skipped Node tests.",
+    "Developer Tools preview and owner-timeline capture, iOS, Android, CloudBase execution, development-version upload and release remain UNVERIFIED; the checked-in owner timeline PNG is LOCAL_STATIC_RENDER, SYNTHETIC and DEMO_ONLY evidence only.",
+    "All demo materials and fixtures remain SYNTHETIC and DEMO_ONLY; they are not human-reviewed, live, uploaded or deployment evidence."
+  ]
+}

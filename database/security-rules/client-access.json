@@ -1,0 +1,32 @@
+{
+  "contractVersion": "1.0.0",
+  "mode": "CUSTOM_DEFAULT_DENY",
+  "description": "CloudBase security rules apply to client requests only. Every business collection denies direct client reads and writes; clients use the five action APIs and public DTOs.",
+  "rules": {
+    "users": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "profiles_private": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "cards_public": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "card_share_tokens": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "friendships": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "blocks_reports": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "label_catalog": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "verification_requests": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "verification_claims": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "regions": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "countries": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "cities": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "club_nodes": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "organizers": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "events": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "event_enrollments": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "art_items": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "art_collections": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "content_intents": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "media_assets": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "orders": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "feature_flags": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "idempotency_keys": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "audit_logs": { "read": false, "write": false, "create": false, "update": false, "delete": false },
+    "projection_invalidations": { "read": false, "write": false, "create": false, "update": false, "delete": false }
+  }
+}

@@ -1,0 +1,36 @@
+<view class="queue" aria-role="list" aria-label="受限审核队列">
+<view wx:if="{{loading && !items.length}}" class="queue__state" aria-live="polite">
+<text class="queue__state-title">正在核验权限并读取队列</text>
+<text class="queue__state-copy">未完成服务端授权前不会展示管理数据。</text>
+</view>
+<view wx:elif="{{!items.length}}" class="queue__state">
+<text class="queue__state-title">{{emptyText}}</text>
+<button class="queue__retry ab-touch-target" bindtap="onRetry" aria-label="重新加载管理队列">重新加载</button>
+</view>
+<button
+wx:for="{{items}}"
+wx:key="handle"
+class="queue-row {{selectedHandle === item.handle ? 'queue-row--selected' : ''}}"
+data-handle="{{item.handle}}"
+bindtap="onSelect"
+aria-label="{{item.title}}，状态 {{item.status}}"
+>
+<view class="queue-row__topline">
+<text class="queue-row__eyebrow">{{item.eyebrow}}</text>
+<text class="queue-row__status">{{item.status}}</text>
+</view>
+<text class="queue-row__title">{{item.title}}</text>
+<text class="queue-row__summary">{{item.summary}}</text>
+<view class="queue-row__footer">
+<text>{{item.meta}}</text>
+<text>{{item.updatedAt}}</text>
+</view>
+</button>
+<button
+wx:if="{{items.length && hasMore}}"
+class="queue__more ab-touch-target"
+loading="{{loading}}"
+disabled="{{loading}}"
+bindtap="onLoadMore"
+>加载更多</button>
+</view>

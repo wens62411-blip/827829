@@ -1,0 +1,30 @@
+<view class="timeline" aria-role="region" aria-label="本人申请状态路径">
+  <view class="timeline__heading">
+    <text class="timeline__title">申请状态路径</text>
+    <text class="timeline__disclaimer">非 ReviewLog，不推断审核时间</text>
+  </view>
+
+  <view wx:for="{{steps}}" wx:key="key" class="timeline__step timeline__step--{{item.tone}}">
+    <view class="timeline__rail" aria-hidden="true">
+      <view class="timeline__dot"></view>
+      <view wx:if="{{index < steps.length - 1}}" class="timeline__line"></view>
+    </view>
+    <view class="timeline__content">
+      <text class="timeline__label">{{item.label}}</text>
+      <text class="timeline__state">{{item.tone === 'done' ? '已完成' : (item.tone === 'current' ? '当前状态' : '尚未发生')}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{createdAtLabel}}" class="timeline__fact">
+    <text class="timeline__fact-label">申请记录创建时间</text>
+    <text>{{createdAtLabel}}</text>
+  </view>
+  <view class="timeline__fact">
+    <text class="timeline__fact-label">已提交材料</text>
+    <text>{{evidenceCount}} 份（原件地址不展示）</text>
+  </view>
+  <view wx:if="{{reviewerNote}}" class="timeline__note" aria-role="note">
+    <text class="timeline__fact-label">审核意见</text>
+    <text class="timeline__note-text">{{reviewerNote}}</text>
+  </view>
+</view>

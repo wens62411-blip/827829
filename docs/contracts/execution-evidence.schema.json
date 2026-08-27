@@ -1,0 +1,137 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://ab-club.local/contracts/1.0.0/execution-evidence.schema.json",
+  "title": "AB Club execution evidence manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["contractVersion", "module", "phase", "generatedAt", "overall", "gates"],
+  "properties": {
+    "contractVersion": { "const": "1.0.0" },
+    "module": { "type": "string", "minLength": 1 },
+    "phase": { "enum": ["FOUNDATION", "FEATURE_MODULE", "FINAL_INTEGRATION"] },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "overall": { "enum": ["INCOMPLETE", "BLOCKED", "LOCAL_TEST_PASS", "INTEGRATION_READY", "RELEASE_CANDIDATE", "RELEASED"] },
+    "gates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["local", "devtoolsPreview", "iosDevice", "androidDevice", "devVersionUpload", "release"],
+      "properties": {
+        "local": { "$ref": "#/$defs/gate" },
+        "devtoolsPreview": { "$ref": "#/$defs/gate" },
+        "iosDevice": { "$ref": "#/$defs/gate" },
+        "androidDevice": { "$ref": "#/$defs/gate" },
+        "devVersionUpload": { "$ref": "#/$defs/gate" },
+        "release": { "$ref": "#/$defs/gate" }
+      }
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "phase": { "const": "FEATURE_MODULE" } },
+        "required": ["phase"]
+      },
+      "then": {
+        "properties": {
+          "overall": { "enum": ["INCOMPLETE", "BLOCKED", "LOCAL_TEST_PASS"] }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "overall": { "const": "LOCAL_TEST_PASS" } },
+        "required": ["overall"]
+      },
+      "then": { "properties": { "gates": { "$ref": "#/$defs/localPassed" } } }
+    },
+    {
+      "if": {
+        "properties": { "overall": { "const": "INTEGRATION_READY" } },
+        "required": ["overall"]
+      },
+      "then": { "properties": { "gates": { "$ref": "#/$defs/integrationReadyGates" } } }
+    },
+    {
+      "if": {
+        "properties": { "overall": { "const": "RELEASE_CANDIDATE" } },
+        "required": ["overall"]
+      },
+      "then": { "properties": { "gates": { "$ref": "#/$defs/releaseCandidateGates" } } }
+    },
+    {
+      "if": {
+        "properties": { "overall": { "const": "RELEASED" } },
+        "required": ["overall"]
+      },
+      "then": { "properties": { "gates": { "$ref": "#/$defs/releasedGates" } } }
+    }
+  ],
+  "$defs": {
+    "gate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "evidence"],
+      "properties": {
+        "status": { "enum": ["PASS", "FAIL", "UNVERIFIED", "NOT_APPLICABLE"] },
+        "evidence": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+        "note": { "type": "string" }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": { "status": { "const": "PASS" } },
+            "required": ["status"]
+          },
+          "then": { "properties": { "evidence": { "minItems": 1 } } }
+        }
+      ]
+    },
+    "passedGate": {
+      "allOf": [
+        { "$ref": "#/$defs/gate" },
+        {
+          "properties": {
+            "status": { "const": "PASS" },
+            "evidence": { "minItems": 1 }
+          }
+        }
+      ]
+    },
+    "localPassed": {
+      "type": "object",
+      "required": ["local"],
+      "properties": { "local": { "$ref": "#/$defs/passedGate" } }
+    },
+    "integrationReadyGates": {
+      "type": "object",
+      "required": ["local", "devtoolsPreview"],
+      "properties": {
+        "local": { "$ref": "#/$defs/passedGate" },
+        "devtoolsPreview": { "$ref": "#/$defs/passedGate" }
+      }
+    },
+    "releaseCandidateGates": {
+      "type": "object",
+      "required": ["local", "devtoolsPreview", "iosDevice", "androidDevice", "devVersionUpload"],
+      "properties": {
+        "local": { "$ref": "#/$defs/passedGate" },
+        "devtoolsPreview": { "$ref": "#/$defs/passedGate" },
+        "iosDevice": { "$ref": "#/$defs/passedGate" },
+        "androidDevice": { "$ref": "#/$defs/passedGate" },
+        "devVersionUpload": { "$ref": "#/$defs/passedGate" }
+      }
+    },
+    "releasedGates": {
+      "type": "object",
+      "required": ["local", "devtoolsPreview", "iosDevice", "androidDevice", "devVersionUpload", "release"],
+      "properties": {
+        "local": { "$ref": "#/$defs/passedGate" },
+        "devtoolsPreview": { "$ref": "#/$defs/passedGate" },
+        "iosDevice": { "$ref": "#/$defs/passedGate" },
+        "androidDevice": { "$ref": "#/$defs/passedGate" },
+        "devVersionUpload": { "$ref": "#/$defs/passedGate" },
+        "release": { "$ref": "#/$defs/passedGate" }
+      }
+    }
+  }
+}

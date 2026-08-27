@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "主理人",
+  "usingComponents": {
+    "ab-event-state": "/components/ab-event-state/index"
+  }
+}

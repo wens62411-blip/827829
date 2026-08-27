@@ -1,0 +1,151 @@
+{
+  "module": "art",
+  "phase": "FEATURE_MODULE",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T11:48:00.000Z",
+  "overall": "LOCAL_TEST_PASS",
+  "gates": {
+    "local": {
+      "status": "PASS",
+      "evidence": [
+        "ART_SCOPED_PASS: npm run typecheck:miniprogram exited 0; isolated strict TypeScript for contentApi exited 0.",
+        "ART_SCOPED_PASS: contentApi 17/17, art manifest/scope/client/screenshot 23/23, and miniprogram-simulate 6/6 tests passed.",
+        "REPOSITORY_SNAPSHOT_PASS: one full npm run build exited 0 with all TypeScript projects, 337/337 foundation validations, the cloud runtime hash gate and package estimate passing.",
+        "CURRENT_INTEGRATION_BLOCKER: the final npm run build rerun exited 1 only because 13 out-of-scope city JPG hashes no longer match their city asset manifest; art tests remained green."
+      ],
+      "note": "Feature evidence cannot exceed LOCAL_TEST_PASS; no Developer Tools, device, upload or release evidence exists."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "LOCAL_ONLY_NO_APPID; no WeChat Developer Tools preview evidence."
+      ]
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized iOS device run."
+      ]
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized Android device run."
+      ]
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No AppID, upload key or authorized dev-version upload."
+      ]
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No production CloudBase adapter, deployment or release evidence."
+      ]
+    }
+  },
+  "artifacts": [
+    "miniprogram/packageArt/",
+    "tests/components/art/SCOPE.md",
+    "miniprogram/components/ab-art-card/",
+    "miniprogram/components/ab-provenance-summary/",
+    "miniprogram/components/ab-content-source/",
+    "miniprogram/components/ab-intent-action/",
+    "miniprogram/assets/art/",
+    "miniprogram/assets/manifests/art.json",
+    "cloudfunctions/contentApi/",
+    "database/seeds/art-demo.json",
+    "tests/cloud/content/",
+    "tests/components/art/",
+    "tests/components/art/screenshots/evidence.json",
+    "tests/components/art/screenshots/channel.png",
+    "tests/components/art/screenshots/category.png",
+    "tests/components/art/screenshots/detail.png",
+    "tests/components/art/screenshots/exception.png"
+  ],
+  "checks": [
+    {
+      "id": "homepage-art-entry-request",
+      "status": "PASS",
+      "evidence": "MANIFEST_REQUEST: expose the existing /packageArt/pages/channel/index route from the foundation-owned Discover surface; this feature did not edit app.json or pages/discover."
+    },
+    {
+      "id": "public-content-read-boundary",
+      "status": "PASS",
+      "evidence": "17 contentApi tests prove only complete PUBLISHED + publicVisible records are projected; DRAFT, UNDER_REVIEW, ARCHIVED, private and malformed candidates fail closed or are skipped per-record."
+    },
+    {
+      "id": "forged-client-fields",
+      "status": "PASS",
+      "evidence": "Server payload allowlists reject forged publicationState, owner/userId, reviewer and unknown frozen city IDs; cursor filters are cryptographically bound to the requested public view."
+    },
+    {
+      "id": "category-specific-fields",
+      "status": "PASS",
+      "evidence": "Cloud, fixture and UI tests validate separate ART, ANTIQUE and JEWELRY records; PEARL is accepted only as JEWELRY.jewelryKind."
+    },
+    {
+      "id": "evidence-label-separation",
+      "status": "PASS",
+      "evidence": "DEMO_ONLY requires SYNTHETIC; REAL + DEMO_ONLY is rejected, and all bundled fixtures remain SYNTHETIC + DEMO_ONLY + OFFLINE_DEMO without HUMAN_REVIEWED claims."
+    },
+    {
+      "id": "media-rights-manifest",
+      "status": "PASS",
+      "evidence": "Asset quality tests require source, licence, SHA-256, alt, origin, representation and rights fields; deletion of every required field, forged hash and relabelled fallback all fail."
+    },
+    {
+      "id": "public-image-rights-boundary",
+      "status": "PASS",
+      "evidence": "contentApi outputs an image only with APPROVED public rights, permitted use, valid period, HTTPS source, licence, holder, hash, alt and rightsReviewedAt; otherwise the UI uses an explicit no-image state."
+    },
+    {
+      "id": "intent-is-not-a-transaction",
+      "status": "PASS",
+      "evidence": "Intent tests cover trusted principal identity, controlled purpose, ownership, optimistic version, atomic audit, exact idempotent replay, cancel/reactivate and recovery of an existing ACTIVE intent without duplicate writes; UI states that an intent is not an order or transaction."
+    },
+    {
+      "id": "intent-client-response-validation",
+      "status": "PASS",
+      "evidence": "Client tests reject malformed intent identity, purpose, state, content binding, version and timestamps before accepting create/cancel success."
+    },
+    {
+      "id": "component-simulate",
+      "status": "PASS",
+      "evidence": "miniprogram-simulate 6/6 covers long bilingual text, no image, image error, empty source, provenance separation, event suppression, weak network, empty/error states and retry gating."
+    },
+    {
+      "id": "local-static-screenshots",
+      "status": "PASS",
+      "evidence": "LOCAL_STATIC_RENDER: channel, category, detail and exception PNGs have verified hashes and 780x1688 dimensions; they are not WeChat Developer Tools, device or release evidence."
+    },
+    {
+      "id": "scope-exclusions",
+      "status": "PASS",
+      "evidence": "tests/components/art/SCOPE.md and executable-source scans explicitly exclude cart, inventory promises, order/payment, auction, logistics, commission, return forecasts and platform/AI authenticity conclusions."
+    },
+    {
+      "id": "conservative-package-budget",
+      "status": "PASS",
+      "evidence": "npm run check:package exited 0 at 2096508 / 2097152 bytes with no missing route files; this is a static source estimate, not Developer Tools evidence."
+    },
+    {
+      "id": "production-cloudbase-adapter",
+      "status": "FAIL",
+      "evidence": "The seven-action createContentApiEndpoint is implemented and locally tested, but the deployable main remains the frozen NOT_IMPLEMENTED fallback because no authorized CloudBase repository, transaction, auth environment or AppID was supplied."
+    }
+  ],
+  "knownGaps": [
+    "No authorized CloudBase production repository, trusted-principal adapter or transaction runner is configured; direct deployment of the default contentApi main would return NOT_IMPLEMENTED.",
+    "The frozen shared PublicContentProjection does not statically expose art provenance and category fields; the art module uses a backward-compatible local intersection extension without changing shared contracts.",
+    "The current whole-repository build is not green: the out-of-scope city asset manifest test reports hashMismatch for all 13 city JPG files. The art module did not modify those assets or their manifest.",
+    "Developer Tools preview, iOS, Android, upload and production release remain UNVERIFIED.",
+    "The four screenshots are local static render evidence only, not Mini Program runtime screenshots.",
+    "Real content, human editorial review, third-party reports and public image permissions must be supplied and re-reviewed before replacing DEMO_ONLY fixtures.",
+    "The conservative package estimate passes with only 644 bytes of margin; actual subpackage output must be measured in WeChat Developer Tools.",
+    "The root test run skipped six out-of-scope card component simulations because root jsdom was unavailable; the art-owned nested miniprogram-simulate suite installed its own dependencies and passed 6/6.",
+    "npm audit reports four high-severity transitive findings in the dev-only miniprogram-simulate test dependency chain; the runner processes only controlled repository fixtures, and npm offers no compatible automatic upgrade."
+  ]
+}

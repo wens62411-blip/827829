@@ -1,0 +1,39 @@
+{
+  "evidenceClass": "LOCAL_STATIC_RENDER",
+  "limitations": [
+    "NOT_WECHAT_DEVTOOLS_PREVIEW",
+    "NOT_IOS_OR_ANDROID_DEVICE_EVIDENCE",
+    "NOT_RELEASE_EVIDENCE",
+    "STATIC_HTML_USES_SYNTHETIC_DEMO_FIXTURES"
+  ],
+  "viewportCssPixels": {
+    "width": 390,
+    "height": 844,
+    "deviceScaleFactor": 2
+  },
+  "renderer": "Google Chrome headless (local executable)",
+  "source": {
+    "html": "tests/components/art/static-render.html",
+    "htmlSha256": "9f455270ff5f58554eace805ccc7950a894ce7def0171ac966ccf910beb810f1",
+    "fallback": "miniprogram/assets/art/not-real-artwork-fallback.svg",
+    "fallbackSha256": "43f86abc061699b1271b0cbcff51c6a82f4844b323b02b991e763ad51f2a56ea"
+  },
+  "screenshots": {
+    "channel": {
+      "path": "tests/components/art/screenshots/channel.png",
+      "sha256": "1cbf9a7642103d457623625155f27c2cc5a644e176805d57b938d20377dcad57"
+    },
+    "category": {
+      "path": "tests/components/art/screenshots/category.png",
+      "sha256": "cae971e713dc279cca58d72028e5b748be1e4d37d25e2a07ac39bde8db2c8300"
+    },
+    "detail": {
+      "path": "tests/components/art/screenshots/detail.png",
+      "sha256": "4d9241b2d227d27728afa8159963f58232e0dc4768a8778adbf34246dc172f49"
+    },
+    "exception": {
+      "path": "tests/components/art/screenshots/exception.png",
+      "sha256": "90910878eaef7f10e0f5672f714b17ca7469bbe5166e4950df279a02c818083a"
+    }
+  }
+}

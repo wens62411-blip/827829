@@ -1,0 +1,14 @@
+<button
+  class="label {{selected ? 'label--selected' : ''}}"
+  disabled="{{!enabled || busy}}"
+  bindtap="onSelect"
+  aria-label="{{selected ? '已选择' : '选择'}}标签{{nameZh}}"
+>
+  <view class="label__topline">
+    <text class="label__name">{{nameZh}}</text>
+    <text class="label__choice">{{selected ? '已选择' : (enabled ? '选择' : '不可申请')}}</text>
+  </view>
+  <text wx:if="{{nameEn}}" class="label__english">{{nameEn}}</text>
+  <text wx:if="{{descriptionZh}}" class="label__description">{{descriptionZh}}</text>
+  <text class="label__notice">提交后进入人工审核；审核通过不等于自动公开</text>
+</button>

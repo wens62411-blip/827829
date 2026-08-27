@@ -1,0 +1,22 @@
+.evidence {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48rpx;
+  padding: 0 16rpx;
+  border: 2rpx solid currentColor;
+  border-radius: 4rpx;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.evidence--live { color: #246B4A; }
+.evidence--degraded { color: #8A5B13; }
+.evidence--offline { color: #6B6257; }
+
+@media (prefers-color-scheme: dark) {
+  .evidence--live { color: #7AC9A5; }
+  .evidence--degraded { color: #E3BD7D; }
+  .evidence--offline { color: #C5BDB0; }
+}
+

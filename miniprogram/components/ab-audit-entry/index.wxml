@@ -1,0 +1,14 @@
+<view wx:if="{{entry}}" class="audit" aria-role="listitem" aria-label="审计记录 {{entry.action}} {{entry.result}}">
+<view class="audit__topline">
+<text class="audit__action">{{entry.action}}</text>
+<text class="audit__result audit__result--{{entry.result}}">{{entry.result}}</text>
+</view>
+<text class="audit__time">{{entry.occurredAt}}</text>
+<view class="audit__grid">
+<text>操作者：{{entry.actor}} · {{entry.actorRole}}</text>
+<text>目标：{{entry.target}}</text>
+<text>请求：{{entry.request}}</text>
+<text>记录：{{entry.id}}</text>
+</view>
+<text class="audit__reason">结果原因：{{entry.reason}}</text>
+</view>

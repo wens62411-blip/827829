@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "收到的申请",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "ab-friend-request": "/components/ab-friend-request/index"
+  }
+}

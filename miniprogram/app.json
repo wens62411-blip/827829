@@ -1,0 +1,112 @@
+{
+  "entryPagePath": "pages/bootstrap/index",
+  "pages": [
+    "pages/bootstrap/index",
+    "pages/discover/index",
+    "pages/events/index",
+    "pages/card/index",
+    "pages/network/index",
+    "pages/me/index",
+    "pages/card-share/index",
+    "pages/event-share/index"
+  ],
+  "subpackages": [
+    {
+      "root": "packageCard",
+      "name": "card",
+      "pages": [
+        "pages/edit/index",
+        "pages/privacy/index",
+        "pages/view/index",
+        "pages/share/index"
+      ]
+    },
+    {
+      "root": "packageSocial",
+      "name": "social",
+      "pages": [
+        "pages/requests/index",
+        "pages/friend/index",
+        "pages/tag-apply/index",
+        "pages/tag-status/index"
+      ]
+    },
+    {
+      "root": "packageEvents",
+      "name": "events",
+      "pages": [
+        "pages/city/index",
+        "pages/event/index",
+        "pages/organizer/index",
+        "pages/enrollment/index"
+      ]
+    },
+    {
+      "root": "packageArt",
+      "name": "art",
+      "pages": [
+        "pages/channel/index",
+        "pages/detail/index",
+        "pages/intent/index"
+      ]
+    },
+    {
+      "root": "packageAdmin",
+      "name": "admin",
+      "pages": [
+        "pages/home/index",
+        "pages/reviews/index",
+        "pages/events/index",
+        "pages/content/index",
+        "pages/audit/index"
+      ]
+    }
+  ],
+  "preloadRule": {
+    "pages/discover/index": {
+      "network": "all",
+      "packages": ["art"]
+    },
+    "pages/events/index": {
+      "network": "all",
+      "packages": ["events"]
+    },
+    "pages/card/index": {
+      "network": "all",
+      "packages": ["card"]
+    },
+    "pages/network/index": {
+      "network": "all",
+      "packages": ["social"]
+    }
+  },
+  "window": {
+    "navigationBarBackgroundColor": "#F6F1E7",
+    "navigationBarTextStyle": "black",
+    "navigationBarTitleText": "AB Club",
+    "backgroundColor": "#F6F1E7",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#1C2723",
+    "selectedColor": "#173C32",
+    "backgroundColor": "#FCFBF7",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/discover/index", "text": "首页" },
+      { "pagePath": "pages/events/index", "text": "活动" },
+      { "pagePath": "pages/card/index", "text": "名片" },
+      { "pagePath": "pages/network/index", "text": "人脉" },
+      { "pagePath": "pages/me/index", "text": "我的" }
+    ]
+  },
+  "usingComponents": {
+    "ab-page-state": "/components/ab-page-state/index",
+    "ab-verified-tag": "/components/ab-verified-tag/index",
+    "ab-city-status": "/components/ab-city-status/index",
+    "ab-evidence-label": "/components/ab-evidence-label/index"
+  },
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents",
+  "sitemapLocation": "sitemap.json"
+}

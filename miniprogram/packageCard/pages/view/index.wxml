@@ -1,0 +1,29 @@
+<view class="card-page">
+  <text class="card-kicker">Profile</text>
+  <text class="card-title">数字名片</text>
+  <text class="card-subtitle">查看关系由服务端判定；客户端不接收 isFriend、role 或认证状态参数。</text>
+
+  <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在重新核验查看权限"></view>
+
+  <view wx:elif="{{status === 'ERROR'}}" class="card-panel card-panel--error">
+    <text class="card-panel__title">名片不可用</text>
+    <text class="card-panel__text">{{message}}</text>
+    <button wx:if="{{!invalidOwner}}" class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重试</button>
+  </view>
+
+  <ab-profile-card
+    wx:elif="{{card}}"
+    card="{{card}}"
+    viewer-mode="{{viewerMode}}"
+    city-label="{{cityLabel}}"
+    max-visible-claims="3"
+    show-default-actions="{{false}}"
+  >
+    <view wx:if="{{viewerMode === 'SELF'}}" slot="actions" class="card-inline-actions">
+      <navigator class="card-link-button" url="/packageCard/pages/edit/index" hover-class="none">编辑资料</navigator>
+      <navigator class="card-link-button" url="/packageCard/pages/share/index" hover-class="none">分享名片</navigator>
+    </view>
+  </ab-profile-card>
+
+  <view class="card-status">当前视角：{{viewerMode === 'SELF' ? '本人' : viewerMode === 'FRIEND' ? '已接受好友' : '陌生人'}}。每次回到本页或下拉刷新都会重新请求服务端投影。</view>
+</view>

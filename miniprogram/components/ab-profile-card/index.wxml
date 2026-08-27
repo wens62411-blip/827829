@@ -1,0 +1,99 @@
+<view
+  class="profile-card profile-card--{{safeViewerMode}}"
+  aria-role="region"
+  aria-label="{{hasCard ? safeCard.displayName + '的数字名片，' + viewerLabel : '数字名片暂不可用'}}"
+>
+  <block wx:if="{{hasCard}}">
+    <view class="profile-card__header">
+      <view class="profile-card__avatar-wrap" aria-label="头像">
+        <image
+          wx:if="{{safeCard.avatarUrl && !avatarFailed}}"
+          class="profile-card__avatar"
+          src="{{safeCard.avatarUrl}}"
+          mode="aspectFill"
+          lazy-load="{{true}}"
+          binderror="handleAvatarError"
+          aria-label="{{safeCard.displayName}}的头像"
+        />
+        <view wx:else class="profile-card__avatar profile-card__avatar--fallback" aria-label="默认头像">
+          <text>{{avatarInitial}}</text>
+        </view>
+      </view>
+
+      <view class="profile-card__identity">
+        <view class="profile-card__context-row">
+          <text class="profile-card__eyebrow">AB CLUB · MEMBER CARD</text>
+          <text class="profile-card__viewer">{{viewerLabel}}</text>
+        </view>
+        <text class="profile-card__name" user-select="{{true}}">{{safeCard.displayName}}</text>
+        <text wx:if="{{safeCard.headline}}" class="profile-card__headline">{{safeCard.headline}}</text>
+        <text wx:if="{{cityLabel || safeCard.cityId}}" class="profile-card__city">{{cityLabel || safeCard.cityId}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{safeClaims.length}}" class="profile-card__claims" aria-role="group" aria-label="人工审核通过标签">
+      <view class="profile-card__claim-strip">
+        <block wx:for="{{safeClaims}}" wx:key="key">
+          <ab-verified-tag
+            wx:if="{{claimsExpanded || index < claimWindow}}"
+            label="{{item.label}}"
+            review-status="{{item.reviewStatus}}"
+            verification-state="{{item.verificationState}}"
+          />
+        </block>
+      </view>
+      <button
+        wx:if="{{safeClaims.length > claimWindow}}"
+        class="profile-card__claim-toggle"
+        plain="{{true}}"
+        bindtap="handleClaimsToggle"
+        aria-expanded="{{claimsExpanded}}"
+        aria-label="{{claimsExpanded ? '收起认证标签' : '展开全部认证标签'}}"
+      >
+        {{claimsExpanded ? '收起' : '另有 ' + (safeClaims.length - claimWindow) + ' 项'}}
+      </button>
+    </view>
+
+    <view wx:if="{{safeCard.biography}}" class="profile-card__biography">
+      <text class="profile-card__section-label">自我介绍</text>
+      <text class="profile-card__biography-text" user-select="{{true}}">{{safeCard.biography}}</text>
+    </view>
+
+    <view wx:if="{{safeFields.length}}" class="profile-card__fields" aria-role="list" aria-label="名片资料">
+      <view wx:for="{{safeFields}}" wx:key="key" class="profile-card__field" aria-role="listitem">
+        <text class="profile-card__field-label">{{item.label}}</text>
+        <text class="profile-card__field-value" user-select="{{true}}">{{item.value}}</text>
+      </view>
+    </view>
+
+    <view
+      wx:if="{{isSelf && (safePendingLabels.length || safeRejectedLabels.length)}}"
+      class="profile-card__owner-review"
+      aria-role="note"
+      aria-label="仅本人可见的审核进度"
+    >
+      <text class="profile-card__owner-caption">仅本人可见 · 审核进度</text>
+      <view wx:for="{{safePendingLabels}}" wx:key="*this" class="profile-card__review-line">
+        <text class="profile-card__review-state profile-card__review-state--pending">审核中</text>
+        <text class="profile-card__review-label">{{item}}</text>
+      </view>
+      <view wx:for="{{safeRejectedLabels}}" wx:key="*this" class="profile-card__review-line">
+        <text class="profile-card__review-state profile-card__review-state--rejected">未通过</text>
+        <text class="profile-card__review-label">{{item}}</text>
+      </view>
+    </view>
+
+    <view wx:if="{{isSelf && showDefaultActions}}" class="profile-card__default-actions">
+      <button class="profile-card__action profile-card__action--edit" plain="{{true}}" bindtap="handleEdit">编辑资料</button>
+      <button class="profile-card__action profile-card__action--share" plain="{{true}}" bindtap="handleShare">分享名片</button>
+    </view>
+    <view class="profile-card__slot-actions"><slot name="actions"></slot></view>
+  </block>
+
+  <view wx:else class="profile-card__empty" aria-live="polite">
+    <text class="profile-card__empty-title">名片暂不可用</text>
+    <text class="profile-card__empty-copy">请稍后重试；不会使用模拟资料代替真实结果。</text>
+    <button class="profile-card__action profile-card__action--retry" plain="{{true}}" bindtap="handleRetry">重新加载</button>
+    <slot name="empty"></slot>
+  </view>
+</view>

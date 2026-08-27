@@ -1,0 +1,71 @@
+<view class="card-page">
+  <text class="card-kicker">Secure Share</text>
+  <text class="card-title">分享与撤销</text>
+  <text class="card-subtitle">安全入口由高熵随机 token 解析；数据库只保存 hash。页面内的原始 token 不写本地存储、不写日志。</text>
+
+  <view wx:if="{{loadingCard}}" class="card-skeleton" aria-label="正在加载公开名片"></view>
+  <view wx:elif="{{pageError}}" class="card-panel card-panel--error">
+    <text class="card-panel__title">公开名片暂时不可用</text>
+    <text class="card-panel__text">{{pageError}}</text>
+    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重试</button>
+  </view>
+
+  <view wx:if="{{card}}" class="card-panel card-panel--accent">
+    <text class="card-panel__title">{{card.displayName}}</text>
+    <text class="card-panel__text">分享路径不会携带 OPENID、手机号、微信号、完整 profile ID 或客户端权限参数。</text>
+  </view>
+
+  <view wx:if="{{localNotice}}" class="card-status card-status--error">{{localNotice}}</view>
+
+  <view wx:if="{{card && hasRevocableShare && !hasActiveShare && !shareState}}" class="card-panel">
+    <text class="card-panel__title">发现本机最近的分享入口</text>
+    <text class="card-panel__text">本机只保存了非秘密的 shareTokenId 作为撤销指针，没有保存原始 token，因此不能再次转发，但可以请求服务端撤销。</text>
+    <view class="card-stack">
+      <button class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">撤销最近入口</button>
+      <button class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
+    </view>
+  </view>
+
+  <ab-share-state
+    wx:if="{{shareState}}"
+    state="{{shareState}}"
+    title="{{shareTitle}}"
+    description="{{shareDescription}}"
+    allow-retry="{{shareState === 'ERROR' && !busyAction}}"
+    allow-forward="{{shareState === 'SUCCESS'}}"
+    busy="{{busyAction !== ''}}"
+    bind:retry="handleShareRetry"
+  />
+
+  <view wx:if="{{card}}" class="card-stack">
+    <button wx:if="{{(!shareState || shareState === 'REVOKED') && !hasRevocableShare}}" class="card-button" bindtap="createShare" loading="{{busyAction === 'CREATE'}}" disabled="{{busyAction !== ''}}">创建 7 天安全入口</button>
+    <button wx:if="{{hasRevocableShare && (shareState === 'SUCCESS' || shareState === 'ERROR')}}" class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">{{shareState === 'ERROR' ? '重试撤销入口' : '撤销当前入口'}}</button>
+    <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
+  </view>
+
+  <view wx:if="{{shareState === 'SUCCESS'}}" class="card-panel">
+    <text class="card-panel__title">小程序码 scene</text>
+    <text class="card-panel__text">scene 只由短令牌构成，不携带身份或权限信息。历史小程序码每次打开都重新 resolve。</text>
+    <view wx:if="{{qrMessage}}" class="card-status {{qrState === 'ERROR' ? 'card-status--error' : qrState === 'SUCCESS' ? 'card-status--success' : ''}}">{{qrMessage}}</view>
+    <view class="card-stack">
+      <button class="card-button-secondary" bindtap="createQrScene" loading="{{busyAction === 'QR'}}" disabled="{{busyAction !== '' || qrState === 'SUCCESS'}}">{{qrState === 'ERROR' ? '重试生成小程序码' : qrState === 'SUCCESS' ? '小程序码资产已创建' : '生成小程序码'}}</button>
+      <button wx:if="{{qrState === 'ERROR'}}" class="card-button-secondary" open-type="share">降级为微信名片转发</button>
+    </view>
+  </view>
+
+  <view wx:if="{{card}}" class="card-panel">
+    <text class="card-panel__title">Canvas 2D 海报</text>
+    <text class="card-panel__text">海报只绘制 cards_public。当前合同没有小程序码资产 URL，因此海报会明确标注“不含小程序码”，不会绘制假码。</text>
+    <view class="card-canvas-shell {{posterReady ? '' : 'card-hidden-canvas'}}">
+      <canvas type="2d" id="cardPoster" class="card-poster-canvas"></canvas>
+    </view>
+    <view wx:if="{{posterMessage}}" class="card-status {{albumDenied ? 'card-status--error' : ''}}">{{posterMessage}}</view>
+    <view class="card-stack">
+      <button class="card-button-secondary" bindtap="generatePoster" loading="{{busyAction === 'POSTER'}}" disabled="{{busyAction !== ''}}">{{posterReady ? '重新生成海报' : '生成公开投影海报'}}</button>
+      <button wx:if="{{posterReady}}" class="card-button" bindtap="savePosterToAlbum" loading="{{busyAction === 'SAVE'}}" disabled="{{busyAction !== ''}}">保存到相册</button>
+      <button wx:if="{{albumDenied}}" class="card-button-secondary" bindtap="openAlbumSettings">打开相册权限设置</button>
+    </view>
+  </view>
+
+  <view class="card-status">运行模式：{{runtimeMode}}。原始分享 token 与 scene 仅保留在当前页面内存，离开页面即清除。</view>
+</view>

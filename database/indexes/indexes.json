@@ -1,0 +1,32 @@
+{
+  "contractVersion": "1.0.0",
+  "status": "SUGGESTED_NOT_APPLIED",
+  "indexes": [
+    { "collection": "users", "name": "openid_hash_unique", "fields": [{ "field": "openIdHash", "order": "asc" }], "unique": true },
+    { "collection": "profiles_private", "name": "user_unique", "fields": [{ "field": "userId", "order": "asc" }], "unique": true },
+    { "collection": "cards_public", "name": "owner_unique", "fields": [{ "field": "ownerUserId", "order": "asc" }], "unique": true },
+    { "collection": "card_share_tokens", "name": "token_digest_unique", "fields": [{ "field": "tokenDigest", "order": "asc" }], "unique": true },
+    { "collection": "card_share_tokens", "name": "active_target_lookup", "fields": [{ "field": "targetType", "order": "asc" }, { "field": "revoked", "order": "asc" }, { "field": "expiresAt", "order": "asc" }], "unique": false },
+    { "collection": "friendships", "name": "addressee_state_updated", "fields": [{ "field": "addresseeUserId", "order": "asc" }, { "field": "state", "order": "asc" }, { "field": "updatedAt", "order": "desc" }] },
+    { "collection": "friendships", "name": "requester_state_updated", "fields": [{ "field": "requesterUserId", "order": "asc" }, { "field": "state", "order": "asc" }, { "field": "updatedAt", "order": "desc" }] },
+    { "collection": "blocks_reports", "name": "actor_target_type", "fields": [{ "field": "actorUserId", "order": "asc" }, { "field": "targetId", "order": "asc" }, { "field": "recordType", "order": "asc" }] },
+    { "collection": "verification_requests", "name": "subject_updated", "fields": [{ "field": "subjectUserId", "order": "asc" }, { "field": "updatedAt", "order": "desc" }] },
+    { "collection": "verification_requests", "name": "review_status_updated", "fields": [{ "field": "status", "order": "asc" }, { "field": "updatedAt", "order": "asc" }] },
+    { "collection": "verification_claims", "name": "subject_public_validity", "fields": [{ "field": "subjectUserId", "order": "asc" }, { "field": "publicVisible", "order": "asc" }, { "field": "reviewStatus", "order": "asc" }, { "field": "validUntil", "order": "asc" }] },
+    { "collection": "countries", "name": "region", "fields": [{ "field": "regionId", "order": "asc" }] },
+    { "collection": "cities", "name": "operational_updated", "fields": [{ "field": "operationalState", "order": "asc" }, { "field": "updatedAt", "order": "desc" }] },
+    { "collection": "club_nodes", "name": "city_operational", "fields": [{ "field": "cityId", "order": "asc" }, { "field": "operationalState", "order": "asc" }] },
+    { "collection": "events", "name": "city_publication_starts", "fields": [{ "field": "cityId", "order": "asc" }, { "field": "publicationState", "order": "asc" }, { "field": "startsAt", "order": "asc" }] },
+    { "collection": "event_enrollments", "name": "user_event_unique", "fields": [{ "field": "userId", "order": "asc" }, { "field": "eventId", "order": "asc" }], "unique": true },
+    { "collection": "art_items", "name": "publication_category_updated", "fields": [{ "field": "publicationState", "order": "asc" }, { "field": "category", "order": "asc" }, { "field": "updatedAt", "order": "desc" }] },
+    { "collection": "art_collections", "name": "publication_updated", "fields": [{ "field": "publicationState", "order": "asc" }, { "field": "updatedAt", "order": "desc" }] },
+    { "collection": "content_intents", "name": "user_content_unique", "fields": [{ "field": "userId", "order": "asc" }, { "field": "contentId", "order": "asc" }], "unique": true },
+    { "collection": "media_assets", "name": "owner_domain_public", "fields": [{ "field": "ownerUserId", "order": "asc" }, { "field": "domain", "order": "asc" }, { "field": "publicState", "order": "asc" }] },
+    { "collection": "orders", "name": "user_created", "fields": [{ "field": "userId", "order": "asc" }, { "field": "createdAt", "order": "desc" }] },
+    { "collection": "idempotency_keys", "name": "namespace_unique", "fields": [{ "field": "namespace", "order": "asc" }], "unique": true },
+    { "collection": "idempotency_keys", "name": "expires", "fields": [{ "field": "expiresAt", "order": "asc" }] },
+    { "collection": "audit_logs", "name": "target_occurred", "fields": [{ "field": "targetType", "order": "asc" }, { "field": "targetId", "order": "asc" }, { "field": "occurredAt", "order": "desc" }] },
+    { "collection": "projection_invalidations", "name": "source_version", "fields": [{ "field": "sourceAggregateId", "order": "asc" }, { "field": "sourceVersion", "order": "asc" }], "unique": true },
+    { "collection": "projection_invalidations", "name": "kind_occurred", "fields": [{ "field": "kind", "order": "asc" }, { "field": "occurredAt", "order": "asc" }] }
+  ]
+}

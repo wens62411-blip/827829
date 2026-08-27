@@ -1,0 +1,338 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.profile-card {
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
+  padding: var(--ab-space-5);
+  border: 2rpx solid var(--ab-color-border);
+  border-top: 8rpx solid var(--ab-color-green);
+  border-radius: var(--ab-radius-standard);
+  background: var(--ab-color-paper);
+  color: var(--ab-color-ink);
+}
+
+.profile-card__header {
+  display: flex;
+  min-width: 0;
+  gap: var(--ab-space-4);
+  align-items: flex-start;
+}
+
+.profile-card__avatar-wrap,
+.profile-card__avatar {
+  width: 144rpx;
+  height: 144rpx;
+  flex: 0 0 144rpx;
+  border-radius: 50%;
+}
+
+.profile-card__avatar {
+  display: block;
+  border: 2rpx solid var(--ab-color-border);
+  background: var(--ab-color-ivory);
+}
+
+.profile-card__avatar--fallback {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-color: var(--ab-color-gold-soft);
+  color: var(--ab-color-green);
+  font-size: 42rpx;
+  font-weight: 700;
+  letter-spacing: 1rpx;
+}
+
+.profile-card__identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.profile-card__context-row {
+  display: flex;
+  min-width: 0;
+  gap: var(--ab-space-3);
+  align-items: center;
+  justify-content: space-between;
+}
+
+.profile-card__eyebrow {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ab-color-gold-brown);
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 2rpx;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.profile-card__viewer {
+  flex: 0 0 auto;
+  padding: 4rpx 14rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: 999rpx;
+  color: var(--ab-color-muted);
+  font-size: 22rpx;
+}
+
+.profile-card__name,
+.profile-card__headline,
+.profile-card__city,
+.profile-card__biography-text,
+.profile-card__field-value,
+.profile-card__review-label {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.profile-card__name {
+  margin-top: var(--ab-space-1);
+  font-size: var(--ab-font-title);
+  font-weight: 700;
+  letter-spacing: -1rpx;
+  line-height: 1.2;
+}
+
+.profile-card__headline {
+  margin-top: 12rpx;
+  color: var(--ab-color-ink);
+  font-size: 29rpx;
+  line-height: 1.45;
+}
+
+.profile-card__city {
+  margin-top: var(--ab-space-1);
+  color: var(--ab-color-muted);
+  font-size: var(--ab-font-caption);
+}
+
+.profile-card__claims,
+.profile-card__biography,
+.profile-card__fields,
+.profile-card__owner-review,
+.profile-card__default-actions,
+.profile-card__slot-actions {
+  margin-top: var(--ab-space-4);
+}
+
+.profile-card__claims {
+  min-width: 0;
+}
+
+.profile-card__claim-strip {
+  display: flex;
+  min-width: 0;
+  max-width: 100%;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  align-items: center;
+}
+
+.profile-card__claim-toggle {
+  box-sizing: border-box;
+  min-height: 64rpx;
+  margin: 8rpx 0 0;
+  padding: 0 8rpx;
+  border: 0;
+  color: var(--ab-color-green);
+  font-size: var(--ab-font-caption);
+  line-height: 64rpx;
+  text-align: left;
+}
+
+.profile-card__biography,
+.profile-card__owner-review {
+  padding-top: var(--ab-space-4);
+  border-top: 2rpx solid var(--ab-color-border);
+}
+
+.profile-card__section-label,
+.profile-card__owner-caption,
+.profile-card__field-label {
+  display: block;
+  color: var(--ab-color-muted);
+  font-size: var(--ab-font-caption);
+}
+
+.profile-card__biography-text {
+  margin-top: var(--ab-space-1);
+  line-height: 1.7;
+  white-space: pre-wrap;
+}
+
+.profile-card__fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border-top: 2rpx solid var(--ab-color-border);
+  border-left: 2rpx solid var(--ab-color-border);
+}
+
+.profile-card__field {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: var(--ab-space-3);
+  border-right: 2rpx solid var(--ab-color-border);
+  border-bottom: 2rpx solid var(--ab-color-border);
+}
+
+.profile-card__field-value {
+  margin-top: 4rpx;
+  font-size: 29rpx;
+}
+
+.profile-card__owner-review {
+  color: var(--ab-color-muted);
+}
+
+.profile-card__review-line {
+  display: flex;
+  min-width: 0;
+  gap: 16rpx;
+  align-items: flex-start;
+  margin-top: 12rpx;
+}
+
+.profile-card__review-state {
+  flex: 0 0 auto;
+  padding: 2rpx 12rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: 999rpx;
+  font-size: 22rpx;
+}
+
+.profile-card__review-state--pending {
+  border-color: var(--ab-color-gold-soft);
+  color: var(--ab-color-gold-brown);
+}
+
+.profile-card__review-state--rejected {
+  color: #8a3d34;
+}
+
+.profile-card__review-label {
+  flex: 1;
+  color: var(--ab-color-ink);
+  font-size: 28rpx;
+}
+
+.profile-card__default-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--ab-space-3);
+}
+
+.profile-card__action {
+  box-sizing: border-box;
+  min-width: 0;
+  min-height: var(--ab-touch-target);
+  margin: 0;
+  padding: 0 var(--ab-space-3);
+  border: 2rpx solid var(--ab-color-green);
+  border-radius: var(--ab-radius-small);
+  color: var(--ab-color-green);
+  font-size: 29rpx;
+  font-weight: 600;
+  line-height: calc(var(--ab-touch-target) - 4rpx);
+}
+
+.profile-card__action--share {
+  background: var(--ab-color-green);
+  color: var(--ab-color-paper);
+}
+
+.profile-card__empty {
+  display: flex;
+  min-height: 280rpx;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+.profile-card__empty-title {
+  font-size: 36rpx;
+  font-weight: 700;
+}
+
+.profile-card__empty-copy {
+  margin: 12rpx 0 var(--ab-space-4);
+  color: var(--ab-color-muted);
+  font-size: 28rpx;
+}
+
+@media (max-width: 360px) {
+  .profile-card {
+    padding: var(--ab-space-4);
+  }
+
+  .profile-card__header {
+    flex-direction: column;
+  }
+
+  .profile-card__identity {
+    width: 100%;
+  }
+
+  .profile-card__fields,
+  .profile-card__default-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .profile-card {
+    border-color: var(--ab-color-dark-border);
+    border-top-color: var(--ab-color-gold-soft);
+    background: var(--ab-color-dark-surface);
+    color: var(--ab-color-dark-text);
+  }
+
+  .profile-card__avatar,
+  .profile-card__viewer,
+  .profile-card__biography,
+  .profile-card__fields,
+  .profile-card__field,
+  .profile-card__owner-review,
+  .profile-card__review-state {
+    border-color: var(--ab-color-dark-border);
+  }
+
+  .profile-card__name,
+  .profile-card__headline,
+  .profile-card__field-value,
+  .profile-card__review-label {
+    color: var(--ab-color-dark-text);
+  }
+
+  .profile-card__city,
+  .profile-card__viewer,
+  .profile-card__section-label,
+  .profile-card__owner-caption,
+  .profile-card__field-label {
+    color: var(--ab-color-dark-muted);
+  }
+
+  .profile-card__action {
+    border-color: var(--ab-color-gold-soft);
+    color: var(--ab-color-dark-text);
+  }
+
+  .profile-card__action--share {
+    background: var(--ab-color-gold-soft);
+    color: var(--ab-color-dark-canvas);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .profile-card__action,
+  .profile-card__claim-toggle {
+    transition: none;
+  }
+}

@@ -1,0 +1,134 @@
+{
+  "module": "events",
+  "phase": "FEATURE_MODULE",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T12:55:11.161Z",
+  "overall": "LOCAL_TEST_PASS",
+  "gates": {
+    "local": {
+      "status": "PASS",
+      "evidence": [
+        "npm ci exited 0 with 0 vulnerabilities on 2026-08-27",
+        "npm run typecheck:miniprogram exited 0 and npm run validate reported 337/337 pass on 2026-08-27",
+        "Event-focused suite exited 0: 23/23 pass, including frozen geography, transaction model, forgery denial, payment gate, restrained UI, WXML binding integrity, real-photo asset integrity and manifest honesty",
+        "Conservative package projection passed at 2096906 / 2097152 bytes; Developer Tools package result remains unverified",
+        "Workspace-wide npm run build was attempted but stopped before Node tests because a concurrently changed adminApi source invalidated the shared cloud-runtime hash; _shared and adminApi are outside this module's allowed write paths"
+      ],
+      "note": "LOCAL_TEST_PASS only. Default deployed eventApi main remains fail-closed until a CloudBase store and trusted runtime context are integrated."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "LOCAL_ONLY_NO_APPID: no WeChat Developer Tools preview evidence"
+      ]
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No iOS device run"
+      ]
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No Android device run"
+      ]
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized AppID, CloudBase environment or dev-version upload evidence"
+      ]
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No production release evidence"
+      ]
+    }
+  },
+  "artifacts": [
+    "cloudfunctions/eventApi/",
+    "database/seeds/cities.json",
+    "database/seeds/events-demo.json",
+    "miniprogram/pages/events/",
+    "miniprogram/pages/event-share/",
+    "miniprogram/packageEvents/",
+    "miniprogram/components/ab-city-switcher/",
+    "miniprogram/components/ab-city-hero/",
+    "miniprogram/components/ab-event-card/",
+    "miniprogram/components/ab-event-state/",
+    "miniprogram/assets/manifests/cities.json",
+    "LOCAL_RENDER_SCREENSHOT:E:/Temp/AB-Club-Beijing-Quiet-Imperial.local.png",
+    "LOCAL_RENDER_SCREENSHOT:E:/Temp/AB-Club-Zurich-Alpine-Salon.local.png",
+    "LOCAL_RENDER_SCREENSHOT:E:/Temp/AB-Club-Paris-Grand-Tour.local.png",
+    "tests/components/events/",
+    "tests/cloud/events/"
+  ],
+  "checks": [
+    {
+      "id": "frozen-city-tree",
+      "status": "PASS",
+      "evidence": "Automated tests verify GLOBAL -> 3 regions -> 7 countries -> 13 exact frozen cities -> AB Club node -> event, exact order/names/IANA zones, and China order 北京/上海/广州/深圳/杭州"
+    },
+    {
+      "id": "catalog-operation-separation",
+      "status": "PASS",
+      "evidence": "All 13 frozen directory entries are available as catalog entries while the seed contains only operational overlays and sets every city to PLANNED; no LIVE claim is seeded"
+    },
+    {
+      "id": "event-state-policy",
+      "status": "PASS",
+      "evidence": "Feature-local policy tested: only REAL + HUMAN_REVIEWED + dual-PUBLISHED + approved organizer/node/source may be public; absent enrollment -> INTERESTED -> CANCELLED, duplicate/re-registration and illegal cancellation fail closed"
+    },
+    {
+      "id": "registration-transaction",
+      "status": "PASS",
+      "evidence": "LOCAL_TRANSACTION_MODEL_PASS: serialized concurrent submissions do not exceed capacity; same-key replay is stable; current version, time, state, eligibility, duplicate, cancellation, trusted identity and audit behavior are tested. This is not CloudBase isolation evidence"
+    },
+    {
+      "id": "payment-gate",
+      "status": "PASS",
+      "evidence": "All eight capability prerequisites plus the feature flag are required; default is DISABLED/P0_DISABLED. UI contains no payment button, wx.requestPayment or simulated success"
+    },
+    {
+      "id": "api-actions-local-service",
+      "status": "PASS",
+      "evidence": "Injected createEventApi service implements and tests all 12 frozen actions with exact payload rejection and trusted-context authentication"
+    },
+    {
+      "id": "api-production-entrypoint",
+      "status": "UNVERIFIED",
+      "evidence": "Generated eventApi main remains the frozen NOT_IMPLEMENTED fail-closed entrypoint; no authorized CloudBase adapter or deployment context is available"
+    },
+    {
+      "id": "city-media-manifest",
+      "status": "PASS",
+      "evidence": "13 corresponding-city real Wikimedia Commons photographs are local 288x162 JPEGs with no runtime hotlink. cities.json records each source page, landmark, author, exact CC license, download time, source SHA-256/dimensions, runtime SHA-256 and alt; source-page license evidence is verified while rights remain CLAIMED / DRAFT pending human review"
+    },
+    {
+      "id": "content-live",
+      "status": "UNVERIFIED",
+      "evidence": "CONTENT_LIVE_UNVERIFIED: no current organizer, event-source and human-review evidence was supplied"
+    },
+    {
+      "id": "ui-screenshots",
+      "status": "PASS",
+      "evidence": "LOCAL_RENDER_SCREENSHOT: three 430x932 Quiet Grand Tour references outside the mini-program package — Beijing empty state SHA-256 be0e1eb9cd1e7772f69c6616fcaf16194aa559acc0be85ce82693d9cfcd22add, Zurich planned node SHA-256 20ae6edea0571008a8355e8d09eb3eb8430b88ff4f397e20bf96a468f3227670, and Paris DEMO_ONLY detail SHA-256 fee4294e01cba0507db132bf27d53409b7809e959b2c4e69dda6c61c1ed10cd2; not Developer Tools or device evidence"
+    }
+  ],
+  "knownGaps": [
+    "CONTENT_LIVE_UNVERIFIED",
+    "No current human-approved organizer or real event evidence; formal public event and organizer projections must remain empty or unavailable",
+    "The generated default eventApi main is intentionally NOT_IMPLEMENTED; the complete 12-action service is available only through injected createEventApi dependencies until a CloudBase store and trusted WX context are integrated",
+    "Frozen PublicEventProjection cannot expose source, address range, registration method, capacity, optional minParticipants, eligibility tags, price, event type or image-rights detail",
+    "Frozen EventListRequest cannot express type, price or admission filters; those controls must remain disabled outside an explicit OFFLINE_DEMO view",
+    "Frozen CityProjection has no catalogStatus field; frozen directory membership is used as the city-entry fact and operationalState remains a separate overlay",
+    "CloudBase database adapter, runtime transactions and production concurrency remain UNVERIFIED; local in-memory transaction tests are not deployment evidence",
+    "The local event.list reference store scans candidate records and performs per-event approval reads; a production adapter must push filtering, authorization joins and cursor pagination into bounded database queries",
+    "Real payment prerequisites, callback, reconciliation and refund SLA are unavailable; payment feature remains disabled",
+    "City imagery now uses corresponding-city CC BY / CC BY-SA real photographs with source-page evidence, local copies and visible credit; rightsState remains CLAIMED and reviewStatus DRAFT until a human rights review approves publication",
+    "Workspace-wide npm run build is currently blocked by a stale shared cloud-runtime bundle after unrelated adminApi source changes; rebuilding cloudfunctions/_shared and non-events functions is outside this module's allowed write paths",
+    "Developer Tools preview, device runs, upload and release remain UNVERIFIED"
+  ]
+}

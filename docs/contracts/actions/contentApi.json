@@ -1,0 +1,14 @@
+{
+  "contractVersion": "1.0.0",
+  "functionName": "contentApi",
+  "actions": [
+    { "action": "content.list", "requestDto": "ContentListRequest", "responseDto": "ContentListResponse", "auth": "PUBLIC", "writableCollections": [], "idempotency": "NOT_APPLICABLE", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "NOT_FOUND", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR", "INVALID_CURSOR"] },
+    { "action": "content.get", "requestDto": "ContentGetRequest", "responseDto": "ContentGetResponse", "auth": "PUBLIC", "writableCollections": [], "idempotency": "NOT_APPLICABLE", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "NOT_FOUND", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR"] },
+    { "action": "content.listCollections", "requestDto": "ContentListCollectionsRequest", "responseDto": "ContentListCollectionsResponse", "auth": "PUBLIC", "writableCollections": [], "idempotency": "NOT_APPLICABLE", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "NOT_FOUND", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR", "INVALID_CURSOR"] },
+    { "action": "content.getCreator", "requestDto": "ContentGetCreatorRequest", "responseDto": "ContentGetCreatorResponse", "auth": "PUBLIC", "writableCollections": [], "idempotency": "NOT_APPLICABLE", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "NOT_FOUND", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR"] },
+    { "action": "content.listRelatedEvents", "requestDto": "ContentListRelatedEventsRequest", "responseDto": "ContentListRelatedEventsResponse", "auth": "PUBLIC", "writableCollections": [], "idempotency": "NOT_APPLICABLE", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "NOT_FOUND", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR", "PROJECTION_STALE"] },
+    { "action": "content.intent.create", "requestDto": "ContentIntentCreateRequest", "responseDto": "ContentIntentCreateResponse", "auth": "USER", "writableCollections": ["content_intents", "idempotency_keys", "audit_logs"], "idempotency": "REQUIRED", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "VALIDATION_FAILED", "AUTH_REQUIRED", "SESSION_EXPIRED", "FORBIDDEN", "NOT_FOUND", "CONFLICT", "VERSION_CONFLICT", "IDEMPOTENCY_CONFLICT", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR"] },
+    { "action": "content.intent.cancel", "requestDto": "ContentIntentCancelRequest", "responseDto": "ContentIntentCancelResponse", "auth": "USER", "writableCollections": ["content_intents", "idempotency_keys", "audit_logs"], "idempotency": "REQUIRED", "errorCodes": ["NOT_IMPLEMENTED", "INVALID_REQUEST", "VALIDATION_FAILED", "AUTH_REQUIRED", "SESSION_EXPIRED", "FORBIDDEN", "NOT_FOUND", "CONFLICT", "VERSION_CONFLICT", "IDEMPOTENCY_CONFLICT", "RATE_LIMITED", "SERVICE_UNAVAILABLE", "INTERNAL_ERROR"] }
+  ]
+}
+

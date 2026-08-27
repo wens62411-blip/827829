@@ -1,0 +1,16 @@
+<view
+  class="art-card ab-motion"
+  aria-role="button"
+  aria-label="查看{{categoryLabel}}内容：{{title}}"
+  bindtap="handleActivate"
+  hover-class="art-card--pressed"
+  hover-stay-time="100"
+><view class="art-card__media"><image
+      wx:if="{{showImage}}"
+      class="art-card__image"
+      src="{{imageUrl}}"
+      mode="aspectFill"
+      lazy-load
+      aria-label="{{alt}}"
+      binderror="handleImageError"
+    /><view wx:else class="art-card__fallback" aria-role="img" aria-label="{{alt}}"><text class="art-card__fallback-mark">AB</text><text class="art-card__fallback-copy">暂无可公开展示的图片</text></view></view><view class="art-card__body"><view class="art-card__kicker"><text class="art-card__category">{{categoryLabel}}</text><text class="art-card__city">{{cityName}}</text></view><text class="art-card__title">{{title}}</text><text class="art-card__summary">{{summary}}</text><view class="art-card__footer"><text class="art-card__creator">{{creatorName}}</text><view class="art-card__evidence" aria-label="记录来源 {{recordOrigin}}；证据范围 {{evidenceScope}}"><text>{{recordOrigin}}</text><text wx:if="{{evidenceScope === 'DEMO_ONLY'}}">DEMO_ONLY</text></view></view></view></view>

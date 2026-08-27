@@ -1,0 +1,38 @@
+<view
+  class="share-state share-state--{{safeState}}"
+  aria-role="status"
+  aria-live="{{safeState === 'LOADING' ? 'polite' : 'assertive'}}"
+  aria-label="{{resolvedTitle}}"
+>
+  <view class="share-state__mark" aria-hidden="true">{{icon}}</view>
+  <text class="share-state__eyebrow">{{eyebrow}}</text>
+  <text class="share-state__title">{{resolvedTitle}}</text>
+  <text class="share-state__description">{{resolvedDescription}}</text>
+
+  <view class="share-state__detail"><slot name="detail"></slot></view>
+
+  <view wx:if="{{canRetry || canForward}}" class="share-state__actions">
+    <button
+      wx:if="{{canRetry}}"
+      class="share-state__action share-state__action--retry"
+      plain="{{true}}"
+      disabled="{{retryLocked || busy}}"
+      bindtap="handleRetry"
+    >
+      {{retryLocked || busy ? '正在重试' : '重新尝试'}}
+    </button>
+    <button
+      wx:if="{{canForward}}"
+      class="share-state__action share-state__action--forward"
+      plain="{{true}}"
+      open-type="share"
+      disabled="{{busy}}"
+      bindtap="handleForward"
+    >
+      改用微信转发
+    </button>
+  </view>
+
+  <text wx:if="{{assistText}}" class="share-state__assist" aria-live="polite">{{assistText}}</text>
+  <view class="share-state__slot-actions"><slot name="actions"></slot></view>
+</view>

@@ -1,0 +1,6 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ab-content-source": "/components/ab-content-source/index"
+  }
+}

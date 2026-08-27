@@ -1,0 +1,27 @@
+<view class="card-page">
+  <text class="card-kicker">Shared Card</text>
+  <text class="card-title">AB Club 数字名片</text>
+
+  <ab-share-state
+    state="{{state}}"
+    title="{{stateTitle}}"
+    description="{{stateDescription}}"
+    allow-retry="{{allowRetry}}"
+    allow-forward="{{allowForward}}"
+    bind:retry="handleRetry"
+  />
+
+  <ab-profile-card
+    wx:if="{{state === 'SUCCESS' && card}}"
+    card="{{card}}"
+    viewer-mode="STRANGER"
+    city-label="{{cityLabel}}"
+    max-visible-claims="3"
+  />
+
+  <view class="card-status">每次回到本页或下拉刷新都会重新解析入口。好友删除或认证撤销后，旧页面不会继续沿用先前可见内容。</view>
+
+  <view class="card-stack">
+    <navigator class="card-link-button" open-type="switchTab" url="/pages/discover/index" hover-class="none">返回 AB Club</navigator>
+  </view>
+</view>

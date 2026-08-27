@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "我的审核状态",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "ab-review-timeline": "/components/ab-review-timeline/index"
+  }
+}

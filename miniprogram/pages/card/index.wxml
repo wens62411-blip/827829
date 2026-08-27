@@ -1,0 +1,42 @@
+<view class="card-page">
+  <text class="card-kicker">My Card</text>
+  <text class="card-title">我的数字名片</text>
+  <text class="card-subtitle">这里展示服务端生成的公开投影，不直接读取完整私密资料。</text>
+
+  <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载名片"></view>
+
+  <view wx:elif="{{status === 'ERROR'}}" class="card-panel card-panel--error">
+    <text class="card-panel__title">名片暂时不可用</text>
+    <text class="card-panel__text">{{message}}</text>
+    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重试</button>
+    <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">完善最小资料</navigator>
+  </view>
+
+  <ab-profile-card
+    wx:elif="{{card}}"
+    card="{{card}}"
+    viewer-mode="SELF"
+    city-label="{{cityLabel}}"
+    max-visible-claims="3"
+    show-default-actions="{{false}}"
+  >
+    <view slot="actions" class="card-inline-actions">
+      <navigator class="card-link-button" url="/packageCard/pages/edit/index" hover-class="none">编辑资料</navigator>
+      <navigator class="card-link-button" url="/packageCard/pages/privacy/index" hover-class="none">隐私设置</navigator>
+    </view>
+  </ab-profile-card>
+
+  <view wx:if="{{card}}" class="card-panel">
+    <text class="card-panel__title">安全转发</text>
+    <text class="card-panel__text">转发路径只携带服务端生成的高熵令牌，不含 OPENID、手机号、微信号、完整资料 ID 或权限参数。</text>
+    <view wx:if="{{shareHint}}" class="card-status {{shareReady ? 'card-status--success' : ''}}">{{shareHint}}</view>
+    <view class="card-stack">
+      <button wx:if="{{!shareReady && !shareRevokePending}}" class="card-button" bindtap="prepareWechatShare" loading="{{sharePreparing}}" disabled="{{sharePreparing || shareRevoking}}">准备微信转发</button>
+      <button wx:if="{{shareReady}}" class="card-button-secondary" open-type="share">打开微信转发面板</button>
+      <button wx:if="{{shareReady || shareRevokePending}}" class="card-button-secondary" bindtap="revokePreparedShare" loading="{{shareRevoking}}" disabled="{{shareRevoking}}">{{shareRevokePending ? '重试撤销入口' : '撤销当前入口'}}</button>
+      <navigator class="card-link-button" url="/packageCard/pages/share/index" hover-class="none">小程序码、海报与撤销</navigator>
+    </view>
+  </view>
+
+  <view class="card-status">运行模式：{{runtimeMode}}。下拉刷新会重新获取公开投影和当前有效认证标签。</view>
+</view>

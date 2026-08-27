@@ -1,0 +1,14 @@
+<view class="state" aria-role="region" aria-label="{{title}}">
+  <view class="state__topline">
+    <text class="state__eyebrow">{{eyebrow}}</text>
+    <ab-evidence-label mode="{{runtimeMode}}" />
+  </view>
+  <text class="state__title">{{title}}</text>
+  <text class="state__description">{{description}}</text>
+  <view class="state__notice" aria-role="note">
+    <text>模块待接入</text>
+    <text class="state__notice-detail">未连接云环境，不提供模拟成功结果</text>
+  </view>
+  <slot name="actions"></slot>
+</view>
+

@@ -1,0 +1,2 @@
+<text class="evidence evidence--{{tone}}" aria-label="运行模式 {{label}}">{{label}}</text>
+

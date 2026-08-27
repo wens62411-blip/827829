@@ -1,0 +1,10 @@
+node_modules/
+.npm-cache/
+.tmp/
+miniprogram_npm/
+.dist/
+coverage/
+*.log
+project.private.config.json
+.DS_Store
+Thumbs.db

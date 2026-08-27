@@ -1,0 +1,16 @@
+{
+  "evidenceKind": "STATIC_SOURCE_BUDGET_ONLY",
+  "generatedAt": "2026-08-27T07:36:31.066Z",
+  "routeCount": 28,
+  "mainRouteCount": 8,
+  "subpackageRouteCount": 20,
+  "missingPageFiles": [],
+  "sourceBytesExcludingBuiltNpm": 131789,
+  "installedTdesignMiniprogramDistBytes": 1401245,
+  "conservativeProjectedBytes": 1533034,
+  "sourceBudgetBytes": 2097152,
+  "conservativeStaticBudgetPass": true,
+  "builtNpmPresent": false,
+  "devtoolsPackageGate": "UNVERIFIED",
+  "caveat": "Conservative source estimate only; not a WeChat Developer Tools package-size result."
+}

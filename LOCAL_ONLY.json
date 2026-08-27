@@ -1,0 +1,8 @@
+{
+  "mode": "LOCAL_ONLY",
+  "appId": null,
+  "cloudEnvironment": null,
+  "uploadAllowed": false,
+  "releaseAllowed": false,
+  "reason": "LOCAL_ONLY_NO_APPID: no authorized WeChat AppID or CloudBase environment has been supplied."
+}

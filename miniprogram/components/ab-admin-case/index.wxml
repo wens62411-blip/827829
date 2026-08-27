@@ -1,0 +1,74 @@
+<view wx:if="{{detail}}" class="case" aria-role="region" aria-label="案件详情 {{detail.title}}">
+<view class="case__topline">
+<view>
+<text class="case__eyebrow">{{detail.eyebrow}}</text>
+<text class="case__status">{{detail.status}}</text>
+</view>
+<button class="case__close ab-touch-target" bindtap="closeDetail" aria-label="关闭案件详情">关闭</button>
+</view>
+<text class="case__title">{{detail.title}}</text>
+<text class="case__summary">{{detail.summary}}</text>
+<text class="case__updated">{{detail.updatedAt}}</text>
+<view class="case__section" aria-label="脱敏案件信息">
+<text class="case__section-title">脱敏案件信息</text>
+<text wx:for="{{detail.metaLines}}" wx:key="*this" class="case__line">{{item}}</text>
+</view>
+<view class="case__section" aria-label="材料索引">
+<text class="case__section-title">材料索引</text>
+<text wx:if="{{!detail.evidenceLines.length}}" class="case__line">无可展示材料索引</text>
+<text wx:for="{{detail.evidenceLines}}" wx:key="*this" class="case__line">{{item}}</text>
+<text class="case__material-notice">{{detail.materialNotice}}</text>
+</view>
+<view class="case__lease" aria-role="note">
+详情仅在内存中保留 {{expiresInSeconds}} 秒；离开页面会立即清除。
+</view>
+<view class="case__ai" aria-role="note">
+AI 检查只能辅助阅读，不会自动触发批准，也不能代替人的明确操作。
+</view>
+<text wx:if="{{notice}}" class="case__notice" aria-live="polite">{{notice}}</text>
+<view wx:if="{{actions.length && !pendingAction}}" class="case__actions" aria-label="人工审核动作">
+<button
+wx:for="{{actions}}"
+wx:key="id"
+class="case-action case-action--{{item.tone}} ab-touch-target"
+data-action="{{item.id}}"
+data-label="{{item.label}}"
+disabled="{{busy}}"
+bindtap="beginAction"
+>{{item.label}}</button>
+</view>
+<view wx:if="{{pendingAction}}" class="case__confirm" aria-role="region" aria-label="确认 {{pendingLabel}}">
+<text class="case__confirm-title">确认：{{pendingLabel}}</text>
+<text class="case__confirm-copy">这是明确的人工操作。请填写可审计说明后再确认。</text>
+<textarea
+class="case__textarea"
+value="{{note}}"
+maxlength="500"
+placeholder="审核说明（通过、拒绝及运营动作必填）"
+bindinput="onNoteInput"
+aria-label="审核说明"
+/>
+<input
+wx:if="{{pendingAction === 'REJECT' || pendingAction === 'REVOKE'}}"
+class="case__input"
+value="{{reasonCode}}"
+maxlength="64"
+placeholder="原因代码（必填）"
+bindinput="onReasonInput"
+aria-label="原因代码"
+/>
+<textarea
+wx:if="{{pendingAction === 'REQUEST_CHANGES'}}"
+class="case__textarea"
+value="{{changesText}}"
+maxlength="800"
+placeholder="每行一项需要补充的材料"
+bindinput="onChangesInput"
+aria-label="补充材料清单"
+/>
+<view class="case__confirm-actions">
+<button class="case-action case-action--neutral ab-touch-target" disabled="{{busy}}" bindtap="cancelAction">取消</button>
+<button class="case-action case-action--danger ab-touch-target" loading="{{busy}}" disabled="{{busy}}" bindtap="confirmAction">确认人工操作</button>
+</view>
+</view>
+</view>

@@ -1,0 +1,28 @@
+{
+  "evidenceKind": "SYNTHETIC",
+  "use": "DEMO_ONLY",
+  "privacy": {
+    "displayName": "A**",
+    "userId": "REDACTED",
+    "originalMaterialUrlsReturned": false,
+    "realIdentityDocument": false
+  },
+  "request": {
+    "verificationRequestId": "vr_demo_redacted",
+    "labelName": "企业成员（演示标签）",
+    "status": "NEEDS_CHANGES",
+    "createdAt": "2026-08-26T02:15:00.000Z",
+    "evidenceCount": 2,
+    "reviewerNote": "请补充可验证任职期限的非敏感材料（合成演示文案）。"
+  },
+  "statusPath": [
+    { "status": "DRAFT", "presentation": "done" },
+    { "status": "SUBMITTED", "presentation": "done" },
+    { "status": "UNDER_REVIEW", "presentation": "done" },
+    { "status": "NEEDS_CHANGES", "presentation": "current" }
+  ],
+  "disclaimer": "STATE_PATH_ONLY_NOT_REVIEW_LOG",
+  "reviewedBy": null,
+  "reviewedAt": null,
+  "reviewScope": null
+}

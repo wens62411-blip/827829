@@ -1,0 +1,30 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+
+const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), 'utf8');
+
+test('verified tag is visible only for human reviewed APPROVED claims', () => {
+  const source = read('miniprogram/components/ab-verified-tag/index.ts');
+  assert.match(source, /reviewStatus === ReviewStatus\.APPROVED\s*&&\s*verificationState === VerificationState\.HUMAN_REVIEWED/);
+  assert.doesNotMatch(source, /AI_CONSISTENCY_CHECKED.*visible:\s*true/s);
+});
+
+test('evidence label exposes all honest runtime modes', () => {
+  const source = read('miniprogram/components/ab-evidence-label/index.ts');
+  for (const mode of ['LIVE', 'DEGRADED', 'OFFLINE_DEMO']) assert.match(source, new RegExp(mode));
+});
+
+test('visual baseline avoids prohibited patterns and supports accessibility preferences', () => {
+  const appStyles = read('miniprogram/app.wxss');
+  const tokens = read('miniprogram/shared/design-tokens/tokens.wxss');
+  assert.match(tokens, /#173C32/i);
+  assert.match(tokens, /#F6F1E7/i);
+  assert.match(tokens, /#A67C3D/i);
+  assert.match(tokens, /#FCFBF7/i);
+  assert.match(tokens, /#1C2723/i);
+  assert.match(tokens, /--ab-touch-target:\s*88rpx/);
+  assert.match(appStyles, /prefers-reduced-motion/);
+  assert.match(appStyles, /safe-area-inset-bottom|safe-area-inset-bottom/s);
+  assert.doesNotMatch(`${appStyles}\n${tokens}`, /linear-gradient|radial-gradient|#(?:7c3aed|8b5cf6|a855f7)/i);
+});

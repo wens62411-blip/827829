@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "ab-evidence-label": "/components/ab-evidence-label/index"
+  }
+}
+

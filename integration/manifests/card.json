@@ -1,0 +1,245 @@
+{
+  "module": "card",
+  "phase": "FEATURE_MODULE",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T12:08:47.837Z",
+  "overall": "INCOMPLETE",
+  "gates": {
+    "local": {
+      "status": "FAIL",
+      "evidence": [
+        "LOCAL Windows, Node v24.16.0, 2026-08-27: forced miniprogram-simulate command exited 0 with 26/26 card tests and 0 skips; tests/components/card/.",
+        "LOCAL Windows, Node v24.16.0, 2026-08-27: node --test --test-isolation=none tests/cloud/identity/*.test.mjs tests/cloud/action-entrypoints.test.mjs exited 0 with 12/12 tests; tests/cloud/identity/.",
+        "LOCAL Windows, Node v24.16.0, 2026-08-27: node --test --test-isolation=none exited 1 with 228 passed, 2 failed and 6 default-environment card simulator skips; both failures are in out-of-scope admin event-review tests, while the card simulator tests passed in the forced 26/26 command.",
+        "LOCAL Windows, Node v24.16.0, 2026-08-27: npm run typecheck:miniprogram, npm run typecheck:cloud, npm run typecheck:contracts and isolated strict identityApi TypeScript all exited 0.",
+        "LOCAL Windows, Node v24.16.0, 2026-08-27: npm run validate exited 0 at 337/337; npm run check:package exited 0 at conservativeProjectedBytes 2094705 / 2097152 with Developer Tools package gate UNVERIFIED.",
+        "LOCAL Windows, Node v24.16.0, 2026-08-27: npm run check:cloud-runtime exited 1 because cloudfunctions/_shared/auth/index.js was stale; the card task did not run the global generator because it rewrites read-only shared and other modules."
+      ],
+      "note": "Card-scoped implementation and tests pass, but repository-wide test/generated-runtime gates are not green and the deployable identityApi main remains fail-closed NOT_IMPLEMENTED."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized AppID or WeChat Developer Tools preview run; tests/components/card/evidence/screenshots/*.png are explicitly watermarked LOCAL UI REFERENCE · SYNTHETIC DATA · NOT WECHAT DEVTOOLS."
+      ]
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized iOS device run for real forwarding, mini-program code, Canvas 2D or album permission."
+      ]
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized Android device run for real forwarding, mini-program code, Canvas 2D or album permission."
+      ]
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized AppID, CloudBase environment, upload key or dev-version upload evidence."
+      ]
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No production CloudBase adapter, database/index deployment, platform log audit or Mini Program release evidence."
+      ]
+    }
+  },
+  "artifacts": [
+    "ROUTE_REQUEST: /pages/bootstrap/index",
+    "ROUTE_REQUEST: /pages/me/index",
+    "ROUTE_REQUEST: /pages/card/index",
+    "ROUTE_REQUEST: /pages/card-share/index",
+    "ROUTE_REQUEST: /packageCard/pages/edit/index",
+    "ROUTE_REQUEST: /packageCard/pages/privacy/index",
+    "ROUTE_REQUEST: /packageCard/pages/view/index",
+    "ROUTE_REQUEST: /packageCard/pages/share/index",
+    "COMPONENT_EXPORT: /components/ab-profile-card/index",
+    "COMPONENT_EXPORT: /components/ab-privacy-field/index",
+    "COMPONENT_EXPORT: /components/ab-share-state/index",
+    "SHARED_COMPONENT_CONSUMED_READ_ONLY: /components/ab-verified-tag/index",
+    "CLIENT_SERVICE: miniprogram/pages/card/services/identity-client.ts",
+    "CLIENT_SERVICE: miniprogram/pages/card/services/card-presenter.ts",
+    "CLIENT_SERVICE: miniprogram/pages/card/services/introduction-draft.ts",
+    "CLIENT_SERVICE: miniprogram/pages/card/services/share-revocation-pointer.ts",
+    "CLOUD_ACTION: identity.bootstrap",
+    "CLOUD_ACTION: profile.getMine",
+    "CLOUD_ACTION: profile.updateMine",
+    "CLOUD_ACTION: card.getMine",
+    "CLOUD_ACTION: card.getForViewer",
+    "CLOUD_ACTION: card.refreshProjection",
+    "CLOUD_ACTION: share.create",
+    "CLOUD_ACTION: share.resolve",
+    "CLOUD_ACTION: share.revoke",
+    "CLOUD_ACTION: share.createQrScene",
+    "COLLECTION_WRITE_REQUEST: users",
+    "COLLECTION_WRITE_REQUEST: profiles_private",
+    "COLLECTION_WRITE_REQUEST: cards_public",
+    "COLLECTION_WRITE_REQUEST: card_share_tokens",
+    "COLLECTION_WRITE_REQUEST: media_assets",
+    "COLLECTION_WRITE_REQUEST: idempotency_keys",
+    "COLLECTION_WRITE_REQUEST: audit_logs",
+    "COLLECTION_WRITE_REQUEST_CONTRACT_ONLY: projection_invalidations",
+    "COLLECTION_READ_ONLY_CONSUMER: friendships and blocks_reports via ViewerRelationshipProjection",
+    "COLLECTION_READ_ONLY_CONSUMER: verification_claims via PublicVerificationClaimProjection",
+    "COLLECTION_READ_ONLY_CONSUMER: events via frozen generic CARD or EVENT share contract",
+    "SOURCE: cloudfunctions/identityApi/domain.ts",
+    "SOURCE: cloudfunctions/identityApi/service.ts",
+    "SOURCE: cloudfunctions/identityApi/index.ts",
+    "SOURCE: cloudfunctions/identityApi/index.js",
+    "TEST_ARTIFACT: tests/components/card/card-components.test.mjs",
+    "TEST_ARTIFACT: tests/components/card/card-page-resilience.test.mjs",
+    "TEST_ARTIFACT: tests/components/card/card-services.test.mjs",
+    "TEST_ARTIFACT: tests/components/card/evidence-artifacts.test.mjs",
+    "TEST_ARTIFACT: tests/cloud/identity/identity-api.test.mjs",
+    "TEST_ARTIFACT: tests/cloud/identity/redacted-evidence.test.mjs",
+    "TEST_SUPPORT: tests/cloud/identity/fake-runtime.mjs",
+    "EVIDENCE_PROJECTION: tests/cloud/identity/fixtures/redacted-share-projection.json",
+    "LOCAL_STATIC_RENDER_SOURCE: tests/components/card/evidence/local-visual-reference.html",
+    "LOCAL_STATIC_RENDER_TOOL: tests/components/card/evidence/render-local-visual-reference.mjs",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/bootstrap.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/me.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/card-self.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/card-stranger.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/card-friend.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/privacy.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/share-success.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/share-expired.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/share-revoked.png",
+    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/contact-sheet.png"
+  ],
+  "checks": [
+    {
+      "id": "frozen-precondition",
+      "status": "PASS",
+      "evidence": "docs/contracts/FROZEN.json was read before implementation and contains contractVersion 1.0.0 with frozen=true."
+    },
+    {
+      "id": "shared-contract-and-entry-boundary",
+      "status": "PASS",
+      "evidence": "The module consumes frozen shared contracts and ab-verified-tag read-only; cross-module and frozen-contract tests pass, and no card implementation source imports another feature runtime."
+    },
+    {
+      "id": "identity-injected-action-suite",
+      "status": "PASS",
+      "evidence": "12/12 identity plus frozen action-entrypoint tests pass for all ten actions, strict envelopes, trusted identity and fail-closed default entrypoint behavior."
+    },
+    {
+      "id": "viewer-field-visibility-matrix",
+      "status": "PASS",
+      "evidence": "Tests exhaust every profile field across PUBLIC, FRIENDS_ONLY and PRIVATE for OWNER, FRIEND and STRANGER, including stranger-safe owner export and three concrete viewer projections."
+    },
+    {
+      "id": "relationship-projection-identity-binding",
+      "status": "PASS",
+      "evidence": "A ViewerRelationshipProjection bound to the wrong viewer or subject now fails with SERVICE_UNAVAILABLE and returns no card data instead of granting FRIENDS_ONLY visibility."
+    },
+    {
+      "id": "private-data-nonleak",
+      "status": "PASS",
+      "evidence": "Tests prove raw phone, government ID, material URL, OPENID, UnionID and risk flags do not enter public APIs, share query, local persistence or poster input; share titles are fixed and export pages request includePrivatePreview=false."
+    },
+    {
+      "id": "token-and-scene-lifecycle",
+      "status": "PASS",
+      "evidence": "Tests cover exact high-entropy bearer shape, SHA-256 digest-only storage, opaque <=32-character scene, forgery, missing token, expiry, revoke, repeated revoke, QR replay and explicit QR failure without fabricated success."
+    },
+    {
+      "id": "share-target-owner-binding",
+      "status": "PASS",
+      "evidence": "Card and event resolution bind every stored share target to its current authoritative owner; mismatched target, owner or idempotent replay metadata fails closed as TOKEN_INVALID or SERVICE_UNAVAILABLE."
+    },
+    {
+      "id": "dynamic-friend-block-claim-recheck",
+      "status": "PASS",
+      "evidence": "Historical token and QR resolution reread current relationship, both block directions, account state and effective human-reviewed claims; friend deletion retracts FRIENDS_ONLY and claim revocation removes badges immediately."
+    },
+    {
+      "id": "transaction-idempotency-stale-deny-recovery",
+      "status": "PASS",
+      "evidence": "Injected runtime tests cover transaction rollback, idempotent replay/conflict, optimistic versions, full-replacement profile updates and requiredProjectionVersion/sourceProfileVersion stale denial until refresh."
+    },
+    {
+      "id": "client-share-resilience",
+      "status": "PASS",
+      "evidence": "Card client tests cover slow network, duplicate taps, cloud failure, token-only forwarding, in-memory bearer handling, non-secret revocation pointer, explicit retry and no fabricated share success."
+    },
+    {
+      "id": "component-miniprogram-simulate",
+      "status": "PASS",
+      "evidence": "Forced external miniprogram-simulate and jsdom run passed 26/26 card tests with 0 skips; properties, events, named slots, empty values, long bilingual names, image failure and retry deduplication are covered. This is component simulation, not page E2E."
+    },
+    {
+      "id": "ai-editable-deterministic-fallback",
+      "status": "PASS",
+      "evidence": "The editable introduction helper accepts only valid generator text and deterministically falls back for no generator, timeout, error or illegal output; it never reads or mutates claims."
+    },
+    {
+      "id": "redacted-share-projection-evidence",
+      "status": "PASS",
+      "evidence": "tests/cloud/identity/fixtures/redacted-share-projection.json is explicitly SYNTHETIC and LOCAL_TEST_ONLY, has empty claims and contains none of the restricted keys or values."
+    },
+    {
+      "id": "local-static-visual-reference",
+      "status": "PASS",
+      "evidence": "Nine PNG states plus a contact sheet cover bootstrap, me, self, stranger, friend, privacy, share success, expiry and revocation; every image is watermarked as synthetic local reference and is not Developer Tools/device evidence."
+    },
+    {
+      "id": "conservative-package-budget",
+      "status": "PASS",
+      "evidence": "npm run check:package exited 0 at 2094705 / 2097152 bytes with no missing page files; built npm and actual Developer Tools package measurement remain UNVERIFIED."
+    },
+    {
+      "id": "rich-profile-field-visibility-contract",
+      "status": "FAIL",
+      "evidence": "Frozen ProfileUpdateInput/ProfilePrivateDto cannot transport headline, industry, company, position, experience, interests or per-field Visibility; the privacy UI locks these controls instead of claiming a write succeeded."
+    },
+    {
+      "id": "all-writes-expected-version",
+      "status": "FAIL",
+      "evidence": "Frozen IdempotentWrite makes expectedVersion optional; bootstrap and first profile creation use the frozen create semantics with version 0 or omission, so the stricter requirement that every write always carries expectedVersion is not fully expressible without an integration contract decision."
+    },
+    {
+      "id": "production-cloudbase-runtime",
+      "status": "FAIL",
+      "evidence": "The injectable ten-action service is implemented, but cloudfunctions/identityApi/index.ts deliberately exports the frozen NOT_IMPLEMENTED main until a real CloudBase store, transaction runner, WX context, HMAC secret and QR generator are integrated."
+    },
+    {
+      "id": "repository-cloud-typecheck-and-runtime",
+      "status": "FAIL",
+      "evidence": "All three repository TypeScript projects pass, but the final full Node suite has two out-of-scope admin event-review failures and check:cloud-runtime reports stale _shared/auth output; card did not edit or globally regenerate those read-only/out-of-scope files."
+    },
+    {
+      "id": "wechat-runtime-share-qr-canvas-album",
+      "status": "UNVERIFIED",
+      "evidence": "No Developer Tools or device evidence for onShareAppMessage delivery, real mini-program code, Canvas 2D export, album authorization denial/recovery or image save."
+    },
+    {
+      "id": "production-log-and-concurrency-redaction",
+      "status": "UNVERIFIED",
+      "evidence": "Local API/audit/idempotency tests do not prove CloudBase platform logs, deployed indexes, real transaction isolation or production concurrent replay behavior."
+    }
+  ],
+  "knownGaps": [
+    "The default identityApi.main remains fail-closed NOT_IMPLEMENTED; no authorized CloudBase store, transaction adapter, indexes, WX context, HMAC signing secret, QR generator or deployment is configured.",
+    "Frozen ProfileUpdateInput and ProfilePrivateDto do not expose headline, industry, company, position, experience, interests or per-field Visibility; the module preserves the richer private model internally but cannot honestly edit those values through v1.0.0 actions.",
+    "Frozen IdempotentWrite defines expectedVersion as optional. Bootstrap and first profile creation therefore cannot meet the stricter literal requirement that every write always carry an existing expectedVersion without a contract/integration decision.",
+    "Frozen card_share_tokens schema requires _id, ownerUserId, targetType, targetId, revoked, version and updatedAt in addition to digest, purpose, creation/expiry/revocation times and allowedFields; raw token and scene are not stored, but the record is not the literal minimal field list in the feature brief.",
+    "No frozen avatar upload action or storage policy exists; chooseAvatar is only a local preview and is never represented as a saved avatar.",
+    "No frozen AI introduction action or authorized model key exists; the current editable helper uses a deterministic template unless an injected generator returns valid text.",
+    "ShareCreateRequest has no allowedFields input, so v1.0.0 can enforce only the server-configured default share field scope rather than a user-selected per-share scope.",
+    "ShareCreateQrSceneResponse exposes qrAssetId but no authorized drawable/download URL. The UI does not fake a QR image and labels local posters as not containing a mini-program code.",
+    "There is no frozen share-list action. Persistent client state stores only the non-secret latest shareTokenId revocation pointer, so cross-device discovery and revocation of older entries are not implemented.",
+    "profile.updateMine lists projection_invalidations as writable, but frozen ProjectionInvalidationKind has no PROFILE_CHANGED value; the module uses a transactional private write plus projection version watermark/stale denial and explicit refresh, while cross-module invalidation consumption remains unverified.",
+    "Pending and rejected review state is intentionally owner-only in the component, but frozen owner card/profile DTOs provide no trustworthy source for those statuses, so live owner review-state rendering is not wired.",
+    "Platform and CloudBase logging redaction, deployed index uniqueness, real transaction isolation and production concurrency have not been verified.",
+    "The repository currently has no Git commit baseline and all files appear untracked, so Git cannot independently prove cross-task ownership history; this task's edits were limited to the authorized card/identity/test/manifest paths.",
+    "The repository-wide full Node suite currently has two out-of-scope admin event-review failures and the generated-runtime gate reports stale _shared/auth output; all three TypeScript projects and card-scoped tests pass.",
+    "The conservative package estimate passes with a narrow margin, but built npm output and the actual WeChat Developer Tools package size are unverified.",
+    "All supplied screenshots and the redacted projection are synthetic local evidence. There is no Developer Tools, iOS, Android, real WeChat forwarding, real mini-program code, Canvas/album device, dev-version upload or release evidence.",
+    "No real member profile or current human-review fixture is supplied; the redacted example uses origin SYNTHETIC, verificationState USER_DECLARED and an empty claims list."
+  ]
+}

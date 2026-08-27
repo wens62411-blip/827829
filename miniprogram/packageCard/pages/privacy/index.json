@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "名片隐私",
+  "enablePullDownRefresh": false,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "ab-privacy-field": "/components/ab-privacy-field/index"
+  }
+}

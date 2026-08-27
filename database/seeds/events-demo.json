@@ -1,0 +1,74 @@
+{
+  "evidenceState": "DEMO_ONLY",
+  "realContentEvidenceStatus": "CONTENT_LIVE_UNVERIFIED",
+  "publicImportAllowed": false,
+  "notes": [
+    "No current real-event source, approved organizer, or human review evidence is included.",
+    "These records are OFFLINE_DEMO planning fixtures and must never be returned by the formal public API."
+  ],
+  "clubNodes": [
+    {
+      "_id": "node-demo-cn-beijing",
+      "cityId": "cn-beijing",
+      "name": { "zh": "AB Club 北京筹备节点（DEMO_ONLY）", "en": "AB Club Beijing planned node (DEMO_ONLY)" },
+      "operationalState": "PLANNED",
+      "reviewStatus": "DRAFT",
+      "organizerId": "organizer-demo-beijing",
+      "version": 1,
+      "createdAt": "2026-08-27T00:00:00Z",
+      "updatedAt": "2026-08-27T00:00:00Z"
+    }
+  ],
+  "organizers": [
+    {
+      "_id": "organizer-demo-beijing",
+      "ownerUserId": "user-demo-not-authorized",
+      "name": { "zh": "主理人待招募（DEMO_ONLY）", "en": "Host recruitment placeholder (DEMO_ONLY)" },
+      "summary": "仅用于离线页面与状态机测试；未经人工批准，不是公开主理人。",
+      "cityIds": ["cn-beijing"],
+      "reviewStatus": "DRAFT",
+      "verificationState": "USER_DECLARED",
+      "version": 1,
+      "createdAt": "2026-08-27T00:00:00Z",
+      "updatedAt": "2026-08-27T00:00:00Z"
+    }
+  ],
+  "events": [
+    {
+      "_id": "event-demo-beijing-interest",
+      "organizerId": "organizer-demo-beijing",
+      "clubNodeId": "node-demo-cn-beijing",
+      "cityId": "cn-beijing",
+      "title": "北京同城兴趣登记示例（DEMO_ONLY）",
+      "summary": "用于验证空状态、详情布局和兴趣登记状态机的离线数据，不代表真实活动。",
+      "source": {
+        "kind": "INTERNAL_DEMO",
+        "label": "AB Club internal OFFLINE_DEMO fixture",
+        "retrievedAt": "2026-08-27T00:00:00Z",
+        "contentStatus": "DEMO_ONLY"
+      },
+      "startsAt": "2026-09-20T06:00:00Z",
+      "endsAt": "2026-09-20T08:00:00Z",
+      "timezone": "Asia/Shanghai",
+      "addressScope": "北京（场地未确认，DEMO_ONLY）",
+      "registrationMethod": "INTEREST",
+      "capacity": 12,
+      "requiredLabelIds": [],
+      "minParticipantsEnabled": false,
+      "termsVersion": "event-interest-terms-v1",
+      "requiresPayment": false,
+      "state": "DRAFT",
+      "publicationState": "DRAFT",
+      "reservationAvailable": false,
+      "imageRights": {
+        "state": "UNVERIFIED",
+        "alt": "DEMO_ONLY 活动无可公开复用图片"
+      },
+      "origin": "SYNTHETIC",
+      "verificationState": "USER_DECLARED",
+      "version": 1,
+      "createdAt": "2026-08-27T00:00:00Z",
+      "updatedAt": "2026-08-27T00:00:00Z"
+    }
+  ]
+}

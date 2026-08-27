@@ -1,0 +1,10 @@
+{
+  "desc": "LOCAL_ONLY foundation pages are not intended for indexing.",
+  "rules": [
+    {
+      "action": "disallow",
+      "page": "*"
+    }
+  ]
+}
+

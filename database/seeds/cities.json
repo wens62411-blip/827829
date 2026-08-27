@@ -1,0 +1,15 @@
+[
+  { "_id": "cn-beijing", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "cn-shanghai", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "cn-guangzhou", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "cn-shenzhen", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "cn-hangzhou", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "ch-zurich", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "it-milan", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "fr-paris", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "au-melbourne", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "au-sydney", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "sg-singapore", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "ca-toronto", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" },
+  { "_id": "ca-vancouver", "operationalState": "PLANNED", "version": 1, "createdAt": "2026-08-27T00:00:00Z", "updatedAt": "2026-08-27T00:00:00Z" }
+]

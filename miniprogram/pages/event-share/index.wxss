@@ -1,0 +1,5 @@
+.share-reference {
+  padding: var(--ab-space-3) var(--ab-space-4);
+  border-left: 6rpx solid var(--ab-color-gold);
+  color: var(--ab-color-muted);
+}

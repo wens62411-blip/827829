@@ -1,0 +1,22 @@
+<view class="card-page card-page--centered">
+  <view>
+    <text class="card-kicker">AB Club · Identity</text>
+    <text class="card-title">从一张可信、克制的名片开始</text>
+    <text class="card-subtitle">微信身份只由云函数上下文确认。我们不会把手机号、证件、审核材料或微信标识放进公开名片。</text>
+    <view class="card-runtime" aria-role="status">运行模式 · {{runtimeMode}}</view>
+  </view>
+
+  <view class="card-panel card-panel--accent">
+    <text class="card-panel__title">开始前，你需要知道</text>
+    <text class="card-panel__text">初始化只建立账户会话，不代表获得任何认证。公开徽章仅来自仍然有效的人工审核结果。</text>
+  </view>
+
+  <view wx:if="{{message}}" class="card-status {{status === 'ERROR' ? 'card-status--error' : ''}}" aria-live="polite">{{message}}</view>
+
+  <view class="card-stack">
+    <button class="card-button" bindtap="initializeIdentity" loading="{{status === 'LOADING'}}" disabled="{{status === 'LOADING'}}">
+      {{status === 'LOADING' ? '正在初始化…' : '初始化微信身份'}}
+    </button>
+    <button class="card-button-secondary" bindtap="continueOffline" disabled="{{status === 'LOADING'}}">先浏览公开内容</button>
+  </view>
+</view>

@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-08-27T09:31:43.372Z",
+  "policy": {
+    "publicImageRequirement": "RIGHTS_BASIS_OR_NOT_REAL_ARTWORK_FALLBACK",
+    "runtimeExternalHotlinksAllowed": false,
+    "aiGeneratedAssetMayRepresentRealWork": false,
+    "defaultFallbackAssetId": "art-fallback-not-real-v1",
+    "requiredFields": [
+      "assetId",
+      "path",
+      "sourceUrl",
+      "sourceType",
+      "author",
+      "license",
+      "createdAt",
+      "sha256",
+      "width",
+      "height",
+      "alt",
+      "recordOrigin",
+      "representation",
+      "rightsStatus"
+    ]
+  },
+  "assets": [
+    {
+      "assetId": "art-fallback-not-real-v1",
+      "path": "/assets/art/not-real-artwork-fallback.svg",
+      "sourceUrl": "project://miniprogram/assets/art/not-real-artwork-fallback.svg",
+      "sourceType": "PROJECT_ORIGINAL_VECTOR",
+      "author": "AB Club Product Design",
+      "license": "AB_CLUB_PROJECT_OWNED_ORIGINAL",
+      "createdAt": "2026-08-27T09:31:43.372Z",
+      "sha256": "43f86abc061699b1271b0cbcff51c6a82f4844b323b02b991e763ad51f2a56ea",
+      "width": 1200,
+      "height": 900,
+      "alt": "抽象几何占位图：非真实艺术品，仅用于无公开图片权利或图片加载失败状态",
+      "recordOrigin": "SYNTHETIC",
+      "representation": "NOT_REAL_ARTWORK",
+      "rightsStatus": "CLAIMED",
+      "rightsReviewedAt": null,
+      "reviewStatus": "DRAFT",
+      "depictsRealArtwork": false,
+      "aiGenerated": false,
+      "externalHotlink": false,
+      "permittedUses": ["THUMBNAIL_FALLBACK", "DETAIL_FALLBACK", "ERROR_STATE"]
+    }
+  ]
+}

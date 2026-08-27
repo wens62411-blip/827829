@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "联系意向",
+  "usingComponents": {
+    "ab-evidence-label": "/components/ab-evidence-label/index",
+    "ab-intent-action": "/components/ab-intent-action/index",
+    "art-page-state": "/packageArt/components/art-page-state/index"
+  }
+}

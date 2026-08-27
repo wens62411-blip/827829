@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "公开标签申请",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "ab-tag-application": "/components/ab-tag-application/index"
+  }
+}

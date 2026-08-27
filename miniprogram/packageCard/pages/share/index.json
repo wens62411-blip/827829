@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "名片分享",
+  "enablePullDownRefresh": false,
+  "backgroundTextStyle": "dark",
+  "usingComponents": {
+    "ab-share-state": "/components/ab-share-state/index"
+  }
+}

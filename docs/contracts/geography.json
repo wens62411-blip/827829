@@ -1,0 +1,44 @@
+{
+  "contractVersion": "1.0.0",
+  "global": { "id": "global", "name": { "zh": "全球", "en": "Global" } },
+  "regions": [
+    { "id": "asia-pacific", "parentId": "global", "name": { "zh": "亚太", "en": "Asia Pacific" } },
+    { "id": "europe", "parentId": "global", "name": { "zh": "欧洲", "en": "Europe" } },
+    { "id": "north-america", "parentId": "global", "name": { "zh": "北美", "en": "North America" } }
+  ],
+  "countries": [
+    { "id": "cn", "parentId": "asia-pacific", "name": { "zh": "中国", "en": "China" } },
+    { "id": "ch", "parentId": "europe", "name": { "zh": "瑞士", "en": "Switzerland" } },
+    { "id": "it", "parentId": "europe", "name": { "zh": "意大利", "en": "Italy" } },
+    { "id": "fr", "parentId": "europe", "name": { "zh": "法国", "en": "France" } },
+    { "id": "au", "parentId": "asia-pacific", "name": { "zh": "澳大利亚", "en": "Australia" } },
+    { "id": "sg", "parentId": "asia-pacific", "name": { "zh": "新加坡", "en": "Singapore" } },
+    { "id": "ca", "parentId": "north-america", "name": { "zh": "加拿大", "en": "Canada" } }
+  ],
+  "cities": [
+    { "id": "cn-beijing", "parentId": "cn", "regionId": "asia-pacific", "name": { "zh": "北京", "en": "Beijing" }, "timezone": "Asia/Shanghai" },
+    { "id": "cn-shanghai", "parentId": "cn", "regionId": "asia-pacific", "name": { "zh": "上海", "en": "Shanghai" }, "timezone": "Asia/Shanghai" },
+    { "id": "cn-guangzhou", "parentId": "cn", "regionId": "asia-pacific", "name": { "zh": "广州", "en": "Guangzhou" }, "timezone": "Asia/Shanghai" },
+    { "id": "cn-shenzhen", "parentId": "cn", "regionId": "asia-pacific", "name": { "zh": "深圳", "en": "Shenzhen" }, "timezone": "Asia/Shanghai" },
+    { "id": "cn-hangzhou", "parentId": "cn", "regionId": "asia-pacific", "name": { "zh": "杭州", "en": "Hangzhou" }, "timezone": "Asia/Shanghai" },
+    { "id": "ch-zurich", "parentId": "ch", "regionId": "europe", "name": { "zh": "苏黎世", "en": "Zurich" }, "timezone": "Europe/Zurich" },
+    { "id": "it-milan", "parentId": "it", "regionId": "europe", "name": { "zh": "米兰", "en": "Milan" }, "timezone": "Europe/Rome" },
+    { "id": "fr-paris", "parentId": "fr", "regionId": "europe", "name": { "zh": "巴黎", "en": "Paris" }, "timezone": "Europe/Paris" },
+    { "id": "au-melbourne", "parentId": "au", "regionId": "asia-pacific", "name": { "zh": "墨尔本", "en": "Melbourne" }, "timezone": "Australia/Melbourne" },
+    { "id": "au-sydney", "parentId": "au", "regionId": "asia-pacific", "name": { "zh": "悉尼", "en": "Sydney" }, "timezone": "Australia/Sydney" },
+    { "id": "sg-singapore", "parentId": "sg", "regionId": "asia-pacific", "name": { "zh": "新加坡", "en": "Singapore" }, "timezone": "Asia/Singapore" },
+    { "id": "ca-toronto", "parentId": "ca", "regionId": "north-america", "name": { "zh": "多伦多", "en": "Toronto" }, "timezone": "America/Toronto" },
+    { "id": "ca-vancouver", "parentId": "ca", "regionId": "north-america", "name": { "zh": "温哥华", "en": "Vancouver" }, "timezone": "America/Vancouver" }
+  ],
+  "hierarchyRules": [
+    { "level": "GLOBAL", "idType": "literal:global", "parentLevel": null },
+    { "level": "REGION", "idType": "RegionId", "parentLevel": "GLOBAL" },
+    { "level": "COUNTRY", "idType": "CountryId", "parentLevel": "REGION" },
+    { "level": "CITY", "idType": "CityId", "parentLevel": "COUNTRY" },
+    { "level": "CLUB_NODE", "idType": "ClubNodeId", "parentLevel": "CITY" },
+    { "level": "EVENT", "idType": "EventId", "parentLevel": "CLUB_NODE" }
+  ],
+  "operationalStateStorage": "separate-runtime-records",
+  "eventCityField": { "name": "cityId", "type": "CityId", "freeTextForbidden": true }
+}
+

@@ -1,0 +1,41 @@
+.status { box-sizing: border-box; min-height: 100vh; padding: 48rpx var(--ab-page-gutter); }
+.status__eyebrow { display: block; color: var(--ab-color-gold); font-size: 22rpx; font-weight: 700; letter-spacing: 0.1em; }
+.status__title { display: block; margin-top: 22rpx; color: var(--ab-color-green); font-family: Georgia, "Songti SC", serif; font-size: 46rpx; font-weight: 600; }
+.status__lead { display: block; margin-top: 16rpx; color: var(--ab-color-muted); font-size: 26rpx; }
+.status__notice, .status__policy, .status__honesty { margin-top: 28rpx; padding: 24rpx; border-left: 6rpx solid var(--ab-color-gold); background: var(--ab-color-paper); font-size: 25rpx; }
+.status__text-button { min-height: 72rpx; margin: 14rpx 0 0; padding: 0; background: transparent; color: var(--ab-color-green); font-size: 26rpx; text-align: left; }
+.status__text-button::after { border: 0; }
+.status__layout { margin-top: 34rpx; }
+.status__tabs { width: 100%; white-space: nowrap; }
+.status__tab { display: inline-flex; flex-direction: column; justify-content: center; min-width: 220rpx; min-height: 104rpx; margin: 0 14rpx 0 0; padding: 14rpx 20rpx; border: 2rpx solid var(--ab-color-border); border-radius: var(--ab-radius-small); background: var(--ab-color-paper); color: var(--ab-color-ink); text-align: left; vertical-align: top; }
+.status__tab::after { border: 0; }
+.status__tab--active { border-color: var(--ab-color-green); box-shadow: inset 0 -6rpx 0 var(--ab-color-green); }
+.status__tab-name, .status__tab-state, .status__detail-label, .status__detail-id, .status__empty-title { display: block; }
+.status__tab-name { overflow: hidden; font-size: 26rpx; font-weight: 700; text-overflow: ellipsis; }
+.status__tab-state { margin-top: 5rpx; color: var(--ab-color-muted); font-size: 22rpx; }
+.status__detail { margin-top: 30rpx; }
+.status__detail-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 20rpx; margin-bottom: 22rpx; }
+.status__detail-label { font-size: 34rpx; font-weight: 700; }
+.status__detail-id { margin-top: 4rpx; color: var(--ab-color-muted); font-size: 22rpx; }
+.status__badge { flex: 0 0 auto; padding: 8rpx 14rpx; border: 2rpx solid currentColor; border-radius: 4rpx; color: var(--ab-color-gold); font-size: 22rpx; font-weight: 700; }
+.status__badge--APPROVED { color: #246b4a; }
+.status__badge--REJECTED, .status__badge--REVOKED { color: #9d3f36; }
+.status__policy { color: var(--ab-color-muted); }
+.status__button { box-sizing: border-box; display: flex; align-items: center; justify-content: center; width: 100%; min-height: 88rpx; margin-top: 22rpx; border-radius: var(--ab-radius-small); font-size: 28rpx; font-weight: 700; }
+.status__button::after { border: 0; }
+.status__button--primary { border: 2rpx solid var(--ab-color-green); background: var(--ab-color-green); color: #fff; }
+.status__button--danger { border: 2rpx solid #9d3f36; background: transparent; color: #9d3f36; }
+.status__empty { margin-top: 36rpx; padding: 50rpx 28rpx; border: 2rpx dashed var(--ab-color-border); border-radius: var(--ab-radius-standard); text-align: center; }
+.status__empty-title { font-size: 30rpx; font-weight: 700; }
+.status__honesty { color: var(--ab-color-muted); }
+@media (prefers-color-scheme: dark) {
+  .status__title { color: var(--ab-color-dark-text); }
+  .status__lead, .status__tab-state, .status__detail-id, .status__policy, .status__honesty { color: var(--ab-color-dark-muted); }
+  .status__notice, .status__policy, .status__honesty, .status__tab { border-color: var(--ab-color-dark-border); background: var(--ab-color-dark-surface); color: var(--ab-color-dark-text); }
+  .status__text-button { color: var(--ab-color-gold-soft); }
+  .status__tab--active { border-color: var(--ab-color-gold-soft); box-shadow: inset 0 -6rpx 0 var(--ab-color-gold-soft); }
+  .status__badge--APPROVED { color: #7ac9a5; }
+  .status__badge--REJECTED, .status__badge--REVOKED { color: #e08f85; }
+  .status__button--primary { border-color: var(--ab-color-gold-soft); background: var(--ab-color-gold-soft); color: var(--ab-color-dark-canvas); }
+  .status__empty { border-color: var(--ab-color-dark-border); }
+}

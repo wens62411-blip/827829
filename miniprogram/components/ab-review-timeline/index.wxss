@@ -1,0 +1,59 @@
+:host { display: block; }
+
+.timeline {
+  box-sizing: border-box;
+  padding: 28rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: var(--ab-radius-standard);
+  background: var(--ab-color-paper);
+  color: var(--ab-color-ink);
+}
+
+.timeline__heading { margin-bottom: 28rpx; }
+.timeline__title,
+.timeline__disclaimer,
+.timeline__label,
+.timeline__state,
+.timeline__fact-label,
+.timeline__note-text { display: block; }
+.timeline__title { font-size: 32rpx; font-weight: 700; }
+.timeline__disclaimer { margin-top: 6rpx; color: var(--ab-color-muted); font-size: 22rpx; }
+
+.timeline__step { display: flex; min-height: 94rpx; }
+.timeline__rail { display: flex; flex: 0 0 40rpx; flex-direction: column; align-items: center; }
+.timeline__dot { width: 20rpx; height: 20rpx; border: 4rpx solid var(--ab-color-border); border-radius: 50%; background: var(--ab-color-paper); }
+.timeline__line { flex: 1; width: 4rpx; background: var(--ab-color-border); }
+.timeline__content { flex: 1; padding: 0 0 28rpx 20rpx; }
+.timeline__label { font-size: 28rpx; font-weight: 700; }
+.timeline__state { margin-top: 4rpx; color: var(--ab-color-muted); font-size: 22rpx; }
+.timeline__step--done .timeline__dot,
+.timeline__step--done .timeline__line { border-color: var(--ab-color-green); background: var(--ab-color-green); }
+.timeline__step--current .timeline__dot { border-color: var(--ab-color-gold); background: var(--ab-color-gold); }
+.timeline__step--future { opacity: 0.58; }
+
+.timeline__fact,
+.timeline__note {
+  display: flex;
+  justify-content: space-between;
+  gap: 24rpx;
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid var(--ab-color-border);
+  font-size: 26rpx;
+}
+.timeline__fact-label { color: var(--ab-color-muted); }
+.timeline__note { display: block; }
+.timeline__note-text { margin-top: 8rpx; }
+
+@media (prefers-color-scheme: dark) {
+  .timeline { border-color: var(--ab-color-dark-border); background: var(--ab-color-dark-surface); color: var(--ab-color-dark-text); }
+  .timeline__dot { border-color: var(--ab-color-dark-border); background: var(--ab-color-dark-surface); }
+  .timeline__line { background: var(--ab-color-dark-border); }
+  .timeline__disclaimer,
+  .timeline__state,
+  .timeline__fact-label { color: var(--ab-color-dark-muted); }
+  .timeline__fact,
+  .timeline__note { border-color: var(--ab-color-dark-border); }
+  .timeline__step--done .timeline__dot,
+  .timeline__step--done .timeline__line { border-color: var(--ab-color-gold-soft); background: var(--ab-color-gold-soft); }
+}

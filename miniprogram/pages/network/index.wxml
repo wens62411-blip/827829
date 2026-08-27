@@ -1,0 +1,62 @@
+<view class="network ab-safe-bottom">
+  <view class="network__topline">
+    <text class="network__eyebrow">AB CLUB CONNECTIONS</text>
+    <ab-evidence-label mode="{{runtimeMode}}" />
+  </view>
+  <text class="network__title">人脉</text>
+  <text class="network__lead">“申请认识”仅建立 AB Club 平台关系，不会发起微信好友添加，也不提供站内聊天。</text>
+
+  <view wx:if="{{errorMessage}}" class="network__notice network__notice--error" aria-role="alert">
+    <text>{{errorMessage}}</text>
+    <button class="network__retry" disabled="{{loading}}" bindtap="loadOverview">重新加载</button>
+  </view>
+  <view wx:elif="{{loading && !loaded}}" class="network__notice" aria-role="status">正在读取本人关系状态…</view>
+
+  <view class="network__grid">
+    <navigator class="network__metric" url="/packageSocial/pages/requests/index" hover-class="none">
+      <text class="network__metric-label">收到的申请</text>
+      <text class="network__metric-value">{{loaded ? incomingLoadedCount : '—'}}</text>
+      <text class="network__metric-note">仅本人可见 · 查看并处理</text>
+    </navigator>
+    <view class="network__metric">
+      <text class="network__metric-label">已认识成员</text>
+      <text class="network__metric-value">{{loaded ? acceptedLoadedCount : '—'}}</text>
+      <text class="network__metric-note">本页已加载数量</text>
+    </view>
+  </view>
+
+  <view class="network__section">
+    <view class="network__section-head">
+      <text class="network__section-title">我的人脉</text>
+      <text class="network__section-note">只有已接受关系可解锁 FRIENDS_ONLY 字段</text>
+    </view>
+    <view wx:if="{{acceptedPreview.length}}" class="network__people">
+      <navigator
+        wx:for="{{acceptedPreview}}"
+        wx:key="ownerUserId"
+        class="network__person"
+        url="/packageSocial/pages/friend/index?ownerUserId={{item.ownerUserId}}"
+        hover-class="none"
+        aria-label="查看与{{item.displayName}}的 AB Club 平台关系"
+      >
+        <image wx:if="{{item.avatarUrl}}" class="network__avatar" src="{{item.avatarUrl}}" mode="aspectFill" />
+        <view wx:else class="network__avatar network__avatar--fallback">AB</view>
+        <view class="network__identity">
+          <text class="network__name">{{item.displayName}}</text>
+          <text wx:if="{{item.headline}}" class="network__headline">{{item.headline}}</text>
+        </view>
+        <text class="network__chevron" aria-hidden="true">›</text>
+      </navigator>
+    </view>
+    <view wx:elif="{{loaded}}" class="network__empty">还没有已接受的 AB Club 平台关系。</view>
+  </view>
+
+  <view class="network__section">
+    <text class="network__section-title">公开标签申请</text>
+    <text class="network__section-note">公开展示必须经过人工审核，并同时满足有效期、目录资格与本人公开选择。</text>
+    <view class="network__actions">
+      <navigator class="network__action" url="/packageSocial/pages/tag-apply/index" hover-class="none">发起标签申请</navigator>
+      <navigator class="network__action network__action--quiet" url="/packageSocial/pages/tag-status/index" hover-class="none">查看我的审核状态</navigator>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,35 @@
+{
+  "evidence": {
+    "state": "SYNTHETIC",
+    "scope": "LOCAL_TEST_ONLY",
+    "description": "Redacted share.resolve response shape. All private and restricted source fields are intentionally omitted."
+  },
+  "apiResponse": {
+    "ok": true,
+    "data": {
+      "resolution": {
+        "tokenId": "st_synthetic_reference_001",
+        "resolvedAt": "2026-08-27T08:00:00.000Z",
+        "expiresAt": "2026-09-03T08:00:00.000Z",
+        "revoked": false,
+        "targetType": "CARD",
+        "targetId": "card_synthetic_reference_001",
+        "card": {
+          "cardId": "card_synthetic_reference_001",
+          "ownerUserId": "user_synthetic_reference_001",
+          "displayName": "林安然（合成示例）",
+          "cityId": "cn-shenzhen",
+          "biography": "连接可靠的人，也尊重每一项资料的边界。",
+          "visibility": "PUBLIC",
+          "claims": [],
+          "origin": "SYNTHETIC",
+          "verificationState": "USER_DECLARED",
+          "version": 1,
+          "createdAt": "2026-08-27T08:00:00.000Z",
+          "updatedAt": "2026-08-27T08:00:00.000Z"
+        }
+      }
+    },
+    "requestId": "req_synthetic_reference_001"
+  }
+}

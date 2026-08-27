@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "平台关系",
+  "usingComponents": {
+    "ab-verified-tag": "/components/ab-verified-tag/index"
+  }
+}

@@ -1,0 +1,71 @@
+<view class="card-page">
+  <text class="card-kicker">Private Profile</text>
+  <text class="card-title">编辑个人资料</text>
+  <text class="card-subtitle">完整资料保存在私密域；公开名片只由服务端投影生成。带“合同待集成”的字段不会被伪装成已保存。</text>
+
+  <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载资料"></view>
+
+  <view wx:elif="{{status === 'ERROR' && !profile && !creatingProfile}}" class="card-panel card-panel--error">
+    <text class="card-panel__title">资料暂时不可编辑</text>
+    <text class="card-panel__text">{{message}}</text>
+    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重试</button>
+  </view>
+
+  <block wx:if="{{profile || creatingProfile}}">
+    <view wx:if="{{creatingProfile}}" class="card-status">首次创建资料：保存动作不带未知版本；只有服务端返回真实 profile 后才刷新公开名片。</view>
+    <view class="card-form-section">
+      <text class="card-section-heading">最小资料</text>
+      <text class="card-section-caption">昵称、城市和一句话介绍可通过冻结合同保存。头像上传动作尚未包含在 identity 1.0 合同中。</text>
+
+      <view class="card-field">
+        <view class="card-field__label"><text>昵称</text><text class="card-field__hint">必填 · 最多 60 字</text></view>
+        <input class="card-input" value="{{displayName}}" maxlength="60" bindinput="onDisplayNameInput" disabled="{{status === 'SAVING'}}" placeholder="你的称呼" />
+      </view>
+
+      <view class="card-field">
+        <view class="card-field__label"><text>头像</text><text class="card-field__hint">本地预览，不伪造上传</text></view>
+        <view class="card-avatar-draft">
+          <image wx:if="{{localAvatarUsable}}" class="card-avatar-draft__image" src="{{localAvatarPath}}" mode="aspectFill" binderror="onAvatarImageError" />
+          <view wx:else class="card-avatar-draft__fallback">暂无预览</view>
+          <button class="card-button-secondary" style="width: auto; flex: 1" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{status === 'SAVING'}}">选择微信头像</button>
+        </view>
+        <view wx:if="{{avatarDraftPending}}" class="card-status">所选头像仅在本页临时预览。当前冻结合同没有头像上传动作，保存时不会把临时路径当作云端资产。</view>
+      </view>
+
+      <view class="card-field">
+        <view class="card-field__label"><text>城市</text><text class="card-field__hint">7 国 13 城目录</text></view>
+        <picker range="{{cityNames}}" value="{{cityIndex}}" bindchange="onCityChange" disabled="{{status === 'SAVING'}}">
+          <view class="card-picker">
+            <text>{{cityIndex >= 0 ? cityNames[cityIndex] : '请选择城市'}}</text><text>⌄</text>
+          </view>
+        </picker>
+      </view>
+
+      <view class="card-field">
+        <view class="card-field__label"><text>一句话介绍</text><text class="card-field__hint">可编辑 · 最多 240 字</text></view>
+        <textarea class="card-textarea" value="{{biography}}" maxlength="240" auto-height="{{false}}" bindinput="onBiographyInput" disabled="{{status === 'SAVING'}}" placeholder="一句话介绍你自己" />
+        <text class="card-counter">{{biographyLength}} / 240</text>
+        <button class="card-button-secondary" style="margin-top: 16rpx" bindtap="generateIntroductionDraft" loading="{{generatingIntroduction}}" disabled="{{generatingIntroduction || status === 'SAVING'}}">生成可编辑介绍草稿</button>
+        <view wx:if="{{introductionNote}}" class="card-status">{{introductionNote}}</view>
+      </view>
+    </view>
+
+    <view class="card-form-section">
+      <text class="card-section-heading">完整资料</text>
+      <text class="card-section-caption">行业、公司、职位、经历和兴趣尚未进入冻结 ProfileUpdateInput。为防止误导，当前版本不开放伪保存。</text>
+      <view class="card-contract-lock"><text class="card-contract-lock__label">行业 · 公司 · 职位</text><text class="card-contract-lock__reason">合同待集成：当前不会发送未声明字段。</text></view>
+      <view class="card-contract-lock"><text class="card-contract-lock__label">经历</text><text class="card-contract-lock__reason">合同待集成：需要定义私密存储与公开投影字段。</text></view>
+      <view class="card-contract-lock"><text class="card-contract-lock__label">兴趣</text><text class="card-contract-lock__reason">合同待集成：需要同步逐字段可见性。</text></view>
+    </view>
+
+    <view wx:if="{{message}}" class="card-status {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : status === 'SAVED' ? 'card-status--success' : ''}}" aria-live="polite">{{message}}</view>
+
+    <view class="card-stack">
+      <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{creatingProfile ? '创建最小资料' : '保存合同支持的资料'}}</button>
+      <button wx:if="{{status === 'PROJECTION_PENDING'}}" class="card-button-secondary" bindtap="retryProjectionRefresh">重试公开投影刷新</button>
+      <navigator class="card-link-button" url="/packageCard/pages/privacy/index" hover-class="none">查看逐字段隐私说明</navigator>
+    </view>
+  </block>
+
+  <view class="card-status">运行模式：{{runtimeMode}}。AI 草稿只写入可编辑文本框，不读取或修改认证状态。</view>
+</view>

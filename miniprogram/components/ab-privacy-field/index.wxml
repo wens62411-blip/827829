@@ -1,0 +1,42 @@
+<view class="privacy-field" aria-role="group" aria-label="{{label}}字段隐私">
+  <view class="privacy-field__heading">
+    <view class="privacy-field__title-row">
+      <text class="privacy-field__title">{{label || '资料字段'}}</text>
+      <text wx:if="{{required}}" class="privacy-field__required">必填</text>
+      <text wx:if="{{lockedPrivate}}" class="privacy-field__locked">固定私密</text>
+    </view>
+    <text wx:if="{{helper}}" class="privacy-field__helper">{{helper}}</text>
+  </view>
+
+  <view class="privacy-field__editor"><slot name="editor"></slot></view>
+
+  <view wx:if="{{!visibilityKnown && !lockedPrivate}}" class="privacy-field__unknown" aria-live="polite">
+    当前可见性未读取。保存前请重新加载资料；组件不会把未知状态默认为公开或私密。
+  </view>
+  <view wx:if="{{lockedPrivate}}" class="privacy-field__private-note" aria-role="note">
+    此类私密资料固定为 PRIVATE，仅本人可见，且永久不进入公开投影。
+  </view>
+
+  <view class="privacy-field__options" aria-label="可见性选项">
+    <button
+      wx:for="{{options}}"
+      wx:key="value"
+      class="privacy-field__option {{selectedVisibility === item.value ? 'privacy-field__option--selected' : ''}}"
+      plain="{{true}}"
+      disabled="{{disabled || sensitive}}"
+      data-visibility="{{item.value}}"
+      bindtap="handleSelect"
+      aria-pressed="{{selectedVisibility === item.value}}"
+      aria-label="{{item.value}}：{{item.title}}"
+    >
+      <view class="privacy-field__option-copy">
+        <text class="privacy-field__option-code">{{item.value}}</text>
+        <text class="privacy-field__option-title">{{item.title}}</text>
+        <text class="privacy-field__option-summary">{{item.summary}}</text>
+      </view>
+      <text class="privacy-field__check" aria-hidden="true">{{selectedVisibility === item.value ? '✓' : ''}}</text>
+    </button>
+  </view>
+
+  <view class="privacy-field__footer"><slot name="footer"></slot></view>
+</view>

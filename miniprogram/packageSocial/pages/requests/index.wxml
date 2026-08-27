@@ -1,0 +1,33 @@
+<view class="requests ab-safe-bottom">
+  <text class="requests__eyebrow">PRIVATE · 仅本人可见</text>
+  <text class="requests__title">收到的申请</text>
+  <text class="requests__lead">接受后建立 AB Club 平台关系；这里不会添加微信好友，也没有聊天入口。</text>
+
+  <view wx:if="{{errorMessage}}" class="requests__notice" aria-role="alert">
+    <text>{{errorMessage}}</text>
+    <button class="requests__retry" disabled="{{loading}}" bindtap="onRetry">重新加载</button>
+  </view>
+  <view wx:elif="{{loading && !loaded}}" class="requests__notice" aria-role="status">正在读取收到的申请…</view>
+
+  <view wx:if="{{requests.length}}" class="requests__list">
+    <ab-friend-request
+      wx:for="{{requests}}"
+      wx:key="friendshipId"
+      friendship-id="{{item.friendshipId}}"
+      display-name="{{item.displayName}}"
+      headline="{{item.headline}}"
+      avatar-url="{{item.avatarUrl}}"
+      message="{{item.message}}"
+      state="{{item.state}}"
+      direction="INCOMING"
+      busy="{{busyFriendshipId === item.friendshipId}}"
+      bind:accept="onAccept"
+      bind:reject="onReject"
+    />
+  </view>
+  <view wx:elif="{{loaded}}" class="requests__empty">
+    <text class="requests__empty-title">暂无待处理申请</text>
+    <text class="requests__empty-note">新的“申请认识”会出现在这里。</text>
+  </view>
+  <view wx:if="{{loadingMore}}" class="requests__loading-more" aria-role="status">正在加载更多…</view>
+</view>

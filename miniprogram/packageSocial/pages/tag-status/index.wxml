@@ -1,0 +1,73 @@
+<view class="status ab-safe-bottom">
+  <text class="status__eyebrow">PRIVATE REVIEW VIEW</text>
+  <text class="status__title">我的审核状态</text>
+  <text class="status__lead">这里只读取本人申请。待处理、退回与拒绝状态不会进入公开 API，也不会向陌生人展示。</text>
+
+  <view wx:if="{{errorMessage}}" class="status__notice" aria-role="alert">
+    <text>{{errorMessage}}</text>
+    <button class="status__text-button" disabled="{{loading}}" bindtap="loadMine">重新加载</button>
+  </view>
+  <view wx:elif="{{loading && !loaded}}" class="status__notice" aria-role="status">正在读取本人申请…</view>
+
+  <view wx:if="{{requests.length}}" class="status__layout">
+    <scroll-view class="status__tabs" scroll-x enhanced show-scrollbar="false" aria-label="本人标签申请列表">
+      <button
+        wx:for="{{requests}}"
+        wx:key="verificationRequestId"
+        class="status__tab {{selected.verificationRequestId === item.verificationRequestId ? 'status__tab--active' : ''}}"
+        data-request-id="{{item.verificationRequestId}}"
+        bindtap="onSelectRequest"
+      >
+        <text class="status__tab-name">{{item.labelName}}</text>
+        <text class="status__tab-state">{{item.statusLabel}}</text>
+      </button>
+    </scroll-view>
+
+    <view wx:if="{{selected}}" class="status__detail">
+      <view class="status__detail-head">
+        <view>
+          <text class="status__detail-label">{{selected.labelName}}</text>
+          <text class="status__detail-id">本人申请详情 · 原件地址已隐藏</text>
+        </view>
+        <text class="status__badge status__badge--{{selected.status}}">{{selected.statusLabel}}</text>
+      </view>
+
+      <ab-review-timeline
+        status="{{selected.status}}"
+        created-at-label="{{selected.createdAtLabel}}"
+        reviewer-note="{{selected.reviewerNote}}"
+        evidence-count="{{selected.evidenceCount}}"
+      />
+
+      <view wx:if="{{selected.status === 'APPROVED'}}" class="status__policy" aria-role="note">
+        审核通过不等于自动公开。公开还必须具备有效 ReviewLog、审核人/时间/范围、未过期未撤销、目录允许公开和本人主动选择公开。
+      </view>
+      <view wx:if="{{selected.status === 'REJECTED' || selected.status === 'NEEDS_CHANGES'}}" class="status__policy" aria-role="note">
+        此状态只在本人界面显示，不构成公开认证，也不会产生 HUMAN_REVIEWED 徽章。
+      </view>
+
+      <navigator
+        wx:if="{{selected.canResubmit}}"
+        class="status__button status__button--primary"
+        url="/packageSocial/pages/tag-apply/index?verificationRequestId={{selected.verificationRequestId}}"
+        hover-class="none"
+      >按要求补充并重新提交</navigator>
+      <button
+        wx:if="{{selected.canWithdraw}}"
+        class="status__button status__button--danger"
+        loading="{{busyAction === 'withdraw'}}"
+        disabled="{{busyAction}}"
+        bindtap="onWithdraw"
+      >撤回并删除申请</button>
+    </view>
+  </view>
+
+  <view wx:elif="{{loaded}}" class="status__empty">
+    <text class="status__empty-title">还没有标签申请</text>
+    <navigator class="status__button status__button--primary" url="/packageSocial/pages/tag-apply/index" hover-class="none">发起标签申请</navigator>
+  </view>
+
+  <view class="status__honesty" aria-role="note">
+    本页展示冻结状态机的“状态路径”，不是 ReviewLog。当前 DTO 未提供逐步审核时间、reviewedBy 或 reviewScope，因此页面不会从 updatedAt 推断或伪造这些事实。
+  </view>
+</view>

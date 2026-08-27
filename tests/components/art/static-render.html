@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <title>AB Club Art — LOCAL_STATIC_RENDER</title>
+  <style>
+    :root {
+      --paper: #f6f1e7;
+      --surface: #fcfbf7;
+      --ink: #1c2723;
+      --green: #173c32;
+      --gold: #a67c3d;
+      --line: rgba(28, 39, 35, 0.2);
+      --muted: #66706b;
+      font-family: ui-serif, Georgia, "Songti SC", "Noto Serif CJK SC", serif;
+      color: var(--ink);
+      background: var(--paper);
+    }
+    * { box-sizing: border-box; }
+    html, body { margin: 0; min-height: 100%; background: var(--paper); }
+    body { width: 390px; min-height: 844px; overflow: hidden; }
+    button { font: inherit; }
+    .screen { display: none; min-height: 844px; padding: 0 22px 30px; background: var(--paper); }
+    .screen.is-active { display: block; }
+    .evidence-strip {
+      margin: 0 -22px 24px;
+      padding: 9px 16px;
+      color: #fff;
+      background: var(--green);
+      font-family: ui-sans-serif, system-ui, sans-serif;
+      font-size: 9px;
+      font-weight: 700;
+      letter-spacing: 0.09em;
+      text-align: center;
+    }
+    .masthead { display: flex; align-items: center; justify-content: space-between; padding: 0 0 20px; border-bottom: 1px solid var(--line); }
+    .brand { font-size: 15px; letter-spacing: 0.16em; font-weight: 700; }
+    .folio, .kicker, .meta, .chip, .label, .fine, .button {
+      font-family: ui-sans-serif, system-ui, "Microsoft YaHei", sans-serif;
+    }
+    .folio { color: var(--muted); font-size: 10px; letter-spacing: 0.08em; }
+    .hero { padding: 38px 0 30px; }
+    .kicker { color: var(--gold); font-size: 10px; font-weight: 700; letter-spacing: 0.17em; text-transform: uppercase; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { margin-top: 14px; max-width: 330px; font-size: 39px; font-weight: 500; line-height: 1.12; letter-spacing: -0.035em; }
+    h2 { font-size: 25px; font-weight: 500; line-height: 1.24; }
+    h3 { font-size: 17px; font-weight: 500; line-height: 1.38; }
+    .dek { margin-top: 17px; max-width: 320px; color: var(--muted); font-size: 13px; line-height: 1.75; }
+    .category-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .category { padding: 16px 8px 17px; min-width: 0; }
+    .category + .category { border-left: 1px solid var(--line); }
+    .category strong { display: block; font-size: 17px; font-weight: 500; }
+    .category span { display: block; margin-top: 5px; color: var(--muted); font-family: ui-sans-serif, system-ui, sans-serif; font-size: 8px; letter-spacing: 0.12em; }
+    .feature { display: grid; grid-template-columns: 0.93fr 1.07fr; gap: 18px; padding: 25px 0 20px; border-bottom: 1px solid var(--line); }
+    .feature img { width: 100%; aspect-ratio: 4 / 5; object-fit: contain; background: var(--surface); border: 1px solid var(--line); }
+    .meta { color: var(--gold); font-size: 9px; font-weight: 700; letter-spacing: 0.09em; }
+    .feature h2 { margin-top: 12px; font-size: 20px; }
+    .feature p { margin-top: 12px; color: var(--muted); font-size: 11px; line-height: 1.65; }
+    .fine { margin-top: 12px; color: var(--muted); font-size: 9px; line-height: 1.55; }
+    .tabs { display: flex; gap: 20px; padding: 17px 0; border-bottom: 1px solid var(--line); }
+    .tab { color: var(--muted); font-family: ui-sans-serif, system-ui, sans-serif; font-size: 11px; }
+    .tab.active { color: var(--ink); font-weight: 700; border-bottom: 1px solid var(--gold); }
+    .section-head { padding: 30px 0 22px; }
+    .section-head h1 { font-size: 34px; }
+    .pearl-note { margin-top: 13px; padding-left: 12px; border-left: 2px solid var(--gold); color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .editorial-list { border-top: 1px solid var(--ink); }
+    .row { display: grid; grid-template-columns: 30px 1fr auto; gap: 12px; align-items: start; padding: 20px 0; border-bottom: 1px solid var(--line); }
+    .row-no { color: var(--gold); font-family: ui-sans-serif, system-ui, sans-serif; font-size: 10px; }
+    .row h3 { overflow-wrap: anywhere; }
+    .row p { margin-top: 8px; color: var(--muted); font-size: 11px; line-height: 1.55; }
+    .chip { align-self: start; padding: 4px 6px; border: 1px solid var(--line); color: var(--green); font-size: 8px; white-space: nowrap; }
+    .detail-title { padding: 30px 0 23px; border-bottom: 1px solid var(--ink); }
+    .detail-title h1 { font-size: 30px; overflow-wrap: anywhere; }
+    .detail-title .dek { font-size: 12px; }
+    .object-frame { position: relative; margin: 22px 0; border: 1px solid var(--line); background: var(--surface); }
+    .object-frame img { display: block; width: 100%; height: 208px; object-fit: contain; opacity: 0.92; }
+    .object-frame .stamp { position: absolute; left: 10px; bottom: 10px; padding: 5px 7px; color: #fff; background: rgba(23, 60, 50, 0.92); font: 700 8px/1.2 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.08em; }
+    .field-grid { display: grid; grid-template-columns: 1fr 1fr; margin-bottom: 22px; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+    .field { min-height: 66px; padding: 11px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .label { display: block; color: var(--muted); font-size: 8px; letter-spacing: 0.08em; }
+    .value { display: block; margin-top: 7px; font-size: 12px; line-height: 1.35; overflow-wrap: anywhere; }
+    .provenance { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--ink); border-left: 1px solid var(--line); }
+    .provenance section { min-height: 105px; padding: 13px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .provenance h3 { font: 700 10px/1.3 ui-sans-serif, system-ui, sans-serif; letter-spacing: 0.08em; }
+    .provenance p { margin-top: 8px; color: var(--muted); font-size: 10px; line-height: 1.55; overflow-wrap: anywhere; }
+    .button { display: block; width: 100%; margin-top: 18px; padding: 13px 16px; border: 1px solid var(--green); color: #fff; background: var(--green); font-size: 12px; font-weight: 700; }
+    .notice { margin: 28px 0 18px; padding: 14px; border: 1px solid var(--gold); background: var(--surface); }
+    .notice strong { display: block; font: 700 11px/1.4 ui-sans-serif, system-ui, sans-serif; }
+    .notice p { margin-top: 7px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .missing-image { display: grid; place-items: center; min-height: 230px; padding: 28px; border: 1px solid var(--line); background: var(--surface); text-align: center; }
+    .missing-mark { width: 58px; height: 58px; border: 1px solid var(--gold); transform: rotate(45deg); }
+    .missing-image h2 { margin-top: 28px; }
+    .missing-image p { margin-top: 10px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    .empty { margin-top: 20px; padding: 30px 16px; border-top: 1px solid var(--ink); border-bottom: 1px solid var(--line); text-align: center; }
+    .empty p { margin-top: 10px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+    body[data-view="detail"] .evidence-strip { margin-bottom: 14px; }
+    body[data-view="detail"] .masthead { padding-bottom: 12px; }
+    body[data-view="detail"] .detail-title { padding: 18px 0 14px; }
+    body[data-view="detail"] .detail-title h1 { margin-top: 10px; font-size: 24px; line-height: 1.08; }
+    body[data-view="detail"] .detail-title .dek { margin-top: 10px; font-size: 10px; }
+    body[data-view="detail"] .object-frame { margin: 12px 0; }
+    body[data-view="detail"] .object-frame img { height: 128px; }
+    body[data-view="detail"] .field-grid { margin-bottom: 12px; }
+    body[data-view="detail"] .field { min-height: 50px; padding: 8px; }
+    body[data-view="detail"] .field .value { margin-top: 4px; font-size: 10px; }
+    body[data-view="detail"] .provenance section { min-height: 72px; padding: 9px; }
+    body[data-view="detail"] .provenance h3 { font-size: 8px; }
+    body[data-view="detail"] .provenance p { margin-top: 5px; font-size: 8px; line-height: 1.42; }
+    body[data-view="detail"] .button { margin-top: 10px; padding: 9px 12px; font-size: 10px; }
+    @media (prefers-color-scheme: dark) {
+      :root { --paper: #151b18; --surface: #1d2622; --ink: #f1eadc; --green: #285c4c; --gold: #c79a54; --line: rgba(241, 234, 220, 0.22); --muted: #b2b9b4; }
+    }
+    @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; } }
+  </style>
+</head>
+<body data-view="channel">
+  <main class="screen" data-screen="channel">
+    <div class="evidence-strip">LOCAL_STATIC_RENDER · NOT DEVTOOLS / DEVICE EVIDENCE</div>
+    <header class="masthead"><span class="brand">AB CLUB</span><span class="folio">ART CHANNEL · 01</span></header>
+    <section class="hero">
+      <div class="kicker">Art · Antiques · Jewellery</div>
+      <h1>收藏，被更诚实地看见</h1>
+      <p class="dek">以来源、审核和图片权利为先的编辑式内容频道。平台展示信息，不提供交易、竞拍或真伪鉴定结论。</p>
+    </section>
+    <nav class="category-grid" aria-label="艺术频道分类">
+      <div class="category"><strong>艺术</strong><span>ART</span></div>
+      <div class="category"><strong>古董</strong><span>ANTIQUES</span></div>
+      <div class="category"><strong>珠宝</strong><span>JEWELLERY</span></div>
+    </nav>
+    <article class="feature">
+      <img src="../../../miniprogram/assets/art/not-real-artwork-fallback.svg" alt="抽象几何占位图：非真实艺术品">
+      <div>
+        <div class="meta">SYNTHETIC · DEMO_ONLY</div>
+        <h2>编辑精选：如何阅读一条来源记录</h2>
+        <p>先看资料从何而来，再区分内容审核、图片权利与第三方报告引用。</p>
+        <div class="fine">占位图不代表真实作品 · 城市关联使用共享稳定 ID</div>
+      </div>
+    </article>
+  </main>
+
+  <main class="screen" data-screen="category">
+    <div class="evidence-strip">LOCAL_STATIC_RENDER · SYNTHETIC DEMO DATA</div>
+    <header class="masthead"><span class="brand">AB CLUB</span><span class="folio">CATEGORY · 02</span></header>
+    <nav class="tabs" aria-label="分类切换"><span class="tab">艺术</span><span class="tab">古董</span><span class="tab active">珠宝</span></nav>
+    <section class="section-head">
+      <div class="kicker">Jewellery</div>
+      <h1>珠宝</h1>
+      <p class="pearl-note">珍珠明确归入珠宝；材质声明、尺寸与报告引用分别展示，不承诺保值或投资回报。</p>
+    </section>
+    <section class="editorial-list" aria-label="珠宝演示内容">
+      <article class="row">
+        <span class="row-no">01</span>
+        <div><h3>海水珍珠项饰研究样本：一条故意很长的中英文混排标题 Pearl Jewellery Reference Record for Long-title Layout Verification</h3><p>材质声明：银色金属与养殖海水珍珠 · 尺寸：演示数据 · 报告：仅引用，不代替出具机构原文</p></div>
+        <span class="chip">DEMO_ONLY</span>
+      </article>
+      <article class="row">
+        <span class="row-no">02</span>
+        <div><h3>无公开图片的珠宝资料条目</h3><p>图片权利依据不足，因此不展示图片。来源页与审核时间仍独立可见。</p></div>
+        <span class="chip">无图</span>
+      </article>
+      <article class="row">
+        <span class="row-no">03</span>
+        <div><h3>上海 · 相关线下品鉴</h3><p>城市关联：cn-shanghai · 预约仅记录意向，不代表名额、库存或成交。</p></div>
+        <span class="chip">意向</span>
+      </article>
+    </section>
+  </main>
+
+  <main class="screen" data-screen="detail">
+    <div class="evidence-strip">LOCAL_STATIC_RENDER · NOT A REAL ARTWORK RECORD</div>
+    <header class="masthead"><span class="brand">AB CLUB</span><span class="folio">DETAIL · 03</span></header>
+    <section class="detail-title">
+      <div class="meta">SYNTHETIC · DEMO_ONLY · ART</div>
+      <h1>Study in Quiet Geometry — 用于超长标题与来源分区验证的演示条目</h1>
+      <p class="dek">城市关联：cn-shanghai · publicationState: PUBLISHED</p>
+    </section>
+    <figure class="object-frame">
+      <img src="../../../miniprogram/assets/art/not-real-artwork-fallback.svg" alt="抽象几何占位图：非真实艺术品">
+      <figcaption class="stamp">NOT_REAL_ARTWORK FALLBACK</figcaption>
+    </figure>
+    <section class="field-grid" aria-label="艺术字段">
+      <div class="field"><span class="label">作者</span><span class="value">演示作者 / Synthetic Creator</span></div>
+      <div class="field"><span class="label">年份</span><span class="value">2026（演示）</span></div>
+      <div class="field"><span class="label">媒介</span><span class="value">数字排版研究</span></div>
+      <div class="field"><span class="label">尺寸 / 版数</span><span class="value">120 × 90 cm / N.A.</span></div>
+    </section>
+    <section class="provenance" aria-label="证据状态">
+      <section><h3>01 · 来源</h3><p>项目内脱敏 fixture；sourceUrl 独立保留。</p></section>
+      <section><h3>02 · 内容审核</h3><p>PUBLISHED · reviewedAt 单独展示，不等于鉴定。</p></section>
+      <section><h3>03 · 图片权利</h3><p>CLAIMED · 当前仅展示项目自有非作品占位图。</p></section>
+      <section><h3>04 · 平台说明</h3><p>平台不做真伪鉴定，不承诺价值、收益或成交。</p></section>
+    </section>
+    <button class="button" type="button">提交合作意向 · 不构成成交</button>
+  </main>
+
+  <main class="screen" data-screen="exception">
+    <div class="evidence-strip">LOCAL_STATIC_RENDER · ERROR / EMPTY STATE</div>
+    <header class="masthead"><span class="brand">AB CLUB</span><span class="folio">RESILIENCE · 04</span></header>
+    <aside class="notice" aria-live="polite"><strong>网络连接较慢</strong><p>已保留当前筛选条件。可稍后重试；不会静默切换为未标识的演示数据。</p></aside>
+    <section class="missing-image">
+      <div class="missing-mark" aria-hidden="true"></div>
+      <h2>图像未展示</h2>
+      <p>图片加载失败或缺少公开权利依据。正文、来源与审核状态仍可阅读，不以 AI 图片代替真实作品。</p>
+    </section>
+    <section class="empty">
+      <div class="kicker">Empty collection</div>
+      <h2>当前分类暂无可公开内容</h2>
+      <p>草稿、审核中、已归档或不允许公开的记录不会出现在这里。</p>
+      <button class="button" type="button">重新加载</button>
+    </section>
+  </main>
+
+  <script>
+    const requested = new URLSearchParams(location.search).get('view') || 'channel';
+    const valid = ['channel', 'category', 'detail', 'exception'];
+    const view = valid.includes(requested) ? requested : 'channel';
+    document.body.dataset.view = view;
+    document.querySelector(`[data-screen="${view}"]`).classList.add('is-active');
+    document.title = `AB Club Art ${view} — LOCAL_STATIC_RENDER`;
+  </script>
+</body>
+</html>

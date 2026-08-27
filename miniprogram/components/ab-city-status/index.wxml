@@ -1,0 +1,11 @@
+<view class="city" aria-role="group" aria-label="城市目录与运营状态">
+  <view>
+    <text class="city__label">目录城市</text>
+    <text class="city__value">{{cityName}}</text>
+  </view>
+  <view class="city__operation">
+    <text class="city__label">运营状态</text>
+    <text class="city__value">{{operationalState}}</text>
+  </view>
+</view>
+

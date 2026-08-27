@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-labelledby="title description">
+  <title id="title">非真实艺术品占位图</title>
+  <desc id="description">AB Club 项目自有抽象几何占位图，仅用于无图、无公开图片权利或图片加载失败状态，不代表任何真实艺术品、古董或珠宝。</desc>
+  <rect width="1200" height="900" fill="#F6F1E7"/>
+  <rect x="64" y="64" width="1072" height="772" fill="none" stroke="#173C32" stroke-width="2"/>
+  <path d="M132 646 C312 472 420 516 558 360 C688 214 852 240 1068 118" fill="none" stroke="#A67C3D" stroke-width="5"/>
+  <circle cx="340" cy="304" r="128" fill="none" stroke="#173C32" stroke-width="3"/>
+  <circle cx="340" cy="304" r="76" fill="none" stroke="#A67C3D" stroke-width="2"/>
+  <rect x="690" y="232" width="286" height="286" fill="none" stroke="#1C2723" stroke-width="3" transform="rotate(8 833 375)"/>
+  <path d="M132 716 H1068" stroke="#173C32" stroke-width="2"/>
+  <text x="132" y="770" fill="#1C2723" font-family="serif" font-size="32" letter-spacing="5">NOT REAL ARTWORK</text>
+  <text x="1068" y="770" fill="#173C32" font-family="sans-serif" font-size="24" text-anchor="end">非真实作品 · 清权占位</text>
+</svg>

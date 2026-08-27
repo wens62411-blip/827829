@@ -1,0 +1,46 @@
+<view class="request" aria-role="article" aria-label="{{displayName}}的申请认识请求">
+  <view class="request__profile">
+    <image
+      wx:if="{{avatarUrl}}"
+      class="request__avatar"
+      src="{{avatarUrl}}"
+      mode="aspectFill"
+      aria-label="{{displayName}}的头像"
+    />
+    <view wx:else class="request__avatar request__avatar--fallback" aria-hidden="true">AB</view>
+    <view class="request__identity">
+      <text class="request__name">{{displayName}}</text>
+      <text wx:if="{{headline}}" class="request__headline">{{headline}}</text>
+    </view>
+    <text class="request__status">{{statusLabel}}</text>
+  </view>
+
+  <view wx:if="{{message}}" class="request__message" aria-role="note">
+    <text class="request__message-label">申请附言</text>
+    <text class="request__message-text">{{message}}</text>
+  </view>
+
+  <view wx:if="{{showIncomingActions}}" class="request__actions" aria-role="group" aria-label="处理申请认识">
+    <button
+      class="request__button request__button--quiet"
+      disabled="{{busy}}"
+      bindtap="onReject"
+      aria-label="婉拒{{displayName}}的申请认识"
+    >婉拒</button>
+    <button
+      class="request__button request__button--primary"
+      loading="{{busy}}"
+      disabled="{{busy}}"
+      bindtap="onAccept"
+      aria-label="接受{{displayName}}的申请认识"
+    >接受</button>
+  </view>
+
+  <button
+    wx:if="{{showCancelAction}}"
+    class="request__button request__button--quiet request__button--full"
+    loading="{{busy}}"
+    disabled="{{busy}}"
+    bindtap="onCancel"
+  >撤回申请</button>
+</view>

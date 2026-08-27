@@ -1,0 +1,84 @@
+<view class="apply ab-safe-bottom">
+  <text class="apply__eyebrow">HUMAN REVIEW REQUIRED</text>
+  <text class="apply__title">公开标签申请</text>
+  <text class="apply__lead">选择目录标签、创建草稿并提交必要材料。OCR 或 AI 结果只可作为辅助检查，绝不会自动批准。</text>
+
+  <view class="apply__warning" aria-role="note">
+    <text class="apply__warning-title">材料最小化原则</text>
+    <text>请勿上传真实身份证原件、银行卡、家庭资产等超出业务必要范围的材料。单份不超过 5 MB，最多 3 份。</text>
+  </view>
+  <view class="apply__warning apply__warning--risk" aria-role="note">
+    财富、资产、车辆和家庭背景类标签在 P0 不具备公开资格；普通审核通过也不代表可以公开。
+  </view>
+
+  <view wx:if="{{errorMessage}}" class="apply__error" aria-role="alert">{{errorMessage}}</view>
+
+  <view class="apply__section">
+    <text class="apply__step">01</text>
+    <text class="apply__section-title">选择标签</text>
+    <text class="apply__section-note">目录接口当前只返回可用标签；分类、公开资格和独立合规开关须由冻结合同 proposal 补齐。</text>
+    <view wx:if="{{labels.length}}" class="apply__labels">
+      <ab-tag-application
+        wx:for="{{labels}}"
+        wx:key="labelId"
+        label-id="{{item.labelId}}"
+        name-zh="{{item.nameZh}}"
+        name-en="{{item.nameEn}}"
+        description-zh="{{item.descriptionZh}}"
+        enabled="{{item.enabled}}"
+        selected="{{selectedLabelId === item.labelId}}"
+        busy="{{busyAction || verificationRequestId}}"
+        bind:select="onSelectLabel"
+      />
+    </view>
+    <view wx:elif="{{loadingCatalog}}" class="apply__empty" aria-role="status">正在读取标签目录…</view>
+    <view wx:else class="apply__empty">当前没有可申请标签。</view>
+    <button
+      wx:if="{{selectedLabelId && !verificationRequestId}}"
+      class="apply__button apply__button--primary"
+      loading="{{busyAction === 'create-draft'}}"
+      disabled="{{busyAction}}"
+      bindtap="onCreateDraft"
+    >创建申请草稿</button>
+    <view wx:if="{{verificationRequestId}}" class="apply__draft-fact">草稿已创建 · 当前状态 {{currentStatus}}</view>
+  </view>
+
+  <view wx:if="{{verificationRequestId}}" class="apply__section">
+    <text class="apply__step">02</text>
+    <text class="apply__section-title">补充必要材料</text>
+    <text class="apply__section-note">原件路径不在页面展示，公开 API 也不得返回原件 URL。</text>
+    <view class="apply__chooser">
+      <button class="apply__button apply__button--quiet" disabled="{{busyAction || materials.length >= 3}}" bindtap="onChooseImages">选择图片</button>
+      <button class="apply__button apply__button--quiet" disabled="{{busyAction || materials.length >= 3}}" bindtap="onChooseDocuments">选择 PDF / 图片文件</button>
+    </view>
+    <view wx:if="{{materials.length}}" class="apply__materials">
+      <view wx:for="{{materials}}" wx:key="localId" class="apply__material">
+        <view class="apply__material-main">
+          <text class="apply__material-name">{{item.name}}</text>
+          <text class="apply__material-meta">{{item.sizeLabel}} · {{item.statusLabel}}</text>
+        </view>
+        <button class="apply__remove" data-local-id="{{item.localId}}" disabled="{{busyAction}}" bindtap="onRemoveMaterial" aria-label="移除{{item.name}}">移除</button>
+      </view>
+    </view>
+    <view wx:if="{{existingEvidenceCount}}" class="apply__draft-fact">已有 {{existingEvidenceCount}} 份私有材料（不显示原件地址）</view>
+  </view>
+
+  <view wx:if="{{verificationRequestId}}" class="apply__section">
+    <text class="apply__step">03</text>
+    <text class="apply__section-title">本人声明并提交</text>
+    <textarea
+      class="apply__textarea"
+      value="{{userStatement}}"
+      maxlength="500"
+      placeholder="说明申请理由与材料能证明的事实；请勿填写不必要的敏感信息。"
+      bindinput="onStatementInput"
+      disabled="{{busyAction}}"
+      aria-label="标签申请本人声明"
+    />
+    <view class="apply__public-choice" aria-role="note">
+      <text class="apply__warning-title">公开展示意愿</text>
+      <text>当前冻结提交 DTO 尚未承载本人公开选择，因此本次提交只进入审核，不会由客户端承诺自动公开。</text>
+    </view>
+    <button class="apply__button apply__button--primary" loading="{{busyAction === 'submit'}}" disabled="{{busyAction}}" bindtap="onSubmit">提交人工审核</button>
+  </view>
+</view>

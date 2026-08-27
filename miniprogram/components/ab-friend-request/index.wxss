@@ -1,0 +1,83 @@
+:host { display: block; }
+
+.request {
+  box-sizing: border-box;
+  padding: 28rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: var(--ab-radius-standard);
+  background: var(--ab-color-paper);
+  color: var(--ab-color-ink);
+}
+
+.request__profile {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+}
+
+.request__avatar {
+  display: flex;
+  flex: 0 0 88rpx;
+  align-items: center;
+  justify-content: center;
+  width: 88rpx;
+  height: 88rpx;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--ab-color-ivory);
+}
+
+.request__avatar--fallback {
+  color: var(--ab-color-green);
+  font-size: 24rpx;
+  font-weight: 700;
+}
+
+.request__identity { flex: 1; min-width: 0; }
+.request__name,
+.request__headline,
+.request__message-label,
+.request__message-text { display: block; }
+.request__name { font-size: 32rpx; font-weight: 700; }
+.request__headline { margin-top: 4rpx; color: var(--ab-color-muted); font-size: 26rpx; }
+.request__status { color: var(--ab-color-gold); font-size: 24rpx; font-weight: 700; }
+
+.request__message {
+  margin-top: 24rpx;
+  padding: 20rpx;
+  border-left: 6rpx solid var(--ab-color-gold-soft);
+  background: var(--ab-color-ivory);
+}
+
+.request__message-label { color: var(--ab-color-muted); font-size: 22rpx; }
+.request__message-text { margin-top: 6rpx; font-size: 28rpx; }
+
+.request__actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+  margin-top: 28rpx;
+}
+
+.request__button {
+  min-height: 88rpx;
+  border-radius: var(--ab-radius-small);
+  font-size: 28rpx;
+  font-weight: 700;
+}
+
+.request__button::after { border: 0; }
+.request__button--primary { background: var(--ab-color-green); color: #fff; }
+.request__button--quiet { border: 2rpx solid var(--ab-color-border); background: transparent; color: var(--ab-color-green); }
+.request__button--full { width: 100%; margin-top: 28rpx; }
+.request__button[disabled] { opacity: 0.55; }
+
+@media (prefers-color-scheme: dark) {
+  .request { border-color: var(--ab-color-dark-border); background: var(--ab-color-dark-surface); color: var(--ab-color-dark-text); }
+  .request__avatar,
+  .request__message { background: var(--ab-color-dark-canvas); }
+  .request__avatar--fallback,
+  .request__headline,
+  .request__message-label { color: var(--ab-color-dark-muted); }
+  .request__button--quiet { border-color: var(--ab-color-dark-border); color: var(--ab-color-dark-text); }
+}

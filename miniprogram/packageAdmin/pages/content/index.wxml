@@ -1,0 +1,43 @@
+<view class="admin-page">
+<view class="admin-header">
+<view class="admin-header__topline">
+<text class="admin-header__eyebrow">CONTENT · RIGHTS FIRST</text>
+<ab-evidence-label mode="{{runtimeMode}}" />
+</view>
+<text class="admin-header__title">艺术内容</text>
+<text class="admin-header__description">人工审核发布与下架。素材权利状态由服务端强制检查，AI 不提供真伪或权利结论。</text>
+</view>
+<view wx:if="{{gateState !== 'AUTHORIZED'}}" class="admin-gate" aria-live="polite">
+<text class="admin-gate__title">{{gateTitle}}</text>
+<text class="admin-gate__copy">{{gateMessage}}</text>
+<button wx:if="{{gateState !== 'CHECKING'}}" class="admin-gate__retry ab-touch-target" bindtap="refreshAccess">重新核验</button>
+</view>
+<block wx:else>
+<view class="admin-notice">
+<text class="admin-notice__title">权利状态检查</text>
+<text class="admin-notice__copy">ReviewCaseProjection 不包含私有权利材料。批准请求仍会由 content.review 在服务端校验，失败时保持原状态。</text>
+</view>
+<text wx:if="{{detailNotice}}" class="admin-page__notice" aria-live="polite">{{detailNotice}}</text>
+<view class="admin-layout">
+<ab-admin-queue
+items="{{items}}"
+loading="{{loading}}"
+has-more="{{hasMore}}"
+selected-handle="{{selectedHandle}}"
+bind:select="onSelect"
+bind:retry="onRetryQueue"
+bind:loadmore="onLoadMore"
+/>
+<ab-admin-case
+wx:if="{{detail}}"
+detail="{{detail}}"
+actions="{{actions}}"
+busy="{{actionBusy}}"
+notice="{{detailNotice}}"
+expires-in-seconds="{{120}}"
+bind:decision="onDecision"
+bind:close="clearDetail"
+/>
+</view>
+</block>
+</view>

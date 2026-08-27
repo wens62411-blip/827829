@@ -1,0 +1,71 @@
+<view class="admin-page">
+<view class="admin-header">
+<view class="admin-header__topline">
+<text class="admin-header__eyebrow">OPERATIONS · RESTRICTED</text>
+<ab-evidence-label mode="{{runtimeMode}}" />
+</view>
+<text class="admin-header__title">主理人与活动</text>
+<text class="admin-header__description">审核动作按域授权；城市、节点和支付能力只消费冻结公开投影。</text>
+</view>
+<view wx:if="{{gateState !== 'AUTHORIZED'}}" class="admin-gate" aria-live="polite">
+<text class="admin-gate__title">{{gateTitle}}</text>
+<text class="admin-gate__copy">{{gateMessage}}</text>
+<button wx:if="{{gateState !== 'CHECKING'}}" class="admin-gate__retry ab-touch-target" bindtap="refreshAccess">重新核验</button>
+</view>
+<block wx:else>
+<view class="admin-tabs" aria-role="tablist">
+<button wx:if="{{eventAvailable}}" class="admin-tab {{selectedDomain === 'EVENT' ? 'admin-tab--active' : ''}}" data-domain="EVENT" bindtap="onDomainChange">活动</button>
+<button wx:if="{{organizerAvailable}}" class="admin-tab {{selectedDomain === 'ORGANIZER' ? 'admin-tab--active' : ''}}" data-domain="ORGANIZER" bindtap="onDomainChange">主理人</button>
+</view>
+<view wx:if="{{selectedDomain === 'ORGANIZER'}}" class="admin-notice">
+<text class="admin-notice__title">主理人非通过决策暂不可提交</text>
+<text class="admin-notice__copy">冻结 PublicOrganizerProjection 只能表达已通过状态；拒绝和补材料按钮保持隐藏，避免伪造 APPROVED 响应，等待合同升级。</text>
+</view>
+<text wx:if="{{detailNotice}}" class="admin-page__notice" aria-live="polite">{{detailNotice}}</text>
+<view class="admin-layout">
+<ab-admin-queue
+items="{{items}}"
+loading="{{loading}}"
+has-more="{{hasMore}}"
+selected-handle="{{selectedHandle}}"
+bind:select="onSelect"
+bind:retry="onRetryQueue"
+bind:loadmore="onLoadMore"
+/>
+<ab-admin-case
+wx:if="{{detail}}"
+detail="{{detail}}"
+actions="{{actions}}"
+busy="{{actionBusy}}"
+notice="{{detailNotice}}"
+expires-in-seconds="{{120}}"
+bind:decision="onDecision"
+bind:close="clearDetail"
+/>
+</view>
+<view class="admin-section" aria-label="城市与节点只读状态">
+<text class="admin-section__title">城市与 AB Club 节点</text>
+<text class="admin-section__copy">{{citiesNotice}}</text>
+<view class="admin-readonly-list">
+<button wx:for="{{cities}}" wx:key="handle" class="admin-readonly-button ab-touch-target" data-handle="{{item.handle}}" bindtap="onCitySelect" aria-label="查看 {{item.cityName}} 公开节点">
+<ab-city-status city-name="{{item.cityName}}" operational-state="{{item.operationalState}}" />
+<text class="city-meta">{{item.countryName}} · {{item.timezone}}</text>
+</button>
+</view>
+<view wx:if="{{selectedNode}}" class="node-card">
+<text class="node-card__title">{{selectedNode.cityName}} · {{selectedNode.nodeName}}</text>
+<text class="node-card__copy">状态：{{selectedNode.operationalState}}</text>
+<text class="node-card__copy">公开主理人：{{selectedNode.organizerName}}</text>
+</view>
+</view>
+<view class="admin-section" aria-label="支付能力状态">
+<text class="admin-section__title">订单与退款</text>
+<text class="admin-section__copy">{{paymentReason}}</text>
+<text wx:if="{{paymentEnabled}}" class="admin-section__copy">能力已启用，但当前冻结路由没有订单/退款页，因此仍不展示假入口。</text>
+</view>
+<view class="admin-section" aria-label="功能开关状态">
+<text class="admin-section__title">Feature flag</text>
+<text class="admin-section__copy">冻结合同未提供 feature flag Action；此处只说明合同能力，不显示推测值或变更按钮。</text>
+</view>
+</block>
+</view>

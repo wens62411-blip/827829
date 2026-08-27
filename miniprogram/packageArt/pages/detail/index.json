@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "艺术内容详情",
+  "usingComponents": {
+    "ab-evidence-label": "/components/ab-evidence-label/index",
+    "ab-intent-action": "/components/ab-intent-action/index",
+    "ab-provenance-summary": "/components/ab-provenance-summary/index",
+    "art-page-state": "/packageArt/components/art-page-state/index"
+  }
+}

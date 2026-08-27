@@ -1,0 +1,32 @@
+<view class="admin-page">
+<view class="admin-header">
+<view class="admin-header__topline">
+<text class="admin-header__eyebrow">AUDIT · APPEND ONLY</text>
+<ab-evidence-label mode="{{runtimeMode}}" />
+</view>
+<text class="admin-header__title">审计日志</text>
+<text class="admin-header__description">只读 AuditEntryProjection。操作者、目标和 requestId 默认掩码，客户端不提供修改或删除。</text>
+</view>
+<view wx:if="{{gateState !== 'AUTHORIZED'}}" class="admin-gate" aria-live="polite">
+<text class="admin-gate__title">{{gateTitle}}</text>
+<text class="admin-gate__copy">{{gateMessage}}</text>
+<button wx:if="{{gateState !== 'CHECKING'}}" class="admin-gate__retry ab-touch-target" bindtap="refreshAccess">重新核验</button>
+</view>
+<block wx:else>
+<view class="admin-notice">
+<text class="admin-notice__title">脱敏只读视图</text>
+<text class="admin-notice__copy">冻结投影不包含完整 ReviewLog 前后状态或原始材料 URL；本页不会尝试读取私有审计文档。</text>
+</view>
+<text wx:if="{{listNotice}}" class="audit-notice" aria-live="polite">{{listNotice}}</text>
+<view class="admin-list" aria-role="list">
+<ab-audit-entry wx:for="{{entries}}" wx:key="id" entry="{{item}}" />
+<view wx:if="{{loading && !entries.length}}" class="admin-gate">
+<text class="admin-gate__title">正在读取脱敏审计投影</text>
+</view>
+<view wx:if="{{!loading && !entries.length}}" class="admin-gate">
+<text class="admin-gate__title">没有可展示审计记录</text>
+</view>
+<button wx:if="{{hasMore}}" class="audit-more ab-touch-target" loading="{{loading}}" disabled="{{loading}}" bindtap="onLoadMore">加载更多</button>
+</view>
+</block>
+</view>

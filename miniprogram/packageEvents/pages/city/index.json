@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "全球城市目录",
+  "usingComponents": {
+    "ab-city-hero": "/components/ab-city-hero/index"
+  }
+}

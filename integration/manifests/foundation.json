@@ -1,0 +1,70 @@
+{
+  "module": "foundation",
+  "phase": "FOUNDATION",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T07:36:31.066Z",
+  "overall": "LOCAL_TEST_PASS",
+  "gates": {
+    "local": {
+      "status": "PASS",
+      "evidence": [
+        "npm run build exited 0 on 2026-08-27",
+        "TypeScript mini, cloud and contract projects exited 0",
+        "44/44 Node tests and 337/337 foundation validations passed",
+        "Cloud runtime source SHA-256 092cbd05d9d4edade3d6df78c796eadce40caeb5c49306c567f21dc20f06a7b1 matched all 13 generated bundles",
+        "Conservative static package estimate 1533034 / 2097152 bytes passed; Developer Tools package result remains UNVERIFIED"
+      ]
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": ["No authorized AppID or WeChat Developer Tools evidence"]
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": ["No iOS device run"]
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": ["No Android device run"]
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": ["LOCAL_ONLY_NO_APPID cannot establish upload evidence"]
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": ["Production release is outside Prompt 01 scope"]
+    }
+  },
+  "artifacts": [
+    "DECISION_LOCK.md",
+    "docs/contracts/FROZEN.json",
+    "docs/contracts/actions/",
+    "miniprogram/shared/contracts/",
+    "cloudfunctions/",
+    "database/"
+  ],
+  "checks": [
+    {
+      "id": "cross-module-projections",
+      "status": "PASS",
+      "evidence": "STATIC_CONTRACT_PASS: tests verify the four projection DTO directions and prohibit feature entrypoint imports from another domain; business behavior remains NOT_IMPLEMENTED"
+    },
+    {
+      "id": "projection-invalidation",
+      "status": "PASS",
+      "evidence": "Cloud tests verify exact invalidation fields, immutable clone, dirty marking, stale denial and collection-specific atomic revocation patch binding for all 10 supported source collections"
+    },
+    {
+      "id": "collection-writer-matrix",
+      "status": "PASS",
+      "evidence": "Security tests verify all 25 named collections are covered by the frozen 15-row writer matrix"
+    }
+  ],
+  "knownGaps": [
+    "No feature business workflow is implemented",
+    "No authorized WeChat AppID or CloudBase environment is configured",
+    "Developer Tools, device, upload and release gates are unverified",
+    "Real payment remains disabled"
+  ]
+}

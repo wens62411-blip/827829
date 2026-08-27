@@ -1,0 +1,32 @@
+<view class="art-intent"><view class="art-intent__inner"><art-page-state
+      wx:if="{{state === 'LOADING' || state === 'ERROR'}}"
+      kind="{{state}}"
+      title="{{stateTitle}}"
+      description="{{stateDescription}}"
+      weak-network="{{weakNetwork}}"
+      retryable="{{retryable}}"
+      bindretry="handleRetry"
+    /><block wx:if="{{state === 'READY'}}"><view class="art-intent__topline"><text class="art-intent__eyebrow">EXPRESSION OF INTEREST</text><ab-evidence-label mode="{{runtimeMode}}" /></view><view class="art-intent__header"><text class="art-intent__title">联系意向</text><text class="art-intent__subtitle">表达希望被联系的用途，不创建订单。</text></view><view class="art-intent__context" aria-label="关联内容"><view class="art-intent__context-topline"><text>{{categoryLabel}}</text><text>{{evidenceScope}}</text></view><text class="art-intent__content-title">{{contentTitle}}</text></view><view class="art-intent__section" aria-label="选择意向用途"><view class="art-intent__section-heading"><text class="art-intent__section-index">01</text><text class="art-intent__section-title">用途 / Purpose</text></view><view class="art-intent__purpose-list"><button
+            wx:for="{{purposeOptions}}"
+            wx:key="value"
+            class="art-intent__purpose {{purpose === item.value ? 'art-intent__purpose--active' : ''}}"
+            data-purpose="{{item.value}}"
+            disabled="{{submitting || intentState === 'ACTIVE'}}"
+            aria-current="{{purpose === item.value ? 'true' : 'false'}}"
+            bindtap="handlePurposeTap"
+          ><text class="art-intent__purpose-title">{{item.label}}</text><text class="art-intent__purpose-copy">{{item.description}}</text></button></view></view><view class="art-intent__section" aria-label="补充说明"><view class="art-intent__section-heading"><text class="art-intent__section-index">02</text><text class="art-intent__section-title">补充说明 / Note</text></view><textarea
+          class="art-intent__textarea"
+          value="{{message}}"
+          maxlength="180"
+          disabled="{{submitting || intentState === 'ACTIVE'}}"
+          placeholder="可选。请勿填写证件、支付或其他敏感信息。"
+          bindinput="handleMessageInput"
+        /><text class="art-intent__counter">{{messageLength}} / 180</text></view><view class="art-intent__section art-intent__action" aria-live="polite"><view class="art-intent__section-heading"><text class="art-intent__section-index">03</text><text class="art-intent__section-title">状态 / Status</text></view><text wx:if="{{feedback}}" class="art-intent__feedback art-intent__feedback--{{feedbackTone}}">{{feedback}}</text><ab-intent-action
+          content-id="{{contentId}}"
+          state="{{intentState}}"
+          loading="{{submitting}}"
+          create-label="提交或恢复当前意向"
+          cancel-label="取消当前意向"
+          bindintentcreate="handleIntentCreate"
+          bindintentcancel="handleIntentCancel"
+        /></view><view class="art-intent__boundary" aria-role="note"><text class="art-intent__boundary-title">能力边界</text><text>本页不提供购物车、库存锁定、竞拍、支付、物流或分佣。意向状态 ACTIVE 仅表示已记录联系需求，不代表任何一方接受合作或完成交易。</text></view></block></view></view>

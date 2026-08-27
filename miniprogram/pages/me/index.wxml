@@ -1,0 +1,43 @@
+<view class="card-page">
+  <text class="card-kicker">Account</text>
+  <text class="card-title">我的</text>
+  <text class="card-subtitle">管理完整资料、字段隐私与分享入口。私密资料不会进入公开名片。</text>
+
+  <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载个人资料"></view>
+
+  <view wx:elif="{{status === 'ERROR'}}" class="card-panel card-panel--error">
+    <text class="card-panel__title">资料暂时不可用</text>
+    <text class="card-panel__text">{{message}}</text>
+    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重试</button>
+    <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">创建或完善最小资料</navigator>
+  </view>
+
+  <view wx:elif="{{profile}}" class="card-panel card-panel--accent">
+    <view class="card-row card-row--wrap">
+      <view class="card-meta">
+        <text class="card-meta__label">当前昵称</text>
+        <text class="card-meta__value">{{profile.displayName}}</text>
+      </view>
+      <view class="card-runtime">资料完整度 {{completionPercent}}%</view>
+    </view>
+    <view wx:if="{{profile.phoneMasked}}" class="card-status">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开投影。</view>
+  </view>
+
+  <view class="card-panel">
+    <text class="card-panel__title">资料与名片</text>
+    <navigator class="card-list-link" url="/packageCard/pages/edit/index" hover-class="none">
+      <text>编辑个人资料</text><text class="card-list-link__arrow">›</text>
+    </navigator>
+    <navigator class="card-list-link" url="/packageCard/pages/privacy/index" hover-class="none">
+      <text>逐字段隐私</text><text class="card-list-link__arrow">›</text>
+    </navigator>
+    <navigator class="card-list-link" url="/packageCard/pages/share/index" hover-class="none">
+      <text>安全分享与撤销</text><text class="card-list-link__arrow">›</text>
+    </navigator>
+    <navigator class="card-list-link" open-type="switchTab" url="/pages/card/index" hover-class="none">
+      <text>查看我的公开名片</text><text class="card-list-link__arrow">›</text>
+    </navigator>
+  </view>
+
+  <view class="card-status">运行模式：{{runtimeMode}}。本地离线或云失败时，本页不会展示模拟资料。</view>
+</view>

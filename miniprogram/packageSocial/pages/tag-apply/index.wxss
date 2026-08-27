@@ -1,0 +1,40 @@
+.apply { box-sizing: border-box; min-height: 100vh; padding: 48rpx var(--ab-page-gutter); }
+.apply__eyebrow { display: block; color: var(--ab-color-gold); font-size: 22rpx; font-weight: 700; letter-spacing: 0.1em; }
+.apply__title { display: block; margin-top: 22rpx; color: var(--ab-color-green); font-family: Georgia, "Songti SC", serif; font-size: 46rpx; font-weight: 600; }
+.apply__lead, .apply__section-note, .apply__material-meta { display: block; color: var(--ab-color-muted); }
+.apply__lead { margin-top: 16rpx; font-size: 26rpx; }
+.apply__warning, .apply__error, .apply__public-choice { margin-top: 28rpx; padding: 24rpx; border-left: 6rpx solid var(--ab-color-gold); background: var(--ab-color-paper); font-size: 25rpx; }
+.apply__warning--risk, .apply__error { border-color: #9d3f36; }
+.apply__warning-title { display: block; margin-bottom: 6rpx; font-weight: 700; }
+.apply__section { margin-top: 52rpx; }
+.apply__step { display: block; color: var(--ab-color-gold); font-family: Georgia, serif; font-size: 24rpx; font-weight: 700; }
+.apply__section-title { display: block; margin-top: 6rpx; font-size: 34rpx; font-weight: 700; }
+.apply__section-note { margin-top: 8rpx; font-size: 24rpx; }
+.apply__labels { display: flex; flex-direction: column; gap: 18rpx; margin-top: 24rpx; }
+.apply__empty { margin-top: 24rpx; padding: 36rpx 24rpx; border: 2rpx dashed var(--ab-color-border); color: var(--ab-color-muted); font-size: 25rpx; text-align: center; }
+.apply__button { box-sizing: border-box; min-height: 88rpx; border-radius: var(--ab-radius-small); font-size: 27rpx; font-weight: 700; }
+.apply__button::after { border: 0; }
+.apply__button--primary { width: 100%; margin-top: 24rpx; background: var(--ab-color-green); color: #fff; }
+.apply__button--quiet { border: 2rpx solid var(--ab-color-border); background: transparent; color: var(--ab-color-green); }
+.apply__button[disabled], .apply__remove[disabled] { opacity: 0.55; }
+.apply__draft-fact { margin-top: 20rpx; padding: 18rpx 22rpx; background: var(--ab-color-paper); color: var(--ab-color-muted); font-size: 24rpx; }
+.apply__chooser { display: grid; grid-template-columns: 1fr 1fr; gap: 16rpx; margin-top: 22rpx; }
+.apply__materials { display: flex; flex-direction: column; gap: 14rpx; margin-top: 20rpx; }
+.apply__material { display: flex; align-items: center; gap: 18rpx; min-height: 88rpx; padding: 14rpx 20rpx; border: 2rpx solid var(--ab-color-border); border-radius: var(--ab-radius-small); background: var(--ab-color-paper); }
+.apply__material-main { flex: 1; min-width: 0; }
+.apply__material-name { display: block; overflow: hidden; font-size: 26rpx; font-weight: 700; text-overflow: ellipsis; white-space: nowrap; }
+.apply__material-meta { margin-top: 2rpx; font-size: 22rpx; }
+.apply__remove { min-width: 88rpx; min-height: 72rpx; margin: 0; padding: 0 14rpx; background: transparent; color: #9d3f36; font-size: 24rpx; }
+.apply__remove::after { border: 0; }
+.apply__textarea { box-sizing: border-box; width: 100%; min-height: 240rpx; margin-top: 22rpx; padding: 22rpx; border: 2rpx solid var(--ab-color-border); border-radius: var(--ab-radius-small); background: var(--ab-color-paper); }
+.apply__public-choice { color: var(--ab-color-muted); }
+@media (prefers-color-scheme: dark) {
+  .apply__title { color: var(--ab-color-dark-text); }
+  .apply__lead, .apply__section-note, .apply__material-meta, .apply__public-choice, .apply__draft-fact, .apply__empty { color: var(--ab-color-dark-muted); }
+  .apply__warning, .apply__error, .apply__public-choice, .apply__draft-fact, .apply__material, .apply__textarea { border-color: var(--ab-color-dark-border); background: var(--ab-color-dark-surface); color: var(--ab-color-dark-text); }
+  .apply__warning--risk, .apply__error { border-color: #e08f85; }
+  .apply__empty { border-color: var(--ab-color-dark-border); }
+  .apply__button--primary { background: var(--ab-color-gold-soft); color: var(--ab-color-dark-canvas); }
+  .apply__button--quiet { border-color: var(--ab-color-dark-border); color: var(--ab-color-dark-text); }
+  .apply__public-choice, .apply__draft-fact { color: var(--ab-color-dark-muted); }
+}

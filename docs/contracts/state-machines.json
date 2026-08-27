@@ -1,0 +1,43 @@
+{
+  "contractVersion": "1.0.0",
+  "enums": {
+    "RecordOrigin": ["REAL", "SYNTHETIC"],
+    "VerificationState": ["USER_DECLARED", "AI_CONSISTENCY_CHECKED", "HUMAN_REVIEWED", "NOT_APPLICABLE"],
+    "ReviewStatus": ["DRAFT", "SUBMITTED", "UNDER_REVIEW", "NEEDS_CHANGES", "APPROVED", "REJECTED", "EXPIRED", "REVOKED"],
+    "Visibility": ["PRIVATE", "FRIENDS_ONLY", "PUBLIC"],
+    "OperationalState": ["PLANNED", "RECRUITING_HOST", "PILOT", "LIVE", "PAUSED", "DISABLED"],
+    "RuntimeMode": ["LIVE", "DEGRADED", "OFFLINE_DEMO"],
+    "FriendshipState": ["PENDING", "ACCEPTED", "REJECTED", "CANCELLED", "REMOVED"],
+    "EventState": ["DRAFT", "SUBMITTED", "UNDER_REVIEW", "PUBLISHED", "PAUSED", "CANCELLED", "COMPLETED", "REJECTED"],
+    "EnrollmentState": ["INTERESTED", "WAITLISTED", "CONFIRMED", "CANCELLED", "ATTENDED", "NO_SHOW"],
+    "PaymentState": ["DISABLED", "NOT_REQUIRED", "PENDING", "AUTHORIZED", "PAID", "FAILED", "CANCELLED", "REFUNDED"],
+    "PublicationState": ["DRAFT", "SUBMITTED", "UNDER_REVIEW", "PUBLISHED", "UNPUBLISHED", "REJECTED"],
+    "EvidencePhase": ["FOUNDATION", "FEATURE_MODULE", "FINAL_INTEGRATION"]
+  },
+  "reviewTransitions": [
+    ["DRAFT", "SUBMITTED"],
+    ["SUBMITTED", "UNDER_REVIEW"],
+    ["UNDER_REVIEW", "APPROVED"],
+    ["UNDER_REVIEW", "REJECTED"],
+    ["UNDER_REVIEW", "NEEDS_CHANGES"],
+    ["NEEDS_CHANGES", "SUBMITTED"],
+    ["APPROVED", "EXPIRED"],
+    ["APPROVED", "REVOKED"]
+  ],
+  "verificationWithdrawal": {
+    "action": "verification.withdraw",
+    "allowedPreviousStatuses": ["DRAFT", "SUBMITTED"],
+    "persistence": "ATOMIC_PHYSICAL_DELETE",
+    "response": "VerificationWithdrawalTombstone",
+    "requiresOwnership": true,
+    "requiresExpectedVersion": true,
+    "requiresIdempotencyKey": true,
+    "auditAppend": true,
+    "projectionInvalidation": {
+      "kind": "VERIFICATION_CHANGED",
+      "reason": "VERIFICATION_REQUEST_WITHDRAWN",
+      "sourceVersion": "deletedVersion"
+    },
+    "invalidStateError": "REVIEW_INVALID_TRANSITION"
+  }
+}

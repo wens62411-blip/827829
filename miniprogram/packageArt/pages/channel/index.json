@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "艺术频道",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "ab-art-card": "/components/ab-art-card/index",
+    "ab-evidence-label": "/components/ab-evidence-label/index",
+    "art-page-state": "/packageArt/components/art-page-state/index"
+  }
+}

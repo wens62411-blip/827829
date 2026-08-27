@@ -1,0 +1,55 @@
+<view class="admin-page">
+<view class="admin-header">
+<view class="admin-header__topline">
+<text class="admin-header__eyebrow">REVIEW · HUMAN ONLY</text>
+<ab-evidence-label mode="{{runtimeMode}}" />
+</view>
+<text class="admin-header__title">标签与举报</text>
+<text class="admin-header__description">列表默认脱敏。详情只消费冻结投影，所有决定必须由人明确点击。</text>
+</view>
+<view wx:if="{{gateState !== 'AUTHORIZED'}}" class="admin-gate" aria-live="polite">
+<text class="admin-gate__title">{{gateTitle}}</text>
+<text class="admin-gate__copy">{{gateMessage}}</text>
+<button wx:if="{{gateState !== 'CHECKING'}}" class="admin-gate__retry ab-touch-target" bindtap="refreshAccess">重新核验</button>
+</view>
+<block wx:else>
+<view class="admin-tabs" aria-role="tablist">
+<button
+wx:if="{{socialAvailable}}"
+class="admin-tab {{selectedQueue === 'SOCIAL' ? 'admin-tab--active' : ''}}"
+data-queue="SOCIAL"
+bindtap="onQueueChange"
+aria-role="tab"
+>标签审核</button>
+<button
+wx:if="{{reportAvailable}}"
+class="admin-tab {{selectedQueue === 'REPORT' ? 'admin-tab--active' : ''}}"
+data-queue="REPORT"
+bindtap="onQueueChange"
+aria-role="tab"
+>举报处理</button>
+</view>
+<text wx:if="{{detailNotice}}" class="admin-page__notice" aria-live="polite">{{detailNotice}}</text>
+<view class="admin-layout">
+<ab-admin-queue
+items="{{items}}"
+loading="{{loading}}"
+has-more="{{hasMore}}"
+selected-handle="{{selectedHandle}}"
+bind:select="onSelect"
+bind:retry="onRetryQueue"
+bind:loadmore="onLoadMore"
+/>
+<ab-admin-case
+wx:if="{{detail}}"
+detail="{{detail}}"
+actions="{{actions}}"
+busy="{{actionBusy}}"
+notice="{{detailNotice}}"
+expires-in-seconds="{{120}}"
+bind:decision="onDecision"
+bind:close="clearDetail"
+/>
+</view>
+</block>
+</view>

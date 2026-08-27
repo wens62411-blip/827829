@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="750" height="1334" viewBox="0 0 750 1334" role="img" aria-labelledby="title desc">
+  <title id="title">AB Club 本人审核状态路径合成演示</title>
+  <desc id="desc">明确标注 SYNTHETIC DEMO_ONLY 的需要补充材料状态路径，不是 ReviewLog。</desc>
+  <rect width="750" height="1334" fill="#F6F1E7"/>
+  <rect x="32" y="36" width="686" height="52" rx="6" fill="#173C32"/>
+  <text x="56" y="70" fill="#FCFBF7" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="22" font-weight="700" letter-spacing="2">SYNTHETIC · DEMO_ONLY · 非真实用户</text>
+
+  <text x="40" y="142" fill="#A67C3D" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18" font-weight="700" letter-spacing="2">PRIVATE REVIEW VIEW</text>
+  <text x="40" y="202" fill="#173C32" font-family="Georgia, Songti SC, SimSun, serif" font-size="46" font-weight="600">我的审核状态</text>
+  <text x="40" y="244" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="21">仅本人视角 · 脱敏 fixture · 原件地址不展示</text>
+
+  <rect x="40" y="282" width="670" height="124" rx="16" fill="#FCFBF7" stroke="#D9D2C5" stroke-width="2"/>
+  <text x="68" y="326" fill="#1C2723" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="27" font-weight="700">企业成员（演示标签）</text>
+  <text x="68" y="362" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="19">申请人 A** · 2 份私有材料</text>
+  <rect x="500" y="314" width="174" height="52" rx="4" fill="none" stroke="#A67C3D" stroke-width="2"/>
+  <text x="519" y="347" fill="#A67C3D" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="20" font-weight="700">需要补充材料</text>
+
+  <rect x="40" y="434" width="670" height="630" rx="18" fill="#FCFBF7" stroke="#D9D2C5" stroke-width="2"/>
+  <text x="68" y="486" fill="#1C2723" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="28" font-weight="700">申请状态路径</text>
+  <text x="68" y="518" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">非 ReviewLog · 不从 updatedAt 推断审核时间</text>
+
+  <line x1="91" y1="576" x2="91" y2="845" stroke="#173C32" stroke-width="4"/>
+  <circle cx="91" cy="582" r="12" fill="#173C32"/>
+  <text x="126" y="590" fill="#1C2723" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700">创建草稿</text>
+  <text x="126" y="620" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">已完成 · 无伪造逐步时间</text>
+
+  <circle cx="91" cy="680" r="12" fill="#173C32"/>
+  <text x="126" y="688" fill="#1C2723" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700">提交申请</text>
+  <text x="126" y="718" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">已完成 · 进入人工审核流程</text>
+
+  <circle cx="91" cy="778" r="12" fill="#173C32"/>
+  <text x="126" y="786" fill="#1C2723" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700">人工审核</text>
+  <text x="126" y="816" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">已完成 · AI 不得代替人工决定</text>
+
+  <circle cx="91" cy="876" r="14" fill="#A67C3D"/>
+  <text x="126" y="884" fill="#A67C3D" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="25" font-weight="700">需要补充材料</text>
+  <text x="126" y="914" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">当前状态 · 仅本人可见</text>
+
+  <line x1="68" y1="954" x2="682" y2="954" stroke="#D9D2C5" stroke-width="2"/>
+  <text x="68" y="994" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">审核意见（合成演示文案）</text>
+  <text x="68" y="1029" fill="#1C2723" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="21">请补充可验证任职期限的非敏感材料。</text>
+
+  <rect x="40" y="1092" width="670" height="126" rx="10" fill="#173C32"/>
+  <text x="68" y="1135" fill="#FCFBF7" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="21" font-weight="700">证据边界</text>
+  <text x="68" y="1170" fill="#C8CFC9" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">此图只验证预期布局与文案，不是开发者工具预览，</text>
+  <text x="68" y="1198" fill="#C8CFC9" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="18">不证明 CloudBase、真机、人工审核通过或发布状态。</text>
+
+  <text x="40" y="1272" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="17">Fixture: tests/components/social/fixtures/review-timeline-demo-only.json</text>
+  <text x="40" y="1302" fill="#64716C" font-family="Segoe UI, PingFang SC, Microsoft YaHei, sans-serif" font-size="17">reviewedBy / reviewedAt / reviewScope: 未由当前冻结 DTO 提供</text>
+</svg>

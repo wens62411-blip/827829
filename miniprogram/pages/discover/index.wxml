@@ -1,0 +1,7 @@
+<ab-page-state eyebrow="{{eyebrow}}" title="{{title}}" description="{{description}}" runtime-mode="{{runtimeMode}}">
+  <view slot="actions" class="ab-actions">
+    <navigator class="ab-action" open-type="switchTab" url="/pages/events/index" hover-class="none">全球同城线下活动</navigator>
+    <navigator class="ab-action" url="/packageArt/pages/channel/index" hover-class="none">艺术频道</navigator>
+  </view>
+</ab-page-state>
+

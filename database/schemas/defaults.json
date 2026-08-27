@@ -1,0 +1,12 @@
+{
+  "contractVersion": "1.0.0",
+  "featureFlags": {
+    "payment": "DISABLED"
+  },
+  "runtimeEvidence": "LOCAL_ONLY",
+  "notes": [
+    "This is a schema default, not a deployed record.",
+    "Enabling payment requires a separately approved contract and server capability.",
+    "No APPROVED, HUMAN_REVIEWED, LIVE, payment, upload, deployment, or release evidence is implied."
+  ]
+}

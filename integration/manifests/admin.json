@@ -1,0 +1,173 @@
+{
+  "module": "admin",
+  "phase": "FEATURE_MODULE",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T12:42:41.702Z",
+  "overall": "BLOCKED",
+  "gates": {
+    "local": {
+      "status": "PASS",
+      "evidence": [
+        "MODULE_SCOPED_LOCAL_PASS: node --test --test-isolation=none with the explicit tests/cloud/admin/*.test.mjs file list exited 0: 47/47 passed against an in-memory SYNTHETIC_TEST_FIXTURE transaction adapter, including manifest schema checks.",
+        "node --test with the explicit tests/components/admin/*.test.mjs file list exited 0: 13/13 static/source security checks passed, including cross-case draft isolation and successful-detail notice cleanup. Separate in-memory mock-transport probes verified out-of-order A/B detail responses and late mutation responses after route rebinding.",
+        "adminApi-only strict TypeScript compilation exited 0; npm run typecheck:miniprogram, npm run typecheck:cloud and npm run typecheck:contracts each exited 0 in the latest repository run.",
+        "Frozen contract, route, default-entrypoint and cross-module-boundary tests exited 0: 24/24 passed. The final adminApi/index.js is byte-identical to an in-memory rebuild with the project esbuild settings, is self-contained, and its default main still returns NOT_IMPLEMENTED."
+      ],
+      "note": "This is local module evidence only. The default production main remains NOT_IMPLEMENTED, no CloudBase adapter is bound, and the explicit fixture states productionData=false and humanOperationsTeamEstablished=false. Repository-wide typechecks pass, while the full build and conservative whole-miniprogram package estimate have separate failures recorded below."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "LOCAL_ONLY_NO_APPID: no WeChat Developer Tools preview, network trace or screenshot evidence is recorded."
+      ]
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized iOS device run is recorded."
+      ]
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No authorized Android device run is recorded."
+      ]
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No AppID, bound CloudBase environment, production RBAC allowlist, development-version upload or remote transaction evidence is available."
+      ]
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": [
+        "No production deployment, real administrator roster, operational approval record or release evidence is claimed."
+      ]
+    }
+  },
+  "artifacts": [
+    "cloudfunctions/adminApi/index.ts",
+    "cloudfunctions/adminApi/index.js",
+    "cloudfunctions/adminApi/model.ts",
+    "cloudfunctions/adminApi/policy.ts",
+    "cloudfunctions/adminApi/service.ts",
+    "cloudfunctions/adminApi/dto.ts",
+    "cloudfunctions/adminApi/time.ts",
+    "cloudfunctions/adminApi/validation.ts",
+    "miniprogram/packageAdmin/",
+    "miniprogram/components/ab-admin-queue/",
+    "miniprogram/components/ab-admin-case/",
+    "miniprogram/components/ab-audit-entry/",
+    "tests/cloud/admin/",
+    "tests/components/admin/",
+    "integration/manifests/admin.json"
+  ],
+  "checks": [
+    {
+      "id": "unauthorized-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: all 13 actions reject ordinary or missing trusted context; client-supplied isAdmin, role, reviewerId and openid are rejected before mutation. Wrong role, disabled account, malformed server grant (including impossible-calendar timestamps), and allowlist=false also fail closed."
+    },
+    {
+      "id": "authorized-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: trusted OPENID plus an active server-side allowlisted grant authorizes only the action/domain combinations in the RBAC matrix; successful writes are explicit decision test invocations with human-confirmation-shaped payloads and are not evidence of a real operations team."
+    },
+    {
+      "id": "version-conflict-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL TRANSACTION MODEL: two reviewers concurrently submitted the same expectedVersion; Promise.all produced exactly one successful commit and one VERSION_CONFLICT, with one ReviewLog and one ProjectionInvalidation."
+    },
+    {
+      "id": "approve-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: review.approve read the opaque original snapshot at sourceVersion=43, moved UNDER_REVIEW ReviewCase v3 to APPROVED v4, appended a structurally complete ReviewLog from an explicit decision test invocation, created the frozen APPROVED/HUMAN_REVIEWED/publicVisible claim shape and appended VERIFICATION_CHANGED bound to claim v1. No initial fixture row was APPROVED, and this does not establish a real human review."
+    },
+    {
+      "id": "reject-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: review.reject recorded the uppercase reason code, explicit note, actor, requestId, scope, original snapshot sourceVersion=43, UNDER_REVIEW to REJECTED transition, expectedVersion/result version and VERIFICATION_CHANGED bound to the snapshot aggregate at sequential sourceVersion=44."
+    },
+    {
+      "id": "request-changes-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: review.requestChanges required one to ten safe material requests, moved the case to NEEDS_CHANGES, wrote the complete ReviewLog and appended VERIFICATION_CHANGED bound to the snapshot aggregate at sequential sourceVersion=44 even though the frozen response omits projectionInvalidated."
+    },
+    {
+      "id": "revoke-evidence",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: review.revoke accepted only an exact verification_claims source proof with sequential v1 to v2 REVOKED/publicVisible=false patch. Its invalidation is bound to the claim ID and v2; public tag, old share and friend view become dirty/deny immediately, and cards_public writes remain zero."
+    },
+    {
+      "id": "rbac-matrix",
+      "status": "PASS",
+      "evidence": "Server matrix: REVIEWER=[review approve/reject/requestChanges/revoke, SOCIAL/REPORT list/get, report resolve]; EVENT_MANAGER=[ORGANIZER/EVENT list/get, organizer/event review]; CONTENT_MANAGER=[CONTENT list/get, content review]; SUPER_ADMIN=[all 13 actions including audit.list]. Every action defaults to deny; applicable actions additionally check requested scope, domain and case assignment."
+    },
+    {
+      "id": "ai-advisory-only",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: both AI consistent=true and false snapshots caused zero writes without an explicit decision-action invocation. AI fields are not accepted in decision payloads, AI_AUTOMATION_DISABLED is true, and the client has no lifecycle/observer write trigger."
+    },
+    {
+      "id": "approved-review-log-integrity",
+      "status": "PASS",
+      "evidence": "APPROVED projection is denied when ReviewLog is missing or has forged action, target, actor, reviewScope, time, transition, requestId, reason or version. Complete log fields include reviewedBy=user_reviewerA, reviewedAt=2026-08-27T08:00:00.000Z, reviewScope=TAG_VERIFICATION, beforeStatus=UNDER_REVIEW, afterStatus=APPROVED, requestId=req_approve_evidence_0001, expectedVersion=3, sourceSnapshotVersion=43 and version=4."
+    },
+    {
+      "id": "redacted-append-only-audit",
+      "status": "PASS",
+      "evidence": "Sanitized list example: {\"auditEntryId\":\"audit_REDACTED\",\"actorRole\":\"REVIEWER\",\"action\":\"review.approve\",\"targetType\":\"REVIEW_CASE\",\"targetId\":\"REDACTED_TARGET\",\"requestId\":\"request_REDACTED\",\"occurredAt\":\"2026-08-27T08:00:00.000Z\",\"result\":\"SUCCEEDED\",\"reasonCode\":\"ADMIN_REVIEW_APPROVED\"}. Repository interfaces expose append only; no client edit/delete action exists. Locator-shaped audit fields fail closed."
+    },
+    {
+      "id": "projection-invalidation-example",
+      "status": "PASS",
+      "evidence": "Exact seven-field revoke example: {\"eventId\":\"projection_invalidation_fixture_0002\",\"kind\":\"VERIFICATION_CHANGED\",\"sourceAggregateId\":\"claim_case_social_revoke\",\"sourceVersion\":2,\"occurredAt\":\"2026-08-27T08:00:00.000Z\",\"reason\":\"RIGHTS_WITHDRAWN\",\"requestId\":\"req_revoke_evidence_0001\"}. Adapter source/case/version mismatches and extra fields roll back the entire transaction."
+    },
+    {
+      "id": "organizer-event-content-report",
+      "status": "PASS",
+      "evidence": "LOCAL SYNTHETIC_TEST_FIXTURE: organizer approval, all event decisions, all content decisions, content rights gate and report resolution were exercised. Wrong event/content decision projections roll back; content APPROVE requires APPROVED rights. Organizer non-approve remains a frozen-contract blocker described in knownGaps."
+    },
+    {
+      "id": "default-redaction-and-material-boundary",
+      "status": "PASS",
+      "evidence": "Lists redact aggregates, submitters, evidence, actors, targets and request IDs. List copy explicitly states that the frozen protocol has no material-access audit and raw materials remain invisible. Review detail consumes only ReviewCaseProjection; locator-shaped IDs/evidence, cursor metadata, public DTO extras and raw URL fields produce INTERNAL_ERROR with transaction rollback. Client keeps full IDs only in ephemeral memory maps and clears detail after 120 seconds/onHide/onUnload."
+    },
+    {
+      "id": "direct-route-and-action-negative-tests",
+      "status": "PASS",
+      "evidence": "All five existing native WeChat admin routes re-bootstrap a fixed scope on onShow and render admin data only after AUTHORIZED. Route parameters cannot assert authority. Ordinary callers are separately denied by every cloud action even when the page/action name is known."
+    },
+    {
+      "id": "payment-and-read-only-operations",
+      "status": "PASS",
+      "evidence": "Payment disabled/unknown renders a reason and no order/refund navigator or fixture; no fake orders exist. City data uses public geo DTOs only, and feature-flag/user mutation controls are absent because no frozen admin action authorizes them."
+    },
+    {
+      "id": "runtime-default-fail-closed",
+      "status": "PASS",
+      "evidence": "cloudfunctions/adminApi/index.ts and its generated self-contained index.js keep default main on the frozen NOT_IMPLEMENTED endpoint. The implemented endpoint is available only through createAdminEndpoint with explicit trusted dependencies; tests inject a named SYNTHETIC_TEST_FIXTURE. Final bundle evidence: aggregate source hash 4f54b0888ea0693f6f062f4083a23a1d4567c9056d842942d7402bb1e98e24df, 131856 bytes, SHA256 87cb98154bb9eca0c2b9321be721b1cdbeda8498b936eafa35b8e4109fce650d, fresh in-memory byte comparison=true."
+    },
+    {
+      "id": "production-material-access-contract",
+      "status": "FAIL",
+      "evidence": "BLOCKER: frozen review.get has writableCollections=[] and ReviewGetResponse contains only ReviewCaseProjection, so it cannot atomically append a material-access audit or return a short-lived access-grant DTO. The client therefore never receives raw material URLs. A future frozen contract is required before claiming that a real reviewer viewed necessary source materials."
+    },
+    {
+      "id": "repository-wide-build-and-package",
+      "status": "FAIL",
+      "evidence": "npm run build exited 1 at check:cloud-runtime because the aggregate generated bundle set begins with stale out-of-scope cloudfunctions/_shared/auth/index.js; all three typecheck stages and validate (337/337) passed earlier in that same build. At observedAt=2026-08-27T12:42:26.118Z, npm run check:package separately exited 1 with sourceBytesExcludingBuiltNpm=722189, conservativeProjectedBytes=2123434 over sourceBudgetBytes=2097152, builtNpmPresent=false and devtoolsPackageGate=UNVERIFIED; this volatile whole-miniprogram estimate spans modules outside the admin ownership boundary."
+    }
+  ],
+  "knownGaps": [
+    "The default exported adminApi main is intentionally the frozen NOT_IMPLEMENTED boundary. No authorized CloudBase repository, transaction implementation, WX-context binding or production RBAC/allowlist is connected.",
+    "Frozen review.get is read-only and has no access-log write or short-lived material-access DTO. The safe client does not display raw source materials, so the local approval fixture cannot establish that a real human reviewed real evidence.",
+    "Frozen OrganizerReviewResponse always requires PublicOrganizerProjection, whose state is APPROVED/HUMAN_REVIEWED. organizer.review therefore returns NOT_IMPLEMENTED for REJECT and REQUEST_CHANGES rather than fabricating a public approved organizer.",
+    "The structured claim revocation proof binds the claim source/version and local reviewCaseId, but frozen shared projections expose no claim-to-review-case association proof. Real cross-module binding remains an integration requirement.",
+    "No frozen admin actions exist for a standalone user view or mutation, city-node mutation, feature-flag read or mutation, orders, or refunds. The client exposes only the minimal redacted report target plus public city data and explicit unavailable/read-only states; it never invents the missing capabilities.",
+    "Repository-wide build currently stops at the aggregate cloud-runtime staleness check. At 2026-08-27T12:42:26.118Z the volatile whole-miniprogram conservative static estimate was 2123434 bytes against 2097152, and the actual Developer Tools package gate remains UNVERIFIED. This estimate spans modules outside the admin ownership boundary; no generated bundles or source files outside that boundary were changed to mask those failures.",
+    "Developer Tools preview, iOS, Android, real CloudBase concurrency, upload and release are UNVERIFIED.",
+    "All local records are explicitly SYNTHETIC_TEST_FIXTURE with productionData=false and humanOperationsTeamEstablished=false. A developer clicking test controls is not represented as an established operations review team."
+  ]
+}
