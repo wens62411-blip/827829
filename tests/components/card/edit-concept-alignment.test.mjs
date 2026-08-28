@@ -57,7 +57,7 @@ test('card editor theme control matches the approved live-preview geometry', () 
   const themeOptionRule = cssRule(styles, '.card-theme-option', /border:\s*0/);
   assert.match(themeOptionRule, /min-height:\s*100rpx/);
   assert.match(themeOptionRule, /background:\s*transparent/);
-  assert.doesNotMatch(themeOptionRule, /border:\s*[1-9]\d*rpx|box-shadow/);
+  assert.doesNotMatch(themeOptionRule, /(?:^|\n)\s*(?:border:\s*[1-9]\d*rpx|box-shadow\s*:)/);
   const swatchRule = cssRule(styles, '.card-theme-option__swatch', /height:\s*46rpx/);
   assert.match(swatchRule, /width:\s*46rpx/);
   assert.match(swatchRule, /border-radius:\s*50%/);

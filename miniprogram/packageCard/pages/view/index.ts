@@ -12,8 +12,6 @@ import { readCardThemePreference, type CardTheme } from '../../../pages/card/ser
 type IdentityClientModule = typeof import('../../../pages/card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
 
-let viewedOwnerUserId: UserId | undefined;
-
 function getCardRuntime(): { readonly runtimeMode: string; readonly cloudConfigured: boolean } {
   try {
     const app = getApp<{ globalData?: { runtimeMode?: string; cloudEnvironmentConfigured?: boolean } }>();
@@ -37,6 +35,9 @@ function parseOwnerUserId(value: string | undefined): UserId | undefined {
 }
 
 Page({
+  viewedOwnerUserId: undefined as UserId | undefined,
+  viewLoadGeneration: 0,
+  viewUnloaded: true,
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
@@ -53,6 +54,8 @@ Page({
   },
 
   onLoad(options: Record<string, string | undefined>) {
+    this.viewUnloaded = false;
+    this.viewLoadGeneration += 1;
     const runtime = getCardRuntime();
     const demoMode = isOfflineDemo(runtime);
     const demoVisitorPreview = demoMode && options.preview === 'STRANGER';
@@ -60,21 +63,22 @@ Page({
       runtimeMode: runtime.runtimeMode,
       demoMode,
       demoVisitorPreview,
+      invalidOwner: false,
       cardTheme: readCardThemePreference(),
     });
     if (options.ownerUserId !== undefined) {
-      viewedOwnerUserId = parseOwnerUserId(options.ownerUserId);
-      if (!viewedOwnerUserId) {
+      this.viewedOwnerUserId = parseOwnerUserId(options.ownerUserId);
+      if (!this.viewedOwnerUserId) {
         this.setData({
           invalidOwner: true,
           status: 'ERROR',
           message: '名片查看参数无效，请从可信入口重新打开。',
         });
       } else {
-        this.setData({ viewedOwnerUserId });
+        this.setData({ viewedOwnerUserId: this.viewedOwnerUserId });
       }
     } else {
-      viewedOwnerUserId = undefined;
+      this.viewedOwnerUserId = undefined;
       this.setData({ viewedOwnerUserId: '' });
     }
   },
@@ -84,7 +88,9 @@ Page({
   },
 
   onUnload() {
-    viewedOwnerUserId = undefined;
+    this.viewUnloaded = true;
+    this.viewLoadGeneration += 1;
+    this.viewedOwnerUserId = undefined;
   },
 
   onPullDownRefresh() {
@@ -105,6 +111,13 @@ Page({
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
     }
+    const viewedOwnerUserId = this.viewedOwnerUserId;
+    const loadGeneration = ++this.viewLoadGeneration;
+    const isCurrentLoad = () => (
+      !this.viewUnloaded
+      && this.viewLoadGeneration === loadGeneration
+      && this.viewedOwnerUserId === viewedOwnerUserId
+    );
     if (this.data.demoMode && !viewedOwnerUserId) {
       this.setData({
         status: 'READY',
@@ -122,6 +135,7 @@ Page({
     if (!viewedOwnerUserId) {
       const { getMyCard } = loadIdentityClient();
       const result = await getMyCard();
+      if (!isCurrentLoad()) return;
       if (!result.ok) {
         this.setData({ status: 'ERROR', message: result.message });
       } else {
@@ -138,6 +152,7 @@ Page({
 
     const { getCardForViewer } = loadIdentityClient();
     const result = await getCardForViewer(viewedOwnerUserId);
+    if (!isCurrentLoad()) return;
     if (!result.ok) {
       this.setData({
         status: 'ERROR',

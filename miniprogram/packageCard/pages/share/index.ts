@@ -20,7 +20,11 @@ import {
   readShareRevocationPointer,
   rememberShareForRevocation,
 } from '../../../pages/card/services/share-revocation-pointer';
-import { OFFLINE_DEMO_CARD, isOfflineDemo } from '../../../pages/card/services/offline-demo';
+import {
+  OFFLINE_DEMO_CARD,
+  OFFLINE_DEMO_FIELDS,
+  isOfflineDemo,
+} from '../../../pages/card/services/offline-demo';
 import {
   readCardThemePreference,
   type CardTheme,
@@ -206,6 +210,7 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
+    demoFields: OFFLINE_DEMO_FIELDS,
     card: null as PublicCardProjection | null,
     cardTheme: 'ivory' as CardTheme,
     cityLabel: '',

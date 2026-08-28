@@ -12,6 +12,9 @@ test('share page presents the card and human-facing sharing choices', () => {
   const config = JSON.parse(read('miniprogram/packageCard/pages/share/index.json'));
 
   assert.match(template, /<ab-profile-card\b[\s\S]*?card="\{\{card\}\}"/);
+  assert.match(template, /viewer-mode="STRANGER"/);
+  assert.match(template, /fields="\{\{demoMode \? demoFields : \[\]\}\}"/);
+  assert.match(template, /好友接收视角/);
   assert.match(template, /微信好友|生成名片海报|撤销/);
   assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送演示名片到微信/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);

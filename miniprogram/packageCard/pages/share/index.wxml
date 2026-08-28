@@ -20,8 +20,9 @@
   <ab-profile-card
     wx:elif="{{card}}"
     card="{{card}}"
-    viewer-mode="SELF"
+    viewer-mode="STRANGER"
     city-label="{{cityLabel}}"
+    fields="{{demoMode ? demoFields : []}}"
     theme="{{cardTheme}}"
     show-default-actions="{{false}}"
   />
@@ -31,7 +32,7 @@
   <view wx:if="{{demoMode && card}}" class="share-choice-card">
     <text class="share-choice-card__eyebrow">SHARE PREVIEW</text>
     <text class="share-choice-card__title">把名片递给微信好友</text>
-    <text class="share-choice-card__copy">体验版会真实打开微信转发面板；接收方看到的是这张明确标注的合成演示名片，不会被记录成真实会员或人脉。</text>
+    <text class="share-choice-card__copy">上方就是好友接收视角。体验版会真实打开微信转发面板；接收方看到的是这张明确标注的合成演示名片，不会被记录成真实会员或人脉。</text>
     <view class="share-choice-list">
       <view class="share-choice"><text class="share-choice__index">01</text><view><text class="share-choice__title">微信确认后才发送</text><text class="share-choice__note">页面只负责拉起系统面板，不会替你选择好友或自动发送。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">02</text><view><text class="share-choice__title">当前配色随卡片保留</text><text class="share-choice__note">象牙白、墨黑、香槟金与石灰灰会同步到接收页。</text></view></view>

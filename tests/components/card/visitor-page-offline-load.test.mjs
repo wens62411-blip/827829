@@ -18,6 +18,19 @@ test('visitor OFFLINE_DEMO registers without eagerly loading the live identity c
   assert.match(source, /declare const require: \(path: string\) => IdentityClientModule;/);
   assert.match(source, /function getCardRuntime\(\)/);
   assert.doesNotMatch(source, /getRuntimeEvidence/);
+  assert.doesNotMatch(
+    source,
+    /^let\s+viewedOwnerUserId\b/m,
+    'the viewed owner must not leak through module-level state shared by multiple page instances',
+  );
+  assert.match(source, /Page\(\{[\s\S]*?viewedOwnerUserId:\s*undefined as UserId \| undefined,/);
+  assert.match(source, /viewLoadGeneration:\s*0,/);
+  assert.match(source, /viewUnloaded:\s*true,/);
+  assert.match(
+    source,
+    /const isCurrentLoad = \(\) => \([\s\S]*?this\.viewLoadGeneration === loadGeneration[\s\S]*?this\.viewedOwnerUserId === viewedOwnerUserId/,
+    'late async results must be rejected when the page instance or viewed owner has changed',
+  );
 
   const loadCardBody = source.slice(source.indexOf('async loadCard('));
   const demoGuard = loadCardBody.indexOf('if (this.data.demoMode && !viewedOwnerUserId)');

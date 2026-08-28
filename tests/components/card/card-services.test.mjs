@@ -82,7 +82,7 @@ test('share exports use the stranger-safe projection and never put a view-specif
   assert.doesNotMatch(sharePageSource, /\bgetMyCard\(\)/);
   assert.match(
     sharePageSource,
-    /async generatePoster\(\)[\s\S]*?await getMyPublicCard\(\)[\s\S]*?drawPublicPoster\(canvas, posterCard\)/,
+    /async generatePoster\(\)[\s\S]*?await getMyPublicCard\(\)[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/,
   );
 });
 

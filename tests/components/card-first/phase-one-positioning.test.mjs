@@ -108,7 +108,7 @@ test('identity bootstrap is deferred until the user deliberately enters card cre
   const editor = read('miniprogram/packageCard/pages/edit/index.ts');
 
   assert.doesNotMatch(appSource, /bootstrapIdentity\s*\(/, '冷启动不应自动建立身份');
-  assert.match(discover, /创建数字名片[\s\S]*?\/packageCard\/pages\/edit\/index/);
+  assert.match(discover, /<navigator\b[^>]*url="\/packageCard\/pages\/edit\/index"[^>]*>创建数字名片<\/navigator>/);
   assert.match(editor, /bootstrapIdentity/);
   assert.match(
     editor,

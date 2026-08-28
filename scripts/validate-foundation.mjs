@@ -69,7 +69,7 @@ for (const action of actionNames) {
 }
 
 const app = readJson('miniprogram/app.json');
-check(app?.entryPagePath === 'pages/bootstrap/index', 'bootstrap is the explicit entry page');
+check(app?.entryPagePath === 'pages/discover/index', 'Discover is the explicit phase-one entry page');
 check(app?.tabBar?.list?.length === 4, 'phase-one tabBar contains exactly four items');
 check(!app?.subpackages?.some((item) => item.independent === true), 'all subpackages can consume main shared contracts');
 
