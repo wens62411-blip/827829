@@ -26,8 +26,6 @@ test('Discover exposes a restrained card entry while network, event, and art sta
   const template = readPage('index.wxml');
 
   for (const route of [
-    '/packageCard/pages/edit/index',
-    '/pages/card/index',
     '/pages/network/index',
     '/pages/events/index',
     '/packageArt/pages/channel/index',
@@ -36,7 +34,8 @@ test('Discover exposes a restrained card entry while network, event, and art sta
   }
   assert.match(template, /艺术、古董与珠宝/);
   assert.match(template, /packageEvents\/pages\/event\/index\?demoEventId=\{\{primaryEvent\.eventId\}\}/);
-  assert.match(template, /完整名片只在进入名片页后展示/);
+  assert.match(template, /创建、查看和分享名片统一在「我的」中管理/);
+  assert.doesNotMatch(template, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
   assert.doesNotMatch(template, /discover-card__profile|discover-card__avatar|AB Club 示例名片/);
 });
 
@@ -52,7 +51,8 @@ test('Discover keeps one stable demo event identity and title into event detail'
   assert.doesNotMatch(template, /demoCityId=/);
   assert.match(demoSource, /私人收藏与家族传承对话/);
   assert.match(demoSource, /getDemoEventById/);
-  assert.match(detailSource, /query\.demoEventId\s*\?\s*getDemoEventById\(query\.demoEventId\)\s*:\s*undefined/);
+  assert.match(detailSource, /const demoEventId = decodeRouteParam\(query\.demoEventId\)/);
+  assert.match(detailSource, /demoEventId\s*\?\s*getDemoEventById\(demoEventId\)\s*:\s*undefined/);
   assert.match(detailSource, /detail:\s*toDemoDetail\(demo\)/);
   assert.doesNotMatch(detailSource, /(?:make|create).*Demo.*\(query\.demoEventId\)/i);
 });
@@ -96,7 +96,7 @@ test('Discover uses the transparent AB Club crest and its frozen local manifest'
 test('Discover controls meet touch targets and keep the approved light canvas', () => {
   const styles = readPage('index.wxss');
 
-  assert.match(styles, /\.discover-card-entry__primary,\s*\n\.discover-card-entry__secondary\s*\{[\s\S]*?min-height:\s*88rpx/);
+  assert.match(styles, /\.discover-global-chip\s*\{[\s\S]*?min-height:\s*88rpx/);
   assert.match(styles, /\.discover-text-link\s*\{[\s\S]*?min-height:\s*88rpx/);
   assert.doesNotMatch(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/, '首页品牌画布不应跟随系统强制反色');
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);

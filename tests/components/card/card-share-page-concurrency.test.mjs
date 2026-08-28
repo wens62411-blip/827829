@@ -6,6 +6,19 @@ import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 
+async function loadBundledTypeScript(relativePath) {
+  const result = await build({
+    entryPoints: [resolve(root, relativePath)],
+    bundle: true,
+    platform: 'node',
+    format: 'esm',
+    target: 'es2020',
+    write: false,
+    logLevel: 'silent',
+  });
+  return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}#${Date.now()}-${Math.random()}`);
+}
+
 function deferred() {
   let resolvePromise;
   const promise = new Promise((resolveValue) => { resolvePromise = resolveValue; });
@@ -200,7 +213,9 @@ test('explicit demo share opens only in offline demo, keeps theme, and never res
     assert.equal(page.data.state, 'SUCCESS');
     assert.equal(page.data.cardTheme, 'champagne');
     assert.match(page.data.stateDescription, /合成演示/);
-    assert.equal(page.onShareAppMessage.call(page).path, '/pages/card-share/index?demo=1&theme=champagne');
+    const forwardedPath = page.onShareAppMessage.call(page).path;
+    assert.match(forwardedPath, /^\/pages\/card-share\/index\?demo=1&snapshot=[A-Za-z0-9_-]+\.[0-9a-f]{8}$/);
+    assert.doesNotMatch(forwardedPath, /林知遥|demo@|\+41/);
     assert.equal(resolveCalls, 0);
     assert.equal(wxCalls.filter(([name]) => name === 'showShareMenu').length, 1);
   } finally {
@@ -227,6 +242,57 @@ test('demo query is rejected outside offline demo', async () => {
     assert.equal(page.data.allowForward, false);
     assert.match(page.data.stateDescription, /不接受演示名片入口/);
     assert.equal(wxCalls.filter(([name]) => name === 'showShareMenu').length, 0);
+  } finally {
+    delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('a demo snapshot cold start restores only its explicit public labels and fails closed after tampering', async () => {
+  const wxCalls = installWx();
+  globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__ = {
+    runtimeEvidence: { runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false },
+    resolveCardShare: async () => success('unexpected'),
+  };
+
+  try {
+    const [definition, draftService, snapshotService] = await Promise.all([
+      loadCardSharePage(),
+      loadBundledTypeScript('miniprogram/pages/card/services/offline-demo-draft.ts'),
+      loadBundledTypeScript('miniprogram/pages/card/services/offline-demo-share-snapshot.ts'),
+    ]);
+    const draft = {
+      ...draftService.createDefaultOfflineDemoDraft(),
+      selectedLabels: ['艺术策展', '长期主义'],
+      showTags: true,
+      showPhone: false,
+      showEmail: true,
+    };
+    const built = snapshotService.buildOfflineDemoSharePath(draft, 'stone');
+    assert.equal(built.ok, true);
+    const encoded = built.path.match(/[?&]snapshot=([^&]+)/)?.[1];
+    assert.ok(encoded);
+
+    const received = instantiate(definition);
+    received.onLoad.call(received, { demo: '1', snapshot: encoded });
+    assert.equal(received.data.state, 'SUCCESS');
+    assert.equal(received.data.cardTheme, 'stone');
+    assert.deepEqual(received.data.demoPublicLabels, ['艺术策展', '长期主义']);
+    assert.equal(received.data.demoFields.some((field) => field.key === 'phone'), false);
+    assert.equal(received.data.demoFields.some((field) => field.key === 'email'), true);
+
+    const tampered = instantiate(definition);
+    tampered.onLoad.call(tampered, {
+      demo: '1',
+      snapshot: `${encoded.slice(0, -1)}${encoded.endsWith('a') ? 'b' : 'a'}`,
+    });
+    assert.equal(tampered.data.state, 'ERROR');
+    assert.equal(tampered.data.card, null);
+    assert.deepEqual(tampered.data.demoPublicLabels, []);
+    assert.equal(tampered.data.allowForward, false);
+    assert.match(tampered.data.stateDescription, /不完整或被修改/);
+    assert.ok(wxCalls.filter(([name]) => name === 'showShareMenu').length >= 1);
   } finally {
     delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;
     delete globalThis.Page;

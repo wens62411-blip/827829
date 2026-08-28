@@ -26,6 +26,10 @@
     </view>
 
     <view class="detail__intro">
+      <view class="detail__taxonomy" aria-label="活动分类与所属模块">
+        <text>{{detail.categoryLabel}}</text>
+        <text>{{detail.sectionLabel}}</text>
+      </view>
       <text class="detail__city">{{detail.cityName}} / {{detail.cityNameEn}}</text>
       <text class="detail__title">{{detail.title}}</text>
       <text class="detail__summary">{{detail.summary}}</text>

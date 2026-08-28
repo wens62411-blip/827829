@@ -11,8 +11,17 @@ import {
   safeShareTitle,
   sanitizePublicCard,
 } from '../card/services/card-presenter';
-import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../card/services/offline-demo';
+import { OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../card/services/offline-demo';
 import { normalizeCardTheme, type CardTheme } from '../card/services/card-theme-preference';
+import {
+  createDefaultOfflineDemoDraft,
+  type OfflineDemoPublicField,
+} from '../card/services/offline-demo-draft';
+import {
+  buildOfflineDemoSharePath,
+  createOfflineDemoShareSnapshot,
+  decodeOfflineDemoShareSnapshot,
+} from '../card/services/offline-demo-share-snapshot';
 
 type ShareReference = { readonly token: string } | { readonly scene: string };
 type ShareState = 'SUCCESS' | 'EXPIRED' | 'REVOKED' | 'ERROR' | 'LOADING';
@@ -45,6 +54,7 @@ Page({
   shareResolveGeneration: 0,
   shareResolving: false,
   shareUnloaded: false,
+  demoForwardPath: '',
   data: {
     ...frozenShareEntry.data,
     runtimeMode: 'OFFLINE_DEMO',
@@ -56,7 +66,8 @@ Page({
     card: null as PublicCardProjection | null,
     cityLabel: '',
     demoMode: false,
-    demoFields: OFFLINE_DEMO_FIELDS,
+    demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
+    demoPublicLabels: [] as string[],
     cardTheme: 'ivory' as CardTheme,
   },
 
@@ -65,6 +76,7 @@ Page({
     this.shareReference = undefined;
     this.shareResolveGeneration += 1;
     this.shareResolving = false;
+    this.demoForwardPath = '';
     frozenShareEntry.onLoad.call(this, options);
     const runtime = getRuntimeEvidence();
     const cardTheme = normalizeCardTheme(options.theme);
@@ -83,6 +95,29 @@ Page({
         });
         return;
       }
+      const decoded = options.snapshot === undefined
+        ? { ok: true as const, snapshot: createOfflineDemoShareSnapshot(createDefaultOfflineDemoDraft(), cardTheme) }
+        : decodeOfflineDemoShareSnapshot(options.snapshot);
+      if (!decoded.ok) {
+        this.setData({
+          state: 'ERROR',
+          stateTitle: '体验名片已损坏',
+          stateDescription: '这张体验名片的公开快照不完整或被修改，请让分享者重新发送。',
+          allowRetry: false,
+          allowForward: false,
+          demoMode: true,
+          card: null,
+          demoFields: [],
+          demoPublicLabels: [],
+          cityLabel: '',
+        });
+        return;
+      }
+      const snapshot = decoded.snapshot;
+      const forwardPath = options.snapshot === undefined
+        ? buildOfflineDemoSharePath(createDefaultOfflineDemoDraft(), snapshot.cardTheme)
+        : { ok: true as const, path: `/pages/card-share/index?demo=1&snapshot=${options.snapshot}` };
+      this.demoForwardPath = forwardPath.ok ? forwardPath.path : '';
       this.setData({
         state: 'SUCCESS',
         stateTitle: 'AB Club 名片体验',
@@ -90,8 +125,11 @@ Page({
         allowRetry: false,
         allowForward: true,
         demoMode: true,
-        card: OFFLINE_DEMO_CARD,
-        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+        card: snapshot.card,
+        demoFields: [...snapshot.fields],
+        demoPublicLabels: [...snapshot.publicLabels],
+        cardTheme: snapshot.cardTheme,
+        cityLabel: cityDisplayName(snapshot.card.cityId),
       });
       wx.showShareMenu({ menus: ['shareAppMessage'] });
       return;
@@ -128,6 +166,7 @@ Page({
   onUnload() {
     this.shareUnloaded = true;
     this.shareReference = undefined;
+    this.demoForwardPath = '';
     this.shareResolveGeneration += 1;
     this.shareResolving = false;
   },
@@ -222,7 +261,7 @@ Page({
     if (!this.shareUnloaded && this.data.demoMode && card && this.data.state === 'SUCCESS') {
       return {
         title: 'AB Club · 数字名片体验',
-        path: `/pages/card-share/index?demo=1${themeQuery}`,
+        path: this.demoForwardPath || `/pages/card-share/index?demo=1${themeQuery}`,
       };
     }
     if (this.shareUnloaded || !reference || !card || this.data.state !== 'SUCCESS') {

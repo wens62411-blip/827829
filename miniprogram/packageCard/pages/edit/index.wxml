@@ -13,7 +13,7 @@
     <button class="card-editor-tab {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-role="tab" aria-selected="{{editorMode === 'EDIT'}}">编辑内容</button>
   </view>
 
-  <view wx:if="{{demoMode}}" class="card-editor-evidence">SYNTHETIC · DEMO_ONLY · 当前内容仅供本机预览</view>
+  <view wx:if="{{demoMode}}" class="card-editor-evidence">SYNTHETIC · DEMO_ONLY · 当前内容只保存为本机体验草稿</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载资料"></view>
   <view wx:elif="{{status === 'ERROR' && !profile && !creatingProfile}}" class="card-panel card-panel--error">
@@ -29,7 +29,7 @@
         viewer-mode="SELF"
         city-label="{{previewCityLabel}}"
         fields="{{previewFields}}"
-        selected-labels="{{previewSelectedLabels}}"
+        public-labels="{{previewPublicLabels}}"
         gallery-urls="{{previewGalleryImages}}"
         theme="{{cardTheme}}"
         max-visible-claims="3"
@@ -37,9 +37,9 @@
       />
       <view class="card-editor-preview__actions">
         <button class="card-button" data-mode="EDIT" bindtap="setEditorMode">编辑这张名片</button>
-        <navigator class="card-link-button" open-type="switchTab" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
+        <navigator class="card-link-button" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
       </view>
-      <text class="card-editor-preview__note">配色、标签和图片会实时预览；未保存的内容不会被公开。</text>
+      <text class="card-editor-preview__note">这里只预览已经打开“对外展示”的标签；关闭后，访客和分享名片都会隐藏。</text>
     </view>
 
     <view wx:else class="card-editor-workspace">
@@ -100,6 +100,37 @@
         </view>
       </view>
 
+      <view wx:if="{{demoMode}}" class="card-editor-section">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">CONTACT</text><text class="card-editor-section__title">联系方式</text></view>
+          <text class="card-editor-section__hint">选填 · 独立公开</text>
+        </view>
+        <text class="card-editor-contact-intro">电话与邮箱分别控制。只有填写有效内容并打开对应开关，才会出现在访客名片、微信分享卡片和接收页。</text>
+        <view class="card-editor-contact-grid">
+          <view class="card-editor-contact-card">
+            <view class="card-field card-editor-contact-field">
+              <view class="card-field__label"><text>电话号码</text><text class="card-field__hint">选填</text></view>
+              <input class="card-input" value="{{phone}}" maxlength="24" bindinput="onPhoneInput" disabled="{{status === 'SAVING'}}" placeholder="+41 44 555 01 10" />
+            </view>
+            <view class="card-editor-contact-visibility">
+              <view><text class="card-editor-contact-visibility__title">对外展示电话</text><text class="card-editor-contact-visibility__note">关闭后不会进入分享内容</text></view>
+              <switch color="#a67c3f" checked="{{showPhone}}" data-module="phone" bindchange="onModuleToggle" />
+            </view>
+          </view>
+          <view class="card-editor-contact-card">
+            <view class="card-field card-editor-contact-field">
+              <view class="card-field__label"><text>邮箱地址</text><text class="card-field__hint">选填</text></view>
+              <input class="card-input" value="{{email}}" maxlength="72" bindinput="onEmailInput" disabled="{{status === 'SAVING'}}" placeholder="name@example.com" />
+            </view>
+            <view class="card-editor-contact-visibility">
+              <view><text class="card-editor-contact-visibility__title">对外展示邮箱</text><text class="card-editor-contact-visibility__note">关闭后不会进入分享内容</text></view>
+              <switch color="#a67c3f" checked="{{showEmail}}" data-module="email" bindchange="onModuleToggle" />
+            </view>
+          </view>
+        </view>
+        <text wx:if="{{contactMessage}}" class="card-editor-inline-note card-editor-inline-note--error" aria-live="polite">{{contactMessage}}</text>
+      </view>
+
       <view class="card-editor-section">
         <view class="card-editor-section__heading">
           <view><text class="card-editor-section__eyebrow">ABOUT</text><text class="card-editor-section__title">自由填写内容</text></view>
@@ -115,9 +146,21 @@
 
       <view class="card-editor-section">
         <view class="card-editor-section__heading">
-          <view><text class="card-editor-section__eyebrow">TAGS</text><text class="card-editor-section__title">预设标签</text></view>
-          <text class="card-editor-section__hint">20 项可多选</text>
+          <view><text class="card-editor-section__eyebrow">TAGS</text><text class="card-editor-section__title">预设与自定义标签</text></view>
+          <text class="card-editor-section__hint">最多 5 个 · 每个 10 字</text>
         </view>
+        <text class="card-editor-tag-group">已选择 {{selectedLabels.length}} / 5</text>
+        <view wx:if="{{selectedLabels.length}}" class="card-editor-selected-tags" aria-role="list" aria-label="已选择标签">
+          <view wx:for="{{selectedLabels}}" wx:key="*this" class="card-editor-selected-tag" aria-role="listitem">
+            <text>{{item}}</text>
+            <button class="card-editor-selected-tag__remove" data-tag="{{item}}" bindtap="removeProfileTag" aria-label="删除标签 {{item}}">×</button>
+          </view>
+        </view>
+        <view class="card-editor-custom-tag">
+          <input class="card-input card-editor-custom-tag__input" value="{{customLabelInput}}" maxlength="10" bindinput="onCustomLabelInput" disabled="{{status === 'SAVING' || selectedLabels.length >= 5}}" placeholder="输入你的个人标签" confirm-type="done" bindconfirm="addCustomProfileTag" />
+          <button class="card-editor-custom-tag__add" bindtap="addCustomProfileTag" disabled="{{status === 'SAVING' || selectedLabels.length >= 5}}">添加</button>
+        </view>
+        <text wx:if="{{tagMessage}}" class="card-editor-inline-note card-editor-inline-note--error" aria-live="polite">{{tagMessage}}</text>
         <text class="card-editor-tag-group">身份类</text>
         <view class="card-interest-chips">
           <button wx:for="{{identityTagOptions}}" wx:key="label" class="card-interest-chip {{item.selected ? 'card-interest-chip--selected' : ''}}" data-tag="{{item.label}}" bindtap="toggleProfileTag">{{item.label}}</button>
@@ -148,7 +191,7 @@
           <view><text class="card-editor-section__eyebrow">DISPLAY</text><text class="card-editor-section__title">模块显示</text></view>
           <text class="card-editor-section__hint">自由开关</text>
         </view>
-        <view class="card-editor-switch-row"><text>显示标签</text><switch color="#a67c3f" checked="{{showTags}}" data-module="tags" bindchange="onModuleToggle" /></view>
+        <view class="card-editor-switch-row"><view><text>对外展示个人标签</text><text class="card-editor-switch-note">关闭后，本人预览、访客页与分享名片全部隐藏</text></view><switch color="#a67c3f" checked="{{showTags}}" data-module="tags" bindchange="onModuleToggle" /></view>
         <view class="card-editor-switch-row"><text>显示图片</text><switch color="#a67c3f" checked="{{showGallery}}" data-module="gallery" bindchange="onModuleToggle" /></view>
       </view>
 
@@ -157,7 +200,7 @@
       <view class="card-editor-savebar">
         <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{demoMode ? '完成本页预览' : creatingProfile ? '创建我的名片' : '保存名片'}}</button>
         <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode">查看实时效果</button>
-        <text class="card-editor-savebar__note">标签与图片当前仅在本页预览，不会被冒充为已保存或已审核。</text>
+        <text class="card-editor-savebar__note">标签与图片仅用于本机体验预览；标签会保存进 DEMO_ONLY 草稿，但不会被冒充为人工认证。</text>
       </view>
     </view>
   </block>

@@ -8,7 +8,6 @@ const here = dirname(fileURLToPath(import.meta.url));
 const evidenceDirectory = resolve(here, 'evidence');
 const screenshotDirectory = resolve(evidenceDirectory, 'screenshots');
 const requiredScreenshots = [
-  'bootstrap.png',
   'me.png',
   'card-self.png',
   'card-stranger.png',

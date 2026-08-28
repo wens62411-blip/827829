@@ -6,7 +6,6 @@
     "pages/card/index",
     "pages/me/index",
     "pages/network/index",
-    "pages/bootstrap/index",
     "pages/card-share/index",
     "pages/event-share/index"
   ],
@@ -95,12 +94,6 @@
         "text": "活动",
         "iconPath": "assets/icons/tab-events.png",
         "selectedIconPath": "assets/icons/tab-events-active.png"
-      },
-      {
-        "pagePath": "pages/card/index",
-        "text": "名片",
-        "iconPath": "assets/icons/tab-card.png",
-        "selectedIconPath": "assets/icons/tab-card-active.png"
       },
       {
         "pagePath": "pages/me/index",

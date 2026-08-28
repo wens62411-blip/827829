@@ -21,6 +21,8 @@
     viewer-mode="STRANGER"
     city-label="{{cityLabel}}"
     fields="{{demoMode ? demoFields : []}}"
+    public-labels="{{demoPublicLabels}}"
+    allow-public-contacts="{{demoMode}}"
     theme="{{cardTheme}}"
     max-visible-claims="3"
     show-default-actions="{{false}}"

@@ -23,9 +23,33 @@
     viewer-mode="STRANGER"
     city-label="{{cityLabel}}"
     fields="{{demoMode ? demoFields : []}}"
+    public-labels="{{demoPublicLabels}}"
+    allow-public-contacts="{{demoMode}}"
     theme="{{cardTheme}}"
     show-default-actions="{{false}}"
   />
+
+  <view wx:if="{{card}}" class="native-share-canvas-stage" aria-hidden="true">
+    <canvas type="2d" id="nativeShareCardCanvas" class="native-share-canvas"></canvas>
+  </view>
+
+  <view wx:if="{{card}}" class="share-native-cover" aria-role="region" aria-label="微信分享卡片预览">
+    <text class="share-format-card__eyebrow">WECHAT SHARE CARD</text>
+    <view class="share-native-cover__heading">
+      <text class="share-format-card__title">微信分享卡片预览</text>
+      <text class="share-native-cover__ratio">5 : 4</text>
+    </view>
+    <image wx:if="{{shareCoverState === 'READY'}}" class="share-native-cover__image" src="{{shareCoverPath}}" mode="widthFix" aria-label="包含竖排姓名和公开资料的微信分享卡片" />
+    <view wx:elif="{{shareCoverState === 'LOADING'}}" class="share-native-cover__loading" aria-live="polite">
+      <view class="share-native-cover__skeleton"></view>
+      <text>正在按当前公开权限生成…</text>
+    </view>
+    <view wx:else class="share-native-cover__empty" aria-live="polite">
+      <text>{{shareCoverMessage || '分享卡片尚未生成。'}}</text>
+      <button wx:if="{{shareCoverState === 'ERROR'}}" class="card-button-secondary share-native-cover__retry" bindtap="retryNativeShareCover">重新生成</button>
+    </view>
+    <text wx:if="{{shareCoverState === 'READY'}}" class="share-native-cover__note">{{shareCoverMessage}}</text>
+  </view>
 
   <view wx:if="{{localNotice}}" class="share-notice" aria-live="polite">{{localNotice}}</view>
 
@@ -38,8 +62,8 @@
       <view class="share-choice"><text class="share-choice__index">02</text><view><text class="share-choice__title">当前配色随卡片保留</text><text class="share-choice__note">象牙白、墨黑、香槟金与石灰灰会同步到接收页。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">03</text><view><text class="share-choice__title">可生成本地海报</text><text class="share-choice__note">海报明确标注演示边界，不包含私密资料或虚构二维码。</text></view></view>
     </view>
-    <button class="card-button share-wechat-button" open-type="share"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>发送演示名片到微信</text></button>
-    <navigator class="card-link-button share-return" open-type="switchTab" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
+    <button class="card-button share-wechat-button" open-type="share" disabled="{{shareCoverState !== 'READY'}}"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>{{shareCoverState === 'READY' ? '发送演示名片到微信' : '正在准备分享卡片'}}</text></button>
+    <navigator class="card-link-button share-return" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
   </view>
 
   <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="share-choice-card share-choice-card--quiet">
@@ -57,7 +81,7 @@
     title="{{shareTitle}}"
     description="{{shareDescription}}"
     allow-retry="{{shareState === 'ERROR' && !busyAction}}"
-    allow-forward="{{shareState === 'SUCCESS'}}"
+    allow-forward="{{shareState === 'SUCCESS' && shareCoverState === 'READY'}}"
     busy="{{busyAction !== ''}}"
     bind:retry="handleShareRetry"
   />

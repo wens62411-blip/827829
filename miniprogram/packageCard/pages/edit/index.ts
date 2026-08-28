@@ -17,6 +17,14 @@ import {
   writeCardThemePreference,
   type CardTheme,
 } from '../../../pages/card/services/card-theme-preference';
+import {
+  MAX_PROFILE_LABELS,
+  addProfileLabel,
+  normalizeProfileLabels,
+  readOfflineDemoDraft,
+  writeOfflineDemoDraft,
+} from '../../../pages/card/services/offline-demo-draft';
+import { buildOfflineDemoSharePath } from '../../../pages/card/services/offline-demo-share-snapshot';
 
 type EditorMode = 'PREVIEW' | 'EDIT';
 
@@ -26,6 +34,10 @@ interface DraftInput {
   readonly cityIndex: number;
   readonly profession: string;
   readonly selectedLabels: readonly string[];
+  readonly phone: string;
+  readonly email: string;
+  readonly showPhone: boolean;
+  readonly showEmail: boolean;
   readonly avatarUrl: string;
 }
 
@@ -71,8 +83,26 @@ function compactDraftText(value: string, maximumLength: number): string {
   return value.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim().slice(0, maximumLength);
 }
 
+function normalizeDraftPhone(value: string): string {
+  const candidate = compactDraftText(value, 24);
+  return candidate.length >= 6 && /^\+?[0-9](?:[0-9 ()-]*[0-9])$/.test(candidate)
+    ? candidate
+    : '';
+}
+
+function normalizeDraftEmail(value: string): string {
+  const candidate = compactDraftText(value, 72);
+  if (!candidate || /\s/.test(candidate)) return '';
+  const parts = candidate.split('@');
+  return parts.length === 2
+    && Boolean(parts[0])
+    && /^[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(parts[1] ?? '')
+    ? candidate
+    : '';
+}
+
 function uniqueLabels(values: readonly string[]): string[] {
-  return [...new Set(values.map((value) => compactDraftText(value, 48)).filter(Boolean))].slice(0, 20);
+  return normalizeProfileLabels(values);
 }
 
 function makeTagOptions(values: readonly string[], selectedLabels: readonly string[]) {
@@ -91,6 +121,8 @@ function displayInitial(displayName: string): string {
 function makePreview(draft: DraftInput) {
   const cityId = draft.cityIndex >= 0 ? CITY_IDS[draft.cityIndex] : undefined;
   const profession = compactDraftText(draft.profession, 80);
+  const phone = normalizeDraftPhone(draft.phone);
+  const email = normalizeDraftEmail(draft.email);
   return {
     previewCard: {
       displayName: compactDraftText(draft.displayName, 60) || '你的名字',
@@ -101,7 +133,10 @@ function makePreview(draft: DraftInput) {
       claims: [],
     },
     previewCityLabel: cityDisplayName(cityId),
-    previewFields: [],
+    previewFields: [
+      ...(draft.showPhone && phone ? [{ key: 'phone', label: '电话', value: phone }] : []),
+      ...(draft.showEmail && email ? [{ key: 'email', label: '邮箱', value: email }] : []),
+    ],
     previewInitial: displayInitial(draft.displayName),
     identityTagOptions: makeTagOptions(IDENTITY_LABELS, draft.selectedLabels),
     interestTagOptions: makeTagOptions(INTEREST_LABELS, draft.selectedLabels),
@@ -114,6 +149,10 @@ const EMPTY_DRAFT: DraftInput = {
   cityIndex: -1,
   profession: '',
   selectedLabels: [],
+  phone: '',
+  email: '',
+  showPhone: false,
+  showEmail: false,
   avatarUrl: '',
 };
 
@@ -133,11 +172,19 @@ Page({
     biographyLength: 0,
     profession: '',
     selectedLabels: [] as string[],
+    phone: '',
+    email: '',
+    showPhone: false,
+    showEmail: false,
+    contactMessage: '',
     galleryImages: [] as string[],
     showTags: true,
     showGallery: true,
     previewSelectedLabels: [] as string[],
+    previewPublicLabels: [] as string[],
     previewGalleryImages: [] as string[],
+    customLabelInput: '',
+    tagMessage: '',
     galleryNote: '',
     ...makePreview(EMPTY_DRAFT),
     cityNames: CITY_NAMES,
@@ -158,13 +205,18 @@ Page({
       cityIndex: overrides.cityIndex ?? this.data.cityIndex,
       profession: overrides.profession ?? this.data.profession,
       selectedLabels,
+      phone: overrides.phone ?? this.data.phone,
+      email: overrides.email ?? this.data.email,
+      showPhone: overrides.showPhone ?? this.data.showPhone,
+      showEmail: overrides.showEmail ?? this.data.showEmail,
       avatarUrl,
     };
     this.setData({
       ...overrides,
       selectedLabels,
       ...makePreview(draft),
-      previewSelectedLabels: this.data.showTags ? selectedLabels : [],
+      previewSelectedLabels: [],
+      previewPublicLabels: this.data.showTags ? selectedLabels : [],
     });
   },
 
@@ -189,14 +241,19 @@ Page({
     const runtime = getRuntimeEvidence();
     const demoMode = isOfflineDemo(runtime);
     if (demoMode) {
-      const cityIndex = OFFLINE_DEMO_PROFILE.cityId ? CITY_IDS.indexOf(OFFLINE_DEMO_PROFILE.cityId) : -1;
-      const selectedLabels = ['创始人', '艺术爱好者', '旅行爱好者'];
+      const storedDraft = readOfflineDemoDraft();
+      const cityIndex = CITY_IDS.indexOf(storedDraft.cityId);
+      const selectedLabels = [...storedDraft.selectedLabels];
       const demoDraft: DraftInput = {
-        displayName: OFFLINE_DEMO_PROFILE.displayName,
-        biography: OFFLINE_DEMO_PROFILE.biography ?? '',
+        displayName: storedDraft.displayName,
+        biography: storedDraft.biography,
         cityIndex,
-        profession: '跨城市品牌与文化连接者',
+        profession: storedDraft.profession,
         selectedLabels,
+        phone: storedDraft.phone,
+        email: storedDraft.email,
+        showPhone: storedDraft.showPhone,
+        showEmail: storedDraft.showEmail,
         avatarUrl: '',
       };
       this.setData({
@@ -213,9 +270,16 @@ Page({
         cityIndex,
         profession: demoDraft.profession,
         selectedLabels,
-        previewSelectedLabels: selectedLabels,
+        phone: demoDraft.phone,
+        email: demoDraft.email,
+        showPhone: demoDraft.showPhone,
+        showEmail: demoDraft.showEmail,
+        contactMessage: '',
+        showTags: storedDraft.showTags,
+        previewSelectedLabels: [],
+        previewPublicLabels: storedDraft.showTags ? selectedLabels : [],
         ...makePreview(demoDraft),
-        message: 'DEMO_ONLY：当前修改只在本页预览，不会写入云端。',
+        message: 'DEMO_ONLY：名片可保存为本机体验草稿，不会写入云端。',
       });
       return;
     }
@@ -259,8 +323,14 @@ Page({
           cityIndex: -1,
           profession: '',
           selectedLabels: [],
+          phone: '',
+          email: '',
+          showPhone: false,
+          showEmail: false,
+          contactMessage: '',
           galleryImages: [],
           previewSelectedLabels: [],
+          previewPublicLabels: [],
           previewGalleryImages: [],
           ...makePreview(EMPTY_DRAFT),
           message: '',
@@ -279,6 +349,10 @@ Page({
       cityIndex,
       profession: '',
       selectedLabels: [],
+      phone: '',
+      email: '',
+      showPhone: false,
+      showEmail: false,
       avatarUrl: '',
     };
     this.setData({
@@ -292,8 +366,14 @@ Page({
       cityIndex,
       profession: '',
       selectedLabels: [],
+      phone: '',
+      email: '',
+      showPhone: false,
+      showEmail: false,
+      contactMessage: '',
       galleryImages: [],
       previewSelectedLabels: [],
+      previewPublicLabels: [],
       previewGalleryImages: [],
       ...makePreview(loadedDraft),
       message: '',
@@ -316,22 +396,82 @@ Page({
     this.syncPreview({ profession: event.detail.value });
   },
 
+  onPhoneInput(event: WechatMiniprogram.Input) {
+    this.syncPreview({ phone: event.detail.value });
+    this.setData({ contactMessage: '' });
+  },
+
+  onEmailInput(event: WechatMiniprogram.Input) {
+    this.syncPreview({ email: event.detail.value });
+    this.setData({ contactMessage: '' });
+  },
+
   toggleProfileTag(event: WechatMiniprogram.TouchEvent) {
-    const value = compactDraftText(String(event.currentTarget.dataset.tag ?? ''), 48);
+    const value = String(event.currentTarget.dataset.tag ?? '').trim();
     if (!value || !PROFILE_LABEL_SET.has(value)) return;
     const current = uniqueLabels(this.data.selectedLabels);
-    const next = current.includes(value) ? current.filter((item) => item !== value) : [...current, value];
-    this.syncPreview({ selectedLabels: next });
+    if (current.includes(value)) {
+      this.syncPreview({ selectedLabels: current.filter((item) => item !== value) });
+      this.setData({ tagMessage: '' });
+      return;
+    }
+    const result = addProfileLabel(current, value);
+    if (!result.ok) {
+      this.setData({ tagMessage: result.code === 'MAX_COUNT' ? `最多添加 ${MAX_PROFILE_LABELS} 个标签。` : '这个标签暂时无法添加。' });
+      return;
+    }
+    this.syncPreview({ selectedLabels: result.labels });
+    this.setData({ tagMessage: '' });
+  },
+
+  onCustomLabelInput(event: WechatMiniprogram.Input) {
+    this.setData({ customLabelInput: event.detail.value, tagMessage: '' });
+  },
+
+  addCustomProfileTag() {
+    const result = addProfileLabel(this.data.selectedLabels, this.data.customLabelInput);
+    if (!result.ok) {
+      const messages = {
+        EMPTY: '请先输入标签内容。',
+        CONTROL_CHARACTER: '标签不能包含换行或不可见控制字符。',
+        TOO_LONG: '每个标签最多 10 个字。',
+        DUPLICATE: '这个标签已经添加过了。',
+        MAX_COUNT: `最多添加 ${MAX_PROFILE_LABELS} 个标签。`,
+      } as const;
+      this.setData({ tagMessage: messages[result.code] });
+      return;
+    }
+    this.syncPreview({ selectedLabels: result.labels });
+    this.setData({ customLabelInput: '', tagMessage: '' });
+  },
+
+  removeProfileTag(event: WechatMiniprogram.TouchEvent) {
+    const value = String(event.currentTarget.dataset.tag ?? '').trim();
+    if (!value) return;
+    this.syncPreview({ selectedLabels: this.data.selectedLabels.filter((label) => label !== value) });
+    this.setData({ tagMessage: '' });
   },
 
   onModuleToggle(event: WechatMiniprogram.CustomEvent<{ value: boolean }>) {
     const moduleName = String(event.currentTarget.dataset.module ?? '');
     const enabled = Boolean(event.detail.value);
     if (moduleName === 'tags') {
-      this.setData({ showTags: enabled, previewSelectedLabels: enabled ? this.data.selectedLabels : [] });
+      this.setData({
+        showTags: enabled,
+        previewSelectedLabels: [],
+        previewPublicLabels: enabled ? this.data.selectedLabels : [],
+      });
     }
     if (moduleName === 'gallery') {
       this.setData({ showGallery: enabled, previewGalleryImages: enabled ? this.data.galleryImages : [] });
+    }
+    if (moduleName === 'phone') {
+      this.syncPreview({ showPhone: enabled });
+      this.setData({ contactMessage: '' });
+    }
+    if (moduleName === 'email') {
+      this.syncPreview({ showEmail: enabled });
+      this.setData({ contactMessage: '' });
     }
   },
 
@@ -416,10 +556,50 @@ Page({
   async saveProfile() {
     if (this.data.status === 'SAVING') return;
     if (this.data.demoMode) {
+      const current = readOfflineDemoDraft();
+      const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
+      const phone = normalizeDraftPhone(this.data.phone);
+      const email = normalizeDraftEmail(this.data.email);
+      if (this.data.phone.trim() && !phone) {
+        this.setData({ status: 'ERROR', contactMessage: '请填写有效电话号码，或留空。', message: '电话格式需要检查。' });
+        return;
+      }
+      if (this.data.email.trim() && !email) {
+        this.setData({ status: 'ERROR', contactMessage: '请填写有效邮箱地址，或留空。', message: '邮箱格式需要检查。' });
+        return;
+      }
+      const draft = {
+        ...current,
+        displayName: this.data.displayName,
+        biography: this.data.biography,
+        profession: this.data.profession,
+        cityId,
+        selectedLabels: this.data.selectedLabels,
+        showTags: this.data.showTags,
+        phone,
+        email,
+        showPhone: this.data.showPhone,
+        showEmail: this.data.showEmail,
+      };
+      const sharePreflight = buildOfflineDemoSharePath(draft, this.data.cardTheme);
+      if (!sharePreflight.ok) {
+        this.setData({
+          status: 'ERROR',
+          message: '名片内容超出微信分享路径预算，请精简个人简介后再保存。',
+        });
+        return;
+      }
+      if (!writeOfflineDemoDraft(draft)) {
+        this.setData({ status: 'ERROR', message: '本机体验草稿保存失败，请检查存储空间后重试。' });
+        return;
+      }
       this.setData({
-        status: 'READY',
+        status: 'SAVED',
         editorMode: 'PREVIEW',
-        message: '未保存：这是 SYNTHETIC · DEMO_ONLY 本页草稿。',
+        phone,
+        email,
+        contactMessage: '',
+        message: '已保存到本机 SYNTHETIC · DEMO_ONLY 体验草稿；未写入云端。',
       });
       return;
     }
@@ -476,6 +656,10 @@ Page({
       cityIndex,
       profession: this.data.profession,
       selectedLabels: this.data.selectedLabels,
+      phone: '',
+      email: '',
+      showPhone: false,
+      showEmail: false,
       avatarUrl: this.data.localAvatarUsable ? this.data.localAvatarPath : '',
     };
     this.setData({

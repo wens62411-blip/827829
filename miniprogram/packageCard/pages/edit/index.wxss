@@ -67,7 +67,9 @@
 .card-editor-upload::after,
 .card-editor-ai::after,
 .card-editor-gallery-upload::after,
-.card-editor-gallery__remove::after {
+.card-editor-gallery__remove::after,
+.card-editor-selected-tag__remove::after,
+.card-editor-custom-tag__add::after {
   border: 0;
 }
 
@@ -437,6 +439,76 @@
   line-height: 1.55;
 }
 
+.card-editor-contact-intro {
+  display: block;
+  margin: -4rpx 0 20rpx;
+  color: var(--editor-muted);
+  font-size: 23rpx;
+  line-height: 1.65;
+  overflow-wrap: anywhere;
+}
+
+.card-editor-contact-grid {
+  display: grid;
+  min-width: 0;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16rpx;
+}
+
+.card-editor-contact-card {
+  box-sizing: border-box;
+  min-width: 0;
+  padding: 22rpx;
+  border: 2rpx solid var(--editor-line);
+  border-radius: 8rpx;
+  background: #fbf8f1;
+}
+
+.card-editor-contact-field {
+  min-width: 0;
+  margin-top: 0;
+}
+
+.card-editor-contact-visibility {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16rpx;
+  margin-top: 18rpx;
+  padding-top: 18rpx;
+  border-top: 2rpx solid var(--editor-soft);
+}
+
+.card-editor-contact-visibility > view {
+  min-width: 0;
+  flex: 1;
+}
+
+.card-editor-contact-visibility switch {
+  flex: 0 0 auto;
+}
+
+.card-editor-contact-visibility__title,
+.card-editor-contact-visibility__note {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.card-editor-contact-visibility__title {
+  color: var(--editor-ink);
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.card-editor-contact-visibility__note {
+  margin-top: 5rpx;
+  color: var(--editor-muted);
+  font-size: 20rpx;
+  line-height: 1.45;
+}
+
 .card-editor-tag-group {
   display: block;
   margin: 22rpx 0 10rpx;
@@ -446,6 +518,75 @@
 
 .card-editor-section .card-interest-chips {
   margin-top: 0;
+}
+
+.card-editor-selected-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12rpx;
+  margin-bottom: 20rpx;
+}
+
+.card-editor-selected-tag {
+  display: inline-flex;
+  min-height: 72rpx;
+  align-items: center;
+  gap: 4rpx;
+  padding-left: 22rpx;
+  border: 2rpx solid rgba(166, 124, 63, .48);
+  border-radius: 4rpx;
+  background: #fbf8f1;
+  color: var(--editor-ink);
+  font-size: 24rpx;
+}
+
+.card-editor-selected-tag__remove {
+  display: flex;
+  width: 72rpx;
+  min-width: 72rpx;
+  height: 72rpx;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--editor-gold);
+  font-size: 32rpx;
+  line-height: 72rpx;
+}
+
+.card-editor-custom-tag {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 132rpx;
+  gap: 12rpx;
+  margin-bottom: 26rpx;
+}
+
+.card-editor-custom-tag__input {
+  min-width: 0;
+}
+
+.card-editor-custom-tag__add {
+  min-height: 88rpx;
+  margin: 0;
+  padding: 0 18rpx;
+  border: 2rpx solid var(--editor-gold);
+  border-radius: 4rpx;
+  background: transparent;
+  color: var(--editor-gold);
+  font-size: 25rpx;
+  line-height: 84rpx;
+}
+
+.card-editor-custom-tag__add[disabled] {
+  border-color: var(--editor-line);
+  color: var(--editor-muted);
+  opacity: .64;
+}
+
+.card-editor-inline-note--error {
+  color: #8b3f32;
 }
 
 .card-editor-gallery-upload {
@@ -504,6 +645,24 @@
   font-size: 27rpx;
 }
 
+.card-editor-switch-row > view {
+  min-width: 0;
+  flex: 1;
+}
+
+.card-editor-switch-row switch {
+  flex: 0 0 auto;
+}
+
+.card-editor-switch-note {
+  display: block;
+  max-width: 500rpx;
+  margin-top: 6rpx;
+  color: var(--editor-muted);
+  font-size: 21rpx;
+  line-height: 1.45;
+}
+
 .card-editor-savebar {
   display: grid;
   gap: 16rpx;
@@ -519,12 +678,28 @@
   text-align: center;
 }
 
+@media (max-width: 430px) {
+  .card-editor-contact-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .card-editor-contact-card {
+    padding: 24rpx 26rpx;
+  }
+
+  .card-editor-contact-visibility__title,
+  .card-editor-contact-visibility__note {
+    overflow-wrap: normal;
+  }
+}
+
 @media (max-width: 360px) {
   .card-theme-options {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .card-editor-preview__actions,
+  .card-editor-contact-grid,
   .card-editor-gallery {
     grid-template-columns: minmax(0, 1fr);
   }

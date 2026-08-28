@@ -66,6 +66,17 @@
       <text class="profile-card__biography-text" user-select="{{true}}">{{safeCard.biography}}</text>
     </view>
 
+    <view wx:if="{{safePublicLabels.length}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="公开个人标签，未经人工认证">
+      <view class="profile-card__section-heading">
+        <text>人物标签</text>
+        <text class="profile-card__section-count">{{safePublicLabels.length}} 项</text>
+      </view>
+      <text class="profile-card__section-note">本人自定义 · 未经人工认证</text>
+      <view class="profile-card__tag-list">
+        <text wx:for="{{safePublicLabels}}" wx:key="*this" class="profile-card__self-tag">{{item}}</text>
+      </view>
+    </view>
+
     <view wx:if="{{safeFields.length}}" class="profile-card__section profile-card__fields-section" aria-role="list" aria-label="名片资料">
       <view class="profile-card__section-heading">
         <text>资料</text>

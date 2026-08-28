@@ -30,7 +30,7 @@ function contrastRatio(foreground, background) {
   return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
 }
 
-test('Discover v3 leads with brand and a restrained create-or-view card entry', () => {
+test('Discover v3 leads with brand and a restrained non-interactive card introduction', () => {
   const template = read('index.wxml');
   const cardOffset = template.indexOf('class="discover-card-entry"');
   const peopleOffset = template.indexOf('值得认识');
@@ -42,14 +42,9 @@ test('Discover v3 leads with brand and a restrained create-or-view card entry', 
   assert.ok(eventOffset > cardOffset, '活动必须位于数字名片入口之后');
   assert.ok(artOffset > cardOffset, '艺术垂类必须位于数字名片入口之后');
 
-  for (const route of [
-    '/packageCard/pages/edit/index',
-    '/pages/card/index',
-  ]) {
-    assert.match(template, new RegExp(`url="${route.replaceAll('/', '\\/')}"`));
-  }
+  assert.doesNotMatch(template, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
+  assert.match(template, /创建、查看和分享名片统一在「我的」中管理/);
   assert.doesNotMatch(template, /discover-card__profile|discover-card__avatar|AB Club 示例名片/);
-  assert.match(template, /完整名片只在进入名片页后展示/);
   assert.doesNotMatch(template, /discover-journey|discover-hero__image/);
 });
 

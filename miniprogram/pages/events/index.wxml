@@ -1,161 +1,74 @@
+<template name="event-list">
+  <view class="event-list">
+    <ab-event-card wx:for="{{items}}" wx:key="eventId" event-id="{{item.eventId}}" title="{{item.title}}" summary="{{item.summary}}" city-name="{{item.cityName}}" time-label="{{item.timeLabel}}" timezone="{{item.timezone}}" state-label="{{item.stateLabel}}" registration-label="{{item.registrationLabel}}" origin="{{item.origin}}" verification-state="{{item.verificationState}}" cover-src="{{item.coverSrc}}" cover-alt="{{item.coverAlt}}" detail-available="{{item.detailAvailable}}" bind:open="openEvent" />
+  </view>
+</template>
+
 <view class="events-page ab-safe-bottom">
   <view class="events-topbar">
     <view class="events-brand">
-      <image
-        wx:if="{{!brandLogoFailed}}"
-        class="events-brand__crest"
-        src="/assets/brand/ab-club-crest.png"
-        mode="aspectFit"
-        alt="AB Club 盾徽标志"
-        aria-label="AB Club 盾徽标志"
-        binderror="onBrandLogoError"
-      />
-      <view wx:else class="events-brand__fallback" aria-label="AB Club 标志加载失败，显示文字标识">AB</view>
-      <view class="events-brand__copy">
-        <text class="events-brand__name">AB Club</text>
-        <text class="events-brand__note">GLOBAL CHINESE CLUB</text>
-      </view>
+      <image wx:if="{{!brandLogoFailed}}" class="events-brand__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽" aria-label="AB Club 盾徽" binderror="onBrandLogoError" />
+      <view wx:else class="events-brand__fallback" aria-label="AB Club 文字标识">AB</view>
+      <view><text class="events-brand__name">AB Club</text><text class="events-brand__note">GLOBAL CHINESE CLUB</text></view>
     </view>
-    <button class="events-directory-chip" bindtap="openCityDirectory" hover-class="events-press" aria-label="查看全球七国十三城目录">
-      <text>7 国</text>
-      <text>13 城</text>
-    </button>
+    <button class="events-directory-chip" bindtap="openCityDirectory" hover-class="events-press" aria-label="查看七国十三城目录"><text>7 国</text><text>13 城</text></button>
   </view>
 
-  <view class="events-hero" aria-role="region" aria-label="AB Club 全球活动发现">
+  <view class="events-hero" aria-role="region" aria-label="AB Club 活动">
     <text class="events-kicker">GLOBAL GATHERINGS · PHASE 01</text>
     <text class="events-hero__title">在城市与艺术之间，留下一次值得赴约的相遇。</text>
-    <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。第一阶段不做活动交易、商户入驻或报名闭环，只展示少量策展方向与全球城市入口。</text>
-    <view class="events-hero__meta" aria-role="note">
-      <text>一期轻量预览</text>
-      <text>艺术 · 收藏 · 商业 · 城市文化</text>
-    </view>
+    <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。先选城市，再从艺术、古董、珠宝与克制的商业对话中浏览演示方向。</text>
   </view>
 
-  <view class="events-section" aria-role="region" aria-label="城市活动方向预览">
-    <view class="section-heading">
-      <view>
-        <text class="section-heading__eyebrow">SELECTED GATHERINGS</text>
-        <text class="section-heading__title">精选活动方向</text>
-      </view>
-      <ab-evidence-label mode="{{runtimeMode}}" />
+  <view class="event-filters" aria-role="region" aria-label="城市和活动类型">
+    <view class="filter-heading">
+      <view><text class="section-heading__eyebrow">SELECT A CITY</text><text class="filter-heading__title">选择城市</text></view>
+      <button class="filter-heading__directory" bindtap="openCityDirectory">完整目录 ›</button>
     </view>
-
-    <text class="events-section__lead">三场本地策展样稿，用来确认活动内容与视觉方向；不代表真实排期、场地确认、合作关系或城市节点已运营。</text>
-
-    <view wx:if="{{offlineDemo}}" class="demo-notice" aria-role="note">
-      <text class="demo-notice__label">DEMO_ONLY</text>
-      <text>本地图片与合成文案仅作方向预览，不会冒充真实活动或报名能力。</text>
+    <view class="selected-city" aria-role="status">
+      <view class="selected-city__index">CITY</view>
+      <view class="selected-city__copy"><text class="selected-city__name">{{selectedCityLabel}}</text><text class="selected-city__meta">{{selectedCityNameEn}} · {{selectedCityTimezone}}</text></view>
     </view>
-
-    <view wx:if="{{loading}}" class="events-loading" aria-role="status">正在读取公开活动信息…</view>
-    <view wx:elif="{{events.length}}" class="event-list">
-      <ab-event-card
-        wx:for="{{events}}"
-        wx:key="eventId"
-        event-id="{{item.eventId}}"
-        title="{{item.title}}"
-        summary="{{item.summary}}"
-        city-name="{{item.cityName}}"
-        time-label="{{item.timeLabel}}"
-        timezone="{{item.timezone}}"
-        state-label="{{item.stateLabel}}"
-        registration-label="{{item.registrationLabel}}"
-        origin="{{item.origin}}"
-        verification-state="{{item.verificationState}}"
-        cover-src="{{item.coverSrc}}"
-        cover-alt="{{item.coverAlt}}"
-        detail-available="{{item.detailAvailable}}"
-        bind:open="openEvent"
-      />
-    </view>
-    <ab-event-state
-      wx:else
-      kind="{{stateKind}}"
-      title="{{stateTitle}}"
-      description="{{stateDescription}}"
-      detail="{{stateDetail}}"
-      action-label="查看全球城市覆盖"
-      bind:action="openCityDirectory"
-    />
-  </view>
-
-  <view class="city-explorer" aria-role="region" aria-label="七国十三城筛选与入口">
-    <view class="section-heading section-heading--city">
-      <view>
-        <text class="section-heading__eyebrow">GLOBAL CITY DIRECTORY</text>
-        <text class="section-heading__title">从一座城市开始</text>
-      </view>
-      <text class="city-explorer__count">7 国 · 13 城</text>
-    </view>
-    <text class="events-section__lead">选择国家浏览首发城市。城市列入目录仅用于名片归属和活动方向探索，不等于当地节点已经运营。</text>
-
-    <scroll-view class="country-filter-rail" scroll-x="true" enable-flex="true" show-scrollbar="false" aria-label="按国家筛选城市">
-      <view class="country-filter-list">
-        <button
-          wx:for="{{countryFilters}}"
-          wx:key="id"
-          class="country-filter {{item.selected ? 'country-filter--selected' : ''}}"
-          data-country-id="{{item.id}}"
-          bindtap="selectCountry"
-          hover-class="events-press"
-          aria-label="{{item.label}}，{{item.count}} 座城市{{item.selected ? '，当前已选择' : ''}}"
-        >
-          <text>{{item.label}}</text>
-          <text>{{item.count}}</text>
-        </button>
+    <scroll-view class="city-filter-rail" scroll-x="true" enable-flex="true" show-scrollbar="false" aria-label="选择活动城市">
+      <view class="city-filter-list">
+        <button wx:for="{{cityFilters}}" wx:key="id" class="city-filter {{item.selected ? 'city-filter--selected' : ''}}" data-city-id="{{item.id}}" bindtap="selectCity" hover-class="events-press" aria-pressed="{{item.selected}}"><text>{{item.label}}</text><text>{{item.nameEn}}</text></button>
       </view>
     </scroll-view>
 
-    <view class="city-preview-grid">
-      <button
-        wx:for="{{cityPreviews}}"
-        wx:key="id"
-        class="city-preview"
-        data-city-id="{{item.id}}"
-        bindtap="openCity"
-        hover-class="city-preview--pressed"
-        aria-label="查看 {{item.name}} 城市目录；当前不代表节点已运营"
-      >
-        <view class="city-preview__media">
-          <image
-            wx:if="{{!item.imageFailed}}"
-            class="city-preview__image"
-            src="{{item.imageSrc}}"
-            mode="aspectFill"
-            lazy-load="true"
-            alt="{{item.imageAlt}}"
-            aria-label="{{item.imageAlt}}"
-            data-index="{{index}}"
-            binderror="onCityImageError"
-          />
-          <view wx:else class="city-preview__fallback ab-image-fallback" aria-role="img" aria-label="{{item.name}}本地城市图片加载失败">
-            <text>AB</text>
-            <text>本地图片暂不可用</text>
-          </view>
-          <view class="city-preview__shade"></view>
-          <text class="city-preview__region">{{item.regionName}} · {{item.countryName}}</text>
-        </view>
-        <view class="city-preview__body">
-          <view>
-            <text class="city-preview__name">{{item.name}}</text>
-            <text class="city-preview__name-en">{{item.nameEn}}</text>
-          </view>
-          <text class="city-preview__arrow">›</text>
-        </view>
-      </button>
+    <view class="filter-heading filter-heading--category">
+      <view><text class="section-heading__eyebrow">CURATED CATEGORIES</text><text class="filter-heading__title">活动分类</text></view>
+      <text class="filter-heading__summary">{{visibleEventCount}} 个 DEMO</text>
     </view>
-
-    <button class="city-directory" bindtap="openCityDirectory" hover-class="city-directory--pressed">
-      <text>查看 7 国 13 城覆盖范围</text>
-      <text>完整目录 ›</text>
-    </button>
+    <scroll-view class="category-rail" scroll-x="true" enable-flex="true" show-scrollbar="false" aria-label="按类型筛选">
+      <view class="category-list">
+        <button wx:for="{{categoryFilters}}" wx:key="id" class="category-filter {{item.selected ? 'category-filter--selected' : ''}}" data-category-id="{{item.id}}" bindtap="selectCategory" hover-class="events-press" aria-pressed="{{item.selected}}">
+          <text class="category-filter__en">{{item.nameEn}}</text><text class="category-filter__name">{{item.label}}</text><text class="category-filter__description">{{item.description}}</text>
+        </button>
+      </view>
+    </scroll-view>
+    <view wx:if="{{offlineDemo}}" class="demo-notice" aria-role="note"><text class="demo-notice__label">OFFLINE_DEMO · SYNTHETIC</text><text>以下均为演示内容；卡片可打开稳定详情，但不代表活动已举办或可报名。</text></view>
   </view>
 
-  <view class="events-policy" aria-role="note">
-    <text class="events-policy__eyebrow">PHASE 01 BOUNDARY</text>
-    <text class="events-policy__title">一期以名片为核心，活动保持轻量。</text>
-    <text>活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段。</text>
-    <text class="events-policy__detail">所有 DEMO_ONLY 内容都应在正式运营资料完成审核后再替换，不从图片或城市目录推断真实活动状态。</text>
-  </view>
+  <view wx:if="{{loading}}" class="events-loading" aria-role="status">正在读取公开活动…</view>
+  <ab-event-state wx:elif="{{!visibleEventCount}}" kind="{{stateKind}}" title="{{stateTitle}}" description="{{stateDescription}}" detail="{{stateDetail}}" action-label="查看全球城市" bind:action="openCityDirectory" />
+  <block wx:else>
+    <view class="events-section events-section--featured" aria-role="region" aria-label="本月精选">
+      <view class="section-heading"><view><text class="section-heading__eyebrow">EDITOR'S SELECTION</text><text class="section-heading__title">本月精选</text></view><ab-evidence-label mode="{{runtimeMode}}" /></view>
+      <text class="events-section__lead">{{selectedCityLabel}}的重点策展模板，点击卡片可查看完整演示详情。</text>
+      <template is="event-list" data="{{items: featuredEvents}}" />
+    </view>
+    <view class="events-section events-section--upcoming" aria-role="region" aria-label="近期方向">
+      <view class="section-heading"><view><text class="section-heading__eyebrow">COMING INTO VIEW</text><text class="section-heading__title">近期方向</text></view><text class="section-heading__side">DEMO_ONLY</text></view>
+      <text class="events-section__lead">日期、场地与合作方仍待后续人工确认。</text>
+      <template is="event-list" data="{{items: upcomingEvents}}" />
+    </view>
+    <view class="events-section events-section--city-theme" aria-role="region" aria-label="城市主题">
+      <view class="section-heading"><view><text class="section-heading__eyebrow">CITY NOTES</text><text class="section-heading__title">城市主题</text></view><text class="section-heading__side">{{selectedCityNameEn}}</text></view>
+      <text class="events-section__lead">从建筑、设计、博物馆与城市创意网络出发。</text>
+      <template is="event-list" data="{{items: cityThemeEvents}}" />
+    </view>
+  </block>
+
+  <view class="city-directory-note" aria-role="note"><text>城市目录不等于当地节点已经运营。</text><button bindtap="openCityDirectory">查看 7 国 13 城完整目录 ›</button></view>
+  <view class="events-policy" aria-role="note"><text class="events-policy__eyebrow">PHASE 01 BOUNDARY</text><text class="events-policy__title">一期以名片为核心，活动保持轻量。</text><text>活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段。</text><text class="events-policy__detail">所有 OFFLINE_DEMO · SYNTHETIC 内容须在人工审核后替换。</text></view>
 </view>

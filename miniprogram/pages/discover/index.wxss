@@ -26,7 +26,9 @@
   display: flex;
   align-items: center;
   min-width: 0;
+  flex: 1 1 auto;
   gap: 18rpx;
+  overflow: hidden;
 }
 
 .discover-brandmark,
@@ -53,6 +55,8 @@
 
 .discover-brand__copy {
   min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .discover-brand__name,
@@ -61,11 +65,15 @@
 }
 
 .discover-global-chip {
+  box-sizing: border-box;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 10rpx;
   min-width: 132rpx;
   min-height: 88rpx;
+  flex: 0 0 auto;
+  margin: 0;
   padding: 0 24rpx;
   border: 2rpx solid var(--discover-line);
   border-radius: 999rpx;
@@ -98,6 +106,8 @@
   color: var(--discover-muted);
   font-size: 20rpx;
   letter-spacing: 0.1em;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
 }
 
 .discover-intro {
@@ -145,6 +155,7 @@
   display: grid;
   grid-template-columns: 88rpx minmax(0, 1fr);
   gap: 28rpx;
+  width: calc(100% - 64rpx);
   max-width: 916rpx;
   margin: 0 32rpx;
   padding: 40rpx 8rpx;
@@ -187,54 +198,12 @@
   line-height: 1.68;
 }
 
-.discover-card-entry__actions {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 24rpx;
-  margin-top: 30rpx;
-}
-
-.discover-card-entry__primary,
-.discover-card-entry__secondary {
-  box-sizing: border-box;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 88rpx;
-  font-size: 24rpx;
-  font-weight: 650;
-  line-height: 1.35;
-}
-
-.discover-card-entry__primary {
-  min-width: 248rpx;
-  padding: 16rpx 28rpx;
-  border: 2rpx solid var(--discover-ink);
-  border-radius: 14rpx;
-  background: var(--discover-ink);
-  color: var(--discover-paper);
-}
-
-.discover-card-entry__secondary {
-  min-width: 224rpx;
-  padding: 16rpx 6rpx;
-  border-bottom: 2rpx solid var(--discover-accent);
-  color: var(--discover-ink);
-}
-
-.discover-card-entry__secondary text {
-  margin-left: 14rpx;
-  color: var(--discover-accent);
-  font-family: Georgia, serif;
-  font-size: 32rpx;
-}
-
 .discover-runtime {
   box-sizing: border-box;
   display: flex;
   align-items: flex-start;
   gap: 16rpx;
+  width: calc(100% - 64rpx);
   max-width: 916rpx;
   margin: 20rpx 32rpx 0;
   padding: 18rpx 20rpx;
@@ -250,9 +219,11 @@
 }
 
 .discover-runtime__text {
+  min-width: 0;
   color: var(--discover-muted);
   font-size: 21rpx;
   line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .discover-section {
@@ -267,6 +238,11 @@
   align-items: flex-end;
   justify-content: space-between;
   gap: 22rpx;
+}
+
+.discover-section__head > view {
+  min-width: 0;
+  flex: 1;
 }
 
 .discover-heading {
@@ -288,10 +264,12 @@
 .discover-demo-chip,
 .discover-section__aside {
   flex: 0 0 auto;
+  max-width: 42%;
   color: var(--discover-accent);
   font-size: 21rpx;
   line-height: 1.45;
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .discover-demo-chip {
@@ -338,6 +316,7 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
+  min-width: 0;
   gap: 18rpx;
 }
 
@@ -350,11 +329,14 @@
 }
 
 .discover-person__name {
+  min-width: 0;
   font-size: 28rpx;
   font-weight: 650;
 }
 
 .discover-person__city {
+  min-width: 0;
+  flex: 0 1 auto;
   color: var(--discover-accent);
   font-size: 21rpx;
 }
@@ -377,12 +359,16 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  min-width: 0;
   min-height: 88rpx;
+  gap: 20rpx;
   margin-top: 20rpx;
   border-bottom: 2rpx solid var(--discover-accent);
   color: var(--discover-ink);
   font-size: 25rpx;
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .discover-text-link text {
@@ -441,14 +427,18 @@
 }
 
 .discover-event-feature__notice {
+  box-sizing: border-box;
   position: absolute;
   top: 18rpx;
   left: 18rpx;
+  max-width: calc(100% - 36rpx);
   padding: 9rpx 12rpx;
   background: rgba(33, 30, 26, 0.82);
   color: var(--discover-paper);
   font-size: 20rpx;
   letter-spacing: 0.08em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 .discover-event-feature__body {
@@ -511,6 +501,7 @@
 
 .discover-art__item {
   box-sizing: border-box;
+  min-width: 0;
   min-height: 164rpx;
   padding: 20rpx 16rpx;
   border: 2rpx solid var(--discover-line);
@@ -593,7 +584,9 @@
   font-size: 20rpx;
   font-weight: 700;
   letter-spacing: 0.1em;
+  line-height: 1.45;
   text-align: right;
+  overflow-wrap: anywhere;
 }
 
 .discover-city-groups {
@@ -617,14 +610,17 @@
 }
 
 .discover-city-group__region {
+  min-width: 0;
   color: var(--discover-accent);
   font-size: 22rpx;
   font-weight: 700;
 }
 
 .discover-city-group__cities {
+  min-width: 0;
   font-size: 23rpx;
   line-height: 1.6;
+  overflow-wrap: anywhere;
 }
 
 .discover-rights {
@@ -657,6 +653,7 @@
   font-size: 20rpx;
   letter-spacing: 0.07em;
   line-height: 1.5;
+  overflow-wrap: anywhere;
 }
 
 .discover-press {
@@ -672,7 +669,12 @@
 }
 
 @media (max-width: 340px) {
-  .discover-topbar,
+  .discover-topbar {
+    flex-wrap: wrap;
+    gap: 16rpx;
+    padding: 24rpx 28rpx;
+  }
+
   .discover-section__head,
   .discover-person__topline {
     align-items: flex-start;
@@ -683,8 +685,29 @@
     flex-direction: column;
   }
 
+  .discover-intro {
+    padding-right: 28rpx;
+    padding-left: 28rpx;
+  }
+
   .discover-intro__title {
     font-size: 46rpx;
+  }
+
+  .discover-card-entry,
+  .discover-runtime {
+    width: calc(100% - 48rpx);
+    margin-right: 24rpx;
+    margin-left: 24rpx;
+  }
+
+  .discover-runtime {
+    flex-direction: column;
+  }
+
+  .discover-section {
+    padding-right: 24rpx;
+    padding-left: 24rpx;
   }
 
   .discover-art__grid {
@@ -696,19 +719,22 @@
     gap: 16rpx;
   }
 
-  .discover-card-entry__actions {
-    align-items: stretch;
-    flex-direction: column;
-  }
-
-  .discover-card-entry__primary,
-  .discover-card-entry__secondary {
-    width: 100%;
-  }
-
   .discover-demo-chip,
   .discover-section__aside {
+    max-width: 100%;
     text-align: left;
+  }
+
+  .discover-city-group {
+    grid-template-columns: 92rpx minmax(0, 1fr);
+    gap: 14rpx;
+    padding-right: 18rpx;
+    padding-left: 18rpx;
+  }
+
+  .discover-footer {
+    padding-right: 24rpx;
+    padding-left: 24rpx;
   }
 }
 

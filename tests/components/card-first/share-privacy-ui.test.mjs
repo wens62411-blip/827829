@@ -49,7 +49,6 @@ test('visitor page keeps the exchange decision clear and quiet', () => {
 
 test('core card journey keeps implementation language out of member-facing templates', () => {
   const templates = [
-    'miniprogram/pages/bootstrap/index.wxml',
     'miniprogram/pages/card/index.wxml',
     'miniprogram/pages/me/index.wxml',
     'miniprogram/packageCard/pages/privacy/index.wxml',

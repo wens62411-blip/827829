@@ -1,7 +1,11 @@
 .detail-page {
   box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
   min-height: 100vh;
+  overflow-x: hidden;
   padding: 42rpx 32rpx 72rpx;
+  padding-bottom: calc(72rpx + env(safe-area-inset-bottom));
   background: var(--ab-color-ivory);
   color: var(--ab-color-ink);
 }
@@ -72,6 +76,23 @@
   padding: 30rpx;
 }
 
+.detail__taxonomy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-bottom: 16rpx;
+}
+
+.detail__taxonomy text {
+  max-width: 100%;
+  padding: 7rpx 12rpx;
+  border: 1rpx solid var(--ab-color-border);
+  color: var(--ab-color-gold-brown);
+  font-size: 18rpx;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
 .detail__city,
 .detail__title,
 .detail__summary,
@@ -94,6 +115,7 @@
   font-size: 44rpx;
   font-weight: 500;
   line-height: 1.3;
+  overflow-wrap: anywhere;
 }
 
 .detail__summary {
@@ -101,6 +123,7 @@
   color: var(--ab-color-muted);
   font-size: 24rpx;
   line-height: 1.7;
+  overflow-wrap: anywhere;
 }
 
 .detail__id {
@@ -188,6 +211,27 @@
   }
 }
 
+@media (max-width: 360px) {
+  .detail-page {
+    padding-right: 24rpx;
+    padding-left: 24rpx;
+  }
+
+  .detail__intro,
+  .fact-section {
+    padding-right: 24rpx;
+    padding-left: 24rpx;
+  }
+
+  .detail__title {
+    font-size: 38rpx;
+  }
+
+  .fact-row {
+    grid-template-columns: minmax(104rpx, 128rpx) minmax(0, 1fr);
+  }
+}
+
 @media (prefers-color-scheme: dark) {
   .detail-page {
     background: var(--ab-color-dark-canvas);
@@ -214,7 +258,8 @@
   }
 
   .fact-section,
-  .fact-row {
+  .fact-row,
+  .detail__taxonomy text {
     border-color: var(--ab-color-dark-border);
   }
 

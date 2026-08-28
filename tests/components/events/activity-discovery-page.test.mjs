@@ -1,6 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import test from 'node:test';
+import { build } from 'esbuild';
 
 const read = (path) => readFileSync(new URL(`../../../${path}`, import.meta.url), 'utf8');
 
@@ -14,43 +16,40 @@ test('activity discovery is a branded independent surface with restrained phase-
   assert.match(template, /src="\/assets\/brand\/ab-club-crest\.png"/);
   assert.match(template, /GLOBAL GATHERINGS · PHASE 01/);
   assert.match(template, /活动是数字名片连接后的轻量延伸/);
-  assert.match(template, /精选活动方向/);
+  assert.match(template, /本月精选/);
+  assert.match(template, /近期方向/);
+  assert.match(template, /城市主题/);
   assert.match(template, /一期以名片为核心，活动保持轻量/);
-  assert.match(source, /return DISCOVER_DEMO_EVENTS\.map/);
-  assert.match(styles, /--events-canvas:\s*#f4efe5/i);
-  assert.match(styles, /--events-ink:\s*#211e1a/i);
-  assert.match(styles, /--events-gold:\s*#8a6538/i);
+  assert.match(source, /listActivityDemoEvents/);
+  assert.match(source, /buildDemoSections/);
+  assert.match(styles, /--canvas:\s*#f4efe5/i);
+  assert.match(styles, /--ink:\s*#211e1a/i);
+  assert.match(styles, /--gold:\s*#8a6538/i);
   assert.doesNotMatch(styles, /#(?:173c32|102821|1d463b|7ac9a5|246b4a)|--ab-color-green/i);
 });
 
-test('country filter exposes the frozen seven-country thirteen-city directory without inventing operations', () => {
+test('top city rail exposes the frozen thirteen-city directory without inventing operations', () => {
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
 
-  assert.match(source, /COUNTRY_DIRECTORY/);
-  assert.match(source, /REGION_DIRECTORY/);
-  assert.match(source, /CITY_DIRECTORY\.filter\(\(city\) => countryId === ALL_COUNTRIES/);
-  assert.match(source, /countryFilters:\s*buildCountryFilters\(ALL_COUNTRIES\)/);
-  assert.match(source, /cityPreviews:\s*buildCityPreviews\(ALL_COUNTRIES\)/);
-  assert.match(template, /wx:for="\{\{countryFilters\}\}"/);
-  assert.match(template, /wx:for="\{\{cityPreviews\}\}"/);
-  assert.match(template, /7 国 · 13 城/);
+  assert.match(source, /CITY_DIRECTORY\.map\(\(city\) =>/);
+  assert.match(source, /cityFilters:\s*buildCityFilters\(DEFAULT_CITY\.id\)/);
+  assert.match(template, /wx:for="\{\{cityFilters\}\}"/);
+  assert.match(template, /查看 7 国 13 城完整目录/);
   assert.match(template, /不等于当地节点已经运营/);
   assert.doesNotMatch(template, /运营中|已开放|席位|余位|立即报名/);
 });
 
-test('city previews only use local images, fail closed, and preserve the existing city route contract', () => {
+test('activity cards only use local images and preserve the selected-city directory route contract', () => {
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
+  const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
 
-  assert.match(source, /imageSrc:\s*`\/assets\/cities\/\$\{city\.id\}\.jpg`/);
-  assert.doesNotMatch(source, /https?:\/\//);
-  assert.match(template, /src="\{\{item\.imageSrc\}\}"/);
-  assert.match(template, /alt="\{\{item\.imageAlt\}\}"/);
-  assert.match(template, /binderror="onCityImageError"/);
-  assert.match(template, /wx:else[^>]*city-preview__fallback/);
-  assert.match(source, /imageFailed:\s*true/);
-  assert.match(source, /url:\s*`\/packageEvents\/pages\/city\/index\?cityId=\$\{encodeURIComponent\(cityId\)\}`/);
+  assert.doesNotMatch(`${source}\n${demoSource}`, /https?:\/\//);
+  assert.match(demoSource, /\['\/assets\/editorial-events\//);
+  assert.match(template, /cover-src="\{\{item\.coverSrc\}\}"/);
+  assert.match(template, /cover-alt="\{\{item\.coverAlt\}\}"/);
+  assert.match(source, /url:\s*`\/packageEvents\/pages\/city\/index\?cityId=\$\{encodeURIComponent\(this\.data\.selectedCityId\)\}`/);
 });
 
 test('DEMO_ONLY and no-registration boundaries remain explicit but no transaction CTA is rendered', () => {
@@ -58,8 +57,75 @@ test('DEMO_ONLY and no-registration boundaries remain explicit but no transactio
   const template = read('miniprogram/pages/events/index.wxml');
 
   assert.match(template, /DEMO_ONLY/);
-  assert.match(template, /不代表真实排期、场地确认、合作关系或城市节点已运营/);
+  assert.match(template, /不代表活动已举办或可报名/);
   assert.match(template, /活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段/);
   assert.match(source, /正式请求失败后不会回退为合成活动/);
   assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:报名|支付|购买|登记兴趣)/s);
+});
+
+test('city and category controls rebuild all three event modules from one stable demo catalog', () => {
+  const source = read('miniprogram/pages/events/index.ts');
+  const template = read('miniprogram/pages/events/index.wxml');
+  const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
+
+  for (const label of ['全部', '艺术', '古董', '珠宝', '商业交流']) {
+    assert.match(source, new RegExp(`label: '${label}'`));
+  }
+  assert.match(source, /selectCity[\s\S]*applyDemoFilters\(cityId, this\.data\.selectedCategoryId\)/);
+  assert.match(source, /selectCategory[\s\S]*applyDemoFilters\(this\.data\.selectedCityId, categoryId\)/);
+  assert.match(source, /wx\.setStorageSync\('ab-events-city-id', city\.id\)/);
+  assert.match(source, /featuredEvents:[\s\S]*upcomingEvents:[\s\S]*cityThemeEvents:/);
+  assert.match(demoSource, /demo:activity:\$\{city\.id\}:\$\{category\[0\]\}:\$\{section\[0\]\}/);
+  assert.match(demoSource, /getDemoEventById[\s\S]*listActivityDemoEvents\(\)\.find/);
+  assert.equal((template.match(/bind:open="openEvent"/g) ?? []).length, 1);
+  assert.equal((template.match(/detail-available="\{\{item\.detailAvailable\}\}"/g) ?? []).length, 1);
+  assert.equal((template.match(/<template is="event-list"/g) ?? []).length, 3);
+});
+
+test('activity layout protects small screens, long copy, dark mode, reduced motion, and the safe bottom', () => {
+  const template = read('miniprogram/pages/events/index.wxml');
+  const styles = read('miniprogram/pages/events/index.wxss');
+  const detailStyles = read('miniprogram/packageEvents/pages/event/index.wxss');
+
+  assert.match(template, /class="events-page ab-safe-bottom"/);
+  assert.match(styles, /overflow-x:\s*hidden/);
+  assert.match(styles, /padding-bottom:\s*calc\([^;]*env\(safe-area-inset-bottom\)/);
+  assert.match(styles, /overflow-wrap:\s*anywhere/);
+  assert.match(styles, /@media\s*\(max-width:\s*360px\)/);
+  assert.match(styles, /\.city-directory-note[\s\S]*flex-direction:\s*column/);
+  assert.match(styles, /font-family:\s*Georgia,\s*"Songti SC",\s*"STSong",\s*SimSun,\s*serif/);
+  assert.match(styles, /prefers-color-scheme:\s*dark/);
+  assert.match(styles, /prefers-reduced-motion:\s*reduce/);
+  assert.match(detailStyles, /overflow-x:\s*hidden/);
+  assert.match(detailStyles, /env\(safe-area-inset-bottom\)/);
+  assert.match(detailStyles, /overflow-wrap:\s*anywhere/);
+});
+
+test('every generated city-category-section ID resolves to the same stable demo detail', async () => {
+  const entryPoint = fileURLToPath(new URL(
+    '../../../miniprogram/components/ab-event-card/demo-data.ts',
+    import.meta.url,
+  ));
+  const result = await build({
+    entryPoints: [entryPoint],
+    bundle: true,
+    format: 'esm',
+    platform: 'node',
+    target: 'es2022',
+    write: false,
+    logLevel: 'silent',
+  });
+  const bundled = result.outputFiles[0]?.text;
+  assert.ok(bundled);
+  const moduleUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
+  const catalog = await import(moduleUrl);
+  const events = catalog.listActivityDemoEvents();
+
+  assert.equal(events.length, 13 * 4 * 3);
+  assert.equal(new Set(events.map((event) => event.eventId)).size, events.length);
+  for (const event of events) {
+    assert.equal(event.eventId, `demo:activity:${event.cityId}:${event.categoryId}:${event.sectionId}`);
+    assert.deepEqual(catalog.getDemoEventById(event.eventId), event);
+    assert.match(event.summary, /^DEMO_ONLY/);
+  }
 });

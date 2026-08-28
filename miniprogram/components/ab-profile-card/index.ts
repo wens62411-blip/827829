@@ -76,9 +76,12 @@ const FIELD_LABELS: Readonly<Record<string, string>> = {
   position: '职位',
   experience: '经历',
   interests: '兴趣',
+  phone: '电话',
+  email: '邮箱',
 };
 
 const ALLOWED_CARD_FIELD_KEYS = new Set(Object.keys(FIELD_LABELS));
+const PUBLIC_CONTACT_FIELD_KEYS = new Set(['phone', 'email']);
 
 const EMPTY_CARD: RenderCard = {
   displayName: '',
@@ -163,7 +166,7 @@ function normalizeFieldValue(value: unknown): string {
   return '';
 }
 
-function normalizeFields(value: unknown): RenderField[] {
+function normalizeFields(value: unknown, allowPublicContacts: boolean = false): RenderField[] {
   if (!Array.isArray(value)) return [];
 
   return value.flatMap((entry) => {
@@ -171,6 +174,7 @@ function normalizeFields(value: unknown): RenderField[] {
     const field = entry as FieldInput;
     const key = safeText(field.key, 48);
     if (!ALLOWED_CARD_FIELD_KEYS.has(key)) return [];
+    if (PUBLIC_CONTACT_FIELD_KEYS.has(key) && !allowPublicContacts) return [];
 
     const displayValue = normalizeFieldValue(field.value);
     if (!displayValue) return [];
@@ -209,6 +213,23 @@ function normalizeSelectedLabels(value: unknown): string[] {
   });
 }
 
+function normalizePublicLabels(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  const labels: string[] = [];
+  const seen = new Set<string>();
+  for (const entry of value) {
+    if (typeof entry !== 'string') continue;
+    const label = entry.trim();
+    if (!label || /[\p{Cc}\p{Cf}]/u.test(label) || Array.from(label).length > 10) continue;
+    const key = label.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    labels.push(label);
+    if (labels.length === 5) break;
+  }
+  return labels;
+}
+
 function normalizeGallery(value: unknown, viewerMode: ViewerMode): RenderGalleryItem[] {
   if (viewerMode !== 'SELF' || !Array.isArray(value)) return [];
   const seen = new Set<string>();
@@ -235,9 +256,11 @@ Component({
     viewerMode: { type: String, value: 'STRANGER' },
     cityLabel: { type: String, value: '' },
     fields: { type: Array, value: [] },
+    allowPublicContacts: { type: Boolean, value: false },
     pendingLabels: { type: Array, value: [] },
     rejectedLabels: { type: Array, value: [] },
     selectedLabels: { type: Array, value: [] },
+    publicLabels: { type: Array, value: [] },
     galleryUrls: { type: Array, value: [] },
     theme: { type: String, value: 'ivory' },
     maxVisibleClaims: { type: Number, value: 4 },
@@ -254,6 +277,7 @@ Component({
     safePendingLabels: [] as string[],
     safeRejectedLabels: [] as string[],
     safeSelectedLabels: [] as string[],
+    safePublicLabels: [] as string[],
     safeGallery: [] as RenderGalleryItem[],
     safeTheme: 'ivory' as CardTheme,
     claimsExpanded: false,
@@ -266,8 +290,8 @@ Component({
     card() {
       this.syncCard();
     },
-    fields(value: unknown) {
-      this.setData({ safeFields: normalizeFields(value) });
+    'fields, allowPublicContacts'(value: unknown, allowPublicContacts: boolean) {
+      this.setData({ safeFields: normalizeFields(value, allowPublicContacts === true) });
     },
     'pendingLabels, rejectedLabels'(pendingLabels: unknown, rejectedLabels: unknown) {
       this.setData({
@@ -277,6 +301,9 @@ Component({
     },
     'selectedLabels, galleryUrls'(selectedLabels: unknown, galleryUrls: unknown) {
       this.syncCustomization(this.data.safeViewerMode, selectedLabels, galleryUrls);
+    },
+    publicLabels(value: unknown) {
+      this.setData({ safePublicLabels: normalizePublicLabels(value) });
     },
     theme(value: unknown) {
       this.setData({ safeTheme: normalizeTheme(value) });
@@ -292,7 +319,11 @@ Component({
   lifetimes: {
     attached() {
       this.syncViewer(this.properties.viewerMode);
-      this.setData({ safeTheme: normalizeTheme(this.properties.theme) });
+      this.setData({
+        safeTheme: normalizeTheme(this.properties.theme),
+        safeFields: normalizeFields(this.properties.fields, this.properties.allowPublicContacts === true),
+        safePublicLabels: normalizePublicLabels(this.properties.publicLabels),
+      });
     },
   },
   methods: {

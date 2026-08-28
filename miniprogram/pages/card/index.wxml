@@ -27,8 +27,8 @@
     show-default-actions="{{false}}"
   >
     <view slot="actions" class="card-inline-actions card-first-actions">
-      <navigator class="card-link-button" url="/packageCard/pages/edit/index" hover-class="none"><image class="card-link-button__icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑名片</text></navigator>
-      <navigator class="card-link-button card-link-button--strong" url="/packageCard/pages/share/index" hover-class="none"><image class="card-link-button__icon" src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>分享名片</text></navigator>
+      <button class="card-link-button" bindtap="openEditor"><image class="card-link-button__icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑名片</text></button>
+      <button class="card-link-button card-link-button--strong" bindtap="openShare"><image class="card-link-button__icon" src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>分享名片</text></button>
     </view>
   </ab-profile-card>
 
@@ -39,7 +39,7 @@
   </view>
 
   <view wx:if="{{card}}" class="card-truth-note" aria-role="note">
-    <text>{{demoMode ? 'SYNTHETIC · DEMO_ONLY · 编辑不会写入云端；分享页可实际发送明确标注的演示名片。' : '名片按当前可见范围显示；分享操作在独立页面完成。'}}</text>
+    <text>{{demoMode ? 'SYNTHETIC · DEMO_ONLY · 编辑内容可保存在本机体验草稿；分享页可实际发送当前公开字段的合成体验快照，并在接收页明确标注演示，不会写入云端。' : '名片按当前可见范围显示；分享操作在独立页面完成。'}}</text>
     <text>认证完全可选；标签必须先经过人工审核，才会公开显示。</text>
   </view>
 </view>

@@ -49,7 +49,6 @@
     }
   },
   "artifacts": [
-    "ROUTE_REQUEST: /pages/bootstrap/index",
     "ROUTE_REQUEST: /pages/me/index",
     "ROUTE_REQUEST: /pages/card/index",
     "ROUTE_REQUEST: /pages/card-share/index",
@@ -101,7 +100,6 @@
     "EVIDENCE_PROJECTION: tests/cloud/identity/fixtures/redacted-share-projection.json",
     "LOCAL_STATIC_RENDER_SOURCE: tests/components/card/evidence/local-visual-reference.html",
     "LOCAL_STATIC_RENDER_TOOL: tests/components/card/evidence/render-local-visual-reference.mjs",
-    "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/bootstrap.png",
     "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/me.png",
     "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/card-self.png",
     "LOCAL_STATIC_RENDER: tests/components/card/evidence/screenshots/card-stranger.png",
@@ -186,7 +184,7 @@
     {
       "id": "local-static-visual-reference",
       "status": "PASS",
-      "evidence": "Nine PNG states plus a contact sheet cover bootstrap, me, self, stranger, friend, privacy, share success, expiry and revocation; every image is watermarked as synthetic local reference and is not Developer Tools/device evidence."
+      "evidence": "Eight retained PNG states plus a contact sheet cover me, self, stranger, friend, privacy, share success, expiry and revocation; every image is watermarked as synthetic local reference and is not Developer Tools/device evidence."
     },
     {
       "id": "conservative-package-budget",

@@ -28,7 +28,7 @@
     <view wx:if="{{profile.phoneMasked}}" class="me-private-note" aria-role="note">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开名片。</view>
 
     <view class="me-link-group" aria-role="region" aria-label="我的数字名片">
-      <navigator class="me-link-row" open-type="switchTab" url="/pages/card/index" hover-class="me-pressed">
+      <navigator class="me-link-row" url="/pages/card/index" hover-class="me-pressed">
         <image class="me-link-row__icon" src="/assets/icons/ui-card.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">我的数字名片</text><text class="me-link-row__note">预览、编辑与分享</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
       </navigator>
     </view>

@@ -1,12 +1,36 @@
 @import "./shared/design-tokens/tokens.wxss";
 
 page {
+  box-sizing: border-box;
+  width: 100%;
   min-height: 100%;
+  overflow-x: hidden;
   background: var(--ab-color-ivory);
   color: var(--ab-color-ink);
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+  font-family: var(--ab-font-text);
   font-size: var(--ab-font-body);
   line-height: 1.6;
+}
+
+button,
+input,
+textarea,
+picker,
+navigator {
+  box-sizing: border-box;
+  max-width: 100%;
+  font-family: inherit;
+}
+
+image {
+  max-width: 100%;
+}
+
+.card-title,
+.ab-editorial-title {
+  font-family: var(--ab-font-display);
+  font-weight: 500;
+  letter-spacing: 0.015em;
 }
 
 button,
@@ -23,6 +47,7 @@ navigator,
 }
 
 .ab-safe-bottom {
+  box-sizing: border-box;
   padding-bottom: calc(var(--ab-space-6) + env(safe-area-inset-bottom));
 }
 
@@ -31,13 +56,17 @@ navigator,
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  min-width: 0;
   min-height: var(--ab-touch-target);
+  gap: var(--ab-space-3);
   padding: var(--ab-space-3) var(--ab-space-4);
   border: 2rpx solid var(--ab-color-ink);
   border-radius: var(--ab-radius-small);
   background: var(--ab-color-paper);
   color: var(--ab-color-ink);
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
 .ab-action::after {

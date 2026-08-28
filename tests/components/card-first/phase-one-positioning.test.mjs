@@ -22,16 +22,15 @@ function registeredRoutes() {
   return routes;
 }
 
-test('phase-one navigation opens on Discover and exposes activity, card, and Me without a network tab', () => {
+test('phase-one navigation opens on Discover and exposes only activity and Me beside it', () => {
   const tabs = app.tabBar?.list ?? [];
   const errors = [];
   const expectedPaths = [
     'pages/discover/index',
     'pages/events/index',
-    'pages/card/index',
     'pages/me/index',
   ];
-  const expectedLabels = ['发现', '活动', '名片', '我的'];
+  const expectedLabels = ['发现', '活动', '我的'];
   if (app.entryPagePath !== 'pages/discover/index') errors.push('冷启动没有直接进入发现品牌首页');
   if (JSON.stringify(tabs.map((item) => item.pagePath)) !== JSON.stringify(expectedPaths)) {
     errors.push(`一级导航路径不符：${tabs.map((item) => item.pagePath).join(' / ')}`);
@@ -52,16 +51,12 @@ test('phase-one navigation opens on Discover and exposes activity, card, and Me 
   }
 
   const discover = read('miniprogram/pages/discover/index.wxml');
-  const primary = discover.match(/<navigator\b[^>]*class="[^"]*discover-primary[^"]*"[^>]*url="([^"]+)"/i)?.[1];
-  if (!primary || !/^\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//.test(primary)) {
-    errors.push(`首页主按钮仍指向 ${primary}，而不是名片创建/展示/分享`);
+  if (/url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//.test(discover)) {
+    errors.push('发现首页仍绕过“我的”直接进入名片管理');
   }
+  if (!/创建、查看和分享名片统一在「我的」中管理/.test(discover)) errors.push('发现页没有说明名片入口位于“我的”');
   if (/<ab-profile-card\b/.test(discover)) errors.push('发现首页仍直接展示完整个人名片');
-
-  const bootstrapActions = actionMarkup(read('miniprogram/pages/bootstrap/index.wxml'));
-  if (/packageArt|pages\/events|活动与艺术|先浏览活动/i.test(bootstrapActions)) {
-    errors.push('启动页仍用活动/艺术分流核心注意力');
-  }
+  if (app.pages.includes('pages/bootstrap/index')) errors.push('启动注册/介绍中转页仍被注册');
 
   assert.deepEqual(errors, []);
 });
@@ -105,10 +100,12 @@ test('phase-one card journey exposes create, display, live preview, share, and a
 test('identity bootstrap is deferred until the user deliberately enters card creation', () => {
   const appSource = read('miniprogram/app.ts');
   const discover = read('miniprogram/pages/discover/index.wxml');
+  const me = read('miniprogram/pages/me/index.wxml');
   const editor = read('miniprogram/packageCard/pages/edit/index.ts');
 
   assert.doesNotMatch(appSource, /bootstrapIdentity\s*\(/, '冷启动不应自动建立身份');
-  assert.match(discover, /<navigator\b[^>]*url="\/packageCard\/pages\/edit\/index"[^>]*>创建数字名片<\/navigator>/);
+  assert.doesNotMatch(discover, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
+  assert.match(me, /<navigator\b[^>]*url="\/packageCard\/pages\/edit\/index"/);
   assert.match(editor, /bootstrapIdentity/);
   assert.match(
     editor,
@@ -119,12 +116,15 @@ test('identity bootstrap is deferred until the user deliberately enters card cre
 
 test('network overview is reachable only as a quiet secondary entry from Discover', () => {
   const discover = read('miniprogram/pages/discover/index.wxml');
+  const network = read('miniprogram/pages/network/index.wxml');
   const ownerCard = read('miniprogram/pages/card/index.wxml');
   const me = read('miniprogram/pages/me/index.wxml');
   const visitor = read('miniprogram/packageCard/pages/view/index.wxml');
 
   assert.equal((discover.match(/url="\/pages\/network\/index"/g) ?? []).length, 1);
   assert.match(discover, /discover-text-link--quiet[^>]*url="\/pages\/network\/index"/);
+  assert.match(network, /open-type="switchTab"[^>]*url="\/pages\/me\/index"/);
+  assert.doesNotMatch(network, /url="\/pages\/card\/index"/);
   for (const [name, template] of Object.entries({ ownerCard, me, visitor })) {
     assert.doesNotMatch(template, /url="\/pages\/network\/index"/, `${name} 不应再暴露人脉总页入口`);
   }
@@ -163,7 +163,6 @@ test('stage-two and stage-three capabilities are absent from registered phase-on
   }
 
   const mainTemplates = [
-    'miniprogram/pages/bootstrap/index.wxml',
     'miniprogram/pages/discover/index.wxml',
     'miniprogram/pages/card/index.wxml',
     'miniprogram/pages/network/index.wxml',

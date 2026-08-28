@@ -2,13 +2,19 @@ import type { PublicCardProjection } from '../../shared/types/projections';
 import type { UtcInstant } from '../../shared/types/primitives';
 import { cityDisplayName, isSafeShareBearer, safeShareTitle, sanitizePublicCard, shareExpiry } from './services/card-presenter';
 import {
-  OFFLINE_DEMO_CARD,
   OFFLINE_DEMO_FIELDS,
   OFFLINE_DEMO_SELECTED_LABELS,
   isOfflineDemo,
 } from './services/offline-demo';
 import { forgetShareRevocationPointer, isSafeShareTokenId, rememberShareForRevocation } from './services/share-revocation-pointer';
 import { readCardThemePreference, type CardTheme } from './services/card-theme-preference';
+import {
+  materializeOfflineDemoCard,
+  materializeOfflineDemoFields,
+  publicLabelsForDraft,
+  readOfflineDemoDraft,
+  type OfflineDemoPublicField,
+} from './services/offline-demo-draft';
 
 type IdentityClientModule = typeof import('./services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -38,8 +44,8 @@ Page({
     card: null as PublicCardProjection | null,
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
-    demoFields: OFFLINE_DEMO_FIELDS,
-    demoSelectedLabels: OFFLINE_DEMO_SELECTED_LABELS,
+    demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
+    demoSelectedLabels: [...OFFLINE_DEMO_SELECTED_LABELS] as string[],
     demoGalleryUrls: [] as string[],
     cardTheme: 'ivory' as CardTheme,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
@@ -82,9 +88,13 @@ Page({
       return;
     }
     if (this.data.demoMode) {
+      const draft = readOfflineDemoDraft();
+      const demoCard = materializeOfflineDemoCard(draft);
       this.setData({
-        card: OFFLINE_DEMO_CARD,
-        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+        card: demoCard,
+        demoFields: materializeOfflineDemoFields(draft),
+        demoSelectedLabels: publicLabelsForDraft(draft),
+        cityLabel: cityDisplayName(demoCard.cityId),
         status: 'READY',
         message: 'SYNTHETIC · DEMO_ONLY：示例不会保存、分享或进入审核。',
       });
@@ -111,6 +121,14 @@ Page({
       message: '',
     });
     if (fromPullDown) wx.stopPullDownRefresh();
+  },
+
+  openEditor() {
+    void wx.navigateTo({ url: '/packageCard/pages/edit/index' });
+  },
+
+  openShare() {
+    void wx.navigateTo({ url: '/packageCard/pages/share/index' });
   },
 
   async prepareWechatShare() {

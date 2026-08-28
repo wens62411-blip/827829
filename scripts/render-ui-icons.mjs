@@ -85,6 +85,25 @@ const icons = {
   chevron: ['<path d="m9 18 6-6-6-6"/>'],
 };
 
+const tabIcons = {
+  discover: [
+    '<circle cx="12" cy="12" r="8.25"/>',
+    '<path d="M12 6.2 13.7 10.3 17.8 12l-4.1 1.7-1.7 4.1-1.7-4.1L6.2 12l4.1-1.7z"/>',
+    '<circle cx="12" cy="12" r=".75" fill="currentColor" stroke="none"/>',
+  ],
+  events: [
+    '<path d="M7.5 4v3.2M16.5 4v3.2"/>',
+    '<path d="M5 6.2h14v13.3H5z"/>',
+    '<path d="M5 10h14"/>',
+    '<circle cx="9" cy="14.5" r=".85" fill="currentColor" stroke="none"/>',
+    '<path d="M12 14.5h4"/>',
+  ],
+  me: [
+    '<circle cx="12" cy="8.3" r="3.55"/>',
+    '<path d="M5.4 20c.55-4.05 2.8-6.1 6.6-6.1s6.05 2.05 6.6 6.1"/>',
+  ],
+};
+
 function svg(name, color, size) {
   return Buffer.from(`
     <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"
@@ -94,8 +113,21 @@ function svg(name, color, size) {
   `);
 }
 
+function tabSvg(name, color, size) {
+  return Buffer.from(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24"
+      fill="none" stroke="${color}" color="${color}" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+      ${tabIcons[name].join('')}
+    </svg>
+  `);
+}
+
 async function render(fileName, name, color, size) {
   await sharp(svg(name, color, size), { density: 216 }).resize(size, size).png({ compressionLevel: 9, palette: true }).toFile(resolve(outputDir, fileName));
+}
+
+async function renderTab(fileName, name, color, size) {
+  await sharp(tabSvg(name, color, size), { density: 216 }).resize(size, size).png({ compressionLevel: 9, palette: true }).toFile(resolve(outputDir, fileName));
 }
 
 await mkdir(outputDir, { recursive: true });
@@ -106,14 +138,12 @@ const uiGold = '#8A6538';
 const uiLight = '#FFF7E8';
 
 for (const [fileName, name] of [
-  ['tab-card.png', 'contact'],
-  ['tab-network.png', 'users'],
-  ['tab-home.png', 'compass'],
-  ['tab-events.png', 'calendar'],
-  ['tab-me.png', 'user'],
+  ['tab-home.png', 'discover'],
+  ['tab-events.png', 'events'],
+  ['tab-me.png', 'me'],
 ]) {
-  await render(fileName, name, muted, 81);
-  await render(fileName.replace('.png', '-active.png'), name, selected, 81);
+  await renderTab(fileName, name, muted, 81);
+  await renderTab(fileName.replace('.png', '-active.png'), name, selected, 81);
 }
 
 for (const [fileName, name] of [

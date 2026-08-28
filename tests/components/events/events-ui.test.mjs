@@ -91,16 +91,16 @@ test('phase-one event preview consumes frozen geography without sending unsuppor
   assert.match(payloadBlock, /limit:\s*3/);
   assert.doesNotMatch(payloadBlock, /cityId|type|price|access|admission|organizer|capacity|participants|registration/i);
 
-  assert.match(template, /查看 7 国 13 城覆盖范围/);
-  assert.match(source, /url:\s*'\/packageEvents\/pages\/city\/index'/);
-  assert.match(template, /第一阶段不做活动交易、商户入驻或报名闭环/);
+  assert.match(template, /查看 7 国 13 城完整目录/);
+  assert.match(source, /url:\s*`\/packageEvents\/pages\/city\/index\?cityId=\$\{encodeURIComponent\(this\.data\.selectedCityId\)\}`/);
+  assert.match(template, /先选城市，再从艺术、古董、珠宝/);
   assert.match(template, /活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段/);
   assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:立即报名|提交报名|登记兴趣|立即支付|确认支付)/s);
-  assert.match(source, /showListFailure[\s\S]*runtimeMode:\s*RuntimeMode\.DEGRADED[\s\S]*events:\s*\[\]/);
+  assert.match(source, /showListFailure[\s\S]*runtimeMode:\s*RuntimeMode\.DEGRADED[\s\S]*featuredEvents:\s*\[\]/);
   assert.match(source, /正式请求失败后不会回退为合成活动/);
 });
 
-test('OFFLINE_DEMO keeps the 13-city directory while the phase-one list shows only three honest curated previews', () => {
+test('OFFLINE_DEMO keeps the 13-city directory and provides stable city-category-section detail routes', () => {
   const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
   const listSource = read('miniprogram/pages/events/index.ts');
   const listTemplate = read('miniprogram/pages/events/index.wxml');
@@ -114,15 +114,29 @@ test('OFFLINE_DEMO keeps the 13-city directory while the phase-one list shows on
   assert.match(demoSource, /DISCOVER_DEMO_EVENTS/);
   assert.equal((demoSource.match(/eventId:\s*'demo:discover:/g) ?? []).length, 3);
   assert.match(demoSource, /getDemoEventById/);
-  assert.match(listSource, /return DISCOVER_DEMO_EVENTS\.map/);
-  assert.match(listSource, /events:\s*buildDemoCards\(\)/);
+  assert.match(demoSource, /DemoEventCategoryId\.ART/);
+  assert.match(demoSource, /DemoEventCategoryId\.ANTIQUES/);
+  assert.match(demoSource, /DemoEventCategoryId\.JEWELRY/);
+  assert.match(demoSource, /DemoEventCategoryId\.BUSINESS/);
+  assert.match(demoSource, /DemoEventSectionId\.FEATURED/);
+  assert.match(demoSource, /DemoEventSectionId\.UPCOMING/);
+  assert.match(demoSource, /DemoEventSectionId\.CITY_THEME/);
+  assert.match(demoSource, /eventId:\s*`demo:activity:\$\{city\.id\}:\$\{category\[0\]\}:\$\{section\[0\]\}`/);
+  assert.match(demoSource, /listActivityDemoEvents\(\)\.find\(\(event\) => event\.eventId === value\)/);
+  assert.match(listSource, /buildDemoSections/);
+  assert.match(listSource, /featuredEvents/);
+  assert.match(listSource, /upcomingEvents/);
+  assert.match(listSource, /cityThemeEvents/);
   assert.match(listSource, /eventId\.startsWith\('demo:'\)/);
   assert.match(listSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
   assert.match(listTemplate, /DEMO_ONLY/);
-  assert.match(listTemplate, /不代表真实排期、场地确认、合作关系或城市节点已运营/);
-  assert.match(listTemplate, /查看 7 国 13 城覆盖范围/);
-  assert.match(detailSource, /query\.demoCityId\s*\?\s*getDemoEventByCityId\(query\.demoCityId\)\s*:\s*undefined/);
-  assert.match(detailSource, /query\.demoEventId\s*\?\s*getDemoEventById\(query\.demoEventId\)\s*:\s*undefined/);
+  assert.match(listTemplate, /不代表活动已举办或可报名/);
+  assert.match(listTemplate, /查看 7 国 13 城完整目录/);
+  assert.match(detailSource, /const demoCityId = decodeRouteParam\(query\.demoCityId\)/);
+  assert.match(detailSource, /const demoEventId = decodeRouteParam\(query\.demoEventId\)/);
+  assert.match(detailSource, /demoCityId\s*\?\s*getDemoEventByCityId\(demoCityId\)\s*:\s*undefined/);
+  assert.match(detailSource, /demoEventId\s*\?\s*getDemoEventById\(demoEventId\)\s*:\s*undefined/);
+  assert.match(detailSource, /decodeURIComponent\(value\)/);
   assert.match(detailSource, /detail:\s*toDemoDetail\(demo\)/);
   assert.match(detailSource, /displayId:\s*event\.eventId/);
   assert.match(detailSource, /title:\s*event\.title/);
@@ -151,7 +165,8 @@ test('Art synthetic related event preserves its stable identity into event detai
   assert.match(artDemoSource, /summary:ART_RELATED_DEMO_EVENT\.summary/);
   assert.match(artDetailSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
   assert.doesNotMatch(artDetailSource, /demoCityId=\$\{encodeURIComponent\(cityId\)\}/);
-  assert.match(eventDetailSource, /query\.demoEventId\s*\?\s*getDemoEventById\(query\.demoEventId\)\s*:\s*undefined/);
+  assert.match(eventDetailSource, /const demoEventId = decodeRouteParam\(query\.demoEventId\)/);
+  assert.match(eventDetailSource, /demoEventId\s*\?\s*getDemoEventById\(demoEventId\)\s*:\s*undefined/);
   assert.match(eventDetailSource, /detail:\s*toDemoDetail\(demo\)/);
   assert.match(eventDetailSource, /if \(query\.demoEventId \|\| query\.demoCityId\)/);
 });

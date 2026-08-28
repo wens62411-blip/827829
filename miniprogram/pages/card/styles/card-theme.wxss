@@ -260,7 +260,13 @@
 }
 
 .card-first-actions {
+  width: 100%;
+  min-width: 0;
   margin-top: 0;
+}
+
+.card-first-actions .card-link-button {
+  min-width: 0;
 }
 
 .card-secondary-tools {
@@ -697,6 +703,7 @@
 }
 
 @media (max-width: 380px) {
+  .card-inline-actions,
   .card-secondary-tools {
     grid-template-columns: minmax(0, 1fr);
   }

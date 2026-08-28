@@ -21,7 +21,6 @@ import {
   rememberShareForRevocation,
 } from '../../../pages/card/services/share-revocation-pointer';
 import {
-  OFFLINE_DEMO_CARD,
   OFFLINE_DEMO_FIELDS,
   isOfflineDemo,
 } from '../../../pages/card/services/offline-demo';
@@ -29,6 +28,20 @@ import {
   readCardThemePreference,
   type CardTheme,
 } from '../../../pages/card/services/card-theme-preference';
+import {
+  readOfflineDemoDraft,
+  type OfflineDemoDraft,
+  type OfflineDemoPublicField,
+} from '../../../pages/card/services/offline-demo-draft';
+import {
+  buildOfflineDemoSharePath,
+  createOfflineDemoShareSnapshot,
+} from '../../../pages/card/services/offline-demo-share-snapshot';
+import {
+  drawNativeShareCard,
+  NATIVE_SHARE_CARD_HEIGHT,
+  NATIVE_SHARE_CARD_WIDTH,
+} from '../../../pages/card/services/native-share-card';
 
 type OwnerShareState = '' | 'SUCCESS' | 'REVOKED' | 'ERROR' | 'LOADING';
 type QrState = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
@@ -200,9 +213,12 @@ function drawPublicPoster(
 
 Page({
   activeCard: undefined as PublicCardProjection | undefined,
+  activeDemoDraft: undefined as OfflineDemoDraft | undefined,
   activeShareSecret: undefined as TransientShareSecret | undefined,
   revocableTokenId: undefined as ShareTokenId | undefined,
   posterCanvas: undefined as WechatMiniprogram.Canvas | undefined,
+  nativeShareCanvas: undefined as WechatMiniprogram.Canvas | undefined,
+  nativeShareCoverGeneration: 0,
   sharePageGeneration: 0,
   loadCardRequestGeneration: 0,
   actionRequestGeneration: 0,
@@ -210,7 +226,8 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
-    demoFields: OFFLINE_DEMO_FIELDS,
+    demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
+    demoPublicLabels: [] as string[],
     card: null as PublicCardProjection | null,
     cardTheme: 'ivory' as CardTheme,
     cityLabel: '',
@@ -224,6 +241,9 @@ Page({
     hasRevocableShare: false,
     qrState: 'IDLE' as QrState,
     qrMessage: '',
+    shareCoverState: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
+    shareCoverPath: '',
+    shareCoverMessage: '',
     posterReady: false,
     posterPath: '',
     posterMessage: '',
@@ -237,23 +257,36 @@ Page({
     this.loadCardRequestGeneration += 1;
     this.actionRequestGeneration += 1;
     this.activeCard = undefined;
+    this.activeDemoDraft = undefined;
     this.activeShareSecret = undefined;
     this.revocableTokenId = undefined;
     this.posterCanvas = undefined;
+    this.nativeShareCanvas = undefined;
+    this.nativeShareCoverGeneration += 1;
+    wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const cardTheme = readCardThemePreference();
     const runtime = getRuntimeEvidence();
     if (isOfflineDemo(runtime)) {
-      this.activeCard = OFFLINE_DEMO_CARD;
+      const demoDraft = readOfflineDemoDraft();
+      const demoSnapshot = createOfflineDemoShareSnapshot(demoDraft, cardTheme);
+      this.activeDemoDraft = demoDraft;
+      this.activeCard = demoSnapshot.card;
       this.setData({
         runtimeMode: runtime.runtimeMode,
         demoMode: true,
-        card: OFFLINE_DEMO_CARD,
-        cardTheme,
-        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+        card: demoSnapshot.card,
+        demoFields: [...demoSnapshot.fields],
+        demoPublicLabels: [...demoSnapshot.publicLabels],
+        cardTheme: demoSnapshot.cardTheme,
+        cityLabel: cityDisplayName(demoSnapshot.card.cityId),
         loadingCard: false,
         localNotice: 'DEMO_ONLY：可以真实拉起微信转发与生成本地海报；发送的是合成演示名片，不会创建会员关系或云端分享记录。',
+        shareCoverState: 'LOADING',
+        shareCoverMessage: '正在生成微信分享卡片…',
+        shareCoverPath: '',
+      }, () => {
+        wx.nextTick(() => void this.prepareNativeShareCover());
       });
-      wx.showShareMenu({ menus: ['shareAppMessage'] });
       return;
     }
     this.revocableTokenId = readShareRevocationPointer();
@@ -262,7 +295,6 @@ Page({
       cardTheme,
       hasRevocableShare: this.revocableTokenId !== undefined,
     });
-    wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     void this.loadCard();
   },
 
@@ -272,9 +304,12 @@ Page({
     this.loadCardRequestGeneration += 1;
     this.actionRequestGeneration += 1;
     this.activeCard = undefined;
+    this.activeDemoDraft = undefined;
     this.activeShareSecret = undefined;
     this.revocableTokenId = undefined;
     this.posterCanvas = undefined;
+    this.nativeShareCanvas = undefined;
+    this.nativeShareCoverGeneration += 1;
   },
 
   isCurrentLifecycle(generation: number) {
@@ -300,12 +335,30 @@ Page({
       ) return;
       if (!result.ok) {
         this.activeCard = undefined;
-        this.setData({ loadingCard: false, pageError: result.message, card: null, cityLabel: '' });
+        this.setData({
+          loadingCard: false,
+          pageError: result.message,
+          card: null,
+          cityLabel: '',
+          shareCoverState: 'IDLE',
+          shareCoverPath: '',
+          shareCoverMessage: '',
+        });
         return;
       }
       const card = sanitizePublicCard(result.data.card);
       this.activeCard = card;
-      this.setData({ loadingCard: false, pageError: '', card, cityLabel: cityDisplayName(card.cityId) });
+      this.setData({
+        loadingCard: false,
+        pageError: '',
+        card,
+        cityLabel: cityDisplayName(card.cityId),
+        shareCoverState: 'LOADING',
+        shareCoverPath: '',
+        shareCoverMessage: '正在生成微信分享卡片…',
+      }, () => {
+        wx.nextTick(() => void this.prepareNativeShareCover());
+      });
     } catch (_error) {
       if (
         !this.isCurrentLifecycle(lifecycleGeneration)
@@ -317,8 +370,104 @@ Page({
         pageError: '暂时无法确认最新名片内容，本页不会显示或分享未经确认的资料。',
         card: null,
         cityLabel: '',
+        shareCoverState: 'IDLE',
+        shareCoverPath: '',
+        shareCoverMessage: '',
       });
     }
+  },
+
+  async prepareNativeShareCover() {
+    const card = this.activeCard;
+    if (!card || this.sharePageUnloaded) return;
+    const lifecycleGeneration = this.sharePageGeneration;
+    const coverGeneration = ++this.nativeShareCoverGeneration;
+    this.nativeShareCanvas = undefined;
+    this.setData({
+      shareCoverState: 'LOADING',
+      shareCoverPath: '',
+      shareCoverMessage: '正在生成微信分享卡片…',
+    });
+    try {
+      const canvas = await new Promise<WechatMiniprogram.Canvas | undefined>((resolve) => {
+        wx.createSelectorQuery()
+          .in(this)
+          .select('#nativeShareCardCanvas')
+          .node((result) => resolve(result?.node as WechatMiniprogram.Canvas | undefined))
+          .exec();
+      });
+      if (
+        !this.isCurrentLifecycle(lifecycleGeneration)
+        || this.nativeShareCoverGeneration !== coverGeneration
+      ) return;
+      if (!canvas) {
+        this.setData({
+          shareCoverState: 'ERROR',
+          shareCoverMessage: '分享卡片画布没有准备好，请点击重试。',
+        });
+        return;
+      }
+      this.nativeShareCanvas = canvas;
+      const draft = this.data.demoMode ? this.activeDemoDraft : undefined;
+      drawNativeShareCard(canvas, {
+        displayName: card.displayName,
+        headline: card.headline,
+        biography: card.biography,
+        labels: this.data.demoPublicLabels,
+        phone: draft?.showPhone ? draft.phone : '',
+        email: draft?.showEmail ? draft.email : '',
+        demoMode: this.data.demoMode,
+      });
+      const tempFilePath = await new Promise<string | undefined>((resolve) => {
+        wx.canvasToTempFilePath({
+          canvas,
+          width: NATIVE_SHARE_CARD_WIDTH,
+          height: NATIVE_SHARE_CARD_HEIGHT,
+          destWidth: NATIVE_SHARE_CARD_WIDTH * 2,
+          destHeight: NATIVE_SHARE_CARD_HEIGHT * 2,
+          fileType: 'jpg',
+          quality: 0.92,
+          success: (result) => resolve(result.tempFilePath),
+          fail: () => resolve(undefined),
+        }, this);
+      });
+      if (
+        !this.isCurrentLifecycle(lifecycleGeneration)
+        || this.nativeShareCoverGeneration !== coverGeneration
+      ) return;
+      if (!tempFilePath) {
+        this.nativeShareCanvas = undefined;
+        this.setData({
+          shareCoverState: 'ERROR',
+          shareCoverMessage: '微信分享卡片导出失败，请点击重试。',
+        });
+        return;
+      }
+      this.setData({
+        shareCoverState: 'READY',
+        shareCoverPath: tempFilePath,
+        shareCoverMessage: '这就是微信好友在分享入口看到的卡片封面；隐藏的电话、邮箱和标签不会写入图片。',
+      });
+      if (this.data.demoMode || this.data.shareState === 'SUCCESS') {
+        wx.showShareMenu({ menus: ['shareAppMessage'] });
+      }
+    } catch (_error) {
+      if (
+        !this.isCurrentLifecycle(lifecycleGeneration)
+        || this.nativeShareCoverGeneration !== coverGeneration
+      ) return;
+      this.nativeShareCanvas = undefined;
+      this.setData({
+        shareCoverState: 'ERROR',
+        shareCoverPath: '',
+        shareCoverMessage: '微信分享卡片生成失败，请点击重试。',
+      });
+    }
+  },
+
+  retryNativeShareCover() {
+    if (this.data.shareCoverState === 'LOADING' || !this.activeCard) return;
+    void this.prepareNativeShareCover();
   },
 
   async createShare() {
@@ -393,7 +542,12 @@ Page({
         hasActiveShare: true,
         hasRevocableShare: true,
       });
-      wx.showShareMenu({ menus: ['shareAppMessage'] });
+      if (this.data.shareCoverState === 'READY') {
+        wx.showShareMenu({ menus: ['shareAppMessage'] });
+      } else {
+        wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+        void this.prepareNativeShareCover();
+      }
     } catch (_error) {
       if (!this.isCurrentAction(lifecycleGeneration, actionGeneration)) return;
       this.setData({
@@ -723,13 +877,30 @@ Page({
       ? ''
       : `&theme=${encodeURIComponent(this.data.cardTheme)}`;
     if (!this.sharePageUnloaded && this.data.demoMode && card) {
+      const demoDraft = this.activeDemoDraft;
+      const sharePath = demoDraft
+        ? buildOfflineDemoSharePath(demoDraft, this.data.cardTheme)
+        : { ok: false as const, code: 'PATH_TOO_LONG' as const, pathLength: 0 };
+      if (!sharePath.ok) {
+        this.setData({ localNotice: '当前内容超过微信分享路径预算，请返回编辑页精简个人简介。' });
+        wx.showToast({ title: '请先精简名片内容', icon: 'none' });
+        return { title: 'AB Club', path: '/pages/discover/index' };
+      }
       this.setData({ localNotice: '已请求打开微信转发面板；只有你在微信界面确认后才会真正发送。' });
       return {
-        title: 'AB Club · 数字名片体验',
-        path: `/pages/card-share/index?demo=1${themeQuery}`,
+        title: safeShareTitle(card.displayName),
+        path: sharePath.path,
+        ...(this.data.shareCoverState === 'READY' && this.data.shareCoverPath
+          ? { imageUrl: this.data.shareCoverPath }
+          : {}),
       };
     }
-    if (this.sharePageUnloaded || !secret || !card || this.data.shareState !== 'SUCCESS') {
+    if (
+      this.sharePageUnloaded
+      || !secret
+      || !card
+      || this.data.shareState !== 'SUCCESS'
+    ) {
       wx.showToast({ title: '请先创建安全分享入口', icon: 'none' });
       return { title: 'AB Club', path: '/pages/card/index' };
     }
@@ -739,6 +910,9 @@ Page({
     return {
       title: safeShareTitle(card.displayName),
       path: `/pages/card-share/index?token=${encodeURIComponent(secret.token)}${themeQuery}`,
+      ...(this.data.shareCoverState === 'READY' && this.data.shareCoverPath
+        ? { imageUrl: this.data.shareCoverPath }
+        : {}),
     };
   },
 });

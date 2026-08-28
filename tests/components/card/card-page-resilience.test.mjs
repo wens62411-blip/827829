@@ -50,6 +50,33 @@ function instantiate(definition) {
   };
 }
 
+test('owner card edit and share buttons navigate to their exact secondary pages', async () => {
+  const navigations = [];
+  globalThis.wx = {
+    navigateTo(input) { navigations.push(input); },
+  };
+  globalThis.__AB_CARD_PAGE_TEST_HOOKS__ = {
+    createCardShare: async () => ({ ok: false, message: 'not used' }),
+    getMyCard: async () => ({ ok: false, message: 'not used' }),
+    revokeCardShare: async () => ({ ok: false, message: 'not used' }),
+  };
+
+  try {
+    const definition = await loadCardPage();
+    const page = instantiate(definition);
+    page.openEditor.call(page);
+    page.openShare.call(page);
+    assert.deepEqual(navigations, [
+      { url: '/packageCard/pages/edit/index' },
+      { url: '/packageCard/pages/share/index' },
+    ]);
+  } finally {
+    delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
 test('slow share creation stays pending, de-duplicates taps, and cloud failure never becomes success', async () => {
   const storage = new Map();
   const wxCalls = [];

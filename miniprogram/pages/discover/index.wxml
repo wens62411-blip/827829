@@ -34,11 +34,7 @@
     <view class="discover-card-entry__content">
       <text class="discover-kicker">DIGITAL IDENTITY</text>
       <text class="discover-card-entry__title">你的名字，值得被更好地介绍。</text>
-      <text class="discover-card-entry__copy">以克制的版式整理身份、经历与兴趣；完整名片只在进入名片页后展示。</text>
-      <view class="discover-card-entry__actions">
-        <navigator class="discover-card-entry__primary discover-primary-card" url="/packageCard/pages/edit/index" hover-class="discover-press">创建数字名片</navigator>
-        <navigator class="discover-card-entry__secondary" open-type="switchTab" url="/pages/card/index" hover-class="discover-press">查看我的名片 <text>›</text></navigator>
-      </view>
+      <text class="discover-card-entry__copy">以克制的版式整理身份、经历与兴趣；创建、查看和分享名片统一在「我的」中管理。</text>
     </view>
   </view>
 

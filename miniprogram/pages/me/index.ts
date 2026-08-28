@@ -1,6 +1,7 @@
 import { CITY_DIRECTORY } from '../../shared/constants/geography';
 import type { ProfilePrivateDto } from '../../shared/types/projections';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../card/services/offline-demo';
+import { readOfflineDemoDraft } from '../card/services/offline-demo-draft';
 
 type IdentityClientModule = typeof import('../card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -88,12 +89,19 @@ Page({
       return;
     }
     if (this.data.demoMode) {
+      const draft = readOfflineDemoDraft();
+      const profile: ProfilePrivateDto = {
+        ...OFFLINE_DEMO_PROFILE,
+        displayName: draft.displayName,
+        cityId: draft.cityId,
+        biography: draft.biography,
+      };
       this.setData({
-        profile: OFFLINE_DEMO_PROFILE,
+        profile,
         completionPercent: 72,
-        profileInitial: displayInitial(OFFLINE_DEMO_PROFILE.displayName),
+        profileInitial: displayInitial(profile.displayName),
         cityImageFailed: false,
-        ...resolveCityGroup(OFFLINE_DEMO_PROFILE),
+        ...resolveCityGroup(profile),
         status: 'READY',
         message: 'SYNTHETIC · DEMO_ONLY',
       });

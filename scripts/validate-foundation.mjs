@@ -70,7 +70,12 @@ for (const action of actionNames) {
 
 const app = readJson('miniprogram/app.json');
 check(app?.entryPagePath === 'pages/discover/index', 'Discover is the explicit phase-one entry page');
-check(app?.tabBar?.list?.length === 4, 'phase-one tabBar contains exactly four items');
+check(app?.tabBar?.list?.length === 3, 'phase-one tabBar contains exactly three items');
+check(
+  JSON.stringify(app?.tabBar?.list?.map((item) => item.text)) === JSON.stringify(['发现', '活动', '我的']),
+  'phase-one tabBar is Discover, Events, and Me only',
+);
+check(!app?.pages?.includes('pages/bootstrap/index'), 'bootstrap interstitial is not a registered route');
 check(!app?.subpackages?.some((item) => item.independent === true), 'all subpackages can consume main shared contracts');
 
 const project = readJson('project.config.json');

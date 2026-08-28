@@ -26,6 +26,17 @@ interface EventDetailView {
   readonly localTimeLabel: string;
   readonly timezone: string;
   readonly phaseBoundaryLabel: string;
+  readonly categoryLabel: string;
+  readonly sectionLabel: string;
+}
+
+function decodeRouteParam(value: string | undefined): string | undefined {
+  if (!value) return undefined;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return undefined;
+  }
 }
 
 const DEMO_COVERS: Readonly<Record<string, { src: string; alt: string; credit: string }>> = {
@@ -54,15 +65,17 @@ function toDemoDetail(event: DemoEventPresentation): EventDetailView {
     summary: event.summary,
     cityName: event.cityName,
     cityNameEn: event.cityNameEn,
-    imageSrc: cover?.src ?? '',
-    imageAlt: cover?.alt ?? '活动方向视觉参考待补充',
-    imageCredit: cover?.credit ?? '图片归属待补充',
+    imageSrc: event.imageSrc ?? cover?.src ?? '',
+    imageAlt: event.imageAlt ?? cover?.alt ?? '活动方向视觉参考待补充',
+    imageCredit: event.imageCredit ?? cover?.credit ?? '图片归属待补充',
     evidenceLabel: 'DEMO_ONLY',
     stateLabel: '方向预览 · 不是实际排期',
     sourceLabel: '本地合成策展文案；图片来源与许可记录在 editorial-events manifest',
     localTimeLabel: '日期与场地待确认',
     timezone: event.timezone,
     phaseBoundaryLabel: '第一阶段只作信息预览，不开放活动报名、支付、签到、商户入驻或交易。',
+    categoryLabel: event.categoryLabel ?? '城市策展',
+    sectionLabel: event.sectionLabel ?? '方向预览',
   };
 }
 
@@ -107,6 +120,8 @@ function toLiveDetail(event: PublicEventProjection): EventDetailView {
     localTimeLabel: formatEventRange(event),
     timezone: event.timezone,
     phaseBoundaryLabel: '第一阶段仍只作公开信息展示；报名、支付与签到入口不会在本客户端开放。',
+    categoryLabel: '公开活动',
+    sectionLabel: '正式信息',
   };
 }
 
@@ -134,8 +149,11 @@ Page({
   },
 
   onLoad(query: Record<string, string | undefined>) {
-    const demoEvent = query.demoEventId ? getDemoEventById(query.demoEventId) : undefined;
-    const demoCityEvent = query.demoCityId ? getDemoEventByCityId(query.demoCityId) : undefined;
+    const demoEventId = decodeRouteParam(query.demoEventId);
+    const demoCityId = decodeRouteParam(query.demoCityId);
+    const eventId = decodeRouteParam(query.eventId);
+    const demoEvent = demoEventId ? getDemoEventById(demoEventId) : undefined;
+    const demoCityEvent = demoCityId ? getDemoEventByCityId(demoCityId) : undefined;
     const demo = demoEvent ?? demoCityEvent ?? (query.demo === '1' ? FIRST_DEMO : undefined);
     if (demo) {
       this.setData({ hasDetail: true, detail: toDemoDetail(demo), imageFailed: false });
@@ -150,7 +168,7 @@ Page({
       });
       return;
     }
-    if (query.eventId) void this.loadEvent(query.eventId as EventId);
+    if (eventId) void this.loadEvent(eventId as EventId);
   },
 
   async loadEvent(eventId: EventId) {

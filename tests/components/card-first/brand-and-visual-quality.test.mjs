@@ -78,9 +78,8 @@ function jpegDimensions(bytes) {
   throw new Error('JPEG dimensions not found');
 }
 
-test('AB Club crest is present on every key card-first page, not only Discover', () => {
+test('AB Club crest is present on every registered key card-first page, not only Discover', () => {
   const keyPages = [
-    'pages/bootstrap/index',
     'pages/discover/index',
     'pages/card/index',
     'pages/network/index',
@@ -95,7 +94,6 @@ test('main and card-owned user surfaces contain no green palette', () => {
     'miniprogram/app.json',
     'miniprogram/app.wxss',
     'miniprogram/shared/design-tokens/tokens.wxss',
-    'miniprogram/pages/bootstrap/index.wxss',
     'miniprogram/pages/discover/index.wxss',
     'miniprogram/pages/card/index.wxss',
     'miniprogram/pages/card/styles/card-theme.wxss',
@@ -190,7 +188,7 @@ test('owner card makes edit and share clear while network stays out of the owner
   assert.ok(primaryEditIndex >= 0 && shareIndex > primaryEditIndex, '名片第一动作区需要按编辑、分享排列');
   assert.ok(editIndex > shareIndex && privacyIndex > shareIndex, '编辑与隐私应位于核心交换/分享动作之后');
   assert.doesNotMatch(template, /交换名片|\/pages\/network\/index/);
-  assert.match(template, /card-link-button card-link-button--strong[^>]*url="\/packageCard\/pages\/share\/index"/);
+  assert.match(template, /card-link-button card-link-button--strong[^>]*bindtap="openShare"/);
   assert.match(template, /selected-labels="\{\{demoMode \? demoSelectedLabels : \[\]\}\}"/);
   assert.match(template, /gallery-urls="\{\{demoGalleryUrls\}\}"/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);

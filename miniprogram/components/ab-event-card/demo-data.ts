@@ -17,11 +17,90 @@ export interface DemoEventPresentation {
   readonly title: string;
   readonly summary: string;
   readonly localTimeLabel: string;
+  readonly categoryId?: DemoEventCategoryId;
+  readonly categoryLabel?: string;
+  readonly sectionId?: DemoEventSectionId;
+  readonly sectionLabel?: string;
+  readonly imageSrc?: string;
+  readonly imageAlt?: string;
+  readonly imageCredit?: string;
 }
 
 export interface DiscoverDemoEventPresentation extends DemoEventPresentation {
   readonly cardIndex: string;
   readonly cardMeta: string;
+}
+
+export const DemoEventCategoryId = {
+  ART: 'art',
+  ANTIQUES: 'antiques',
+  JEWELRY: 'jewelry',
+  BUSINESS: 'business',
+} as const;
+export type DemoEventCategoryId =
+  (typeof DemoEventCategoryId)[keyof typeof DemoEventCategoryId];
+
+export const DemoEventSectionId = {
+  FEATURED: 'featured',
+  UPCOMING: 'upcoming',
+  CITY_THEME: 'city-theme',
+} as const;
+export type DemoEventSectionId =
+  (typeof DemoEventSectionId)[keyof typeof DemoEventSectionId];
+
+export interface ActivityDemoEventPresentation extends DemoEventPresentation {
+  readonly categoryId: DemoEventCategoryId;
+  readonly categoryLabel: string;
+  readonly sectionId: DemoEventSectionId;
+  readonly sectionLabel: string;
+  readonly imageSrc: string;
+  readonly imageAlt: string;
+  readonly imageCredit: string;
+}
+
+const ACTIVITY_CATEGORY_DEFINITIONS = [
+  [DemoEventCategoryId.ART, '艺术', ['当代艺术与城市夜谈', '工作室开放日', '建筑与公共艺术漫游'], '从作品、空间与城市文化出发，连接创作者与关注者。', ['/assets/editorial-events/gallery-salon.jpg', '美术馆展厅视觉参考', 'Tourbillon · CC BY-SA 3.0']],
+  [DemoEventCategoryId.ANTIQUES, '古董', ['器物、年代与收藏叙事', '东西方工艺阅读会', '城市博物馆观察路线'], '讨论器物历史、工艺与收藏伦理，不提供鉴定或交易。', ['/assets/editorial-events/private-table.jpg', '小型桌谈视觉参考', 'Shixart1985 · CC BY 2.0']],
+  [DemoEventCategoryId.JEWELRY, '珠宝', ['珠宝设计与当代收藏', '宝石色彩与佩戴美学', '独立设计地图导览'], '以设计、材料与佩戴方式为线索，呈现克制的观看与交流。', ['/assets/editorial-events/jewelry-study.jpg', '珠宝展柜视觉参考', 'Hannolans · CC BY 4.0']],
+  [DemoEventCategoryId.BUSINESS, '商业交流', ['跨境品牌与文化合作小桌', '新精英的长期主义对话', '城市创意产业走访'], '围绕跨城市经验、品牌与文化合作交换观点，不构成撮合。', ['/assets/editorial-events/private-table.jpg', '克制餐叙视觉参考', 'Shixart1985 · CC BY 2.0']],
+] as const;
+const ACTIVITY_SECTIONS = [
+  [DemoEventSectionId.FEATURED, '本月精选', 0],
+  [DemoEventSectionId.UPCOMING, '近期方向', 1],
+  [DemoEventSectionId.CITY_THEME, '城市主题', 2],
+] as const;
+
+export function listActivityDemoEvents(
+  cityId?: string,
+): ActivityDemoEventPresentation[] {
+  const cities = cityId
+    ? CITY_DIRECTORY.filter((city) => city.id === cityId)
+    : CITY_DIRECTORY;
+  const events: ActivityDemoEventPresentation[] = [];
+  for (const city of cities) {
+    for (const category of ACTIVITY_CATEGORY_DEFINITIONS) {
+      for (const section of ACTIVITY_SECTIONS) {
+        events.push({
+          eventId: `demo:activity:${city.id}:${category[0]}:${section[0]}`,
+          cityId: city.id,
+          cityName: city.name.zh,
+          cityNameEn: city.name.en,
+          timezone: city.timezone,
+          title: `${city.name.zh} · ${category[2][section[2]]}`,
+          summary: `DEMO_ONLY · ${category[3]} 不代表真实排期、场地或合作关系。`,
+          localTimeLabel: 'DEMO · 日期与场地待确认',
+          categoryId: category[0],
+          categoryLabel: category[1],
+          sectionId: section[0],
+          sectionLabel: section[1],
+          imageSrc: category[4][0],
+          imageAlt: category[4][1],
+          imageCredit: category[4][2],
+        });
+      }
+    }
+  }
+  return events;
 }
 
 const DISCOVER_DEMO_EVENT_DEFINITIONS = [
@@ -114,6 +193,8 @@ export function getDemoEventByCityId(value: string): DemoEventPresentation | und
 export function getDemoEventById(value: string): DemoEventPresentation | undefined {
   const featured = REGISTERED_DEMO_EVENTS.find((event) => event.eventId === value);
   if (featured) return featured;
+  const activity = listActivityDemoEvents().find((event) => event.eventId === value);
+  if (activity) return activity;
   if (!value.startsWith('demo:')) return undefined;
   return getDemoEventByCityId(value.slice('demo:'.length));
 }

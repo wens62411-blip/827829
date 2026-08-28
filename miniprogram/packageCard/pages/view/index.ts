@@ -6,8 +6,15 @@ import {
   viewerModeFromRelationship,
   type CardViewerMode,
 } from '../../../pages/card/services/card-presenter';
-import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../../../pages/card/services/offline-demo';
+import { OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 import { readCardThemePreference, type CardTheme } from '../../../pages/card/services/card-theme-preference';
+import {
+  materializeOfflineDemoCard,
+  materializeOfflineDemoFields,
+  publicLabelsForDraft,
+  readOfflineDemoDraft,
+  type OfflineDemoPublicField,
+} from '../../../pages/card/services/offline-demo-draft';
 
 type IdentityClientModule = typeof import('../../../pages/card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -41,7 +48,8 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
-    demoFields: OFFLINE_DEMO_FIELDS,
+    demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
+    demoPublicLabels: [] as string[],
     card: null as PublicCardProjection | null,
     viewerMode: 'SELF' as CardViewerMode,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
@@ -119,10 +127,14 @@ Page({
       && this.viewedOwnerUserId === viewedOwnerUserId
     );
     if (this.data.demoMode && !viewedOwnerUserId) {
+      const draft = readOfflineDemoDraft();
+      const demoCard = materializeOfflineDemoCard(draft);
       this.setData({
         status: 'READY',
-        card: OFFLINE_DEMO_CARD,
-        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+        card: demoCard,
+        demoFields: materializeOfflineDemoFields(draft),
+        demoPublicLabels: publicLabelsForDraft(draft),
+        cityLabel: cityDisplayName(demoCard.cityId),
         viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
         message: this.data.demoVisitorPreview
           ? 'SYNTHETIC · DEMO_ONLY · 访客视角预览'

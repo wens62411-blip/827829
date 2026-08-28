@@ -7,8 +7,8 @@
   />
 
   <view class="network__card-first" aria-role="region" aria-label="数字名片快捷入口">
-    <navigator class="network__card-primary" open-type="switchTab" url="/pages/card/index" hover-class="network__pressed">
-      <image class="network__entry-icon network__entry-icon--light" src="/assets/icons/ui-card-light.png" mode="aspectFit" aria-hidden="true" /><view class="network__entry-copy"><text>打开我的数字名片</text><text>实时预览 · 编辑 · 分享</text></view><image class="network__entry-arrow network__entry-arrow--light" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+    <navigator class="network__card-primary" open-type="switchTab" url="/pages/me/index" hover-class="network__pressed">
+      <image class="network__entry-icon network__entry-icon--light" src="/assets/icons/ui-card-light.png" mode="aspectFit" aria-hidden="true" /><view class="network__entry-copy"><text>前往「我的」管理名片</text><text>实时预览 · 编辑 · 分享</text></view><image class="network__entry-arrow network__entry-arrow--light" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
     <navigator class="network__card-secondary" url="/packageSocial/pages/requests/index" hover-class="network__pressed">
       <image class="network__entry-icon" src="/assets/icons/ui-inbox.png" mode="aspectFit" aria-hidden="true" /><text class="network__entry-copy">查看收到的名片请求</text><image class="network__entry-arrow" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />

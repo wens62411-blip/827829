@@ -29,7 +29,7 @@ test('card integration manifest follows the frozen overall plus gates schema', (
 test('manifest requests every card route, component and frozen identity action', () => {
   const artifacts = new Set(manifest.artifacts);
   for (const route of [
-    '/pages/bootstrap/index', '/pages/me/index', '/pages/card/index', '/pages/card-share/index',
+    '/pages/me/index', '/pages/card/index', '/pages/card-share/index',
     '/packageCard/pages/edit/index', '/packageCard/pages/privacy/index',
     '/packageCard/pages/view/index', '/packageCard/pages/share/index',
   ]) assert.equal(artifacts.has(`ROUTE_REQUEST: ${route}`), true, route);
@@ -49,7 +49,7 @@ test('manifest requests every card route, component and frozen identity action',
 
 test('manifest exposes every requested visual and redacted projection as local-only evidence', () => {
   const expected = [
-    'bootstrap.png', 'me.png', 'card-self.png', 'card-stranger.png', 'card-friend.png',
+    'me.png', 'card-self.png', 'card-stranger.png', 'card-friend.png',
     'privacy.png', 'share-success.png', 'share-expired.png', 'share-revoked.png',
     'contact-sheet.png',
   ];

@@ -54,15 +54,15 @@ function unnegatedPositiveClaims(source) {
   return [...new Set(findings)];
 }
 
-test('home keeps card primary while events, art, restrained network, and 7-country/13-city scope remain visible', () => {
+test('home explains the card but keeps management inside Me while events, art, network, and city scope remain visible', () => {
   const template = read('miniprogram/pages/discover/index.wxml');
   const geography = read('miniprogram/shared/constants/geography.ts');
   const actions = interactiveMarkup(template);
   const errors = [];
 
   const cardActions = actions.filter((markup) => /^\/(?:pages\/card\/index|packageCard\/pages\/(?:edit|view|share)\/index)/.test(attribute(markup, 'url')));
-  const primaryCard = cardActions.find((markup) => /primary/i.test(attribute(markup, 'class')));
-  if (!primaryCard) errors.push('首页缺少指向名片创建/展示/分享路径的主动作');
+  if (cardActions.length) errors.push(`首页不应绕过“我的”直达名片管理，当前为 ${cardActions.length} 个`);
+  if (!/创建、查看和分享名片统一在「我的」中管理/.test(template)) errors.push('首页没有说明名片管理入口位于“我的”');
 
   const eventActions = actions.filter((markup) => /^\/(?:pages\/events|packageEvents\/pages\/event)\//.test(attribute(markup, 'url')));
   if (!eventActions.length) errors.push('首页缺少轻量活动入口');
@@ -74,14 +74,6 @@ test('home keeps card primary while events, art, restrained network, and 7-count
   if (networkActions.length !== 1) errors.push(`首页人脉入口应克制为一个，当前为 ${networkActions.length} 个`);
   if (networkActions.some((markup) => /primary/i.test(attribute(markup, 'class')))) {
     errors.push('首页人脉入口不应使用主动作视觉层级');
-  }
-
-  const primaryOffset = primaryCard ? template.indexOf(primaryCard) : -1;
-  for (const [label, candidates] of [['活动', eventActions], ['艺术', artActions], ['人脉', networkActions]]) {
-    const firstOffset = candidates.length ? template.indexOf(candidates[0]) : -1;
-    if (primaryOffset >= 0 && firstOffset >= 0 && firstOffset < primaryOffset) {
-      errors.push(`${label}入口出现在名片主动作之前`);
-    }
   }
 
   if (!hasGeographySummary(template)) errors.push('首页未明确展示 7 国 13 城摘要');

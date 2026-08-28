@@ -38,6 +38,17 @@ test('Me city group reuses shipped city photography and keeps operations-pending
   assert.doesNotMatch(template, /申请成功|加入成功|城市群[^<\n]{0,20}\bLIVE\b/);
 });
 
+test('Me refreshes its offline profile and city from the saved card draft', () => {
+  const source = read('miniprogram/pages/me/index.ts');
+
+  assert.match(source, /import \{ readOfflineDemoDraft \}/);
+  assert.match(source, /const draft = readOfflineDemoDraft\(\)/);
+  assert.match(source, /displayName:\s*draft\.displayName/);
+  assert.match(source, /cityId:\s*draft\.cityId/);
+  assert.match(source, /biography:\s*draft\.biography/);
+  assert.match(source, /\.\.\.resolveCityGroup\(profile\)/);
+});
+
 test('Me page keeps accessible touch targets, dark mode, and reduced-motion treatment', () => {
   const styles = read('miniprogram/pages/me/index.wxss');
 

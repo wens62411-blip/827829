@@ -7,28 +7,55 @@ const root = new URL('../../', import.meta.url);
 const miniRoot = new URL('../../miniprogram/', import.meta.url);
 const app = JSON.parse(readFileSync(new URL('app.json', miniRoot), 'utf8'));
 
+const registeredRoutePaths = new Set([
+  ...app.pages.map((page) => `/${page}`),
+  ...app.subpackages.flatMap((entry) => entry.pages.map((page) => `/${entry.root}/${page}`)),
+]);
+const tabRoutePaths = new Set(app.tabBar.list.map((item) => `/${item.pagePath}`));
+
+const visibleRouteSurfaces = [
+  'pages/discover/index',
+  'pages/events/index',
+  'pages/me/index',
+  'pages/card/index',
+  'pages/card-share/index',
+  'pages/network/index',
+  'packageCard/pages/edit/index',
+  'packageCard/pages/privacy/index',
+  'packageCard/pages/view/index',
+  'packageCard/pages/share/index',
+  'packageEvents/pages/city/index',
+  'packageEvents/pages/event/index',
+  'packageSocial/pages/friend/index',
+  'packageSocial/pages/requests/index',
+  'packageSocial/pages/tag-apply/index',
+  'packageSocial/pages/tag-status/index',
+];
+
 const expectedMain = [
   'pages/discover/index',
   'pages/events/index',
   'pages/card/index',
   'pages/me/index',
   'pages/network/index',
-  'pages/bootstrap/index',
   'pages/card-share/index',
   'pages/event-share/index',
 ];
 
-test('main package starts on Discover with Discover, Events, Card, and Me tabs', () => {
+test('main package starts on Discover with Discover, Events, and Me tabs only', () => {
   assert.deepEqual(app.pages, expectedMain);
   assert.equal(app.entryPagePath, 'pages/discover/index');
-  assert.equal(app.tabBar.list.length, 4);
-  assert.deepEqual(app.tabBar.list.map((item) => item.text), ['发现', '活动', '名片', '我的']);
+  assert.equal(app.tabBar.list.length, 3);
+  assert.deepEqual(app.tabBar.list.map((item) => item.text), ['发现', '活动', '我的']);
   assert.deepEqual(app.tabBar.list.map((item) => item.pagePath), [
     'pages/discover/index',
     'pages/events/index',
-    'pages/card/index',
     'pages/me/index',
   ]);
+  assert.ok(!app.pages.includes('pages/bootstrap/index'));
+  for (const extension of ['.ts', '.json', '.wxml', '.wxss']) {
+    assert.equal(existsSync(new URL(`pages/bootstrap/index${extension}`, miniRoot)), false);
+  }
   assert.ok(!app.tabBar.list.some((item) => item.text === '人脉'));
   assert.ok(!app.tabBar.list.some((item) => item.text.includes('艺术')));
 });
@@ -60,8 +87,8 @@ test('every tab ships distinct 81px PNG artwork for idle and selected states', (
     }
   }
 
-  assert.equal(iconPaths.length, 8);
-  assert.equal(new Set(iconPaths).size, 8, '四个 tab 的默认/选中图标不应共用同一文件');
+  assert.equal(iconPaths.length, 6);
+  assert.equal(new Set(iconPaths).size, 6, '三个 tab 的默认/选中图标不应共用同一文件');
 });
 
 test('subpackage routes match the frozen route table', () => {
@@ -73,7 +100,7 @@ test('subpackage routes match the frozen route table', () => {
     packageArt: 3,
     packageAdmin: 5,
   });
-  assert.equal(app.pages.length + app.subpackages.reduce((sum, item) => sum + item.pages.length, 0), 27);
+  assert.equal(app.pages.length + app.subpackages.reduce((sum, item) => sum + item.pages.length, 0), 26);
 });
 
 test('every registered route has TypeScript, JSON, WXML and WXSS files', () => {
@@ -111,6 +138,49 @@ test('all links and fallbacks targeting the Activity tab use switchTab', () => {
   assert.match(citySource, /wx\.switchTab\(\{ url: '\/pages\/events\/index' \}\)/);
   assert.match(eventSource, /wx\.switchTab\(\{ url: '\/pages\/events\/index' \}\)/);
   assert.doesNotMatch(`${citySource}\n${eventSource}`, /redirectTo\(\{ url: '\/pages\/events\/index'/);
+});
+
+test('visible navigators resolve to registered routes and use switchTab only for real tabs', () => {
+  for (const route of visibleRouteSurfaces) {
+    const template = readFileSync(new URL(`${route}.wxml`, miniRoot), 'utf8');
+    for (const match of template.matchAll(/<navigator\b([^>]*)>/g)) {
+      const attributes = match[1];
+      const rawUrl = attributes.match(/\burl="([^"]+)"/)?.[1];
+      if (!rawUrl) continue;
+      const path = rawUrl.split('?')[0];
+      const usesSwitchTab = /\bopen-type="switchTab"/.test(attributes);
+      assert.ok(registeredRoutePaths.has(path), `${route} 指向未注册页面 ${path}`);
+      assert.equal(
+        usesSwitchTab,
+        tabRoutePaths.has(path),
+        `${route} → ${path} 的页面类型与 ${usesSwitchTab ? 'switchTab' : 'navigateTo'} 不匹配`,
+      );
+    }
+  }
+});
+
+test('every visible tap binding has a page or component method', () => {
+  const surfaces = [
+    ...visibleRouteSurfaces,
+    'components/ab-event-card/index',
+  ];
+  for (const route of surfaces) {
+    const template = readFileSync(new URL(`${route}.wxml`, miniRoot), 'utf8');
+    const source = readFileSync(new URL(`${route}.ts`, miniRoot), 'utf8');
+    for (const match of template.matchAll(/\b(?:bindtap|catchtap|bind:[A-Za-z][\w-]*)="([A-Za-z_$][\w$]*)"/g)) {
+      const method = match[1];
+      assert.match(source, new RegExp(`\\b${method}\\s*\\(`), `${route} 缺少 ${method} 点击方法`);
+    }
+  }
+});
+
+test('activity card forwards the clicked event identity into the registered detail route', () => {
+  const componentSource = readFileSync(new URL('components/ab-event-card/index.ts', miniRoot), 'utf8');
+  const eventsSource = readFileSync(new URL('pages/events/index.ts', miniRoot), 'utf8');
+  assert.match(componentSource, /triggerEvent\('open',\s*\{\s*eventId:\s*this\.properties\.eventId\s*\}\)/);
+  assert.match(eventsSource, /const eventId = event\.detail\.eventId/);
+  assert.match(eventsSource, /eventId\.startsWith\('demo:'\)[\s\S]*?demoEventId=/);
+  assert.match(eventsSource, /wx\.navigateTo\(\{ url: `\/packageEvents\/pages\/event\/index\?\$\{query\}` \}\)/);
 });
 
 test('project permits only an authorized experience upload and has no second frontend framework', () => {

@@ -101,7 +101,10 @@ function instantiate(definition) {
   return {
     ...definition,
     data: structuredClone(definition.data),
-    setData(patch) { Object.assign(this.data, patch); },
+    setData(patch, callback) {
+      Object.assign(this.data, patch);
+      callback?.();
+    },
   };
 }
 
@@ -116,6 +119,10 @@ function createCanvas(label) {
     moveTo() {},
     lineTo() {},
     stroke() {},
+    strokeRect() {},
+    save() {},
+    restore() {},
+    createLinearGradient() { return { addColorStop() {} }; },
     measureText(text) { return { width: String(text).length * 10 }; },
   };
   return { label, width: 0, height: 0, getContext: () => context };
@@ -130,6 +137,7 @@ function installWx(cardTheme) {
     showShareMenu(input) { calls.push(['showShareMenu', input]); },
     showToast(input) { calls.push(['showToast', input]); },
     showModal(input) { calls.push(['showModal', input]); },
+    nextTick(callback) { queueMicrotask(callback); },
     getWindowInfo() { return { pixelRatio: 1 }; },
     createSelectorQuery() {
       let page;
@@ -363,11 +371,14 @@ test('offline demo opens native WeChat sharing, keeps the selected theme, and bu
     const page = instantiate(definition);
     page.canvasForTest = createCanvas('demo');
     page.onLoad.call(page);
+    await settle();
 
     assert.equal(page.data.demoMode, true);
     assert.equal(page.data.cardTheme, 'ink');
     assert.match(page.data.localNotice, /真实拉起微信转发/);
-    assert.equal(page.onShareAppMessage.call(page).path, '/pages/card-share/index?demo=1&theme=ink');
+    const sharePath = page.onShareAppMessage.call(page).path;
+    assert.match(sharePath, /^\/pages\/card-share\/index\?demo=1&snapshot=[A-Za-z0-9_-]+\.[0-9a-f]{8}$/);
+    assert.doesNotMatch(sharePath, /林知遥|demo@|\+41/);
     assert.equal(calls.filter(([name]) => name === 'showShareMenu').length, 1);
 
     await page.generatePoster.call(page);

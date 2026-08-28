@@ -21,35 +21,6 @@ async function loadDemo() {
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}#${Date.now()}`);
 }
 
-async function loadBootstrapPage() {
-  let definition;
-  globalThis.Page = (candidate) => { definition = candidate; };
-  const result = await build({
-    entryPoints: [resolve(root, 'miniprogram/pages/bootstrap/index.ts')],
-    bundle: true,
-    platform: 'node',
-    format: 'esm',
-    target: 'es2020',
-    write: false,
-    logLevel: 'silent',
-    plugins: [{
-      name: 'offline-identity-client',
-      setup(api) {
-        api.onResolve({ filter: /card\/services\/identity-client$/ }, () => ({ path: 'identity', namespace: 'offline' }));
-        api.onLoad({ filter: /.*/, namespace: 'offline' }, () => ({
-          loader: 'js',
-          contents: `
-            export const getRuntimeEvidence = () => ({ runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false });
-            export const bootstrapIdentity = async () => { throw new Error('offline bootstrap must not be called'); };
-          `,
-        }));
-      },
-    }],
-  });
-  await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString('base64')}#${Date.now()}`);
-  return definition;
-}
-
 test('offline fixtures are visibly synthetic and never fabricate approval', async () => {
   const demo = await loadDemo();
   assert.equal(demo.OFFLINE_DEMO_CARD.origin, 'SYNTHETIC');
@@ -61,28 +32,6 @@ test('offline fixtures are visibly synthetic and never fabricate approval', asyn
   assert.equal(JSON.stringify(demo.OFFLINE_DEMO_REVIEW_ITEMS).includes('HUMAN_REVIEWED'), false);
   assert.equal(demo.isOfflineDemo({ runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false }), true);
   assert.equal(demo.isOfflineDemo({ runtimeMode: 'LIVE', cloudConfigured: true }), false);
-});
-
-test('bootstrap registers and exposes a usable offline route without identity fabrication', async () => {
-  const switches = [];
-  globalThis.wx = { switchTab: (input) => switches.push(input) };
-  try {
-    const definition = await loadBootstrapPage();
-    assert.ok(definition);
-    const page = {
-      ...definition,
-      data: structuredClone(definition.data),
-      setData(patch) { Object.assign(this.data, patch); },
-    };
-    page.onLoad.call(page);
-    assert.equal(page.data.demoMode, true);
-    assert.match(page.data.message, /DEMO_ONLY/);
-    page.continueOffline.call(page);
-    assert.deepEqual(switches, [{ url: '/pages/card/index' }]);
-  } finally {
-    delete globalThis.Page;
-    delete globalThis.wx;
-  }
 });
 
 test('offline card surfaces label state, editable preview, and explicitly labelled native sharing', () => {
@@ -98,7 +47,7 @@ test('offline card surfaces label state, editable preview, and explicitly labell
   for (const source of [cardPage, mePage, sharePage]) assert.match(source, /SYNTHETIC · DEMO_ONLY/);
   assert.match(cardPage, /标签必须先经过人工审核/);
   assert.match(mePage, /公开标签状态/);
-  assert.match(editSource, /未保存：[\s\S]*?DEMO_ONLY/);
+  assert.match(editSource, /已保存到本机[\s\S]*?DEMO_ONLY[\s\S]*?未写入云端/);
   assert.match(shareSource, /未创建分享：[\s\S]*?OFFLINE_DEMO/);
   assert.match(shareSource, /SYNTHETIC · DEMO_ONLY[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/);
   assert.match(sharePage, /<button\b[^>]*open-type="share"[^>]*>/);
