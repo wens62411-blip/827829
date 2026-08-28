@@ -16,6 +16,7 @@
     "urlCheck": true,
     "checkInvalidKey": true,
     "checkSiteMap": true,
+    "ignoreDevUnusedFiles": true,
     "uploadWithSourceMap": true,
     "packNpmManually": true,
     "packNpmRelationList": [

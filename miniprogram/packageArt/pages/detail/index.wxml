@@ -29,6 +29,8 @@
             wx:key="eventId"
             class="art-detail__event"
             data-event-id="{{item.eventId}}"
+            data-city-id="{{item.cityId}}"
+            data-record-origin="{{item.recordOrigin}}"
             aria-role="button"
             bindtap="handleRelatedEventTap"
           ><view class="art-detail__event-copy"><text class="art-detail__event-title">{{item.title}}</text><text class="art-detail__event-meta">{{item.cityName}} · {{item.startsAt}}</text></view><text class="art-detail__event-state">{{item.reservationAvailable ? '请查看活动页资格' : '当前不承诺可预约'}}</text></view></view><text wx:else class="art-detail__notice">当前没有可公开关联的线下活动。</text></view><view class="art-detail__section art-detail__intent" aria-label="品鉴或合作意向"><view class="art-detail__section-heading"><text class="art-detail__section-index">05</text><text class="art-detail__section-title">联系意向 / Expression of Interest</text></view><text class="art-detail__intent-copy">可选择预约品鉴意向或合作意向。提交只记录联系需求，不代表接受、成交或任何资源承诺。</text><ab-intent-action

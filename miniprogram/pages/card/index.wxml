@@ -1,7 +1,10 @@
 <view class="card-page">
-  <text class="card-kicker">My Card</text>
-  <text class="card-title">我的数字名片</text>
-  <text class="card-subtitle">这里展示服务端生成的公开投影，不直接读取完整私密资料。</text>
+  <view class="card-hero-row">
+    <view><text class="card-kicker">MEMBER EDITION · 01</text><text class="card-title">数字名片</text></view>
+    <view class="card-monogram">AB</view>
+  </view>
+  <text class="card-subtitle">一张克制、可信、面向全球城市网络的自我介绍。</text>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 非真实会员</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载名片"></view>
 
@@ -17,6 +20,7 @@
     card="{{card}}"
     viewer-mode="SELF"
     city-label="{{cityLabel}}"
+    fields="{{demoMode ? demoFields : []}}"
     max-visible-claims="3"
     show-default-actions="{{false}}"
   >
@@ -26,7 +30,23 @@
     </view>
   </ab-profile-card>
 
-  <view wx:if="{{card}}" class="card-panel">
+  <view wx:if="{{demoMode && card}}" class="card-panel card-panel--wine">
+    <text class="card-panel__eyebrow">HUMAN REVIEW</text>
+    <text class="card-panel__title">标签必须先经过人工审核</text>
+    <text class="card-panel__text">下面是流程示意，不是已提交申请，也不是认证结果。</text>
+    <view wx:for="{{demoReviewItems}}" wx:key="label" class="card-review-item">
+      <view class="card-row"><text class="card-review-item__label">{{item.label}}</text><text class="card-review-item__state">{{item.state}}</text></view>
+      <text class="card-review-item__note">{{item.note}}</text>
+    </view>
+  </view>
+
+  <view wx:if="{{demoMode && card}}" class="card-panel">
+    <text class="card-panel__title">分享预览</text>
+    <text class="card-panel__text">你可以查看分享与撤销的界面结构；离线演示不会创建 token、小程序码或“分享成功”记录。</text>
+    <navigator class="card-link-button card-link-button--compact" url="/packageCard/pages/share/index" hover-class="none">查看安全分享设计 <text>›</text></navigator>
+  </view>
+
+  <view wx:if="{{card && !demoMode}}" class="card-panel">
     <text class="card-panel__title">安全转发</text>
     <text class="card-panel__text">转发路径只携带服务端生成的高熵令牌，不含 OPENID、手机号、微信号、完整资料 ID 或权限参数。</text>
     <view wx:if="{{shareHint}}" class="card-status {{shareReady ? 'card-status--success' : ''}}">{{shareHint}}</view>
@@ -38,5 +58,5 @@
     </view>
   </view>
 
-  <view class="card-status">运行模式：{{runtimeMode}}。下拉刷新会重新获取公开投影和当前有效认证标签。</view>
+  <view class="card-status">{{demoMode ? '当前仅为本地合成预览；编辑、保存、人工审核与分享均未发生。' : '运行模式：' + runtimeMode + '。下拉刷新会重新获取公开投影和当前有效认证标签。'}}</view>
 </view>

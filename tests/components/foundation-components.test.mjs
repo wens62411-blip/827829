@@ -6,8 +6,13 @@ const read = (path) => readFileSync(new URL(`../../${path}`, import.meta.url), '
 
 test('verified tag is visible only for human reviewed APPROVED claims', () => {
   const source = read('miniprogram/components/ab-verified-tag/index.ts');
+  const template = read('miniprogram/components/ab-verified-tag/index.wxml');
+  const config = JSON.parse(read('miniprogram/components/ab-verified-tag/index.json'));
   assert.match(source, /reviewStatus === ReviewStatus\.APPROVED\s*&&\s*verificationState === VerificationState\.HUMAN_REVIEWED/);
   assert.doesNotMatch(source, /AI_CONSISTENCY_CHECKED.*visible:\s*true/s);
+  assert.match(template, /人工审核/);
+  assert.doesNotMatch(template, /<t-tag/);
+  assert.equal(config.usingComponents, undefined);
 });
 
 test('evidence label exposes all honest runtime modes', () => {

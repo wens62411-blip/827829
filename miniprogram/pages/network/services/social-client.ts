@@ -2,9 +2,9 @@ import type {
   CloudAction,
   CloudActionData,
   CloudActionPayload,
-} from '../../../shared/contracts';
-import { CLOUD_ACTION_REGISTRY } from '../../../shared/contracts';
-import { callCloudAction } from '../../../shared/services';
+} from '../../../shared/contracts/action-map';
+import { CLOUD_ACTION_REGISTRY } from '../../../shared/contracts/action-registry';
+import { callCloudAction } from '../../../shared/services/cloud-client';
 import type { IdempotencyKey, UserId } from '../../../shared/types/primitives';
 import { createRequestId } from '../../../shared/utils/request-id';
 

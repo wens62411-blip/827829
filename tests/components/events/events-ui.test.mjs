@@ -84,8 +84,90 @@ test('event discovery consumes frozen geography and keeps unsupported filters ou
   for (const label of ['类型', '时间', '价格', '准入']) assert.match(template, new RegExp(`>${label}<`));
   assert.match(template, /disabled="\{\{!extendedFiltersAvailable\}\}"/);
   assert.match(template, /\{\{browseGlobal \? '只看当前城市' : '跨城浏览'\}\}/);
-  assert.match(template, /DEMO_ONLY 活动详情字段结构/);
+  assert.match(template, /当前城市 DEMO_ONLY 详情与边界/);
   assert.match(template, /真实微信支付 DISABLED|paymentGateLabel/);
+});
+
+test('OFFLINE_DEMO renders one honest, navigable curation card for every frozen city', () => {
+  const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
+  const listSource = read('miniprogram/pages/events/index.ts');
+  const listTemplate = read('miniprogram/pages/events/index.wxml');
+  const detailSource = read('miniprogram/packageEvents/pages/event/index.ts');
+
+  assert.match(demoSource, /CITY_DIRECTORY\.findIndex/);
+  assert.match(demoSource, /for \(const city of CITY_DIRECTORY\)/);
+  assert.match(demoSource, /eventId:\s*`demo:\$\{city\.id\}`/);
+  assert.match(demoSource, /DEMO_ONLY.*不代表真实活动已排期/);
+  assert.match(demoSource, /DISCOVER_DEMO_EVENTS/);
+  assert.match(demoSource, /getDemoEventById/);
+  assert.match(listSource, /const DEMO_EVENTS = buildDemoEventCards\(\)/);
+  assert.match(listSource, /browseGlobal \|\| event\.eventId === `demo:\$\{selected\.id\}`/);
+  assert.match(listSource, /this\.data\.offlineDemo && eventId\.startsWith\('demo:'\)/);
+  assert.match(listSource, /demoCityId=\$\{encodeURIComponent\(eventId\.slice\(5\)\)\}/);
+  assert.match(listTemplate, /OFFLINE_DEMO · 策展预览/);
+  assert.match(listTemplate, /不代表 AB Club 已运营、已排期或开放报名/);
+  assert.match(detailSource, /makeDemoDetail\(query\.demoCityId\)/);
+  assert.match(detailSource, /makeDemoDetailByEventId\(query\.demoEventId\)/);
+  assert.match(detailSource, /displayId:\s*event\.eventId/);
+  assert.match(detailSource, /title:\s*event\.title/);
+  assert.match(detailSource, /OFFLINE_DEMO · 当前不可提交/);
+  assert.match(detailSource, /canRegisterInterest:\s*false/);
+  assert.match(detailSource, /不会模拟报名或支付成功/);
+  assert.doesNotMatch(demoSource, /HUMAN_REVIEWED|APPROVED|LIVE/);
+});
+
+test('Art synthetic related event preserves its stable identity into event detail', () => {
+  const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
+  const artDemoSource = read('miniprogram/packageArt/data/demo.ts');
+  const artDetailSource = read('miniprogram/packageArt/pages/detail/index.ts');
+  const eventDetailSource = read('miniprogram/packageEvents/pages/event/index.ts');
+
+  assert.match(demoSource, /ART_RELATED_DEMO_EVENT/);
+  assert.match(demoSource, /eventId:\s*'event_demo_art_reading_001'/);
+  assert.match(demoSource, /cityId:\s*city\.id/);
+  assert.match(demoSource, /title:\s*'作品资料阅读会（DEMO_ONLY）'/);
+  assert.match(demoSource, /summary:\s*'合成线下活动，不代表真实排期或官方合作。'/);
+  assert.match(demoSource, /REGISTERED_DEMO_EVENTS[\s\S]*ART_RELATED_DEMO_EVENT/);
+  assert.match(artDemoSource, /eventId:ART_RELATED_DEMO_EVENT\.eventId/);
+  assert.match(artDemoSource, /cityId:ART_RELATED_DEMO_EVENT\.cityId/);
+  assert.match(artDemoSource, /title:ART_RELATED_DEMO_EVENT\.title/);
+  assert.match(artDemoSource, /summary:ART_RELATED_DEMO_EVENT\.summary/);
+  assert.match(artDetailSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
+  assert.doesNotMatch(artDetailSource, /demoCityId=\$\{encodeURIComponent\(cityId\)\}/);
+  assert.match(eventDetailSource, /makeDemoDetailByEventId\(query\.demoEventId\)/);
+  assert.match(eventDetailSource, /getDemoEventById\(eventId\)/);
+});
+
+test('OFFLINE_DEMO event routes defer cloud-client until after the formal-runtime guard', () => {
+  const pagePaths = [
+    'miniprogram/pages/events/index.ts',
+    'miniprogram/packageEvents/pages/city/index.ts',
+    'miniprogram/packageEvents/pages/event/index.ts',
+    'miniprogram/packageEvents/pages/enrollment/index.ts',
+    'miniprogram/packageEvents/pages/organizer/index.ts',
+  ];
+  for (const path of pagePaths) {
+    const source = read(path);
+    assert.doesNotMatch(source, /^import\s+\{?\s*callCloudAction[^\n]*cloud-client/m, path);
+    assert.match(source, /getEventCloudClient/, path);
+    assert.match(source, /LOCAL_RUNTIME\.cloudEnvironmentConfigured/, path);
+  }
+
+  const loader = read('miniprogram/components/ab-event-card/cloud-client-loader.ts');
+  assert.match(loader, /type EventCloudClient = typeof import\('\.\.\/\.\.\/shared\/services\/cloud-client'\)/);
+  assert.match(loader, /getEventCloudClient\(\)[\s\S]*return require\('\.\.\/\.\.\/shared\/services\/cloud-client'\)/);
+  assert.doesNotMatch(loader, /^import\s/m);
+
+  const listSource = read('miniprogram/pages/events/index.ts');
+  const offlineBranch = listSource.slice(
+    listSource.indexOf('if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {', listSource.indexOf('async refreshEvents()')),
+    listSource.indexOf('this.setData({ loading: true })'),
+  );
+  assert.match(offlineBranch, /return;[\s\S]*getEventCloudClient\(\)/);
+
+  const detailSource = read('miniprogram/packageEvents/pages/event/index.ts');
+  const loadBlock = detailSource.slice(detailSource.indexOf('async loadEvent'), detailSource.indexOf('async loadPaymentCapability'));
+  assert.match(loadBlock, /if \(!LOCAL_RUNTIME\.cloudEnvironmentConfigured\)[\s\S]*return;[\s\S]*getEventCloudClient\(\)/);
 });
 
 test('event cards expose evidence and never fabricate registrations, transactions, or partners', () => {

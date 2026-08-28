@@ -1,4 +1,3 @@
-import { callCloudAction } from '../../../shared/services/cloud-client';
 import { LOCAL_RUNTIME } from '../../../shared/services/runtime';
 import { EnrollmentState, PaymentState, RuntimeMode } from '../../../shared/types/enums';
 import type {
@@ -7,6 +6,7 @@ IdempotencyKey,
 OptimisticVersion,
 } from '../../../shared/types/primitives';
 import { createRequestId } from '../../../shared/utils/request-id';
+import { getEventCloudClient } from '../../../components/ab-event-card/cloud-client-loader';
 const CANCELLABLE_ENROLLMENTS: readonly string[] = [
 EnrollmentState.INTERESTED,
 EnrollmentState.WAITLISTED,
@@ -54,6 +54,7 @@ stateDescription: 'OFFLINE_DEMO 不会模拟登记、满员、支付或成功状
 });
 return;
 }
+const { callCloudAction } = getEventCloudClient();
 this.setData({ loading: true });
 try {
 const [eligibilityResult, enrollmentResult, paymentResult, eventResult] = await Promise.all([
@@ -115,7 +116,8 @@ this.showFailure('无法连接兴趣登记服务。');
 }
 },
 async registerInterest() {
-if (this.data.busy || !this.data.canRegisterInterest || !this.data.eventId) return;
+if (!LOCAL_RUNTIME.cloudEnvironmentConfigured || this.data.busy || !this.data.canRegisterInterest || !this.data.eventId) return;
+const { callCloudAction } = getEventCloudClient();
 const eventId = this.data.eventId as EventId;
 const idempotencyKey = (this.data.registerIdempotencyKey ||
 createWriteKey('interest')) as IdempotencyKey;
@@ -152,7 +154,8 @@ operationMessage: '请求结果未知；再次提交会复用同一幂等键，�
 }
 },
 async cancelInterest() {
-if (this.data.busy || !this.data.canCancelInterest || !this.data.eventId) return;
+if (!LOCAL_RUNTIME.cloudEnvironmentConfigured || this.data.busy || !this.data.canCancelInterest || !this.data.eventId) return;
+const { callCloudAction } = getEventCloudClient();
 const eventId = this.data.eventId as EventId;
 const idempotencyKey = (this.data.cancelIdempotencyKey ||
 createWriteKey('cancel')) as IdempotencyKey;

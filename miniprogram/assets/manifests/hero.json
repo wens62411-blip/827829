@@ -1,0 +1,24 @@
+{
+  "schemaVersion": "1.0.0",
+  "evidenceStatus": "LICENSE_SOURCE_VERIFIED_HUMAN_REVIEW_PENDING",
+  "runtimePolicy": "LOCAL_FILE_ONLY_NO_HOTLINK",
+  "asset": {
+    "assetId": "discover-hero-zurich-960-v1",
+    "path": "/assets/hero/zurich-960.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Panorama_Stadt_Z%C3%BCrich.jpg",
+    "sourceVariant": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Panorama_Stadt_Z%C3%BCrich.jpg/960px-Panorama_Stadt_Z%C3%BCrich.jpg",
+    "author": "Beat Ruest",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "downloadedAt": "2026-08-28T01:46:54.8982606+08:00",
+    "sha256": "4348cc093352e7c13bc8bf6e5148b08580987ef13f3ca9e04f9a8669cd9101ae",
+    "width": 960,
+    "height": 473,
+    "bytes": 116861,
+    "alt": "苏黎世利马特河两岸老城与教堂天际线",
+    "rightsState": "CLAIMED",
+    "reviewStatus": "DRAFT",
+    "publicationPolicy": "HUMAN_RIGHTS_REVIEW_REQUIRED",
+    "externalHotlink": false
+  }
+}

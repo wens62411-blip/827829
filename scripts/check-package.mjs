@@ -25,10 +25,21 @@ function directoryBytes(directory) {
   }, 0);
 }
 
+function directoryContains(directory, pattern) {
+  return readdirSync(directory, { withFileTypes: true }).some((entry) => {
+    const path = join(directory, entry.name);
+    if (entry.name === 'miniprogram_npm') return false;
+    if (entry.isDirectory()) return directoryContains(path, pattern);
+    return entry.name.endsWith('.json') && pattern.test(readFileSync(path, 'utf8'));
+  });
+}
+
 const sourceBytes = directoryBytes(miniRoot);
 const tdesignDist = join(root, 'node_modules', 'tdesign-miniprogram', 'miniprogram_dist');
 const installedTdesignBytes = existsSync(tdesignDist) ? directoryBytes(tdesignDist) : 0;
-const conservativeProjectedBytes = sourceBytes + installedTdesignBytes;
+const tdesignRuntimeReferenced = directoryContains(miniRoot, /tdesign-miniprogram\//);
+const referencedDependencyBytes = tdesignRuntimeReferenced ? installedTdesignBytes : 0;
+const conservativeProjectedBytes = sourceBytes + referencedDependencyBytes;
 const report = {
   kind: 'STATIC_SOURCE_BUDGET_ONLY',
   routeCount: allRoutes.length,
@@ -37,12 +48,14 @@ const report = {
   missingPageFiles: missing,
   sourceBytesExcludingBuiltNpm: sourceBytes,
   installedTdesignMiniprogramDistBytes: installedTdesignBytes,
+  tdesignRuntimeReferenced,
+  referencedDependencyBytes,
   conservativeProjectedBytes,
   sourceBudgetBytes: 2 * 1024 * 1024,
   conservativeStaticBudgetPass: conservativeProjectedBytes < 2 * 1024 * 1024,
   builtNpmPresent: existsSync(join(miniRoot, 'miniprogram_npm')),
   devtoolsPackageGate: 'UNVERIFIED',
-  caveat: 'Conservative source estimate only; not a WeChat Developer Tools package-size result.',
+  caveat: 'Source plus registered runtime dependencies only; Developer Tools still provides the authoritative package result.',
 };
 
 console.log(JSON.stringify(report, null, 2));

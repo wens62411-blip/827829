@@ -1,9 +1,9 @@
-import {
-  CLOUD_ACTION_REGISTRY,
-  type CloudAction,
-  type CloudActionData,
-  type CloudActionPayload,
-} from '../contracts';
+import type {
+  CloudAction,
+  CloudActionData,
+  CloudActionPayload,
+} from '../contracts/action-map';
+import { CLOUD_ACTION_REGISTRY } from '../contracts/action-registry';
 import {
   ApiErrorCode,
   type ApiErrorCode as ApiErrorCodeValue,

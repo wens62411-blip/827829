@@ -1,13 +1,13 @@
 <view class="intent-action" aria-role="group" aria-label="联系意向操作"><text class="intent-action__scope">意向不是订单，不锁定库存，不构成成交或付款。</text><button
     wx:if="{{!isActive}}"
-    class="intent-action__button intent-action__button--primary ab-motion"
+    class="intent-action__button intent-action__button--primary {{loading || disabled ? 'intent-action__button--disabled' : ''}} ab-motion"
     disabled="{{loading || disabled}}"
     loading="{{loading}}"
     aria-label="{{createLabel}}；此操作不构成交易"
     bindtap="handleCreate"
   >{{loading ? '正在提交…' : createLabel}}</button><button
     wx:else
-    class="intent-action__button intent-action__button--secondary ab-motion"
+    class="intent-action__button intent-action__button--secondary {{loading || disabled ? 'intent-action__button--disabled' : ''}} ab-motion"
     disabled="{{loading || disabled}}"
     loading="{{loading}}"
     aria-label="{{cancelLabel}}"

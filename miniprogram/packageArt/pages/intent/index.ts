@@ -198,13 +198,11 @@ Page({
     this.setData({ submitting: true, feedback: '', feedbackTone: 'neutral' });
 
     if (runtime.runtimeMode === RuntimeMode.OFFLINE_DEMO) {
-      currentIntentId = 'content-intent_demo_art_001' as ContentIntentId;
-      currentIntentVersion = 1 as OptimisticVersion;
       this.setData({
         submitting: false,
-        intentState: 'ACTIVE',
-        feedback: 'DEMO_ONLY：意向状态仅在当前演示页面中更新，未发送给任何机构或用户。',
-        feedbackTone: 'success',
+        intentState: 'NONE',
+        feedback: 'DEMO_ONLY：未提交、未创建任何联系意向；接入正式服务并完成登录后才能发送。',
+        feedbackTone: 'error',
       });
       return;
     }
@@ -247,17 +245,6 @@ Page({
     if (this.data.submitting || this.data.intentState !== 'ACTIVE' || !currentIntentId || !currentIntentVersion) return;
     const runtime = getRuntimeEvidence();
     this.setData({ submitting: true, feedback: '', feedbackTone: 'neutral' });
-
-    if (runtime.runtimeMode === RuntimeMode.OFFLINE_DEMO) {
-      currentIntentVersion = 2 as OptimisticVersion;
-      this.setData({
-        submitting: false,
-        intentState: 'CANCELLED',
-        feedback: 'DEMO_ONLY：演示意向已在本页取消，没有外部状态发生变化。',
-        feedbackTone: 'success',
-      });
-      return;
-    }
 
     if (runtime.runtimeMode !== RuntimeMode.LIVE || !runtime.cloudConfigured) {
       this.setData({ submitting: false, feedback: '当前未连接正式服务，未变更任何意向。', feedbackTone: 'error' });

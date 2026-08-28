@@ -1,15 +1,39 @@
 import type { PublicCardProjection } from '../../shared/types/projections';
 import type { UtcInstant } from '../../shared/types/primitives';
-import { createCardShare, getMyCard, getRuntimeEvidence, revokeCardShare } from './services/identity-client';
 import { cityDisplayName, isSafeShareBearer, safeShareTitle, sanitizePublicCard, shareExpiry } from './services/card-presenter';
+import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, OFFLINE_DEMO_REVIEW_ITEMS, isOfflineDemo } from './services/offline-demo';
 import { forgetShareRevocationPointer, isSafeShareTokenId, rememberShareForRevocation } from './services/share-revocation-pointer';
 
-let transientShare: { readonly token: string; readonly shareTokenId: Parameters<typeof revokeCardShare>[0] } | undefined;
+type IdentityClientModule = typeof import('./services/identity-client');
+declare const require: (path: string) => IdentityClientModule;
+
+type RevokeShareTokenId = Parameters<IdentityClientModule['revokeCardShare']>[0];
+
+function getCardRuntime(): { readonly runtimeMode: string; readonly cloudConfigured: boolean } {
+  try {
+    const app = getApp<{ globalData?: { runtimeMode?: string; cloudEnvironmentConfigured?: boolean } }>();
+    return {
+      runtimeMode: app.globalData?.runtimeMode ?? 'OFFLINE_DEMO',
+      cloudConfigured: app.globalData?.cloudEnvironmentConfigured === true,
+    };
+  } catch (_error) {
+    return { runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false };
+  }
+}
+
+function loadIdentityClient(): IdentityClientModule {
+  return require('./services/identity-client');
+}
+
+let transientShare: { readonly token: string; readonly shareTokenId: RevokeShareTokenId } | undefined;
 
 Page({
   data: {
     card: null as PublicCardProjection | null,
     runtimeMode: 'OFFLINE_DEMO',
+    demoMode: false,
+    demoFields: OFFLINE_DEMO_FIELDS,
+    demoReviewItems: OFFLINE_DEMO_REVIEW_ITEMS,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
     message: '',
     sharePreparing: false,
@@ -21,7 +45,8 @@ Page({
   },
 
   onLoad() {
-    this.setData({ runtimeMode: getRuntimeEvidence().runtimeMode });
+    const runtime = getCardRuntime();
+    this.setData({ runtimeMode: runtime.runtimeMode, demoMode: isOfflineDemo(runtime) });
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
   },
 
@@ -42,7 +67,18 @@ Page({
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
     }
+    if (this.data.demoMode) {
+      this.setData({
+        card: OFFLINE_DEMO_CARD,
+        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+        status: 'READY',
+        message: 'SYNTHETIC · DEMO_ONLY：示例不会保存、分享或进入审核。',
+      });
+      if (fromPullDown) wx.stopPullDownRefresh();
+      return;
+    }
     this.setData({ status: 'LOADING', message: '' });
+    const { getMyCard } = loadIdentityClient();
     const result = await getMyCard();
     if (!result.ok) {
       this.setData({
@@ -65,7 +101,12 @@ Page({
 
   async prepareWechatShare() {
     if (this.data.sharePreparing || this.data.shareRevoking || !this.data.card || transientShare) return;
+    if (this.data.demoMode) {
+      this.setData({ shareHint: 'DEMO_ONLY：未创建分享入口。' });
+      return;
+    }
     this.setData({ sharePreparing: true, shareReady: false, shareHint: '正在创建一次安全分享入口…' });
+    const { createCardShare } = loadIdentityClient();
     const result = await createCardShare(
       this.data.card.cardId,
       this.data.card.version,
@@ -104,7 +145,12 @@ Page({
 
   async revokePreparedShare() {
     if (this.data.shareRevoking || !this.data.card || !transientShare) return;
+    if (this.data.demoMode) {
+      this.setData({ shareHint: 'DEMO_ONLY：没有可撤销的真实分享入口。' });
+      return;
+    }
     this.setData({ shareRevoking: true, shareReady: false, shareHint: '正在请求撤销当前入口…' });
+    const { revokeCardShare } = loadIdentityClient();
     const result = await revokeCardShare(transientShare.shareTokenId, this.data.card.version);
     if (!result.ok || result.data.shareTokenId !== transientShare.shareTokenId) {
       this.setData({

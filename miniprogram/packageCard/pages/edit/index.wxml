@@ -2,6 +2,7 @@
   <text class="card-kicker">Private Profile</text>
   <text class="card-title">编辑个人资料</text>
   <text class="card-subtitle">完整资料保存在私密域；公开名片只由服务端投影生成。带“合同待集成”的字段不会被伪装成已保存。</text>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 本页试填不会保存</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载资料"></view>
 
@@ -61,11 +62,11 @@
     <view wx:if="{{message}}" class="card-status {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : status === 'SAVED' ? 'card-status--success' : ''}}" aria-live="polite">{{message}}</view>
 
     <view class="card-stack">
-      <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{creatingProfile ? '创建最小资料' : '保存合同支持的资料'}}</button>
+      <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{demoMode ? '检查本页草稿（不保存）' : creatingProfile ? '创建最小资料' : '保存合同支持的资料'}}</button>
       <button wx:if="{{status === 'PROJECTION_PENDING'}}" class="card-button-secondary" bindtap="retryProjectionRefresh">重试公开投影刷新</button>
       <navigator class="card-link-button" url="/packageCard/pages/privacy/index" hover-class="none">查看逐字段隐私说明</navigator>
     </view>
   </block>
 
-  <view class="card-status">运行模式：{{runtimeMode}}。AI 草稿只写入可编辑文本框，不读取或修改认证状态。</view>
+  <view class="card-status">{{demoMode ? '离线演示不会建立账户、上传头像、提交审核或保存任何字段。' : '运行模式：' + runtimeMode + '。AI 草稿只写入可编辑文本框，不读取或修改认证状态。'}}</view>
 </view>

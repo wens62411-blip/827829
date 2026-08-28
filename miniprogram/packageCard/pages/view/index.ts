@@ -11,6 +11,7 @@ import {
   viewerModeFromRelationship,
   type CardViewerMode,
 } from '../../../pages/card/services/card-presenter';
+import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 
 let viewedOwnerUserId: UserId | undefined;
 
@@ -23,6 +24,8 @@ function parseOwnerUserId(value: string | undefined): UserId | undefined {
 Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
+    demoMode: false,
+    demoFields: OFFLINE_DEMO_FIELDS,
     card: null as PublicCardProjection | null,
     viewerMode: 'SELF' as CardViewerMode,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
@@ -32,7 +35,9 @@ Page({
   },
 
   onLoad(options: Record<string, string | undefined>) {
-    this.setData({ runtimeMode: getRuntimeEvidence().runtimeMode });
+    const runtime = getRuntimeEvidence();
+    const demoMode = isOfflineDemo(runtime);
+    this.setData({ runtimeMode: runtime.runtimeMode, demoMode });
     if (options.ownerUserId !== undefined) {
       viewedOwnerUserId = parseOwnerUserId(options.ownerUserId);
       if (!viewedOwnerUserId) {
@@ -61,6 +66,17 @@ Page({
 
   async loadCard(fromPullDown: boolean = false) {
     if (this.data.invalidOwner || this.data.status === 'LOADING') {
+      if (fromPullDown) wx.stopPullDownRefresh();
+      return;
+    }
+    if (this.data.demoMode && !viewedOwnerUserId) {
+      this.setData({
+        status: 'READY',
+        card: OFFLINE_DEMO_CARD,
+        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+        viewerMode: 'SELF',
+        message: 'SYNTHETIC · DEMO_ONLY',
+      });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
     }

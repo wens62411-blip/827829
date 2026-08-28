@@ -1,4 +1,1 @@
-<t-tag wx:if="{{visible}}" theme="success" variant="outline" size="medium" aria-label="人工审核通过标签 {{label}}">
-  {{label}}
-</t-tag>
-
+<text wx:if="{{visible}}" class="verified-tag" aria-label="人工审核通过标签 {{label}}"><text class="verified-tag__mark">✓</text>{{label}} · 人工审核</text>

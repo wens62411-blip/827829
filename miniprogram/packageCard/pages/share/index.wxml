@@ -2,6 +2,7 @@
   <text class="card-kicker">Secure Share</text>
   <text class="card-title">分享与撤销</text>
   <text class="card-subtitle">安全入口由高熵随机 token 解析；数据库只保存 hash。页面内的原始 token 不写本地存储、不写日志。</text>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 不会创建真实分享</view>
 
   <view wx:if="{{loadingCard}}" class="card-skeleton" aria-label="正在加载公开名片"></view>
   <view wx:elif="{{pageError}}" class="card-panel card-panel--error">
@@ -17,7 +18,16 @@
 
   <view wx:if="{{localNotice}}" class="card-status card-status--error">{{localNotice}}</view>
 
-  <view wx:if="{{card && hasRevocableShare && !hasActiveShare && !shareState}}" class="card-panel">
+  <view wx:if="{{demoMode && card}}" class="card-panel card-panel--wine">
+    <text class="card-panel__eyebrow">SHARE PREVIEW</text>
+    <text class="card-panel__title">真实接入后的分享标准</text>
+    <view class="card-step"><text>01</text><view><text>创建限时入口</text><text>路径只携带高熵 token，不含身份和权限字段。</text></view></view>
+    <view class="card-step"><text>02</text><view><text>微信确认发送</text><text>打开系统转发面板不等于已送达，页面不会伪造成功。</text></view></view>
+    <view class="card-step"><text>03</text><view><text>随时撤销</text><text>过期、撤销、拉黑或关系变化后，再次打开会重新核验。</text></view></view>
+    <navigator class="card-link-button card-link-button--compact" open-type="switchTab" url="/pages/card/index" hover-class="none">返回示例名片 <text>›</text></navigator>
+  </view>
+
+  <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="card-panel">
     <text class="card-panel__title">发现本机最近的分享入口</text>
     <text class="card-panel__text">本机只保存了非秘密的 shareTokenId 作为撤销指针，没有保存原始 token，因此不能再次转发，但可以请求服务端撤销。</text>
     <view class="card-stack">
@@ -27,7 +37,7 @@
   </view>
 
   <ab-share-state
-    wx:if="{{shareState}}"
+    wx:if="{{!demoMode && shareState}}"
     state="{{shareState}}"
     title="{{shareTitle}}"
     description="{{shareDescription}}"
@@ -37,13 +47,13 @@
     bind:retry="handleShareRetry"
   />
 
-  <view wx:if="{{card}}" class="card-stack">
+  <view wx:if="{{card && !demoMode}}" class="card-stack">
     <button wx:if="{{(!shareState || shareState === 'REVOKED') && !hasRevocableShare}}" class="card-button" bindtap="createShare" loading="{{busyAction === 'CREATE'}}" disabled="{{busyAction !== ''}}">创建 7 天安全入口</button>
     <button wx:if="{{hasRevocableShare && (shareState === 'SUCCESS' || shareState === 'ERROR')}}" class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">{{shareState === 'ERROR' ? '重试撤销入口' : '撤销当前入口'}}</button>
     <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
   </view>
 
-  <view wx:if="{{shareState === 'SUCCESS'}}" class="card-panel">
+  <view wx:if="{{!demoMode && shareState === 'SUCCESS'}}" class="card-panel">
     <text class="card-panel__title">小程序码 scene</text>
     <text class="card-panel__text">scene 只由短令牌构成，不携带身份或权限信息。历史小程序码每次打开都重新 resolve。</text>
     <view wx:if="{{qrMessage}}" class="card-status {{qrState === 'ERROR' ? 'card-status--error' : qrState === 'SUCCESS' ? 'card-status--success' : ''}}">{{qrMessage}}</view>
@@ -53,7 +63,7 @@
     </view>
   </view>
 
-  <view wx:if="{{card}}" class="card-panel">
+  <view wx:if="{{card && !demoMode}}" class="card-panel">
     <text class="card-panel__title">Canvas 2D 海报</text>
     <text class="card-panel__text">海报只绘制 cards_public。当前合同没有小程序码资产 URL，因此海报会明确标注“不含小程序码”，不会绘制假码。</text>
     <view class="card-canvas-shell {{posterReady ? '' : 'card-hidden-canvas'}}">
@@ -67,5 +77,5 @@
     </view>
   </view>
 
-  <view class="card-status">运行模式：{{runtimeMode}}。原始分享 token 与 scene 仅保留在当前页面内存，离开页面即清除。</view>
+  <view class="card-status">{{demoMode ? '离线演示没有原始 token、scene、海报文件或分享状态。' : '运行模式：' + runtimeMode + '。原始 token 与 scene 仅保留在当前页面内存。'}}</view>
 </view>

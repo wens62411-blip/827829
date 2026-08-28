@@ -2,3 +2,26 @@
   display: inline-flex;
 }
 
+.verified-tag {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48rpx;
+  padding: 0 16rpx;
+  border: 2rpx solid #246b4a;
+  border-radius: 4rpx;
+  color: #246b4a;
+  font-size: 22rpx;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.verified-tag__mark {
+  margin-right: 8rpx;
+}
+
+@media (prefers-color-scheme: dark) {
+  .verified-tag {
+    border-color: #7ac9a5;
+    color: #7ac9a5;
+  }
+}

@@ -7,5 +7,5 @@
     "types": ["miniprogram-api-typings"]
   },
   "include": ["miniprogram/**/*.ts"],
-  "exclude": ["node_modules", "miniprogram_npm"]
+  "exclude": ["node_modules", "miniprogram_npm", "miniprogram/miniprogram_npm"]
 }

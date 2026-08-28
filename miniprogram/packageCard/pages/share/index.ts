@@ -19,6 +19,7 @@ import {
   readShareRevocationPointer,
   rememberShareForRevocation,
 } from '../../../pages/card/services/share-revocation-pointer';
+import { OFFLINE_DEMO_CARD, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 
 type OwnerShareState = '' | 'SUCCESS' | 'REVOKED' | 'ERROR' | 'LOADING';
 type QrState = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
@@ -174,6 +175,7 @@ function drawPublicPoster(canvas: WechatMiniprogram.Canvas, card: PublicCardProj
 Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
+    demoMode: false,
     card: null as PublicCardProjection | null,
     loadingCard: true,
     pageError: '',
@@ -193,9 +195,22 @@ Page({
   },
 
   onLoad() {
+    const runtime = getRuntimeEvidence();
+    if (isOfflineDemo(runtime)) {
+      activeCard = OFFLINE_DEMO_CARD;
+      this.setData({
+        runtimeMode: runtime.runtimeMode,
+        demoMode: true,
+        card: OFFLINE_DEMO_CARD,
+        loadingCard: false,
+        localNotice: 'DEMO_ONLY：仅展示分享方案，不创建 token、小程序码、海报或成功记录。',
+      });
+      wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+      return;
+    }
     revocableTokenId = readShareRevocationPointer();
     this.setData({
-      runtimeMode: getRuntimeEvidence().runtimeMode,
+      runtimeMode: runtime.runtimeMode,
       hasRevocableShare: revocableTokenId !== undefined,
     });
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
@@ -211,6 +226,7 @@ Page({
 
   async loadCard() {
     if (this.data.busyAction) return;
+    if (this.data.demoMode) return;
     this.setData({ loadingCard: true, pageError: '' });
     const result = await getMyPublicCard();
     if (!result.ok) {
@@ -224,6 +240,10 @@ Page({
 
   async createShare() {
     if (this.data.busyAction || !activeCard || activeShareSecret || revocableTokenId) return;
+    if (this.data.demoMode) {
+      this.setData({ localNotice: '未创建分享：OFFLINE_DEMO 不会生成或保存任何入口。' });
+      return;
+    }
     this.setData({
       busyAction: 'CREATE',
       localNotice: '',
@@ -359,6 +379,10 @@ Page({
 
   async generatePoster() {
     if (this.data.busyAction || !activeCard) return;
+    if (this.data.demoMode) {
+      this.setData({ posterMessage: '未生成海报：离线示例不把合成资料导出为可传播素材。' });
+      return;
+    }
     this.setData({ busyAction: 'POSTER', posterMessage: '正在使用 Canvas 2D 生成公开投影海报…' });
     const latest = await getMyPublicCard();
     if (!latest.ok) {

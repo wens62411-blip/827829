@@ -36,6 +36,14 @@ test('social pages use 申请认识 language and expose no chat or admin decisio
   assert.doesNotMatch(source, /adminApi|review\.(?:approve|reject|requestChanges|revoke)/);
 });
 
+test('network WXML compiles native boolean expressions and non-live modes clear demo cards', () => {
+  const template = read('miniprogram/pages/network/index.wxml');
+  const source = read('miniprogram/pages/network/index.ts');
+  assert.doesNotMatch(template, /&amp;&amp;/);
+  assert.match(template, /wx:elif="\{\{loading && !loaded\}\}"/);
+  assert.match(source, /runtimeMode !== 'LIVE'[\s\S]*recommendations:\s*\[\]/);
+});
+
 test('social client derives its action boundary from the frozen registry', () => {
   const source = read('miniprogram/pages/network/services/social-client.ts');
   assert.match(source, /Action in CloudAction/);

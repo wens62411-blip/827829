@@ -4,7 +4,6 @@ COUNTRY_DIRECTORY,
 CityId,
 REGION_DIRECTORY,
 } from '../../shared/constants/geography';
-import { callCloudAction } from '../../shared/services/cloud-client';
 import { LOCAL_RUNTIME } from '../../shared/services/runtime';
 import {
 EventState,
@@ -18,6 +17,8 @@ import type { OperationalState as OperationalStateValue } from '../../shared/typ
 import type { PublicEventProjection } from '../../shared/types/projections';
 import { createRequestId } from '../../shared/utils/request-id';
 import { getCityMediaPresentation } from '../../components/ab-city-hero/city-media';
+import { getEventCloudClient } from '../../components/ab-event-card/cloud-client-loader';
+import { listDemoEvents } from '../../components/ab-event-card/demo-data';
 interface CityOptionView {
 readonly id: (typeof CITY_DIRECTORY)[number]['id'];
 readonly label: string;
@@ -173,6 +174,28 @@ detailAvailable,
 startsAtEpoch: Date.parse(event.startsAt),
 };
 }
+function buildDemoEventCards(): EventCardView[] {
+return listDemoEvents().map((event) => {
+const media = getCityMediaPresentation(event.cityId);
+return {
+eventId: event.eventId,
+title: event.title,
+summary: event.summary,
+cityName: `${event.cityName} / ${event.cityNameEn}`,
+timeLabel: event.localTimeLabel,
+timezone: event.timezone,
+stateLabel: 'DEMO · 策展提案',
+registrationLabel: 'OFFLINE · 报名未开放',
+origin: RecordOrigin.SYNTHETIC,
+verificationState: VerificationState.USER_DECLARED,
+coverSrc: `/assets/cities/${event.cityId}.jpg`,
+coverAlt: `${media.alt}；用于 DEMO_ONLY 活动策展预览`,
+detailAvailable: true,
+startsAtEpoch: 0,
+};
+});
+}
+const DEMO_EVENTS = buildDemoEventCards();
 const INITIAL_CITIES = buildCityOptions();
 const INITIAL_CITY = INITIAL_CITIES.find((city) => city.id === CityId.CN_BEIJING)!;
 let eventRequestGeneration = 0;
@@ -202,6 +225,7 @@ timeFilterIndex: 0,
 priceFilterIndex: 0,
 accessFilterIndex: 0,
 extendedFiltersAvailable: false,
+offlineDemo: !LOCAL_RUNTIME.cloudEnvironmentConfigured,
 filterContractNote: '类型、价格、准入字段不在冻结 1.0.0 公开 DTO 中，控件已禁用；时间筛选可用。',
 paymentGateLabel: '真实微信支付 DISABLED · 本页无支付按钮',
 },
@@ -277,6 +301,7 @@ await this.refreshEvents();
 },
 async refreshDirectory() {
 if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) return;
+const { callCloudAction } = getEventCloudClient();
 try {
 const result = await callCloudAction('geo.listCities', createRequestId(), {
 contractVersion: '1.0.0',
@@ -307,20 +332,26 @@ requestGeneration === eventRequestGeneration &&
 this.data.selectedCityId === selected.id &&
 this.data.browseGlobal === browseGlobal;
 if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
+const allEvents = DEMO_EVENTS.filter(
+(event) => browseGlobal || event.eventId === `demo:${selected.id}`,
+);
 this.setData({
 runtimeMode: RuntimeMode.OFFLINE_DEMO,
-allEvents: [],
-events: [],
+allEvents,
+events: allEvents,
 loading: false,
+offlineDemo: true,
 stateKind: 'EMPTY',
-stateTitle: '暂无经当前证据核验的活动',
+stateTitle: '暂无可展示的策展预览',
 stateDescription: browseGlobal
-? '13 个城市入口均可浏览，但目前没有获准公开的真实活动。'
-: `${selected.label}已有目录入口，当前没有获准公开的真实活动。`,
-stateDetail: 'OFFLINE_DEMO 不合成活动成功结果；真实活动内容状态为 CONTENT_LIVE_UNVERIFIED。',
+? '13 个城市入口均已加载 DEMO_ONLY 策展卡；它们不是实际排期。'
+: `${selected.label}的本地策展卡暂不可用。`,
+stateDetail: 'OFFLINE_DEMO 只演示浏览结构，不生成报名、支付、主理人审核或运营成功证据。',
+filterContractNote: 'OFFLINE_DEMO 仅开放城市与跨城浏览；类型、时间、价格和准入不模拟筛选结果。',
 });
 return;
 }
+const { callCloudAction } = getEventCloudClient();
 this.setData({ loading: true });
 try {
 const payload = browseGlobal
@@ -335,6 +366,7 @@ return;
 const allEvents = result.apiResult.data.page.items.map(toEventCard);
 this.setData({
 runtimeMode: RuntimeMode.LIVE,
+offlineDemo: false,
 allEvents,
 events: allEvents,
 loading: false,
@@ -366,12 +398,21 @@ openCityDirectory() {
 void wx.navigateTo({ url: '/packageEvents/pages/city/index' });
 },
 openEvent(event: WechatMiniprogram.CustomEvent<{ eventId: string }>) {
-if (!event.detail.eventId) return;
+const eventId = event.detail.eventId;
+if (!eventId) return;
+if (this.data.offlineDemo && eventId.startsWith('demo:')) {
 void wx.navigateTo({
-url: `/packageEvents/pages/event/index?eventId=${encodeURIComponent(event.detail.eventId)}`,
+url: `/packageEvents/pages/event/index?demoCityId=${encodeURIComponent(eventId.slice(5))}`,
+});
+return;
+}
+void wx.navigateTo({
+url: `/packageEvents/pages/event/index?eventId=${encodeURIComponent(eventId)}`,
 });
 },
 openDemoDetail() {
-void wx.navigateTo({ url: '/packageEvents/pages/event/index?demo=1' });
+void wx.navigateTo({
+url: `/packageEvents/pages/event/index?demoCityId=${encodeURIComponent(this.data.selectedCityId)}`,
+});
 },
 });

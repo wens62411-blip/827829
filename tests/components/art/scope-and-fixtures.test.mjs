@@ -27,6 +27,9 @@ const executableFiles = executableRoots.flatMap(collectExecutable).sort();
 const executableSource = executableFiles
   .map((path) => `\n/* ${relative(rootPath, path).replaceAll('\\', '/')} */\n${readFileSync(path, 'utf8')}`)
   .join('\n');
+const sharedEventDemoSource = read('miniprogram', 'components', 'ab-event-card', 'demo-data.ts');
+const intentActionWxml = read('miniprogram', 'components', 'ab-intent-action', 'index.wxml');
+const intentActionWxss = read('miniprogram', 'components', 'ab-intent-action', 'index.wxss');
 
 const fixture = readJson('database', 'seeds', 'art-demo.json');
 const geography = readJson('docs', 'contracts', 'geography.json');
@@ -61,10 +64,16 @@ test('executable art UI exposes no cart, ordering, payment, auction, logistics, 
 test('negative boundary wording is preserved and is not mistaken for a prohibited capability', () => {
   assert.match(executableSource, /不提供[^。'"`\n]{0,80}(?:真伪)?鉴定/);
   assert.match(executableSource, /不构成[^。'"`\n]{0,80}(?:保值|收益)/);
-  assert.match(executableSource, /不代表[^。'"`\n]{0,80}官方合作|非官方合作/);
+  assert.match(`${executableSource}\n${sharedEventDemoSource}`, /不代表[^。'"`\n]{0,80}官方合作|非官方合作/);
   assert.match(executableSource, /意向不是订单，不锁定库存，不构成成交或付款/);
   assert.match(executableSource, /不提供交易、竞拍、库存承诺、收益预测或 AI 真伪鉴定/);
   assert.doesNotMatch(executableSource, /保证真品|平台鉴定为真|官方认证真品|承诺保值|保证收益|官方合作方/);
+});
+
+test('intent action uses component-safe class styling for disabled state', () => {
+  assert.match(intentActionWxml, /loading \|\| disabled \? 'intent-action__button--disabled'/);
+  assert.match(intentActionWxss, /\.intent-action__button--disabled\{opacity:/);
+  assert.doesNotMatch(intentActionWxss, /\[[^\]]+\]/);
 });
 
 test('every art item fixture carries the seven mandatory provenance fields and a shared city ID', () => {

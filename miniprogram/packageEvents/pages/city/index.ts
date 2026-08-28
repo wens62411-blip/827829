@@ -4,7 +4,6 @@ COUNTRY_DIRECTORY,
 CityId,
 REGION_DIRECTORY,
 } from '../../../shared/constants/geography';
-import { callCloudAction } from '../../../shared/services/cloud-client';
 import { LOCAL_RUNTIME } from '../../../shared/services/runtime';
 import {
 OperationalState,
@@ -13,6 +12,7 @@ RuntimeMode,
 import type { OperationalState as OperationalStateValue } from '../../../shared/types/enums';
 import { createRequestId } from '../../../shared/utils/request-id';
 import { getCityMediaPresentation } from '../../../components/ab-city-hero/city-media';
+import { getEventCloudClient } from '../../../components/ab-event-card/cloud-client-loader';
 interface DirectoryCityView {
 readonly id: (typeof CITY_DIRECTORY)[number]['id'];
 readonly label: string;
@@ -108,6 +108,7 @@ void this.refreshDirectory();
 },
 async refreshDirectory() {
 if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) return;
+const { callCloudAction } = getEventCloudClient();
 try {
 const result = await callCloudAction('geo.listCities', createRequestId(), {
 contractVersion: '1.0.0',
@@ -153,6 +154,7 @@ const requestGeneration = ++nodeRequestGeneration;
 const isCurrent = () =>
 requestGeneration === nodeRequestGeneration && this.data.selectedCityId === city.id;
 if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) return;
+const { callCloudAction } = getEventCloudClient();
 try {
 const result = await callCloudAction('geo.getNode', createRequestId(), {
 contractVersion: '1.0.0',

@@ -1,7 +1,118 @@
-<ab-page-state eyebrow="{{eyebrow}}" title="{{title}}" description="{{description}}" runtime-mode="{{runtimeMode}}">
-  <view slot="actions" class="ab-actions">
-    <navigator class="ab-action" open-type="switchTab" url="/pages/events/index" hover-class="none">全球同城线下活动</navigator>
-    <navigator class="ab-action" url="/packageArt/pages/channel/index" hover-class="none">艺术频道</navigator>
+<view class="discover-page ab-safe-bottom">
+  <view class="discover-hero">
+    <image wx:if="{{!heroImageFailed}}" class="discover-hero__image" src="/assets/hero/zurich-960.jpg" mode="aspectFill" alt="苏黎世利马特河两岸老城与教堂天际线" data-image-key="hero" binderror="handleImageError" />
+    <view wx:else class="discover-hero__fallback" aria-role="img" aria-label="苏黎世城市图片加载失败"><text>AB CLUB</text><text>本地城市影像暂不可用 · 不使用外链替代</text></view>
+    <view class="discover-hero__bar">
+      <image wx:if="{{!brandLogoFailed}}" class="discover-brandmark" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" aria-label="AB Club 盾徽标志" data-image-key="brand" binderror="handleImageError" />
+      <text wx:else class="discover-brandmark__fallback" aria-label="AB Club 标志加载失败，显示文字标识">AB CLUB</text>
+      <ab-evidence-label mode="{{runtimeMode}}" />
+    </view>
+    <view class="discover-hero__copy">
+      <text class="discover-hero__eyebrow">AB CLUB · GLOBAL PRIVATE COMMUNITY</text>
+      <text class="discover-hero__title">让值得认识的人，\n在同一座城相遇</text>
+      <text class="discover-hero__description">从可信名片到全球城市活动，也连接艺术、古董与珠宝领域的长期关系。</text>
+    </view>
   </view>
-</ab-page-state>
 
+  <view class="discover-runtime" aria-role="status">
+    <view>
+      <text class="discover-runtime__label">本地展示版本</text>
+      <text class="discover-runtime__text">当前内容用于确认产品结构与视觉，不代表真实审核、真实报名或线上发布。</text>
+    </view>
+    <text class="discover-runtime__mark">DEMO</text>
+  </view>
+
+  <view class="discover-section discover-intro">
+    <text class="discover-kicker">A TRUSTED CIRCLE</text>
+    <text class="discover-heading">一张名片，连接四种关系</text>
+    <text class="discover-lead">用克制而可信的身份表达，进入人脉、城市活动与文化内容。公开身份标签必须经过人工审核。</text>
+
+    <view class="discover-journey">
+      <navigator class="discover-journey__item" open-type="switchTab" url="/pages/card/index" hover-class="discover-press">
+        <text class="discover-journey__index">01</text>
+        <view class="discover-journey__copy"><text class="discover-journey__title">可信名片</text><text class="discover-journey__text">隐私分层、标签申请与公开范围</text></view>
+        <text class="discover-arrow">›</text>
+      </navigator>
+      <navigator class="discover-journey__item" open-type="switchTab" url="/pages/network/index" hover-class="discover-press">
+        <text class="discover-journey__index">02</text>
+        <view class="discover-journey__copy"><text class="discover-journey__title">人脉连接</text><text class="discover-journey__text">围绕城市、行业与合作意向发现同路人</text></view>
+        <text class="discover-arrow">›</text>
+      </navigator>
+      <navigator class="discover-journey__item" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">
+        <text class="discover-journey__index">03</text>
+        <view class="discover-journey__copy"><text class="discover-journey__title">全球活动</text><text class="discover-journey__text">从北上广深杭到欧洲、澳洲与加拿大</text></view>
+        <text class="discover-arrow">›</text>
+      </navigator>
+      <navigator class="discover-journey__item" url="/packageArt/pages/channel/index" hover-class="discover-press">
+        <text class="discover-journey__index">04</text>
+        <view class="discover-journey__copy"><text class="discover-journey__title">艺术频道</text><text class="discover-journey__text">艺术、古董与珠宝的内容及活动入口</text></view>
+        <text class="discover-arrow">›</text>
+      </navigator>
+    </view>
+  </view>
+
+  <view class="discover-section discover-cities">
+    <view class="discover-section__head">
+      <view><text class="discover-kicker">CITY CHAPTERS</text><text class="discover-heading">全球城市节点</text></view>
+      <navigator class="discover-text-link" open-type="switchTab" url="/pages/events/index" hover-class="none">查看活动 ›</navigator>
+    </view>
+
+    <scroll-view class="discover-city-scroll" scroll-x="true" enhanced="true" show-scrollbar="false">
+      <view class="discover-city-row">
+        <navigator wx:for="{{featuredCities}}" wx:key="id" class="discover-city-card" url="/packageEvents/pages/city/index?cityId={{item.id}}" hover-class="discover-press">
+          <image wx:if="{{!item.imageFailed}}" class="discover-city-card__image" src="{{item.imageSrc}}" mode="aspectFill" alt="{{item.alt}}" lazy-load="true" data-image-key="city:{{item.id}}" binderror="handleImageError" />
+          <view wx:else class="discover-city-card__fallback" aria-role="img" aria-label="{{item.name}}城市图片加载失败"><text>AB</text><text>本地图片暂不可用</text></view>
+          <view class="discover-city-card__caption"><text class="discover-city-card__name">{{item.name}}</text><text class="discover-city-card__region">{{item.region}}</text></view>
+        </navigator>
+      </view>
+    </scroll-view>
+
+    <view class="discover-city-groups">
+      <view wx:for="{{cityGroups}}" wx:key="region" class="discover-city-group"><text class="discover-city-group__region">{{item.region}}</text><text class="discover-city-group__cities">{{item.cities}}</text></view>
+    </view>
+    <text class="discover-rights">城市图片为本地授权来源缩略图；正式发布前仍需完成人工版权复核。</text>
+  </view>
+
+  <view class="discover-section discover-events">
+    <view class="discover-section__head discover-section__head--light">
+      <view><text class="discover-kicker discover-kicker--gold">CURATED GATHERINGS</text><text class="discover-heading discover-heading--light">近期活动构想</text></view>
+      <text class="discover-demo-chip">演示议程</text>
+    </view>
+    <navigator wx:for="{{demoEvents}}" wx:key="eventId" class="discover-event" url="/packageEvents/pages/event/index?demoEventId={{item.eventId}}" hover-class="discover-press">
+      <text class="discover-event__index">{{item.cardIndex}}</text>
+      <view class="discover-event__body"><text class="discover-event__city">{{item.cityName}}</text><text class="discover-event__theme">{{item.title}}</text><text class="discover-event__meta">{{item.cardMeta}} · OFFLINE DEMO</text></view>
+      <text class="discover-event__arrow">↗</text>
+    </navigator>
+  </view>
+
+  <view class="discover-section discover-art">
+    <view class="discover-art__visual">
+      <image wx:if="{{!artImageFailed}}" class="discover-art__image" src="/assets/art/not-real-artwork-fallback.svg" mode="aspectFill" alt="抽象几何视觉占位图，非真实艺术品" data-image-key="art" binderror="handleImageError" />
+      <view wx:else class="discover-art__fallback" aria-role="img" aria-label="原创视觉占位图加载失败"><text>AB CULTURE</text><text>本地视觉占位暂不可用 · 不使用外链替代</text></view>
+      <text class="discover-art__notice">原创视觉占位 · 非真实艺术品</text>
+    </view>
+    <view class="discover-art__content">
+      <text class="discover-kicker">AB CULTURE</text>
+      <text class="discover-heading">艺术，不只是一个频道</text>
+      <text class="discover-lead">它是会员表达审美、交换知识与建立长期信任的另一种方式。</text>
+      <view class="discover-art__list">
+        <view wx:for="{{artVerticals}}" wx:key="en" class="discover-art__item"><text class="discover-art__en">{{item.en}}</text><view><text class="discover-art__name">{{item.name}}</text><text class="discover-art__description">{{item.description}}</text></view></view>
+      </view>
+      <navigator class="discover-primary" url="/packageArt/pages/channel/index" hover-class="discover-primary--pressed">进入艺术频道 <text>›</text></navigator>
+    </view>
+  </view>
+
+  <view class="discover-section discover-trust">
+    <text class="discover-kicker discover-kicker--gold">TRUST BY DESIGN</text>
+    <text class="discover-heading discover-heading--light">公开标签，由人来确认</text>
+    <text class="discover-trust__text">AI 只做材料提示与预分类；企业家、投资人、艺术从业者等公开标签，必须由人工审核后才可展示。</text>
+    <view class="discover-trust__steps">
+      <view class="discover-trust__step"><text>1</text><text>用户申请</text></view><view class="discover-trust__line"></view>
+      <view class="discover-trust__step"><text>2</text><text>人工复核</text></view><view class="discover-trust__line"></view>
+      <view class="discover-trust__step"><text>3</text><text>公开展示</text></view>
+    </view>
+    <navigator class="discover-outline" open-type="switchTab" url="/pages/card/index" hover-class="discover-press">查看我的名片</navigator>
+  </view>
+
+  <view class="discover-footer"><text class="discover-footer__brand">AB CLUB</text><text class="discover-footer__text">GLOBAL BUSINESS · CITY CULTURE · TRUSTED CONNECTIONS</text></view>
+</view>

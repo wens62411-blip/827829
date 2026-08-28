@@ -132,6 +132,8 @@ export interface ArtCardView {
 
 export interface RelatedEventView {
   readonly eventId: string;
+  readonly cityId: string;
+  readonly recordOrigin: string;
   readonly title: string;
   readonly cityName: string;
   readonly startsAt: string;
@@ -257,6 +259,8 @@ export function detailRows(content: ArtContentDetail): readonly DetailRow[] {
 export function toRelatedEventView(event: PublicEventProjection): RelatedEventView {
   return {
     eventId: event.eventId,
+    cityId: event.cityId,
+    recordOrigin: event.origin,
     title: event.title,
     cityName: cityName(event.cityId),
     startsAt: event.startsAt,

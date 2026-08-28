@@ -1,5 +1,4 @@
-import { CITY_DIRECTORY, CityId } from '../../../shared/constants/geography';
-import { callCloudAction } from '../../../shared/services/cloud-client';
+import { CITY_DIRECTORY } from '../../../shared/constants/geography';
 import { LOCAL_RUNTIME } from '../../../shared/services/runtime';
 import {
 EventState,
@@ -12,6 +11,12 @@ import type { EventId } from '../../../shared/types/primitives';
 import type { PublicEventProjection, PublicOrganizerProjection } from '../../../shared/types/projections';
 import { createRequestId } from '../../../shared/utils/request-id';
 import { getCityMediaPresentation } from '../../../components/ab-city-hero/city-media';
+import { getEventCloudClient } from '../../../components/ab-event-card/cloud-client-loader';
+import {
+getDemoEventByCityId,
+getDemoEventById,
+} from '../../../components/ab-event-card/demo-data';
+import type { DemoEventPresentation } from '../../../components/ab-event-card/demo-data';
 interface EventDetailView {
 readonly displayId: string;
 readonly title: string;
@@ -41,35 +46,48 @@ readonly paymentCapabilityLabel: string;
 readonly canRegisterInterest: boolean;
 readonly organizerId: string;
 }
-const DEMO_DETAIL: EventDetailView = {
-displayId: 'DEMO_PRESENTATION_ONLY',
-title: '活动详情字段结构示例',
-summary: '此页面只展示字段与安全边界，不代表活动存在、主理人获批、名额可用或报名成功。',
-cityName: '北京',
-cityNameEn: 'Beijing',
-imageSrc: `/assets/cities/${CityId.CN_BEIJING}.jpg`,
-imageAlt: `${getCityMediaPresentation(CityId.CN_BEIJING).alt}；用于 DEMO_ONLY 详情结构示例`,
+function toDemoDetail(event: DemoEventPresentation): EventDetailView {
+const media = getCityMediaPresentation(event.cityId);
+return {
+displayId: event.eventId,
+title: event.title,
+summary: event.summary,
+cityName: event.cityName,
+cityNameEn: event.cityNameEn,
+imageSrc: `/assets/cities/${event.cityId}.jpg`,
+imageAlt: `${media.alt}；用于 DEMO_ONLY 活动策展预览`,
 evidenceLabel: 'DEMO_ONLY',
 secondaryEvidenceLabel: 'CONTENT_LIVE_UNVERIFIED',
-stateLabel: 'DRAFT · 不可发布',
-sourceLabel: '未提供（DEMO_ONLY）',
-organizerName: '未提供（未经人工批准）',
-organizerSummary: '普通用户不能通过客户端字段自称 organizer；只有服务端认可的 APPROVED 主理人可公开。',
-localTimeLabel: '开始/结束时间未提供',
-timezone: 'Asia/Shanghai',
-timezoneDifferenceLabel: '示例活动按北京当地时区展示；用户所在城市未经读取。',
-addressRangeLabel: '未提供（公开详情仅应展示经批准的地址范围）',
-admissionTags: ['准入标签未提供'],
-registrationMethodLabel: 'INTEREST 结构示意；当前不可提交',
-capacityLabel: '未提供',
+stateLabel: 'DEMO_ONLY · 策展提案 · 不可发布',
+sourceLabel: '未提供（DEMO_ONLY；来源字段未在冻结 1.0.0 公开 DTO 提供）',
+organizerName: '主理人待人工审核（DEMO_ONLY）',
+organizerSummary: '这不是获批主理人资料。只有服务端认可的 APPROVED 主理人可公开。',
+localTimeLabel: event.localTimeLabel,
+timezone: event.timezone,
+timezoneDifferenceLabel: `策展预览沿用 ${event.cityName} 目录时区 ${event.timezone}；没有生成真实排期。`,
+addressRangeLabel: '未提供（场地待策展，不展示虚构地址）',
+admissionTags: ['DEMO_ONLY', '报名未开放'],
+registrationMethodLabel: 'OFFLINE_DEMO · 当前不可提交',
+capacityLabel: '未提供（容量字段待合同扩展）',
 minParticipantsLabel: '未启用；不得默认“两人成团”',
-mediaRightsLabel: '本地城市图 CLAIMED / DRAFT；详见 cities.json，尚非人工 APPROVED',
-mediaSourceLicenseLabel: `${getCityMediaPresentation(CityId.CN_BEIJING).licenseLabel}；来源页见城市素材 manifest；权利状态仍为 CLAIMED / DRAFT`,
+mediaRightsLabel: '本地城市图 CLAIMED / DRAFT；尚非人工 APPROVED',
+mediaSourceLicenseLabel: `${media.licenseLabel}；来源页见城市素材 manifest；权利状态仍为 CLAIMED / DRAFT`,
 referencedCoverLabel: '活动 cover 未提供；当前只显示本地城市 fallback',
-paymentCapabilityLabel: 'DISABLED · 无支付按钮 · 无模拟支付成功',
+paymentCapabilityLabel: 'DISABLED · 无支付按钮 · 不会模拟报名或支付成功',
 canRegisterInterest: false,
 organizerId: '',
 };
+}
+function makeDemoDetail(cityId: string): EventDetailView | undefined {
+const event = getDemoEventByCityId(cityId);
+return event ? toDemoDetail(event) : undefined;
+}
+function makeDemoDetailByEventId(eventId: string): EventDetailView | undefined {
+const event = getDemoEventById(eventId);
+return event ? toDemoDetail(event) : undefined;
+}
+const DEMO_DETAIL = makeDemoDetail(CITY_DIRECTORY[0].id);
+if (!DEMO_DETAIL) throw new Error('Frozen city directory must provide a demo detail seed.');
 const EMPTY_DETAIL: EventDetailView = {
 ...DEMO_DETAIL,
 displayId: '',
@@ -167,6 +185,28 @@ stateDetail: '不会根据任意 URL 参数生成活动、主理人或报名成�
 imageFailed: false,
 },
 onLoad(query: Record<string, string | undefined>) {
+if (query.demoEventId) {
+const detail = makeDemoDetailByEventId(query.demoEventId);
+if (detail) this.setData({ hasDetail: true, detail, imageFailed: false });
+else this.setData({
+stateKind: 'EMPTY',
+stateTitle: '策展预览活动无效',
+stateDescription: '该 DEMO_ONLY 活动不在本地稳定演示目录中。',
+stateDetail: '没有根据任意 URL 参数生成或替换活动身份。',
+});
+return;
+}
+if (query.demoCityId) {
+const detail = makeDemoDetail(query.demoCityId);
+if (detail) this.setData({ hasDetail: true, detail });
+else this.setData({
+stateKind: 'EMPTY',
+stateTitle: '策展预览参数无效',
+stateDescription: '该城市不在冻结的 13 城目录中。',
+stateDetail: '没有根据任意 URL 参数生成活动内容。',
+});
+return;
+}
 if (query.demo === '1') {
 this.setData({ hasDetail: true, detail: DEMO_DETAIL });
 return;
@@ -184,6 +224,7 @@ stateDetail: '需要详情结构可从活动首页进入显著标注的 DEMO_ONL
 });
 return;
 }
+const { callCloudAction } = getEventCloudClient();
 this.setData({ loading: true, hasDetail: false });
 try {
 const result = await callCloudAction('event.get', createRequestId(), {
@@ -208,6 +249,8 @@ this.showFailure('无法连接活动服务，请稍后重试。');
 }
 },
 async loadPaymentCapability(eventId: EventId) {
+if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) return;
+const { callCloudAction } = getEventCloudClient();
 try {
 const result = await callCloudAction('payment.getCapability', createRequestId(), {
 contractVersion: '1.0.0',

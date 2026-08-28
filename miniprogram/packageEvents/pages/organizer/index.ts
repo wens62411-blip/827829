@@ -1,9 +1,9 @@
 import { CITY_DIRECTORY } from '../../../shared/constants/geography';
-import { callCloudAction } from '../../../shared/services/cloud-client';
 import { LOCAL_RUNTIME } from '../../../shared/services/runtime';
 import { RuntimeMode } from '../../../shared/types/enums';
 import type { OrganizerId } from '../../../shared/types/primitives';
 import { createRequestId } from '../../../shared/utils/request-id';
+import { getEventCloudClient } from '../../../components/ab-event-card/cloud-client-loader';
 interface OrganizerView {
 readonly id: string;
 readonly name: string;
@@ -37,6 +37,7 @@ stateDescription: '当前 OFFLINE_DEMO 不会伪造已认证主理人。',
 });
 return;
 }
+const { callCloudAction } = getEventCloudClient();
 this.setData({ loading: true });
 try {
 const result = await callCloudAction('organizer.getPublic', createRequestId(), {

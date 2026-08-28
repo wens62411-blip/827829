@@ -2,6 +2,7 @@
   <text class="card-kicker">Profile</text>
   <text class="card-title">数字名片</text>
   <text class="card-subtitle">查看关系由服务端判定；客户端不接收 isFriend、role 或认证状态参数。</text>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 非真实会员</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在重新核验查看权限"></view>
 
@@ -16,6 +17,7 @@
     card="{{card}}"
     viewer-mode="{{viewerMode}}"
     city-label="{{cityLabel}}"
+    fields="{{demoMode ? demoFields : []}}"
     max-visible-claims="3"
     show-default-actions="{{false}}"
   >
@@ -25,5 +27,5 @@
     </view>
   </ab-profile-card>
 
-  <view class="card-status">当前视角：{{viewerMode === 'SELF' ? '本人' : viewerMode === 'FRIEND' ? '已接受好友' : '陌生人'}}。每次回到本页或下拉刷新都会重新请求服务端投影。</view>
+  <view class="card-status">{{demoMode ? '示例仅用于预览本人名片结构，不代表账户、好友关系或认证状态。' : '当前视角：' + (viewerMode === 'SELF' ? '本人' : viewerMode === 'FRIEND' ? '已接受好友' : '陌生人') + '。每次返回都会重新请求服务端投影。'}}</view>
 </view>

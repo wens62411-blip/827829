@@ -11,7 +11,7 @@ import type {
   ShareResolveResponse,
   ShareRevokeResponse,
 } from '../../../shared/contracts';
-import { callCloudAction } from '../../../shared/services';
+import { callCloudAction } from '../../../shared/services/cloud-client';
 import { createRequestId } from '../../../shared/utils/request-id';
 import type { ApiErrorCode } from '../../../shared/types/api';
 import type {

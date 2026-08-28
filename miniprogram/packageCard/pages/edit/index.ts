@@ -10,6 +10,7 @@ import {
 } from '../../../pages/card/services/identity-client';
 import { cityDisplayName } from '../../../pages/card/services/card-presenter';
 import { createEditableIntroduction } from '../../../pages/card/services/introduction-draft';
+import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 
 const CITY_NAMES = CITY_DIRECTORY.map((city) => `${city.name.zh} · ${city.name.en}`);
 const CITY_IDS = CITY_DIRECTORY.map((city) => city.id);
@@ -17,6 +18,7 @@ const CITY_IDS = CITY_DIRECTORY.map((city) => city.id);
 Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
+    demoMode: false,
     profile: null as ProfilePrivateDto | null,
     creatingProfile: false,
     status: 'LOADING' as 'LOADING' | 'READY' | 'SAVING' | 'ERROR' | 'SAVED' | 'PROJECTION_PENDING',
@@ -34,12 +36,30 @@ Page({
   },
 
   onLoad() {
-    this.setData({ runtimeMode: getRuntimeEvidence().runtimeMode });
+    const runtime = getRuntimeEvidence();
+    const demoMode = isOfflineDemo(runtime);
+    if (demoMode) {
+      const cityIndex = OFFLINE_DEMO_PROFILE.cityId ? CITY_IDS.indexOf(OFFLINE_DEMO_PROFILE.cityId) : -1;
+      this.setData({
+        runtimeMode: runtime.runtimeMode,
+        demoMode: true,
+        profile: OFFLINE_DEMO_PROFILE,
+        status: 'READY',
+        displayName: OFFLINE_DEMO_PROFILE.displayName,
+        biography: OFFLINE_DEMO_PROFILE.biography ?? '',
+        biographyLength: (OFFLINE_DEMO_PROFILE.biography ?? '').length,
+        cityIndex,
+        message: 'DEMO_ONLY：你可以试填和生成介绍，但离开页面后不会保留，也不会写入云端。',
+      });
+      return;
+    }
+    this.setData({ runtimeMode: runtime.runtimeMode, demoMode: false });
     void this.loadProfile();
   },
 
   async loadProfile() {
     if (this.data.status === 'SAVING') return;
+    if (this.data.demoMode) return;
     this.setData({ status: 'LOADING', message: '' });
     const result = await getMyProfile();
     if (!result.ok) {
@@ -128,6 +148,13 @@ Page({
 
   async saveProfile() {
     if (this.data.status === 'SAVING') return;
+    if (this.data.demoMode) {
+      this.setData({
+        status: 'READY',
+        message: '未保存：这是 SYNTHETIC · DEMO_ONLY 本页草稿。配置授权云环境后才能提交真实资料。',
+      });
+      return;
+    }
     const profile = this.data.profile;
     if (!profile && !this.data.creatingProfile) {
       this.setData({ status: 'ERROR', message: '资料版本尚未加载，无法安全保存。' });

@@ -232,6 +232,12 @@ Page({
   handleRelatedEventTap(event: WechatMiniprogram.TouchEvent) {
     const eventId = String(event.currentTarget.dataset.eventId ?? '');
     if (!eventId) return;
+    const cityId = String(event.currentTarget.dataset.cityId ?? '');
+    const recordOrigin = String(event.currentTarget.dataset.recordOrigin ?? '');
+    if (this.data.runtimeMode === RuntimeMode.OFFLINE_DEMO && recordOrigin === 'SYNTHETIC' && cityId) {
+      wx.navigateTo({ url: `/packageEvents/pages/event/index?demoEventId=${encodeURIComponent(eventId)}` });
+      return;
+    }
     wx.navigateTo({ url: `/packageEvents/pages/event/index?eventId=${encodeURIComponent(eventId)}` });
   },
 

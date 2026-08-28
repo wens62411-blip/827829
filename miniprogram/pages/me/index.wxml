@@ -1,7 +1,8 @@
 <view class="card-page">
-  <text class="card-kicker">Account</text>
-  <text class="card-title">我的</text>
-  <text class="card-subtitle">管理完整资料、字段隐私与分享入口。私密资料不会进入公开名片。</text>
+  <text class="card-kicker">PRIVATE DESK</text>
+  <text class="card-title">我的 AB Club</text>
+  <text class="card-subtitle">管理个人资料、逐字段隐私，以及需要人工审核的公开标签。</text>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 所有资料均为合成示例</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载个人资料"></view>
 
@@ -18,9 +19,27 @@
         <text class="card-meta__label">当前昵称</text>
         <text class="card-meta__value">{{profile.displayName}}</text>
       </view>
-      <view class="card-runtime">资料完整度 {{completionPercent}}%</view>
+      <view class="card-runtime">{{demoMode ? '示例字段 ' : '资料完整度 '}}{{completionPercent}}%</view>
     </view>
     <view wx:if="{{profile.phoneMasked}}" class="card-status">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开投影。</view>
+  </view>
+
+  <ab-profile-card
+    wx:if="{{demoMode && profile}}"
+    card="{{demoCard}}"
+    viewer-mode="SELF"
+    city-label="苏黎世"
+    fields="{{demoFields}}"
+    show-default-actions="{{false}}"
+  />
+
+  <view wx:if="{{demoMode}}" class="card-panel card-panel--wine">
+    <text class="card-panel__eyebrow">REVIEW DESK · DEMO</text>
+    <text class="card-panel__title">公开标签状态</text>
+    <view wx:for="{{demoReviewItems}}" wx:key="label" class="card-review-item">
+      <view class="card-row"><text class="card-review-item__label">{{item.label}}</text><text class="card-review-item__state">{{item.state}}</text></view>
+      <text class="card-review-item__note">{{item.note}}</text>
+    </view>
   </view>
 
   <view class="card-panel">
@@ -39,5 +58,5 @@
     </navigator>
   </view>
 
-  <view class="card-status">运行模式：{{runtimeMode}}。本地离线或云失败时，本页不会展示模拟资料。</view>
+  <view class="card-status">{{demoMode ? '离线示例只展示产品结构，不会建立账户、保存资料、提交审核或生成真实分享。' : '运行模式：' + runtimeMode + '。云端失败时不会回退到模拟资料。'}}</view>
 </view>

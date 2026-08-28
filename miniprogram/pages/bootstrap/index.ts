@@ -1,8 +1,18 @@
-import {
-  bootstrapIdentity,
-  getRuntimeEvidence,
-  type IdentityClientFailure,
-} from '../card/services/identity-client';
+import type { IdentityClientFailure } from '../card/services/identity-client';
+
+declare const require: (path: string) => typeof import('../card/services/identity-client');
+
+function getBootstrapRuntime(): { readonly runtimeMode: string; readonly cloudConfigured: boolean } {
+  try {
+    const app = getApp<{ globalData?: { runtimeMode?: string; cloudEnvironmentConfigured?: boolean } }>();
+    return {
+      runtimeMode: app.globalData?.runtimeMode ?? 'OFFLINE_DEMO',
+      cloudConfigured: app.globalData?.cloudEnvironmentConfigured === true,
+    };
+  } catch (_error) {
+    return { runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false };
+  }
+}
 
 function bootstrapFailureMessage(failure: IdentityClientFailure): string {
   if (failure.code === 'AUTH_REQUIRED' || failure.code === 'SESSION_EXPIRED') {
@@ -16,17 +26,20 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     cloudConfigured: false,
+    demoMode: true,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'ERROR',
-    message: '',
+    message: 'DEMO_ONLY：可直接进入公开体验；身份、资料和认证均不会被伪造。',
   },
 
   onLoad() {
-    const runtime = getRuntimeEvidence();
+    const runtime = getBootstrapRuntime();
+    const demoMode = runtime.runtimeMode === 'OFFLINE_DEMO' && !runtime.cloudConfigured;
     this.setData({
       runtimeMode: runtime.runtimeMode,
       cloudConfigured: runtime.cloudConfigured,
+      demoMode,
       ...(!runtime.cloudConfigured
-        ? { message: '当前为本地离线环境，身份初始化不会伪造成功。配置授权云环境后可重试。' }
+        ? { message: 'DEMO_ONLY：可浏览合成示例；不会创建身份、保存资料或产生认证。' }
         : {}),
     });
     if (runtime.cloudConfigured) void this.initializeIdentity();
@@ -34,7 +47,12 @@ Page({
 
   async initializeIdentity() {
     if (this.data.status === 'LOADING') return;
+    if (this.data.demoMode) {
+      this.setData({ message: '当前没有授权云环境，未创建微信身份。你仍可进入 DEMO_ONLY 公开体验。' });
+      return;
+    }
     this.setData({ status: 'LOADING', message: '正在安全初始化微信身份…' });
+    const { bootstrapIdentity } = require('../card/services/identity-client');
     const result = await bootstrapIdentity();
     if (!result.ok) {
       this.setData({ status: 'ERROR', message: bootstrapFailureMessage(result) });
@@ -49,6 +67,6 @@ Page({
   },
 
   continueOffline() {
-    wx.switchTab({ url: '/pages/discover/index' });
+    wx.switchTab({ url: '/pages/card/index' });
   },
 });
