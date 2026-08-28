@@ -19,8 +19,8 @@ test('card integration manifest follows the frozen overall plus gates schema', (
   assert.equal(manifest.module, 'card');
   assert.equal(manifest.phase, 'FEATURE_MODULE');
   assert.equal(manifest.contractVersion, '1.0.0');
-  assert.equal(manifest.overall, 'INCOMPLETE');
-  assert.equal(manifest.gates.local.status, 'FAIL');
+  assert.equal(manifest.overall, 'LOCAL_TEST_PASS');
+  assert.equal(manifest.gates.local.status, 'PASS');
   for (const gate of ['devtoolsPreview', 'iosDevice', 'androidDevice', 'devVersionUpload', 'release']) {
     assert.equal(manifest.gates[gate].status, 'UNVERIFIED', gate);
   }

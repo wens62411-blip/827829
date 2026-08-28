@@ -11,12 +11,12 @@ import {
   safeShareTitle,
   sanitizePublicCard,
 } from '../card/services/card-presenter';
+import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../card/services/offline-demo';
+import { normalizeCardTheme, type CardTheme } from '../card/services/card-theme-preference';
 
 type ShareReference = { readonly token: string } | { readonly scene: string };
 type ShareState = 'SUCCESS' | 'EXPIRED' | 'REVOKED' | 'ERROR' | 'LOADING';
 
-let activeReference: ShareReference | undefined;
-let resolvingShare = false;
 const frozenShareEntry = createShareEntryPage('名片分享入口', 'CARD');
 
 function stateForFailure(failure: IdentityClientFailure): {
@@ -41,6 +41,10 @@ function stateForFailure(failure: IdentityClientFailure): {
 
 Page({
   ...frozenShareEntry,
+  shareReference: undefined as ShareReference | undefined,
+  shareResolveGeneration: 0,
+  shareResolving: false,
+  shareUnloaded: false,
   data: {
     ...frozenShareEntry.data,
     runtimeMode: 'OFFLINE_DEMO',
@@ -51,33 +55,81 @@ Page({
     allowForward: false,
     card: null as PublicCardProjection | null,
     cityLabel: '',
+    demoMode: false,
+    demoFields: OFFLINE_DEMO_FIELDS,
+    cardTheme: 'ivory' as CardTheme,
   },
 
   onLoad(options: Record<string, string | undefined>) {
+    this.shareUnloaded = false;
+    this.shareReference = undefined;
+    this.shareResolveGeneration += 1;
+    this.shareResolving = false;
     frozenShareEntry.onLoad.call(this, options);
-    this.setData({ runtimeMode: getRuntimeEvidence().runtimeMode });
+    const runtime = getRuntimeEvidence();
+    const cardTheme = normalizeCardTheme(options.theme);
+    this.setData({ runtimeMode: runtime.runtimeMode, cardTheme, demoMode: false });
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+    if (options.demo === '1') {
+      if (!isOfflineDemo(runtime)) {
+        this.setData({
+          state: 'ERROR',
+          stateTitle: '演示入口不可用',
+          stateDescription: '当前运行环境不接受演示名片入口，请由名片本人重新生成安全分享。',
+          allowRetry: false,
+          allowForward: false,
+          card: null,
+          cityLabel: '',
+        });
+        return;
+      }
+      this.setData({
+        state: 'SUCCESS',
+        stateTitle: 'AB Club 名片体验',
+        stateDescription: '这张名片由体验版真实转发，人物与资料均为合成演示，不代表真实会员、审核或人脉关系。',
+        allowRetry: false,
+        allowForward: true,
+        demoMode: true,
+        card: OFFLINE_DEMO_CARD,
+        cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
+      });
+      wx.showShareMenu({ menus: ['shareAppMessage'] });
+      return;
+    }
     const normalized = normalizeShareReference(options);
     if (!normalized.ok) {
-      activeReference = undefined;
       this.setData({
         state: 'ERROR',
         stateTitle: '入口不可用',
         stateDescription: normalized.message,
         allowRetry: false,
+        allowForward: false,
+        card: null,
+        cityLabel: '',
       });
       return;
     }
-    activeReference = normalized.reference;
+    this.shareReference = normalized.reference;
+    this.setData({
+      state: 'LOADING',
+      stateTitle: '正在核验分享入口',
+      stateDescription: '服务端会重新检查过期、撤销、拉黑、好友关系和认证有效性。',
+      allowRetry: true,
+      allowForward: false,
+      card: null,
+      cityLabel: '',
+    });
   },
 
   onShow() {
-    if (activeReference) void this.resolveShare();
+    if (this.shareReference) void this.resolveShare();
   },
 
   onUnload() {
-    activeReference = undefined;
-    resolvingShare = false;
+    this.shareUnloaded = true;
+    this.shareReference = undefined;
+    this.shareResolveGeneration += 1;
+    this.shareResolving = false;
   },
 
   onPullDownRefresh() {
@@ -85,11 +137,19 @@ Page({
   },
 
   async resolveShare(fromPullDown: boolean = false) {
-    if (!activeReference || resolvingShare) {
+    const reference = this.shareReference;
+    if (!reference || this.shareResolving || this.shareUnloaded) {
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
     }
-    resolvingShare = true;
+    this.shareResolving = true;
+    const generation = ++this.shareResolveGeneration;
+    const requestIsCurrent = () => (
+      !this.shareUnloaded
+      && this.shareResolving
+      && this.shareResolveGeneration === generation
+      && this.shareReference === reference
+    );
     this.setData({
       state: 'LOADING',
       stateTitle: '正在重新核验',
@@ -97,45 +157,56 @@ Page({
       card: null,
       allowForward: false,
     });
-    const result = await resolveCardShare(activeReference);
-    if (!result.ok) {
-      const failureState = stateForFailure(result);
+    try {
+      const result = await resolveCardShare(reference);
+      if (!requestIsCurrent()) return;
+      if (!result.ok) {
+        const failureState = stateForFailure(result);
+        this.setData({
+          ...failureState,
+          allowRetry: result.retryable || result.code === 'TOKEN_INVALID',
+          allowForward: false,
+        });
+        return;
+      }
+      if (
+        result.data.resolution.targetType !== 'CARD' ||
+        result.data.resolution.targetId !== result.data.resolution.card.cardId
+      ) {
+        this.setData({
+          state: 'ERROR',
+          stateTitle: '入口类型不匹配',
+          stateDescription: '这个入口不是数字名片，请返回正确页面重新打开。',
+          allowRetry: false,
+          allowForward: false,
+        });
+        return;
+      }
       this.setData({
-        ...failureState,
-        allowRetry: result.retryable || result.code === 'TOKEN_INVALID',
-        allowForward: false,
+        state: 'SUCCESS',
+        stateTitle: '分享入口有效',
+        stateDescription: '以下内容是服务端按当前查看关系实时生成的最小公开投影。',
+        allowRetry: true,
+        allowForward: true,
+        card: sanitizePublicCard(result.data.resolution.card),
+        cityLabel: cityDisplayName(result.data.resolution.card.cityId),
       });
-      resolvingShare = false;
-      if (fromPullDown) wx.stopPullDownRefresh();
-      return;
-    }
-    if (
-      result.data.resolution.targetType !== 'CARD' ||
-      result.data.resolution.targetId !== result.data.resolution.card.cardId
-    ) {
+      wx.showShareMenu({ menus: ['shareAppMessage'] });
+    } catch (_error) {
+      if (!requestIsCurrent()) return;
       this.setData({
         state: 'ERROR',
-        stateTitle: '入口类型不匹配',
-        stateDescription: '这个入口不是数字名片，请返回正确页面重新打开。',
-        allowRetry: false,
+        stateTitle: '暂时无法打开',
+        stateDescription: '分享入口核验未完成，未展示任何未经核验的名片内容。请稍后重试。',
+        allowRetry: true,
         allowForward: false,
       });
-      resolvingShare = false;
-      if (fromPullDown) wx.stopPullDownRefresh();
-      return;
+    } finally {
+      if (this.shareResolveGeneration === generation) {
+        this.shareResolving = false;
+        if (fromPullDown && !this.shareUnloaded) wx.stopPullDownRefresh();
+      }
     }
-    this.setData({
-      state: 'SUCCESS',
-      stateTitle: '分享入口有效',
-      stateDescription: '以下内容是服务端按当前查看关系实时生成的最小公开投影。',
-      allowRetry: true,
-      allowForward: true,
-      card: sanitizePublicCard(result.data.resolution.card),
-      cityLabel: cityDisplayName(result.data.resolution.card.cityId),
-    });
-    resolvingShare = false;
-    wx.showShareMenu({ menus: ['shareAppMessage'] });
-    if (fromPullDown) wx.stopPullDownRefresh();
   },
 
   handleRetry() {
@@ -144,16 +215,26 @@ Page({
 
   onShareAppMessage() {
     const card = this.data.card;
-    if (!activeReference || !card || this.data.state !== 'SUCCESS') {
+    const reference = this.shareReference;
+    const themeQuery = this.data.cardTheme === 'ivory'
+      ? ''
+      : `&theme=${encodeURIComponent(this.data.cardTheme)}`;
+    if (!this.shareUnloaded && this.data.demoMode && card && this.data.state === 'SUCCESS') {
+      return {
+        title: 'AB Club · 数字名片体验',
+        path: `/pages/card-share/index?demo=1${themeQuery}`,
+      };
+    }
+    if (this.shareUnloaded || !reference || !card || this.data.state !== 'SUCCESS') {
       wx.showToast({ title: '当前入口不可转发', icon: 'none' });
       return { title: 'AB Club', path: '/pages/discover/index' };
     }
-    const query = 'token' in activeReference
-      ? `token=${encodeURIComponent(activeReference.token)}`
-      : `scene=${encodeURIComponent(activeReference.scene)}`;
+    const query = 'token' in reference
+      ? `token=${encodeURIComponent(reference.token)}`
+      : `scene=${encodeURIComponent(reference.scene)}`;
     return {
       title: safeShareTitle(card.displayName),
-      path: `/pages/card-share/index?${query}`,
+      path: `/pages/card-share/index?${query}${themeQuery}`,
     };
   },
 });

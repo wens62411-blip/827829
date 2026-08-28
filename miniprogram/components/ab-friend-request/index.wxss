@@ -28,7 +28,7 @@
 }
 
 .request__avatar--fallback {
-  color: var(--ab-color-green);
+  color: var(--ab-color-ink);
   font-size: 24rpx;
   font-weight: 700;
 }
@@ -67,8 +67,8 @@
 }
 
 .request__button::after { border: 0; }
-.request__button--primary { background: var(--ab-color-green); color: #fff; }
-.request__button--quiet { border: 2rpx solid var(--ab-color-border); background: transparent; color: var(--ab-color-green); }
+.request__button--primary { background: var(--ab-color-ink); color: #fff; }
+.request__button--quiet { border: 2rpx solid var(--ab-color-border); background: transparent; color: var(--ab-color-ink); }
 .request__button--full { width: 100%; margin-top: 28rpx; }
 .request__button[disabled] { opacity: 0.55; }
 

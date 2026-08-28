@@ -1,13 +1,13 @@
 export const AB_COLORS = {
-  deepGreen: '#173C32',
-  green: '#173C32',
-  ivory: '#F6F1E7',
-  goldBrown: '#A67C3D',
-  gold: '#A67C3D',
-  goldSoft: '#D8C197',
-  paperWhite: '#FCFBF7',
-  paper: '#FCFBF7',
-  ink: '#1C2723',
+  ivory: '#F4EFE6',
+  champagneDeep: '#8A6A36',
+  goldBrown: '#98723A',
+  gold: '#AA8448',
+  goldSoft: '#DEC89C',
+  stone: '#AAA69D',
+  paperWhite: '#FFFDF8',
+  paper: '#FFFDF8',
+  ink: '#211E1A',
 } as const;
 
 export const AB_LAYOUT = {

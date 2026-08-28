@@ -2,22 +2,23 @@
   "module": "foundation",
   "phase": "FOUNDATION",
   "contractVersion": "1.0.0",
-  "generatedAt": "2026-08-27T07:36:31.066Z",
+  "generatedAt": "2026-08-28T09:53:41.232Z",
   "overall": "LOCAL_TEST_PASS",
   "gates": {
     "local": {
       "status": "PASS",
       "evidence": [
-        "npm run build exited 0 on 2026-08-27",
-        "TypeScript mini, cloud and contract projects exited 0",
-        "44/44 Node tests and 337/337 foundation validations passed",
-        "Cloud runtime source SHA-256 092cbd05d9d4edade3d6df78c796eadce40caeb5c49306c567f21dc20f06a7b1 matched all 13 generated bundles",
-        "Conservative static package estimate 1533034 / 2097152 bytes passed; Developer Tools package result remains UNVERIFIED"
+        "npm run build exited 0 on 2026-08-28; all mini-program, cloud-function and contract TypeScript projects passed",
+        "npm run validate exited 0 with 337/337 validations passed",
+        "The full Node suite reported 277 passed, 0 failed and 6 optional miniprogram-simulate tests skipped because jsdom is not installed; the skipped simulator cases are not claimed as passed",
+        "Cloud runtime source SHA-256 4f54b0888ea0693f6f062f4083a23a1d4567c9056d842942d7402bb1e98e24df matched all 13 generated bundles",
+        "Conservative static package estimate passed at 1995249 / 2097152 bytes; actual WeChat Developer Tools package measurement remains UNVERIFIED",
+        "Asset gates passed for 13 city photographs and 3 editorial event photographs: every local JPEG is 1152x648 and matches its SHA-256 plus source/license manifest"
       ]
     },
     "devtoolsPreview": {
       "status": "UNVERIFIED",
-      "evidence": ["No authorized AppID or WeChat Developer Tools evidence"]
+      "evidence": ["The local private project configuration contains the user-authorized AppID, but the desktop is locked and the WeChat Developer Tools IDE service port is closed; no compile or preview evidence was produced"]
     },
     "iosDevice": {
       "status": "UNVERIFIED",
@@ -29,7 +30,7 @@
     },
     "devVersionUpload": {
       "status": "UNVERIFIED",
-      "evidence": ["LOCAL_ONLY_NO_APPID cannot establish upload evidence"]
+      "evidence": ["An authorized AppID exists only in local private configuration; no Developer Tools dev-version upload evidence was produced"]
     },
     "release": {
       "status": "UNVERIFIED",
@@ -62,9 +63,9 @@
     }
   ],
   "knownGaps": [
-    "No feature business workflow is implemented",
-    "No authorized WeChat AppID or CloudBase environment is configured",
+    "No production CloudBase environment, deployed adapter, indexes or trusted runtime context is verified",
     "Developer Tools, device, upload and release gates are unverified",
+    "Six optional miniprogram-simulate cases were skipped because jsdom is not installed; they are not local simulator-pass evidence",
     "Real payment remains disabled"
   ]
 }

@@ -184,6 +184,10 @@ nodeOrganizerLabel: '主理人未提供',
 }
 },
 backToEvents() {
+if (getCurrentPages().length > 1) {
+void wx.navigateBack();
+return;
+}
 void wx.switchTab({ url: '/pages/events/index' });
 },
 });

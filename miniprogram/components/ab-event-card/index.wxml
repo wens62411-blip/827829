@@ -1,1 +1,50 @@
-<view class="card" aria-role="article" aria-label="活动 {{title}}，{{evidenceLabel}}"><view class="card__media" aria-role="img" aria-label="{{coverAlt}}"><image wx:if="{{coverSrc && !imageFailed}}" class="card__image" src="{{coverSrc}}" mode="aspectFill" lazy-load="true" alt="{{coverAlt}}" aria-label="{{coverAlt}}" binderror="onImageError" /><view wx:else class="card__fallback ab-image-fallback" aria-role="img" aria-label="{{coverAlt}}加载失败"><text class="card__fallback-mark">AB</text><text>本地图片不可用</text></view><text class="card__evidence">{{evidenceLabel}}</text></view><view class="card__body"><view class="card__topline"><text class="card__city">{{cityName}}</text><text class="card__state">{{stateLabel}}</text></view><text class="card__title">{{title}}</text><text class="card__summary">{{summary}}</text><view class="card__facts" aria-role="group" aria-label="活动时间与报名方式"><view class="card__fact"><text class="card__fact-label">当地时间</text><text class="card__fact-value">{{timeLabel}}</text><text class="card__timezone">{{timezone}}</text></view><view class="card__fact"><text class="card__fact-label">报名方式</text><text class="card__fact-value">{{registrationLabel}}</text></view></view><button wx:if="{{detailAvailable}}" class="card__action" bindtap="openDetail" hover-class="card__action--pressed" aria-label="查看 {{title}} 详情" > 查看活动详情 </button></view></view>
+<view class="card" aria-role="article" aria-label="活动方向 {{title}}，{{evidenceLabel}}">
+  <view class="card__media" aria-role="img" aria-label="{{coverAlt}}">
+    <image
+      wx:if="{{coverSrc && !imageFailed}}"
+      class="card__image"
+      src="{{coverSrc}}"
+      mode="aspectFill"
+      lazy-load="true"
+      alt="{{coverAlt}}"
+      aria-label="{{coverAlt}}"
+      binderror="onImageError"
+    />
+    <view wx:else class="card__fallback ab-image-fallback" aria-role="img" aria-label="{{coverAlt}}加载失败">
+      <text class="card__fallback-mark">图片待补充</text>
+      <text>不使用城市图冒充活动封面</text>
+    </view>
+    <text class="card__evidence">{{evidenceLabel}}</text>
+  </view>
+
+  <view class="card__body">
+    <view class="card__topline">
+      <text class="card__city">{{cityName}}</text>
+      <text class="card__state">{{stateLabel}}</text>
+    </view>
+    <text class="card__title">{{title}}</text>
+    <text class="card__summary">{{summary}}</text>
+
+    <view class="card__facts" aria-role="group" aria-label="活动方向说明">
+      <view class="card__fact">
+        <text class="card__fact-label">当地时间</text>
+        <text class="card__fact-value">{{timeLabel}}</text>
+        <text class="card__timezone">{{timezone}}</text>
+      </view>
+      <view class="card__fact">
+        <text class="card__fact-label">当前阶段</text>
+        <text class="card__fact-value">{{registrationLabel}}</text>
+      </view>
+    </view>
+
+    <button
+      wx:if="{{detailAvailable}}"
+      class="card__action"
+      bindtap="openDetail"
+      hover-class="card__action--pressed"
+      aria-label="查看 {{title}} 方向详情"
+    >
+      查看方向详情
+    </button>
+  </view>
+</view>

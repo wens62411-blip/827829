@@ -2,7 +2,7 @@
 
 This note records platform constraints that changed the foundation configuration. It is not evidence that Developer Tools, a device, CloudBase, upload or release has run.
 
-- WeChat permits 2–5 tab items; tab targets must be declared in the main `pages` list. The five product tabs therefore use the official maximum, and Art remains a normal subpackage route from Discover.
+- WeChat permits 2–5 tab items; tab targets must be declared in the main `pages` list. Phase one uses four card-first tabs (`Card`, `Network`, `Discover`, `Me`); Events and Art remain secondary routes entered from Discover.
 - Ordinary subpackages may consume main-package `shared/**`; independent subpackages may not. No AB Club business package is marked independent, and the main package does not import package-internal code.
 - The Developer Tools TypeScript compiler removes types but does not perform complete type checking. `npm run typecheck` remains an independent required gate.
 - With root `package.json` and `miniprogramRoot: miniprogram/`, npm build needs `packNpmManually` and `packNpmRelationList`; this mapping is present in `project.config.json`.
@@ -20,4 +20,3 @@ Primary references:
 - [wx.cloud.callFunction](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/reference-sdk-api/functions/Cloud.callFunction.html)
 - [Cloud.getWXContext](https://developers.weixin.qq.com/miniprogram/dev/wxcloud/reference-sdk-api/utils/Cloud.getWXContext.html)
 - [TDesign Mini Program 1.16.0 release](https://github.com/Tencent/tdesign-miniprogram/releases/tag/tdesign-miniprogram%401.16.0)
-

@@ -15,7 +15,7 @@
     "build:test-runtime": "tsc -p tests/runtime/tsconfig.json",
     "build:cloud-runtime": "node scripts/build-cloud-runtime.mjs",
     "check:cloud-runtime": "node scripts/check-cloud-runtime.mjs",
-    "test": "npm run check:cloud-runtime && npm run build:test-runtime && node --test --test-isolation=none",
+    "test": "npm run check:cloud-runtime && npm run build:test-runtime && node --test --test-isolation=none \"tests/**/*.test.mjs\"",
     "validate": "node scripts/validate-foundation.mjs",
     "check:package": "node scripts/check-package.mjs",
     "build": "npm run typecheck && npm run validate && npm test && npm run check:package"

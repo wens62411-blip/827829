@@ -1,0 +1,22 @@
+{
+  "fixtureKind": "SYNTHETIC_RED_TEAM_FIXTURE",
+  "productionData": false,
+  "description": "A deliberately forged public claim with no ReviewLog or user public opt-in proof.",
+  "claim": {
+    "claimId": "claim_red_team_no_review_log_001",
+    "labelId": "label_red_team_founder_001",
+    "labelText": {
+      "zh": "红队伪造认证",
+      "en": "Red-team forged verification"
+    },
+    "reviewStatus": "APPROVED",
+    "verificationState": "HUMAN_REVIEWED",
+    "publicVisible": true,
+    "validFrom": "2026-01-01T00:00:00.000Z",
+    "validUntil": "2027-01-01T00:00:00.000Z",
+    "version": 1,
+    "createdAt": "2026-08-27T08:00:00.000Z",
+    "updatedAt": "2026-08-27T08:00:00.000Z"
+  },
+  "reviewLogs": []
+}

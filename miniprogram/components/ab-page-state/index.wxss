@@ -28,7 +28,7 @@
 
 .state__title {
   max-width: 640rpx;
-  color: var(--ab-color-green);
+  color: var(--ab-color-ink);
   font-family: Georgia, "Songti SC", "SimSun", serif;
   font-size: var(--ab-font-title);
   font-weight: 600;

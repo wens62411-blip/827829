@@ -1,62 +1,102 @@
-<view class="card-page">
-  <text class="card-kicker">PRIVATE DESK</text>
-  <text class="card-title">我的 AB Club</text>
-  <text class="card-subtitle">管理个人资料、逐字段隐私，以及需要人工审核的公开标签。</text>
+<view class="card-page me-page">
+  <ab-brand-header
+    eyebrow="PERSONAL SPACE"
+    title="我的"
+    subtitle="管理个人资料、数字名片与所在城市入口。"
+  />
   <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 所有资料均为合成示例</view>
 
-  <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载个人资料"></view>
+  <view wx:if="{{status === 'LOADING'}}" class="card-skeleton me-loading" aria-label="正在加载个人资料"></view>
 
-  <view wx:elif="{{status === 'ERROR'}}" class="card-panel card-panel--error">
+  <view wx:elif="{{status === 'ERROR'}}" class="card-panel card-panel--error me-error">
     <text class="card-panel__title">资料暂时不可用</text>
     <text class="card-panel__text">{{message}}</text>
     <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重试</button>
     <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">创建或完善最小资料</navigator>
   </view>
 
-  <view wx:elif="{{profile}}" class="card-panel card-panel--accent">
-    <view class="card-row card-row--wrap">
-      <view class="card-meta">
-        <text class="card-meta__label">当前昵称</text>
-        <text class="card-meta__value">{{profile.displayName}}</text>
+  <block wx:elif="{{profile}}">
+    <view class="me-profile" aria-role="region" aria-label="我的个人资料摘要">
+      <view class="me-profile__avatar" aria-label="{{profile.displayName}}的文字头像">{{profileInitial}}</view>
+      <view class="me-profile__identity">
+        <text class="me-profile__name">{{profile.displayName}}</text>
+        <text class="me-profile__meta">{{hasProfileCity ? cityName : '尚未选择城市'}} · 名片资料由你管理</text>
+        <text class="me-profile__completion">{{demoMode ? '示例资料' : '资料完整度 ' + completionPercent + '%'}}</text>
       </view>
-      <view class="card-runtime">{{demoMode ? '示例字段 ' : '资料完整度 '}}{{completionPercent}}%</view>
+      <navigator class="me-profile__edit" url="/packageCard/pages/edit/index" hover-class="me-pressed" aria-label="编辑我的名片资料"><image class="me-profile__edit-icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑</text></navigator>
     </view>
-    <view wx:if="{{profile.phoneMasked}}" class="card-status">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开投影。</view>
-  </view>
+    <view wx:if="{{profile.phoneMasked}}" class="me-private-note" aria-role="note">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开名片。</view>
 
-  <ab-profile-card
-    wx:if="{{demoMode && profile}}"
-    card="{{demoCard}}"
-    viewer-mode="SELF"
-    city-label="苏黎世"
-    fields="{{demoFields}}"
-    show-default-actions="{{false}}"
-  />
+    <view class="me-link-group" aria-role="region" aria-label="我的数字名片">
+      <navigator class="me-link-row" open-type="switchTab" url="/pages/card/index" hover-class="me-pressed">
+        <image class="me-link-row__icon" src="/assets/icons/ui-card.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">我的数字名片</text><text class="me-link-row__note">预览、编辑与分享</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+      </navigator>
+    </view>
+  </block>
 
-  <view wx:if="{{demoMode}}" class="card-panel card-panel--wine">
-    <text class="card-panel__eyebrow">REVIEW DESK · DEMO</text>
-    <text class="card-panel__title">公开标签状态</text>
-    <view wx:for="{{demoReviewItems}}" wx:key="label" class="card-review-item">
-      <view class="card-row"><text class="card-review-item__label">{{item.label}}</text><text class="card-review-item__state">{{item.state}}</text></view>
-      <text class="card-review-item__note">{{item.note}}</text>
+  <view class="me-city-group" aria-role="region" aria-label="所在城市群">
+    <view wx:if="{{cityImageSrc && !cityImageFailed}}" class="me-city-group__art">
+      <image
+        class="me-city-group__image"
+        src="{{cityImageSrc}}"
+        mode="aspectFill"
+        lazy-load="{{true}}"
+        alt="{{cityName}}城市群城市景观"
+        binderror="handleCityImageError"
+      />
+      <view class="me-city-group__shade"></view>
+      <text class="me-city-group__city">CURRENT CITY · {{cityName}}</text>
+    </view>
+    <view wx:else class="me-city-group__art me-city-group__art--fallback">
+      <image class="me-city-group__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
+      <text class="me-city-group__city">CITY GROUP · TO BE SELECTED</text>
+    </view>
+
+    <view class="me-city-group__body">
+      <view class="me-city-group__masthead">
+        <text class="me-city-group__kicker">MY LOCAL CIRCLE</text>
+        <text class="me-city-group__evidence">{{demoMode ? '本地示意' : '功能预告'}} · 待运营确认</text>
+      </view>
+      <text class="me-city-group__title">{{cityGroupTitle}}</text>
+      <text class="me-city-group__copy">
+        {{hasProfileCity ? '未来可接收当地艺术活动预告，并认识同城成员。当前不代表城市群已经开放或你已经加入。' : '先在名片资料中选择所在城市，再查看对应的 AB Club 城市群。'}}
+      </text>
+      <view class="me-city-group__actions">
+        <button
+          class="me-city-group__action me-city-group__action--primary"
+          plain="{{true}}"
+          bindtap="handleCityGroupApplication"
+          aria-label="申请加入当前城市群，当前不会真实提交"
+        >申请加入城市群 · 预告</button>
+        <navigator
+          class="me-city-group__action me-city-group__action--secondary"
+          url="/packageCard/pages/edit/index"
+          hover-class="me-pressed"
+          aria-label="前往个人资料切换所在城市"
+        >切换城市</navigator>
+      </view>
+      <text class="me-city-group__boundary" aria-live="polite">当前仅展示未来入口，申请不会真实提交；运营确认后才会提供受控入群方式，群二维码不公开。</text>
     </view>
   </view>
 
-  <view class="card-panel">
-    <text class="card-panel__title">资料与名片</text>
-    <navigator class="card-list-link" url="/packageCard/pages/edit/index" hover-class="none">
-      <text>编辑个人资料</text><text class="card-list-link__arrow">›</text>
+  <view class="me-section-heading">
+    <text class="me-section-heading__kicker">CARD SETTINGS</text>
+    <text class="me-section-heading__title">资料与设置</text>
+  </view>
+  <view class="me-link-group me-link-group--settings" aria-role="region" aria-label="资料与设置">
+    <navigator class="me-link-row" url="/packageCard/pages/edit/index" hover-class="me-pressed">
+      <image class="me-link-row__icon" src="/assets/icons/ui-settings.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">资料与名片</text><text class="me-link-row__note">填写、预览与保存</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
-    <navigator class="card-list-link" url="/packageCard/pages/privacy/index" hover-class="none">
-      <text>逐字段隐私</text><text class="card-list-link__arrow">›</text>
+    <navigator class="me-link-row" url="/packageCard/pages/privacy/index" hover-class="me-pressed">
+      <image class="me-link-row__icon" src="/assets/icons/ui-privacy.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">隐私与分享范围</text><text class="me-link-row__note">查看逐字段规则</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
-    <navigator class="card-list-link" url="/packageCard/pages/share/index" hover-class="none">
-      <text>安全分享与撤销</text><text class="card-list-link__arrow">›</text>
+    <navigator class="me-link-row" url="/packageCard/pages/share/index" hover-class="me-pressed">
+      <image class="me-link-row__icon" src="/assets/icons/ui-share.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">分享入口与撤销</text><text class="me-link-row__note">管理限时名片入口</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
-    <navigator class="card-list-link" open-type="switchTab" url="/pages/card/index" hover-class="none">
-      <text>查看我的公开名片</text><text class="card-list-link__arrow">›</text>
+    <navigator class="me-link-row" url="/packageSocial/pages/tag-status/index" hover-class="me-pressed">
+      <image class="me-link-row__icon" src="/assets/icons/ui-tag.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">公开标签状态</text><text class="me-link-row__note">可选 · 不影响创建或交换名片</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
   </view>
 
-  <view class="card-status">{{demoMode ? '离线示例只展示产品结构，不会建立账户、保存资料、提交审核或生成真实分享。' : '运行模式：' + runtimeMode + '。云端失败时不会回退到模拟资料。'}}</view>
+  <view class="me-evidence-footer" aria-role="note">{{demoMode ? 'SYNTHETIC · DEMO_ONLY：本页不会建立账户、保存资料、提交审核、加入城市群或生成真实分享。' : '真实资料读取失败时不会用示例替代；城市群申请当前仍为功能预告。'}}</view>
 </view>

@@ -1,1 +1,30 @@
 @import "../card/styles/card-theme.wxss";
+
+.share-entry-page {
+  padding-top: 34rpx;
+}
+
+.share-entry-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24rpx;
+}
+
+.share-entry-header > view {
+  min-width: 0;
+  flex: 1;
+}
+
+.share-entry-header__crest {
+  display: block;
+  width: 96rpx;
+  height: 96rpx;
+  flex: 0 0 96rpx;
+}
+
+.share-entry-page ab-share-state,
+.share-entry-page ab-profile-card {
+  display: block;
+  margin-top: 30rpx;
+}

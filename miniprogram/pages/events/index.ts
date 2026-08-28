@@ -1,418 +1,308 @@
 import {
-CITY_DIRECTORY,
-COUNTRY_DIRECTORY,
-CityId,
-REGION_DIRECTORY,
+  CITY_DIRECTORY,
+  COUNTRY_DIRECTORY,
+  REGION_DIRECTORY,
 } from '../../shared/constants/geography';
 import { LOCAL_RUNTIME } from '../../shared/services/runtime';
 import {
-EventState,
-OperationalState,
-PublicationState,
-RecordOrigin,
-RuntimeMode,
-VerificationState,
+  EventState,
+  PublicationState,
+  RecordOrigin,
+  RuntimeMode,
+  VerificationState,
 } from '../../shared/types/enums';
-import type { OperationalState as OperationalStateValue } from '../../shared/types/enums';
 import type { PublicEventProjection } from '../../shared/types/projections';
 import { createRequestId } from '../../shared/utils/request-id';
-import { getCityMediaPresentation } from '../../components/ab-city-hero/city-media';
 import { getEventCloudClient } from '../../components/ab-event-card/cloud-client-loader';
-import { listDemoEvents } from '../../components/ab-event-card/demo-data';
-interface CityOptionView {
-readonly id: (typeof CITY_DIRECTORY)[number]['id'];
-readonly label: string;
-readonly nameEn: string;
-readonly timezone: string;
-readonly regionLabel: string;
-readonly countryLabel: string;
-readonly groupStart: boolean;
-readonly catalogLabel: 'ACTIVE';
-readonly operationalState: OperationalStateValue;
-readonly operationalLabel: string;
+import { DISCOVER_DEMO_EVENTS } from '../../components/ab-event-card/demo-data';
+
+const ALL_COUNTRIES = 'all' as const;
+
+interface CountryFilterView {
+  readonly id: string;
+  readonly label: string;
+  readonly nameEn: string;
+  readonly count: number;
+  readonly selected: boolean;
 }
-interface CityHeroView extends CityOptionView {
-readonly imageSrc: string;
-readonly imageAlt: string;
-readonly photoCredit: string;
-readonly operationEvidence: string;
-readonly mediaRightsLabel: 'CLAIMED · DRAFT';
+
+interface CityPreviewView {
+  readonly id: string;
+  readonly name: string;
+  readonly nameEn: string;
+  readonly countryName: string;
+  readonly regionName: string;
+  readonly timezone: string;
+  readonly imageSrc: string;
+  readonly imageAlt: string;
+  readonly imageFailed: boolean;
 }
+
 interface EventCardView {
-readonly eventId: string;
-readonly title: string;
-readonly summary: string;
-readonly cityName: string;
-readonly timeLabel: string;
-readonly timezone: string;
-readonly stateLabel: string;
-readonly registrationLabel: string;
-readonly origin: string;
-readonly verificationState: string;
-readonly coverSrc: string;
-readonly coverAlt: string;
-readonly detailAvailable: boolean;
-readonly startsAtEpoch: number;
+  readonly eventId: string;
+  readonly title: string;
+  readonly summary: string;
+  readonly cityName: string;
+  readonly timeLabel: string;
+  readonly timezone: string;
+  readonly stateLabel: string;
+  readonly registrationLabel: string;
+  readonly origin: string;
+  readonly verificationState: string;
+  readonly coverSrc: string;
+  readonly coverAlt: string;
+  readonly detailAvailable: boolean;
 }
-const OPERATIONAL_LABELS: Readonly<Record<OperationalStateValue, string>> = {
-[OperationalState.PLANNED]: '筹备中',
-[OperationalState.RECRUITING_HOST]: '招募主理人',
-[OperationalState.PILOT]: '小范围试运营',
-[OperationalState.LIVE]: '运营中',
-[OperationalState.PAUSED]: '暂停运营',
-[OperationalState.DISABLED]: '停止开放',
-};
+
 const EVENT_STATE_LABELS: Readonly<Record<string, string>> = {
-[EventState.DRAFT]: '草稿',
-[EventState.SUBMITTED]: '待审核',
-[EventState.UNDER_REVIEW]: '审核中',
-[EventState.PUBLISHED]: '已发布',
-[EventState.PAUSED]: '已暂停',
-[EventState.CANCELLED]: '已取消',
-[EventState.COMPLETED]: '已结束',
-[EventState.REJECTED]: '未通过',
+  [EventState.PUBLISHED]: '公开信息',
+  [EventState.PAUSED]: '已暂停',
+  [EventState.COMPLETED]: '已结束',
 };
-const TYPE_FILTERS = [
-{ id: 'ALL', label: '全部类型' },
-{ id: 'SALON', label: '主题沙龙' },
-{ id: 'CULTURE', label: '艺术文化' },
-{ id: 'DINING', label: '餐叙交流' },
-] as const;
-const TIME_FILTERS = [
-{ id: 'ALL', label: '全部时间' },
-{ id: 'NEXT_7_DAYS', label: '未来 7 天' },
-{ id: 'NEXT_30_DAYS', label: '未来 30 天' },
-] as const;
-const PRICE_FILTERS = [
-{ id: 'ALL', label: '全部价格' },
-{ id: 'FREE', label: '免费' },
-{ id: 'PAID', label: '付费' },
-] as const;
-const ACCESS_FILTERS = [
-{ id: 'ALL', label: '全部准入' },
-{ id: 'OPEN', label: '公开参与' },
-{ id: 'MEMBER', label: '会员参与' },
-] as const;
-function buildCityOptions(
-operationalByCity: ReadonlyMap<string, OperationalStateValue> = new Map(),
-): CityOptionView[] {
-let previousCountry = '';
-return CITY_DIRECTORY.map((city) => {
-const country = COUNTRY_DIRECTORY.find((item) => item.id === city.parentId);
-const region = REGION_DIRECTORY.find((item) => item.id === city.regionId);
-const operationalState = operationalByCity.get(city.id) ?? OperationalState.PLANNED;
-const groupStart = previousCountry !== city.parentId;
-previousCountry = city.parentId;
-return {
-id: city.id,
-label: city.name.zh,
-nameEn: city.name.en,
-timezone: city.timezone,
-regionLabel: region?.name.zh ?? '全球',
-countryLabel: country?.name.zh ?? '国家/地区待核验',
-groupStart,
-catalogLabel: 'ACTIVE',
-operationalState,
-operationalLabel: OPERATIONAL_LABELS[operationalState],
+
+const DEMO_COVERS: Readonly<Record<string, { src: string; alt: string }>> = {
+  'demo:discover:zurich-private-collection': {
+    src: '/assets/editorial-events/jewelry-study.jpg',
+    alt: '珠宝博物馆展厅与陈列柜，用于收藏交流方向视觉参考',
+  },
+  'demo:discover:hangzhou-brand-art-dinner': {
+    src: '/assets/editorial-events/private-table.jpg',
+    alt: '布置完成的餐桌与餐具，用于小型餐叙方向视觉参考',
+  },
+  'demo:discover:singapore-founders-night': {
+    src: '/assets/editorial-events/gallery-salon.jpg',
+    alt: '光线柔和的美术馆展厅，用于城市交流方向视觉参考',
+  },
 };
-});
+
+function buildCountryFilters(selectedId: string): CountryFilterView[] {
+  const countryFilters: CountryFilterView[] = [
+    {
+      id: ALL_COUNTRIES,
+      label: '全部',
+      nameEn: 'All cities',
+      count: CITY_DIRECTORY.length,
+      selected: selectedId === ALL_COUNTRIES,
+    },
+  ];
+
+  for (const country of COUNTRY_DIRECTORY) {
+    countryFilters.push({
+      id: country.id,
+      label: country.name.zh,
+      nameEn: country.name.en,
+      count: CITY_DIRECTORY.filter((city) => city.parentId === country.id).length,
+      selected: selectedId === country.id,
+    });
+  }
+  return countryFilters;
 }
-function toHero(city: CityOptionView, formalStateLoaded = false): CityHeroView {
-const media = getCityMediaPresentation(city.id);
-return {
-...city,
-imageSrc: `/assets/cities/${city.id}.jpg`,
-imageAlt: media.alt,
-photoCredit: media.credit,
-operationEvidence: formalStateLoaded
-? '运营状态来自 eventApi · 不等于活动已核验'
-: 'CONTENT_LIVE_UNVERIFIED · 安全默认筹备中',
-mediaRightsLabel: 'CLAIMED · DRAFT',
-};
+
+function buildCityPreviews(countryId: string): CityPreviewView[] {
+  return CITY_DIRECTORY.filter((city) => countryId === ALL_COUNTRIES || city.parentId === countryId)
+    .map((city) => {
+      const country = COUNTRY_DIRECTORY.find((candidate) => candidate.id === city.parentId);
+      const region = REGION_DIRECTORY.find((candidate) => candidate.id === city.regionId);
+      return {
+        id: city.id,
+        name: city.name.zh,
+        nameEn: city.name.en,
+        countryName: country?.name.zh ?? '国家待确认',
+        regionName: region?.name.zh ?? '区域待确认',
+        timezone: city.timezone,
+        imageSrc: `/assets/cities/${city.id}.jpg`,
+        imageAlt: `${city.name.zh}城市实景，用于全球城市目录视觉预览`,
+        imageFailed: false,
+      };
+    });
 }
+
 function formatLocalTime(startsAt: string, timezone: string): string {
-const date = new Date(startsAt);
-if (Number.isNaN(date.getTime())) return '时间待核验';
-try {
-return new Intl.DateTimeFormat('zh-CN', {
-timeZone: timezone,
-month: 'short',
-day: 'numeric',
-weekday: 'short',
-hour: '2-digit',
-minute: '2-digit',
-hour12: false,
-}).format(date);
-} catch {
-return '时间待核验';
+  const date = new Date(startsAt);
+  if (Number.isNaN(date.getTime())) return '时间待确认';
+  try {
+    return new Intl.DateTimeFormat('zh-CN', {
+      timeZone: timezone,
+      month: 'short',
+      day: 'numeric',
+      weekday: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false,
+    }).format(date);
+  } catch {
+    return '时间待确认';
+  }
 }
-}
+
 function toEventCard(event: PublicEventProjection): EventCardView {
-const city = CITY_DIRECTORY.find((item) => item.id === event.cityId);
-const media = getCityMediaPresentation(event.cityId);
-const detailAvailable =
-event.origin === RecordOrigin.REAL &&
-event.verificationState === VerificationState.HUMAN_REVIEWED &&
-event.publicationState === PublicationState.PUBLISHED &&
-(event.state === EventState.PUBLISHED ||
-event.state === EventState.PAUSED ||
-event.state === EventState.COMPLETED);
-return {
-eventId: event.eventId,
-title: event.title,
-summary: event.summary,
-cityName: city?.name.zh ?? '目录城市待核验',
-timeLabel: formatLocalTime(event.startsAt, event.timezone),
-timezone: event.timezone,
-stateLabel: EVENT_STATE_LABELS[event.state] ?? event.state,
-registrationLabel: event.reservationAvailable ? 'INTEREST 兴趣登记' : '主办方官方入口 / 暂无',
-origin: event.origin,
-verificationState: event.verificationState,
-coverSrc: city ? `/assets/cities/${city.id}.jpg` : '',
-coverAlt: city ? media.alt : '活动城市图片不可用',
-detailAvailable,
-startsAtEpoch: Date.parse(event.startsAt),
-};
+  const city = CITY_DIRECTORY.find((item) => item.id === event.cityId);
+  const detailAvailable =
+    event.origin === RecordOrigin.REAL &&
+    event.verificationState === VerificationState.HUMAN_REVIEWED &&
+    event.publicationState === PublicationState.PUBLISHED &&
+    (event.state === EventState.PUBLISHED ||
+      event.state === EventState.PAUSED ||
+      event.state === EventState.COMPLETED);
+
+  return {
+    eventId: event.eventId,
+    title: event.title,
+    summary: event.summary,
+    cityName: city?.name.zh ?? '城市待确认',
+    timeLabel: formatLocalTime(event.startsAt, event.timezone),
+    timezone: event.timezone,
+    stateLabel: EVENT_STATE_LABELS[event.state] ?? '信息待确认',
+    registrationLabel: '一期仅作信息展示',
+    origin: event.origin,
+    verificationState: event.verificationState,
+    coverSrc: '',
+    coverAlt: event.coverAssetId
+      ? '活动封面需要完成独立媒体权利解析后展示'
+      : '该活动尚未提供独立封面',
+    detailAvailable,
+  };
 }
-function buildDemoEventCards(): EventCardView[] {
-return listDemoEvents().map((event) => {
-const media = getCityMediaPresentation(event.cityId);
-return {
-eventId: event.eventId,
-title: event.title,
-summary: event.summary,
-cityName: `${event.cityName} / ${event.cityNameEn}`,
-timeLabel: event.localTimeLabel,
-timezone: event.timezone,
-stateLabel: 'DEMO · 策展提案',
-registrationLabel: 'OFFLINE · 报名未开放',
-origin: RecordOrigin.SYNTHETIC,
-verificationState: VerificationState.USER_DECLARED,
-coverSrc: `/assets/cities/${event.cityId}.jpg`,
-coverAlt: `${media.alt}；用于 DEMO_ONLY 活动策展预览`,
-detailAvailable: true,
-startsAtEpoch: 0,
-};
-});
+
+function buildDemoCards(): EventCardView[] {
+  return DISCOVER_DEMO_EVENTS.map((event) => {
+    const cover = DEMO_COVERS[event.eventId];
+    return {
+      eventId: event.eventId,
+      title: event.title,
+      summary: event.summary,
+      cityName: `${event.cityName} / ${event.cityNameEn}`,
+      timeLabel: '日期与场地待确认',
+      timezone: event.timezone,
+      stateLabel: '方向预览',
+      registrationLabel: '一期不开放报名',
+      origin: RecordOrigin.SYNTHETIC,
+      verificationState: VerificationState.USER_DECLARED,
+      coverSrc: cover?.src ?? '',
+      coverAlt: cover?.alt ?? '活动方向视觉参考',
+      detailAvailable: true,
+    };
+  });
 }
-const DEMO_EVENTS = buildDemoEventCards();
-const INITIAL_CITIES = buildCityOptions();
-const INITIAL_CITY = INITIAL_CITIES.find((city) => city.id === CityId.CN_BEIJING)!;
-let eventRequestGeneration = 0;
+
+let requestGeneration = 0;
+
 Page({
-data: {
-runtimeMode: LOCAL_RUNTIME.mode as string,
-cities: INITIAL_CITIES as CityOptionView[],
-selectedCityId: INITIAL_CITY.id as string,
-selectedCityLabel: INITIAL_CITY.label,
-selectedCityMeta: `${INITIAL_CITY.countryLabel} · ${INITIAL_CITY.timezone}`,
-hero: toHero(INITIAL_CITY),
-browseGlobal: false,
-browseScopeLabel: '当前城市',
-allEvents: [] as EventCardView[],
-events: [] as EventCardView[],
-loading: false,
-stateKind: 'EMPTY',
-stateTitle: '暂无经当前证据核验的活动',
-stateDescription: '北京已进入稳定城市目录，但目录入口存在不等于 AB Club 节点已运营。',
-stateDetail: 'event.list 当前没有可公开记录；不会回退展示虚构活动、报名人数或合作方。',
-typeFilters: TYPE_FILTERS,
-timeFilters: TIME_FILTERS,
-priceFilters: PRICE_FILTERS,
-accessFilters: ACCESS_FILTERS,
-typeFilterIndex: 0,
-timeFilterIndex: 0,
-priceFilterIndex: 0,
-accessFilterIndex: 0,
-extendedFiltersAvailable: false,
-offlineDemo: !LOCAL_RUNTIME.cloudEnvironmentConfigured,
-filterContractNote: '类型、价格、准入字段不在冻结 1.0.0 公开 DTO 中，控件已禁用；时间筛选可用。',
-paymentGateLabel: '真实微信支付 DISABLED · 本页无支付按钮',
-},
-onLoad(query: Record<string, string | undefined>) {
-const stored = wx.getStorageSync('ab-events-city-id') as string;
-const requested = query.cityId || stored;
-const selected = this.data.cities.find((city) => city.id === requested);
-if (selected) this.applySelectedCity(selected);
-void this.refreshDirectoryAndEvents();
-},
-onShow() {
-const stored = wx.getStorageSync('ab-events-city-id') as string;
-if (!stored || stored === this.data.selectedCityId) return;
-const selected = this.data.cities.find((city) => city.id === stored);
-if (!selected) return;
-this.applySelectedCity(selected);
-void this.refreshEvents();
-},
-async onPullDownRefresh() {
-await this.refreshDirectoryAndEvents();
-wx.stopPullDownRefresh();
-},
-applySelectedCity(city: CityOptionView) {
-wx.setStorageSync('ab-events-city-id', city.id);
-this.setData({
-selectedCityId: city.id,
-selectedCityLabel: city.label,
-selectedCityMeta: `${city.countryLabel} · ${city.timezone}`,
-hero: toHero(city, LOCAL_RUNTIME.cloudEnvironmentConfigured),
-browseGlobal: false,
-browseScopeLabel: '当前城市',
-stateDescription: `${city.label}已进入稳定城市目录，但目录入口存在不等于 AB Club 节点已运营。`,
-});
-},
-onCityChange(event: WechatMiniprogram.CustomEvent<{ cityId: string }>) {
-const selected = this.data.cities.find((city) => city.id === event.detail.cityId);
-if (!selected) return;
-this.applySelectedCity(selected);
-void this.refreshEvents();
-},
-toggleBrowseScope() {
-const browseGlobal = !this.data.browseGlobal;
-this.setData({
-browseGlobal,
-browseScopeLabel: browseGlobal ? '全球 13 城' : '当前城市',
-});
-void this.refreshEvents();
-},
-onTimeFilterChange(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
-const parsed = Number(event.detail.value);
-const timeFilterIndex = Number.isInteger(parsed) && TIME_FILTERS[parsed] ? parsed : 0;
-this.setData({ timeFilterIndex });
-this.applyTimeFilter();
-},
-applyTimeFilter() {
-const selected = TIME_FILTERS[this.data.timeFilterIndex] ?? TIME_FILTERS[0];
-if (selected.id === 'ALL') {
-this.setData({ events: this.data.allEvents });
-return;
-}
-const now = Date.now();
-const days = selected.id === 'NEXT_7_DAYS' ? 7 : 30;
-const upperBound = now + days * 24 * 60 * 60 * 1000;
-this.setData({
-events: this.data.allEvents.filter(
-(event) => event.startsAtEpoch >= now && event.startsAtEpoch <= upperBound,
-),
-});
-},
-async refreshDirectoryAndEvents() {
-await this.refreshDirectory();
-await this.refreshEvents();
-},
-async refreshDirectory() {
-if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) return;
-const { callCloudAction } = getEventCloudClient();
-try {
-const result = await callCloudAction('geo.listCities', createRequestId(), {
-contractVersion: '1.0.0',
-});
-if (!result.apiResult.ok) return;
-const stateMap = new Map<string, OperationalStateValue>(
-result.apiResult.data.cities.map((city) => [city.id, city.operationalState]),
-);
-const cities = buildCityOptions(stateMap);
-const selected = cities.find((city) => city.id === this.data.selectedCityId) ?? cities[0];
-if (!selected) return;
-this.setData({
-cities,
-selectedCityLabel: selected.label,
-selectedCityMeta: `${selected.countryLabel} · ${selected.timezone}`,
-hero: toHero(selected, true),
-});
-} catch {
-}
-},
-async refreshEvents() {
-const requestGeneration = ++eventRequestGeneration;
-const selected = this.data.cities.find((city) => city.id === this.data.selectedCityId);
-if (!selected) return;
-const browseGlobal = this.data.browseGlobal;
-const isCurrent = () =>
-requestGeneration === eventRequestGeneration &&
-this.data.selectedCityId === selected.id &&
-this.data.browseGlobal === browseGlobal;
-if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
-const allEvents = DEMO_EVENTS.filter(
-(event) => browseGlobal || event.eventId === `demo:${selected.id}`,
-);
-this.setData({
-runtimeMode: RuntimeMode.OFFLINE_DEMO,
-allEvents,
-events: allEvents,
-loading: false,
-offlineDemo: true,
-stateKind: 'EMPTY',
-stateTitle: '暂无可展示的策展预览',
-stateDescription: browseGlobal
-? '13 个城市入口均已加载 DEMO_ONLY 策展卡；它们不是实际排期。'
-: `${selected.label}的本地策展卡暂不可用。`,
-stateDetail: 'OFFLINE_DEMO 只演示浏览结构，不生成报名、支付、主理人审核或运营成功证据。',
-filterContractNote: 'OFFLINE_DEMO 仅开放城市与跨城浏览；类型、时间、价格和准入不模拟筛选结果。',
-});
-return;
-}
-const { callCloudAction } = getEventCloudClient();
-this.setData({ loading: true });
-try {
-const payload = browseGlobal
-? { contractVersion: '1.0.0' as const, limit: 20 }
-: { contractVersion: '1.0.0' as const, limit: 20, cityId: selected.id };
-const result = await callCloudAction('event.list', createRequestId(), payload);
-if (!isCurrent()) return;
-if (!result.apiResult.ok) {
-this.showListFailure(result.apiResult.error.message);
-return;
-}
-const allEvents = result.apiResult.data.page.items.map(toEventCard);
-this.setData({
-runtimeMode: RuntimeMode.LIVE,
-offlineDemo: false,
-allEvents,
-events: allEvents,
-loading: false,
-stateKind: 'EMPTY',
-stateTitle: '暂无可公开活动',
-stateDescription: browseGlobal
-? '当前全球目录没有通过公开门的活动。'
-: `${selected.label}当前没有通过公开门的活动。`,
-stateDetail: '目录、节点运营和活动供给是三个独立事实。',
-});
-this.applyTimeFilter();
-} catch {
-if (isCurrent()) this.showListFailure('本次正式请求失败，请稍后重试。');
-}
-},
-showListFailure(message: string) {
-this.setData({
-runtimeMode: RuntimeMode.DEGRADED,
-allEvents: [],
-events: [],
-loading: false,
-stateKind: 'ERROR',
-stateTitle: '活动列表暂不可用',
-stateDescription: message,
-stateDetail: '正式运行失败后未回退到 synthetic / DEMO_ONLY 数据。',
-});
-},
-openCityDirectory() {
-void wx.navigateTo({ url: '/packageEvents/pages/city/index' });
-},
-openEvent(event: WechatMiniprogram.CustomEvent<{ eventId: string }>) {
-const eventId = event.detail.eventId;
-if (!eventId) return;
-if (this.data.offlineDemo && eventId.startsWith('demo:')) {
-void wx.navigateTo({
-url: `/packageEvents/pages/event/index?demoCityId=${encodeURIComponent(eventId.slice(5))}`,
-});
-return;
-}
-void wx.navigateTo({
-url: `/packageEvents/pages/event/index?eventId=${encodeURIComponent(eventId)}`,
-});
-},
-openDemoDetail() {
-void wx.navigateTo({
-url: `/packageEvents/pages/event/index?demoCityId=${encodeURIComponent(this.data.selectedCityId)}`,
-});
-},
+  data: {
+    brandLogoFailed: false,
+    runtimeMode: LOCAL_RUNTIME.mode as string,
+    events: buildDemoCards() as EventCardView[],
+    selectedCountryId: ALL_COUNTRIES as string,
+    countryFilters: buildCountryFilters(ALL_COUNTRIES),
+    cityPreviews: buildCityPreviews(ALL_COUNTRIES),
+    loading: false,
+    offlineDemo: !LOCAL_RUNTIME.cloudEnvironmentConfigured,
+    stateKind: 'EMPTY',
+    stateTitle: '当前没有可公开活动',
+    stateDescription: '第一阶段以数字名片交换为核心，活动只保留少量信息预览。',
+    stateDetail: '不会模拟真实排期、报名、支付、商户合作或城市节点运营。',
+  },
+
+  onLoad() {
+    void this.refreshEvents();
+  },
+
+  async onPullDownRefresh() {
+    await this.refreshEvents();
+    wx.stopPullDownRefresh();
+  },
+
+  async refreshEvents() {
+    const generation = ++requestGeneration;
+    if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
+      this.setData({
+        runtimeMode: RuntimeMode.OFFLINE_DEMO,
+        events: buildDemoCards(),
+        loading: false,
+        offlineDemo: true,
+      });
+      return;
+    }
+
+    const { callCloudAction } = getEventCloudClient();
+    this.setData({ loading: true });
+    try {
+      const result = await callCloudAction('event.list', createRequestId(), {
+        contractVersion: '1.0.0',
+        limit: 3,
+      });
+      if (generation !== requestGeneration) return;
+      if (!result.apiResult.ok) {
+        this.showListFailure(result.apiResult.error.message);
+        return;
+      }
+      this.setData({
+        runtimeMode: RuntimeMode.LIVE,
+        offlineDemo: false,
+        events: result.apiResult.data.page.items.map(toEventCard),
+        loading: false,
+      });
+    } catch {
+      if (generation === requestGeneration) this.showListFailure('正式活动信息暂时无法读取。');
+    }
+  },
+
+  showListFailure(message: string) {
+    this.setData({
+      runtimeMode: RuntimeMode.DEGRADED,
+      events: [],
+      loading: false,
+      offlineDemo: false,
+      stateKind: 'ERROR',
+      stateTitle: '活动预览暂不可用',
+      stateDescription: message,
+      stateDetail: '正式请求失败后不会回退为合成活动，也不会生成报名或运营成功证据。',
+    });
+  },
+
+  openCityDirectory() {
+    void wx.navigateTo({ url: '/packageEvents/pages/city/index' });
+  },
+
+  onBrandLogoError() {
+    this.setData({ brandLogoFailed: true });
+  },
+
+  selectCountry(event: WechatMiniprogram.CustomEvent) {
+    const countryId = String(event.currentTarget.dataset.countryId ?? '');
+    if (countryId !== ALL_COUNTRIES && !COUNTRY_DIRECTORY.some((country) => country.id === countryId)) {
+      return;
+    }
+    this.setData({
+      selectedCountryId: countryId,
+      countryFilters: buildCountryFilters(countryId),
+      cityPreviews: buildCityPreviews(countryId),
+    });
+  },
+
+  onCityImageError(event: WechatMiniprogram.CustomEvent) {
+    const failedIndex = Number(event.currentTarget.dataset.index);
+    if (!Number.isInteger(failedIndex) || !this.data.cityPreviews[failedIndex]) return;
+    this.setData({
+      cityPreviews: this.data.cityPreviews.map((city, index) =>
+        index === failedIndex ? { ...city, imageFailed: true } : city),
+    });
+  },
+
+  openCity(event: WechatMiniprogram.CustomEvent) {
+    const cityId = String(event.currentTarget.dataset.cityId ?? '');
+    if (!CITY_DIRECTORY.some((city) => city.id === cityId)) return;
+    void wx.navigateTo({
+      url: `/packageEvents/pages/city/index?cityId=${encodeURIComponent(cityId)}`,
+    });
+  },
+
+  openEvent(event: WechatMiniprogram.CustomEvent<{ eventId: string }>) {
+    const eventId = event.detail.eventId;
+    if (!eventId) return;
+    const query = eventId.startsWith('demo:')
+      ? `demoEventId=${encodeURIComponent(eventId)}`
+      : `eventId=${encodeURIComponent(eventId)}`;
+    void wx.navigateTo({ url: `/packageEvents/pages/event/index?${query}` });
+  },
 });

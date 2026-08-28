@@ -15,7 +15,7 @@
 }
 
 .label::after { border: 0; }
-.label--selected { border-color: var(--ab-color-green); box-shadow: inset 8rpx 0 0 var(--ab-color-green); }
+.label--selected { border-color: var(--ab-color-ink); box-shadow: inset 8rpx 0 0 var(--ab-color-ink); }
 .label[disabled] { opacity: 0.55; }
 .label__topline { display: flex; align-items: center; justify-content: space-between; gap: 20rpx; }
 .label__name,
@@ -23,7 +23,7 @@
 .label__description,
 .label__notice { display: block; }
 .label__name { font-size: 32rpx; font-weight: 700; }
-.label__choice { color: var(--ab-color-green); font-size: 24rpx; font-weight: 700; }
+.label__choice { color: var(--ab-color-ink); font-size: 24rpx; font-weight: 700; }
 .label__english { margin-top: 2rpx; color: var(--ab-color-muted); font-size: 24rpx; }
 .label__description { margin-top: 16rpx; font-size: 28rpx; }
 .label__notice { margin-top: 18rpx; color: var(--ab-color-muted); font-size: 22rpx; }

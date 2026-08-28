@@ -3,6 +3,7 @@
   "enablePullDownRefresh": false,
   "backgroundTextStyle": "dark",
   "usingComponents": {
+    "ab-profile-card": "/components/ab-profile-card/index",
     "ab-share-state": "/components/ab-share-state/index"
   }
 }

@@ -37,7 +37,7 @@
     "devVersionUpload": {
       "status": "UNVERIFIED",
       "evidence": [
-        "LOCAL_ONLY_NO_APPID and the missing authorized CloudBase adapter cannot establish development-version upload evidence."
+        "An authorized AppID exists only in local private configuration; the missing authorized CloudBase adapter and absent Developer Tools upload record mean development-version upload remains unverified."
       ]
     },
     "release": {

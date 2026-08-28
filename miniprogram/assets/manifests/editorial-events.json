@@ -1,0 +1,97 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-08-28T09:24:48.298349Z",
+  "evidenceStatus": "LICENSE_SOURCE_VERIFIED_HUMAN_REVIEW_PENDING",
+  "runtimePolicy": "LOCAL_FILES_ONLY_NO_HOTLINK",
+  "processingProfile": {
+    "name": "PREMIUM_EDITORIAL_PREVIEW_V2",
+    "runtimeFormat": "JPEG",
+    "runtimeWidth": 1152,
+    "runtimeHeight": 648,
+    "jpegQuality": 40,
+    "note": "Licensed Commons derivatives center-cropped to 16:9 at 1152px; restrained desaturation, contrast reduction, warm paper blend and package-aware progressive JPEG compression applied."
+  },
+  "rightsProfile": {
+    "rightsState": "CLAIMED",
+    "reviewStatus": "DRAFT",
+    "publicationPolicy": "HUMAN_RIGHTS_REVIEW_REQUIRED",
+    "attributionRequired": true
+  },
+  "assets": [
+    {
+      "id": "gallery-salon",
+      "title": "File:Gallery interior.JPG",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Gallery_interior.JPG",
+      "author": "Tourbillon",
+      "license": "CC BY-SA 3.0",
+      "alt": "光线柔和的美术馆展厅与陈列作品，用于活动方向视觉参考",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Gallery_interior.JPG?width=1920",
+      "sourceDimensions": [
+        1920,
+        1280
+      ],
+      "originalDimensions": [
+        3888,
+        2592
+      ],
+      "sourceSha256": "6f503d04870c0f2002ac36781f24799a1a309df17418a8a5ad15d230c17e4770",
+      "runtimePath": "/assets/editorial-events/gallery-salon.jpg",
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "sha256": "bba4540b4799d6968ff5db9aac7149315bc995fe230529b666cf3415ef55cb6b",
+      "usage": "PHASE_ONE_EDITORIAL_PREVIEW_ONLY_NOT_REAL_EVENT_EVIDENCE"
+    },
+    {
+      "id": "private-table",
+      "title": "File:Table set for dinner in a restaurant.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Table_set_for_dinner_in_a_restaurant.jpg",
+      "author": "Shixart1985",
+      "license": "CC BY 2.0",
+      "alt": "布置完成的餐桌与餐具，用于小型餐叙方向视觉参考",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Table_set_for_dinner_in_a_restaurant.jpg?width=1920",
+      "sourceDimensions": [
+        1920,
+        2886
+      ],
+      "originalDimensions": [
+        4024,
+        6048
+      ],
+      "sourceSha256": "8f4c9dd739b007e136b1e281c92b91f517ce10f8133b56d70b300bdf0c8eea63",
+      "runtimePath": "/assets/editorial-events/private-table.jpg",
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "sha256": "be055c5a79333d483ee3a456af732e553ae6ebc39043ea6f614212758b637275",
+      "usage": "PHASE_ONE_EDITORIAL_PREVIEW_ONLY_NOT_REAL_EVENT_EVIDENCE"
+    },
+    {
+      "id": "jewelry-study",
+      "title": "File:Exhibition room in National Museum of Jewelry.jpg",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Exhibition_room_in_National_Museum_of_Jewelry.jpg",
+      "author": "Hannolans",
+      "license": "CC BY 4.0",
+      "alt": "珠宝博物馆展厅与陈列柜，用于艺术与珠宝交流方向视觉参考",
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Exhibition_room_in_National_Museum_of_Jewelry.jpg?width=1920",
+      "sourceDimensions": [
+        1920,
+        1440
+      ],
+      "originalDimensions": [
+        4032,
+        3024
+      ],
+      "sourceSha256": "5949b440d182d746ca5c8f39d4d77fc0ea1d206c10f09a3f7fe2357f732ef006",
+      "runtimePath": "/assets/editorial-events/jewelry-study.jpg",
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "sha256": "0b708ace8941c0d4e3301814f0cb9bcd2ced15fdf75e92f7ca16a33a3d9167fa",
+      "usage": "PHASE_ONE_EDITORIAL_PREVIEW_ONLY_NOT_REAL_EVENT_EVIDENCE"
+    }
+  ]
+}

@@ -1,6 +1,6 @@
 {
-  "navigationBarTitleText": "首页",
-  "navigationBarBackgroundColor": "#F6F1E7",
+  "navigationBarTitleText": "发现",
+  "navigationBarBackgroundColor": "#F4EFE6",
   "navigationBarTextStyle": "black",
   "enablePullDownRefresh": false
 }

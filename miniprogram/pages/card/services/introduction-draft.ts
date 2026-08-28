@@ -1,6 +1,8 @@
 export interface IntroductionContext {
   readonly displayName: string;
   readonly cityName: string;
+  readonly education?: string;
+  readonly profession?: string;
   readonly industry?: string;
   readonly position?: string;
   readonly interests?: string;
@@ -24,12 +26,18 @@ function cleanPart(value: string | undefined, fallback: string): string {
 export function deterministicIntroduction(context: IntroductionContext): string {
   const name = cleanPart(context.displayName, '一位新朋友');
   const city = cleanPart(context.cityName, '所在城市');
-  const career = [cleanPart(context.industry, ''), cleanPart(context.position, '')]
+  const career = [
+    cleanPart(context.profession, ''),
+    cleanPart(context.industry, ''),
+    cleanPart(context.position, ''),
+  ]
     .filter(Boolean)
     .join(' · ');
-  const interests = cleanPart(context.interests, '认识真诚、有趣的人');
+  const education = cleanPart(context.education, '');
+  const interests = cleanPart(context.interests, '共同成长与真实连接');
   const careerSentence = career ? `目前关注${career}。` : '';
-  return `你好，我是${name}，常驻${city}。${careerSentence}希望在 AB Club 认识同城伙伴，一起${interests}。`.slice(
+  const educationSentence = education ? `曾就读于${education}。` : '';
+  return `你好，我是${name}，常驻${city}。${educationSentence}${careerSentence}希望在 AB Club 围绕${interests}交流，认识真诚且有行动力的同行者。`.slice(
     0,
     MAX_BIOGRAPHY_LENGTH,
   );

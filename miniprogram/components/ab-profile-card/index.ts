@@ -1,6 +1,7 @@
 import { ReviewStatus, VerificationState } from '../../shared/types/enums';
 
 type ViewerMode = 'SELF' | 'FRIEND' | 'STRANGER';
+type CardTheme = 'ivory' | 'ink' | 'champagne' | 'stone';
 
 interface LocalizedLabelInput {
   readonly zh?: unknown;
@@ -45,6 +46,12 @@ interface RenderField {
   readonly value: string;
 }
 
+interface RenderGalleryItem {
+  readonly key: string;
+  readonly url: string;
+  readonly failed: boolean;
+}
+
 interface RenderCard {
   readonly displayName: string;
   readonly headline: string;
@@ -59,7 +66,11 @@ const VIEWER_LABELS: Readonly<Record<ViewerMode, string>> = {
   STRANGER: '访客视角',
 };
 
+const CARD_THEMES = new Set<CardTheme>(['ivory', 'ink', 'champagne', 'stone']);
+
 const FIELD_LABELS: Readonly<Record<string, string>> = {
+  education: '教育',
+  profession: '职业',
   industry: '行业',
   company: '公司',
   position: '职位',
@@ -81,9 +92,16 @@ function safeText(value: unknown, maximumLength: number): string {
   return typeof value === 'string' ? value.trim().slice(0, maximumLength) : '';
 }
 
-function safeMediaUrl(value: unknown): string {
+function safeMediaUrl(value: unknown, allowLocalTemporary: boolean = false): string {
   const candidate = safeText(value, 2048);
-  return /^(?:https:\/\/|cloud:\/\/)/i.test(candidate) ? candidate : '';
+  if (/^(?:https:\/\/|cloud:\/\/)/i.test(candidate)) return candidate;
+  if (allowLocalTemporary && /^(?:wxfile:\/\/|http:\/\/tmp\/)/i.test(candidate)) return candidate;
+  return '';
+}
+
+function normalizeTheme(value: unknown): CardTheme {
+  const candidate = safeText(value, 16).toLowerCase() as CardTheme;
+  return CARD_THEMES.has(candidate) ? candidate : 'ivory';
 }
 
 function displayInitial(displayName: string): string {
@@ -182,6 +200,31 @@ function normalizeOwnerLabels(value: unknown): string[] {
     .slice(0, 12);
 }
 
+function normalizeSelectedLabels(value: unknown): string[] {
+  const seen = new Set<string>();
+  return normalizeOwnerLabels(value).filter((label) => {
+    if (seen.has(label)) return false;
+    seen.add(label);
+    return true;
+  });
+}
+
+function normalizeGallery(value: unknown, viewerMode: ViewerMode): RenderGalleryItem[] {
+  if (viewerMode !== 'SELF' || !Array.isArray(value)) return [];
+  const seen = new Set<string>();
+  const result: RenderGalleryItem[] = [];
+
+  for (const entry of value) {
+    const url = safeMediaUrl(entry, true);
+    if (!url || seen.has(url)) continue;
+    seen.add(url);
+    result.push({ key: `gallery-${result.length}`, url, failed: false });
+    if (result.length === 4) break;
+  }
+
+  return result;
+}
+
 Component({
   options: {
     multipleSlots: true,
@@ -194,6 +237,9 @@ Component({
     fields: { type: Array, value: [] },
     pendingLabels: { type: Array, value: [] },
     rejectedLabels: { type: Array, value: [] },
+    selectedLabels: { type: Array, value: [] },
+    galleryUrls: { type: Array, value: [] },
+    theme: { type: String, value: 'ivory' },
     maxVisibleClaims: { type: Number, value: 4 },
     showDefaultActions: { type: Boolean, value: true },
   },
@@ -202,10 +248,14 @@ Component({
     hasCard: false,
     avatarInitial: 'AB',
     avatarFailed: false,
+    brandFailed: false,
     safeFields: [] as RenderField[],
     safeClaims: [] as RenderClaim[],
     safePendingLabels: [] as string[],
     safeRejectedLabels: [] as string[],
+    safeSelectedLabels: [] as string[],
+    safeGallery: [] as RenderGalleryItem[],
+    safeTheme: 'ivory' as CardTheme,
     claimsExpanded: false,
     claimWindow: 4,
     safeViewerMode: 'STRANGER' as ViewerMode,
@@ -225,6 +275,12 @@ Component({
         safeRejectedLabels: normalizeOwnerLabels(rejectedLabels),
       });
     },
+    'selectedLabels, galleryUrls'(selectedLabels: unknown, galleryUrls: unknown) {
+      this.syncCustomization(this.data.safeViewerMode, selectedLabels, galleryUrls);
+    },
+    theme(value: unknown) {
+      this.setData({ safeTheme: normalizeTheme(value) });
+    },
     viewerMode(value: string) {
       this.syncViewer(value);
     },
@@ -235,19 +291,20 @@ Component({
   },
   lifetimes: {
     attached() {
-      this.syncCard();
       this.syncViewer(this.properties.viewerMode);
+      this.setData({ safeTheme: normalizeTheme(this.properties.theme) });
     },
   },
   methods: {
-    syncCard() {
+    syncCard(forcedViewerMode?: ViewerMode) {
       const input = (this.properties.card ?? {}) as PublicCardInput;
       const displayName = safeText(input.displayName, 120);
+      const viewerMode = forcedViewerMode ?? this.data.safeViewerMode;
       const nextCard: RenderCard = {
         displayName,
         headline: safeText(input.headline, 160),
         cityId: safeText(input.cityId, 96),
-        avatarUrl: safeMediaUrl(input.avatarUrl),
+        avatarUrl: safeMediaUrl(input.avatarUrl, viewerMode === 'SELF'),
         biography: safeText(input.biography, 1200),
       };
       const avatarChanged = nextCard.avatarUrl !== this.data.safeCard.avatarUrl;
@@ -261,6 +318,19 @@ Component({
         ...(avatarChanged ? { avatarFailed: false } : {}),
       });
     },
+    syncCustomization(
+      forcedViewerMode?: ViewerMode,
+      selectedLabels?: unknown,
+      galleryUrls?: unknown,
+    ) {
+      const viewerMode = forcedViewerMode ?? this.data.safeViewerMode;
+      const rawSelectedLabels = selectedLabels === undefined ? this.properties.selectedLabels : selectedLabels;
+      const rawGalleryUrls = galleryUrls === undefined ? this.properties.galleryUrls : galleryUrls;
+      this.setData({
+        safeSelectedLabels: viewerMode === 'SELF' ? normalizeSelectedLabels(rawSelectedLabels) : [],
+        safeGallery: normalizeGallery(rawGalleryUrls, viewerMode),
+      });
+    },
     syncViewer(value: string) {
       const viewerMode: ViewerMode = value === 'SELF' || value === 'FRIEND' ? value : 'STRANGER';
       this.setData({
@@ -268,11 +338,24 @@ Component({
         viewerLabel: VIEWER_LABELS[viewerMode],
         isSelf: viewerMode === 'SELF',
       });
+      this.syncCard(viewerMode);
+      this.syncCustomization(viewerMode);
     },
     handleAvatarError() {
       if (this.data.avatarFailed) return;
       this.setData({ avatarFailed: true });
       this.triggerEvent('avatarerror');
+    },
+    handleBrandError() {
+      if (this.data.brandFailed) return;
+      this.setData({ brandFailed: true });
+    },
+    handleGalleryError(event: WechatMiniprogram.BaseEvent) {
+      const index = Number(event.currentTarget.dataset.index);
+      if (!Number.isInteger(index) || index < 0 || index >= this.data.safeGallery.length) return;
+      if (this.data.safeGallery[index]?.failed) return;
+      this.setData({ [`safeGallery[${index}].failed`]: true });
+      this.triggerEvent('galleryerror', { index });
     },
     handleClaimsToggle() {
       const expanded = !this.data.claimsExpanded;

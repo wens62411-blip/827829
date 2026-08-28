@@ -1,72 +1,164 @@
-<view class="card-page">
-  <text class="card-kicker">Private Profile</text>
-  <text class="card-title">编辑个人资料</text>
-  <text class="card-subtitle">完整资料保存在私密域；公开名片只由服务端投影生成。带“合同待集成”的字段不会被伪装成已保存。</text>
-  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 本页试填不会保存</view>
+<view class="card-page card-editor-page card-editor-page--{{cardTheme}}">
+  <view class="card-editor-header">
+    <view class="card-editor-header__copy">
+      <text class="card-kicker">ONE TEMPLATE · HIGH CONTROL</text>
+      <text class="card-title">我的数字名片</text>
+      <text class="card-subtitle">像职业资料页一样清楚，比传统名片更安静、更有个人表达。</text>
+    </view>
+    <image class="card-editor-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
+  </view>
+
+  <view class="card-editor-tabs" aria-role="tablist" aria-label="名片编辑视图">
+    <button class="card-editor-tab {{editorMode === 'PREVIEW' ? 'card-editor-tab--active' : ''}}" data-mode="PREVIEW" bindtap="setEditorMode" aria-role="tab" aria-selected="{{editorMode === 'PREVIEW'}}">名片预览</button>
+    <button class="card-editor-tab {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-role="tab" aria-selected="{{editorMode === 'EDIT'}}">编辑内容</button>
+  </view>
+
+  <view wx:if="{{demoMode}}" class="card-editor-evidence">SYNTHETIC · DEMO_ONLY · 当前内容仅供本机预览</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载资料"></view>
-
   <view wx:elif="{{status === 'ERROR' && !profile && !creatingProfile}}" class="card-panel card-panel--error">
     <text class="card-panel__title">资料暂时不可编辑</text>
     <text class="card-panel__text">{{message}}</text>
-    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重试</button>
+    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重新加载</button>
   </view>
 
   <block wx:if="{{profile || creatingProfile}}">
-    <view wx:if="{{creatingProfile}}" class="card-status">首次创建资料：保存动作不带未知版本；只有服务端返回真实 profile 后才刷新公开名片。</view>
-    <view class="card-form-section">
-      <text class="card-section-heading">最小资料</text>
-      <text class="card-section-caption">昵称、城市和一句话介绍可通过冻结合同保存。头像上传动作尚未包含在 identity 1.0 合同中。</text>
-
-      <view class="card-field">
-        <view class="card-field__label"><text>昵称</text><text class="card-field__hint">必填 · 最多 60 字</text></view>
-        <input class="card-input" value="{{displayName}}" maxlength="60" bindinput="onDisplayNameInput" disabled="{{status === 'SAVING'}}" placeholder="你的称呼" />
+    <view wx:if="{{editorMode === 'PREVIEW'}}" class="card-editor-preview" aria-role="region" aria-label="名片实时预览">
+      <ab-profile-card
+        card="{{previewCard}}"
+        viewer-mode="SELF"
+        city-label="{{previewCityLabel}}"
+        fields="{{previewFields}}"
+        selected-labels="{{previewSelectedLabels}}"
+        gallery-urls="{{previewGalleryImages}}"
+        theme="{{cardTheme}}"
+        max-visible-claims="3"
+        show-default-actions="{{false}}"
+      />
+      <view class="card-editor-preview__actions">
+        <button class="card-button" data-mode="EDIT" bindtap="setEditorMode">编辑这张名片</button>
+        <navigator class="card-link-button" open-type="switchTab" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
       </view>
+      <text class="card-editor-preview__note">配色、标签和图片会实时预览；未保存的内容不会被公开。</text>
+    </view>
 
-      <view class="card-field">
-        <view class="card-field__label"><text>头像</text><text class="card-field__hint">本地预览，不伪造上传</text></view>
-        <view class="card-avatar-draft">
-          <image wx:if="{{localAvatarUsable}}" class="card-avatar-draft__image" src="{{localAvatarPath}}" mode="aspectFill" binderror="onAvatarImageError" />
-          <view wx:else class="card-avatar-draft__fallback">暂无预览</view>
-          <button class="card-button-secondary" style="width: auto; flex: 1" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{status === 'SAVING'}}">选择微信头像</button>
+    <view wx:else class="card-editor-workspace">
+      <view class="card-editor-section">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">STYLE</text><text class="card-editor-section__title">卡片配色</text></view>
+          <text class="card-editor-section__hint">四套同源主题</text>
         </view>
-        <view wx:if="{{avatarDraftPending}}" class="card-status">所选头像仅在本页临时预览。当前冻结合同没有头像上传动作，保存时不会把临时路径当作云端资产。</view>
-      </view>
-
-      <view class="card-field">
-        <view class="card-field__label"><text>城市</text><text class="card-field__hint">7 国 13 城目录</text></view>
-        <picker range="{{cityNames}}" value="{{cityIndex}}" bindchange="onCityChange" disabled="{{status === 'SAVING'}}">
-          <view class="card-picker">
-            <text>{{cityIndex >= 0 ? cityNames[cityIndex] : '请选择城市'}}</text><text>⌄</text>
+        <view class="card-theme-live card-theme-live--{{cardTheme}}" aria-role="img" aria-label="当前名片配色实时预览">
+          <view class="card-theme-live__topline">
+            <view class="card-theme-live__brand"><image class="card-theme-live__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" aria-hidden="true" /><text>AB Club</text></view>
+            <text>LIVE PREVIEW</text>
           </view>
-        </picker>
+          <view class="card-theme-live__identity">
+            <view class="card-theme-live__avatar">{{previewInitial}}</view>
+            <view class="card-theme-live__copy">
+              <text class="card-theme-live__name">{{previewCard.displayName}}</text>
+              <text class="card-theme-live__headline">{{previewCard.headline}}</text>
+              <text class="card-theme-live__city">{{previewCityLabel || '选择所在城市'}}</text>
+            </view>
+          </view>
+        </view>
+        <view class="card-theme-options" aria-role="group" aria-label="选择名片配色">
+          <button wx:for="{{themeOptions}}" wx:key="value" class="card-theme-option {{item.selected ? 'card-theme-option--selected' : ''}}" data-theme="{{item.value}}" bindtap="selectCardTheme" aria-pressed="{{item.selected}}">
+            <view class="card-theme-option__swatch card-theme-option__swatch--{{item.value}}"></view>
+            <text>{{item.label}}</text>
+          </button>
+        </view>
       </view>
 
-      <view class="card-field">
-        <view class="card-field__label"><text>一句话介绍</text><text class="card-field__hint">可编辑 · 最多 240 字</text></view>
-        <textarea class="card-textarea" value="{{biography}}" maxlength="240" auto-height="{{false}}" bindinput="onBiographyInput" disabled="{{status === 'SAVING'}}" placeholder="一句话介绍你自己" />
-        <text class="card-counter">{{biographyLength}} / 240</text>
-        <button class="card-button-secondary" style="margin-top: 16rpx" bindtap="generateIntroductionDraft" loading="{{generatingIntroduction}}" disabled="{{generatingIntroduction || status === 'SAVING'}}">生成可编辑介绍草稿</button>
-        <view wx:if="{{introductionNote}}" class="card-status">{{introductionNote}}</view>
+      <view class="card-editor-section">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">IDENTITY</text><text class="card-editor-section__title">基本身份</text></view>
+          <text class="card-editor-section__hint">首屏只保留必要信息</text>
+        </view>
+
+        <view class="card-editor-avatar-row">
+          <image wx:if="{{localAvatarUsable}}" class="card-editor-avatar" src="{{localAvatarPath}}" mode="aspectFill" binderror="onAvatarImageError" />
+          <view wx:else class="card-editor-avatar card-editor-avatar--fallback">{{previewInitial}}</view>
+          <button class="card-editor-upload" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{status === 'SAVING'}}">选择头像</button>
+        </view>
+
+        <view class="card-field">
+          <view class="card-field__label"><text>昵称</text><text class="card-field__hint">最多 60 字</text></view>
+          <input class="card-input" value="{{displayName}}" maxlength="60" bindinput="onDisplayNameInput" disabled="{{status === 'SAVING'}}" placeholder="你的公开称呼" />
+        </view>
+
+        <view class="card-field">
+          <view class="card-field__label"><text>一句话身份</text><text class="card-field__hint">例如职业与方向</text></view>
+          <input class="card-input" value="{{profession}}" maxlength="80" bindinput="onProfessionInput" disabled="{{status === 'SAVING'}}" placeholder="独立品牌创始人 · 跨文化商业连接者" />
+        </view>
+
+        <view class="card-field">
+          <view class="card-field__label"><text>所在城市</text><text class="card-field__hint">7 国 13 城</text></view>
+          <picker range="{{cityNames}}" value="{{cityIndex}}" bindchange="onCityChange" disabled="{{status === 'SAVING'}}">
+            <view class="card-picker"><text>{{cityIndex >= 0 ? cityNames[cityIndex] : '请选择城市'}}</text><text>⌄</text></view>
+          </picker>
+        </view>
       </view>
-    </view>
 
-    <view class="card-form-section">
-      <text class="card-section-heading">完整资料</text>
-      <text class="card-section-caption">行业、公司、职位、经历和兴趣尚未进入冻结 ProfileUpdateInput。为防止误导，当前版本不开放伪保存。</text>
-      <view class="card-contract-lock"><text class="card-contract-lock__label">行业 · 公司 · 职位</text><text class="card-contract-lock__reason">合同待集成：当前不会发送未声明字段。</text></view>
-      <view class="card-contract-lock"><text class="card-contract-lock__label">经历</text><text class="card-contract-lock__reason">合同待集成：需要定义私密存储与公开投影字段。</text></view>
-      <view class="card-contract-lock"><text class="card-contract-lock__label">兴趣</text><text class="card-contract-lock__reason">合同待集成：需要同步逐字段可见性。</text></view>
-    </view>
+      <view class="card-editor-section">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">ABOUT</text><text class="card-editor-section__title">自由填写内容</text></view>
+          <text class="card-editor-section__hint">平台不限制表达方式</text>
+        </view>
+        <textarea class="card-textarea card-editor-free-copy" value="{{biography}}" maxlength="240" bindinput="onBiographyInput" disabled="{{status === 'SAVING'}}" placeholder="写下你的经历、关注方向、可提供的资源，或想认识怎样的人。" />
+        <view class="card-editor-copy-tools">
+          <text class="card-counter">{{biographyLength}} / 240</text>
+          <button class="card-editor-ai" bindtap="generateIntroductionDraft" loading="{{generatingIntroduction}}" disabled="{{generatingIntroduction || status === 'SAVING'}}">AI 辅助润色</button>
+        </view>
+        <text wx:if="{{introductionNote}}" class="card-editor-inline-note">{{introductionNote}}</text>
+      </view>
 
-    <view wx:if="{{message}}" class="card-status {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : status === 'SAVED' ? 'card-status--success' : ''}}" aria-live="polite">{{message}}</view>
+      <view class="card-editor-section">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">TAGS</text><text class="card-editor-section__title">预设标签</text></view>
+          <text class="card-editor-section__hint">20 项可多选</text>
+        </view>
+        <text class="card-editor-tag-group">身份类</text>
+        <view class="card-interest-chips">
+          <button wx:for="{{identityTagOptions}}" wx:key="label" class="card-interest-chip {{item.selected ? 'card-interest-chip--selected' : ''}}" data-tag="{{item.label}}" bindtap="toggleProfileTag">{{item.label}}</button>
+        </view>
+        <text class="card-editor-tag-group">兴趣类</text>
+        <view class="card-interest-chips">
+          <button wx:for="{{interestTagOptions}}" wx:key="label" class="card-interest-chip {{item.selected ? 'card-interest-chip--selected' : ''}}" data-tag="{{item.label}}" bindtap="toggleProfileTag">{{item.label}}</button>
+        </view>
+      </view>
 
-    <view class="card-stack">
-      <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{demoMode ? '检查本页草稿（不保存）' : creatingProfile ? '创建最小资料' : '保存合同支持的资料'}}</button>
-      <button wx:if="{{status === 'PROJECTION_PENDING'}}" class="card-button-secondary" bindtap="retryProjectionRefresh">重试公开投影刷新</button>
-      <navigator class="card-link-button" url="/packageCard/pages/privacy/index" hover-class="none">查看逐字段隐私说明</navigator>
+      <view class="card-editor-section">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">GALLERY</text><text class="card-editor-section__title">展示图片</text></view>
+          <text class="card-editor-section__hint">生活、作品或项目</text>
+        </view>
+        <button class="card-editor-gallery-upload" bindtap="chooseGalleryImages">＋ 上传展示图片</button>
+        <text wx:if="{{galleryNote}}" class="card-editor-inline-note">{{galleryNote}}</text>
+        <view wx:if="{{galleryImages.length}}" class="card-editor-gallery">
+          <view wx:for="{{galleryImages}}" wx:key="*this" class="card-editor-gallery__item">
+            <image src="{{item}}" mode="aspectFill" class="card-editor-gallery__image" />
+            <button class="card-editor-gallery__remove" data-index="{{index}}" bindtap="removeGalleryImage" aria-label="移除第 {{index + 1}} 张图片">×</button>
+          </view>
+        </view>
+      </view>
+
+      <view class="card-editor-section card-editor-section--compact">
+        <view class="card-editor-section__heading">
+          <view><text class="card-editor-section__eyebrow">DISPLAY</text><text class="card-editor-section__title">模块显示</text></view>
+          <text class="card-editor-section__hint">自由开关</text>
+        </view>
+        <view class="card-editor-switch-row"><text>显示标签</text><switch color="#a67c3f" checked="{{showTags}}" data-module="tags" bindchange="onModuleToggle" /></view>
+        <view class="card-editor-switch-row"><text>显示图片</text><switch color="#a67c3f" checked="{{showGallery}}" data-module="gallery" bindchange="onModuleToggle" /></view>
+      </view>
+
+      <view wx:if="{{message && (status === 'ERROR' || status === 'SAVED' || status === 'PROJECTION_PENDING')}}" class="card-status {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : 'card-status--success'}}" aria-live="polite">{{message}}</view>
+
+      <view class="card-editor-savebar">
+        <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{demoMode ? '完成本页预览' : creatingProfile ? '创建我的名片' : '保存名片'}}</button>
+        <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode">查看实时效果</button>
+        <text class="card-editor-savebar__note">标签与图片当前仅在本页预览，不会被冒充为已保存或已审核。</text>
+      </view>
     </view>
   </block>
-
-  <view class="card-status">{{demoMode ? '离线演示不会建立账户、上传头像、提交审核或保存任何字段。' : '运行模式：' + runtimeMode + '。AI 草稿只写入可编辑文本框，不读取或修改认证状态。'}}</view>
 </view>

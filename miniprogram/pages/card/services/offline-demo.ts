@@ -39,11 +39,21 @@ export const OFFLINE_DEMO_PROFILE = {
 } satisfies ProfilePrivateDto;
 
 export const OFFLINE_DEMO_FIELDS = [
+  { key: 'education', label: '教育', value: '艺术史与全球商业（合成示例）' },
+  { key: 'profession', label: '职业', value: '跨城市品牌与文化项目（合成示例）' },
   { key: 'industry', label: '方向', value: '全球商业 · 艺术文化' },
   { key: 'company', label: '机构', value: 'AB Atelier（虚构示例）' },
   { key: 'position', label: '角色', value: '跨城市连接者（示例）' },
   { key: 'experience', label: '关注', value: '品牌出海 · 同城活动 · 私人收藏' },
   { key: 'interests', label: '兴趣', value: ['当代艺术', '古董', '珠宝', '城市漫游'] },
+] as const;
+
+/** Owner-only visual choices for the synthetic card preview; never persisted or projected publicly. */
+export const OFFLINE_DEMO_SELECTED_LABELS = [
+  '全球商业',
+  '艺术文化',
+  '古董与珠宝',
+  '城市漫游',
 ] as const;
 
 export const OFFLINE_DEMO_REVIEW_ITEMS = [

@@ -70,7 +70,7 @@ for (const action of actionNames) {
 
 const app = readJson('miniprogram/app.json');
 check(app?.entryPagePath === 'pages/bootstrap/index', 'bootstrap is the explicit entry page');
-check(app?.tabBar?.list?.length === 5, 'tabBar contains exactly five items');
+check(app?.tabBar?.list?.length === 4, 'phase-one tabBar contains exactly four items');
 check(!app?.subpackages?.some((item) => item.independent === true), 'all subpackages can consume main shared contracts');
 
 const project = readJson('project.config.json');
@@ -113,4 +113,3 @@ for (const required of [
 
 console.log(JSON.stringify({ passCount: pass.length, failureCount: failures.length, failures }, null, 2));
 if (failures.length > 0) process.exit(1);
-

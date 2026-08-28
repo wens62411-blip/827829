@@ -1,1 +1,443 @@
 @import "../card/styles/card-theme.wxss";
+
+.me-page {
+  padding-top: 32rpx;
+}
+
+.me-loading,
+.me-error {
+  margin-top: 36rpx;
+}
+
+.me-profile {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  min-height: 148rpx;
+  margin-top: 36rpx;
+  padding: 24rpx 26rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: 20rpx;
+  background: var(--ab-color-paper);
+}
+
+.me-profile__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 92rpx;
+  height: 92rpx;
+  flex: 0 0 92rpx;
+  border: 2rpx solid var(--ab-color-gold-soft);
+  border-radius: 50%;
+  background: var(--ab-color-ivory);
+  color: var(--ab-color-ink);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 34rpx;
+  font-weight: 600;
+}
+
+.me-profile__identity {
+  min-width: 0;
+  flex: 1;
+}
+
+.me-profile__name,
+.me-profile__meta,
+.me-profile__completion {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.me-profile__name {
+  color: var(--ab-color-ink);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 33rpx;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.me-profile__meta {
+  margin-top: 8rpx;
+  color: var(--ab-color-muted);
+  font-size: 22rpx;
+  line-height: 1.45;
+}
+
+.me-profile__completion {
+  margin-top: 6rpx;
+  color: var(--ab-color-champagne-deep);
+  font-size: 20rpx;
+  font-weight: 600;
+}
+
+.me-profile__edit {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88rpx;
+  min-height: 88rpx;
+  flex: 0 0 auto;
+  border-left: 2rpx solid var(--ab-color-border);
+  color: var(--ab-color-champagne-deep);
+  font-size: 24rpx;
+  font-weight: 600;
+  gap: 8rpx;
+}
+
+.me-profile__edit-icon {
+  display: block;
+  width: 28rpx;
+  height: 28rpx;
+}
+
+.me-private-note {
+  display: block;
+  margin: 14rpx 8rpx 0;
+  color: var(--ab-color-muted);
+  font-size: 21rpx;
+  line-height: 1.55;
+}
+
+.me-link-group {
+  margin-top: 22rpx;
+  overflow: hidden;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: 20rpx;
+  background: var(--ab-color-paper);
+}
+
+.me-link-row {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24rpx;
+  min-height: 112rpx;
+  padding: 20rpx 26rpx;
+  border-bottom: 2rpx solid var(--ab-color-border);
+  color: var(--ab-color-ink);
+}
+
+.me-link-row:last-child {
+  border-bottom: 0;
+}
+
+.me-link-row__copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.me-link-row__icon {
+  box-sizing: border-box;
+  display: block;
+  width: 58rpx;
+  height: 58rpx;
+  flex: 0 0 58rpx;
+  padding: 13rpx;
+  border-radius: 18rpx;
+  background: #f3eee5;
+}
+
+.me-link-row__title,
+.me-link-row__note {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.me-link-row__title {
+  font-size: 27rpx;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.me-link-row__note {
+  margin-top: 7rpx;
+  color: var(--ab-color-muted);
+  font-size: 21rpx;
+  line-height: 1.45;
+}
+
+.me-link-row__arrow {
+  flex: 0 0 auto;
+  color: var(--ab-color-champagne-deep);
+  font-family: Georgia, serif;
+  font-size: 38rpx;
+  line-height: 1;
+}
+
+.me-link-row__arrow-image {
+  display: block;
+  width: 28rpx;
+  height: 28rpx;
+  flex: 0 0 28rpx;
+}
+
+.me-city-group {
+  margin-top: 40rpx;
+  overflow: hidden;
+  border: 2rpx solid #3c352d;
+  border-radius: 22rpx;
+  background: var(--ab-color-ink);
+  color: var(--ab-color-paper);
+}
+
+.me-city-group__art {
+  position: relative;
+  height: 236rpx;
+  overflow: hidden;
+  background: #2d2823;
+}
+
+.me-city-group__image,
+.me-city-group__shade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.me-city-group__shade {
+  background: linear-gradient(180deg, rgba(22, 20, 18, 0.08) 16%, rgba(22, 20, 18, 0.78) 100%);
+}
+
+.me-city-group__art--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #2d2823;
+}
+
+.me-city-group__crest {
+  width: 128rpx;
+  height: 128rpx;
+  opacity: 0.92;
+}
+
+.me-city-group__city {
+  position: absolute;
+  right: 24rpx;
+  bottom: 22rpx;
+  left: 24rpx;
+  color: var(--ab-color-gold-soft);
+  font-size: 19rpx;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-align: right;
+}
+
+.me-city-group__body {
+  padding: 28rpx;
+}
+
+.me-city-group__masthead {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 20rpx;
+}
+
+.me-city-group__kicker,
+.me-city-group__evidence,
+.me-city-group__title,
+.me-city-group__copy,
+.me-city-group__boundary {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.me-city-group__kicker {
+  color: var(--ab-color-gold-soft);
+  font-size: 19rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.me-city-group__evidence {
+  flex: 0 0 auto;
+  color: #c9c0b4;
+  font-size: 19rpx;
+  line-height: 1.4;
+  text-align: right;
+}
+
+.me-city-group__title {
+  margin-top: 22rpx;
+  color: var(--ab-color-paper);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 35rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.me-city-group__copy {
+  margin-top: 14rpx;
+  color: #d1c8bc;
+  font-size: 24rpx;
+  line-height: 1.68;
+}
+
+.me-city-group__actions {
+  display: flex;
+  gap: 18rpx;
+  margin-top: 28rpx;
+}
+
+.me-city-group__action {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  min-height: 92rpx;
+  margin: 0;
+  padding: 0 18rpx;
+  border-radius: 18rpx;
+  font-size: 24rpx;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+}
+
+.me-city-group__action::after {
+  border: 0;
+}
+
+.me-city-group__action--primary {
+  flex: 1.35;
+  border: 2rpx solid var(--ab-color-gold-soft);
+  background: transparent;
+  color: var(--ab-color-gold-soft);
+}
+
+.me-city-group__action--secondary {
+  flex: 1;
+  border: 2rpx solid #7a7063;
+  background: transparent;
+  color: var(--ab-color-paper);
+}
+
+.me-city-group__boundary {
+  margin-top: 22rpx;
+  padding-top: 20rpx;
+  border-top: 2rpx solid #4b443b;
+  color: #aaa094;
+  font-size: 20rpx;
+  line-height: 1.6;
+}
+
+.me-section-heading {
+  margin-top: 48rpx;
+}
+
+.me-section-heading__kicker,
+.me-section-heading__title {
+  display: block;
+}
+
+.me-section-heading__kicker {
+  color: var(--ab-color-champagne-deep);
+  font-size: 19rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.me-section-heading__title {
+  margin-top: 10rpx;
+  color: var(--ab-color-ink);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 35rpx;
+  font-weight: 600;
+}
+
+.me-link-group--settings {
+  margin-top: 20rpx;
+}
+
+.me-evidence-footer {
+  display: block;
+  margin-top: 34rpx;
+  padding-top: 22rpx;
+  border-top: 2rpx solid var(--ab-color-border);
+  color: var(--ab-color-muted);
+  font-size: 20rpx;
+  line-height: 1.62;
+}
+
+.me-pressed {
+  opacity: 0.72;
+}
+
+@media (prefers-color-scheme: dark) {
+  .me-profile,
+  .me-link-group {
+    border-color: var(--ab-color-dark-border);
+    background: var(--ab-color-dark-surface);
+  }
+
+  .me-profile__avatar {
+    border-color: var(--ab-color-gold-soft);
+    background: var(--ab-color-dark-canvas);
+    color: var(--ab-color-dark-text);
+  }
+
+  .me-profile__name,
+  .me-link-row,
+  .me-section-heading__title {
+    color: var(--ab-color-dark-text);
+  }
+
+  .me-profile__meta,
+  .me-private-note,
+  .me-link-row__note,
+  .me-evidence-footer {
+    color: var(--ab-color-dark-muted);
+  }
+
+  .me-profile__edit,
+  .me-link-row,
+  .me-evidence-footer {
+    border-color: var(--ab-color-dark-border);
+  }
+
+  .me-profile__edit,
+  .me-profile__completion,
+  .me-link-row__arrow,
+  .me-section-heading__kicker {
+    color: var(--ab-color-gold-soft);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .me-pressed {
+    opacity: 1;
+  }
+}
+
+@media (max-width: 340px) {
+  .me-profile {
+    flex-wrap: wrap;
+  }
+
+  .me-profile__edit {
+    width: 100%;
+    border-top: 2rpx solid var(--ab-color-border);
+    border-left: 0;
+  }
+
+  .me-city-group__masthead,
+  .me-city-group__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .me-city-group__evidence,
+  .me-city-group__city {
+    text-align: left;
+  }
+}

@@ -6,6 +6,7 @@ interface AcceptedCardView {
   readonly displayName: string;
   readonly headline: string;
   readonly avatarUrl: string;
+  readonly avatarInitial: string;
 }
 
 interface DemoRecommendation {
@@ -44,11 +45,13 @@ interface SocialApp {
 }
 
 function toAcceptedCardView(card: PublicCardProjection): AcceptedCardView {
+  const normalizedName = card.displayName.trim();
   return {
     ownerUserId: card.ownerUserId,
     displayName: card.displayName,
     headline: card.headline ?? '',
     avatarUrl: card.avatarUrl ?? '',
+    avatarInitial: normalizedName ? normalizedName.slice(0, 1).toLocaleUpperCase() : '人',
   };
 }
 

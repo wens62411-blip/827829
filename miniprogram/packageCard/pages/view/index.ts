@@ -1,19 +1,34 @@
 import type { UserId } from '../../../shared/types/primitives';
 import type { PublicCardProjection } from '../../../shared/types/projections';
 import {
-  getCardForViewer,
-  getMyCard,
-  getRuntimeEvidence,
-} from '../../../pages/card/services/identity-client';
-import {
   cityDisplayName,
   sanitizePublicCard,
   viewerModeFromRelationship,
   type CardViewerMode,
 } from '../../../pages/card/services/card-presenter';
 import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../../../pages/card/services/offline-demo';
+import { readCardThemePreference, type CardTheme } from '../../../pages/card/services/card-theme-preference';
+
+type IdentityClientModule = typeof import('../../../pages/card/services/identity-client');
+declare const require: (path: string) => IdentityClientModule;
 
 let viewedOwnerUserId: UserId | undefined;
+
+function getCardRuntime(): { readonly runtimeMode: string; readonly cloudConfigured: boolean } {
+  try {
+    const app = getApp<{ globalData?: { runtimeMode?: string; cloudEnvironmentConfigured?: boolean } }>();
+    return {
+      runtimeMode: app.globalData?.runtimeMode ?? 'OFFLINE_DEMO',
+      cloudConfigured: app.globalData?.cloudEnvironmentConfigured === true,
+    };
+  } catch (_error) {
+    return { runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false };
+  }
+}
+
+function loadIdentityClient(): IdentityClientModule {
+  return require('../../../pages/card/services/identity-client');
+}
 
 function parseOwnerUserId(value: string | undefined): UserId | undefined {
   const normalized = value?.trim();
@@ -31,13 +46,22 @@ Page({
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
     message: '',
     invalidOwner: false,
+    demoVisitorPreview: false,
+    viewedOwnerUserId: '',
     cityLabel: '',
+    cardTheme: 'ivory' as CardTheme,
   },
 
   onLoad(options: Record<string, string | undefined>) {
-    const runtime = getRuntimeEvidence();
+    const runtime = getCardRuntime();
     const demoMode = isOfflineDemo(runtime);
-    this.setData({ runtimeMode: runtime.runtimeMode, demoMode });
+    const demoVisitorPreview = demoMode && options.preview === 'STRANGER';
+    this.setData({
+      runtimeMode: runtime.runtimeMode,
+      demoMode,
+      demoVisitorPreview,
+      cardTheme: readCardThemePreference(),
+    });
     if (options.ownerUserId !== undefined) {
       viewedOwnerUserId = parseOwnerUserId(options.ownerUserId);
       if (!viewedOwnerUserId) {
@@ -46,9 +70,12 @@ Page({
           status: 'ERROR',
           message: '名片查看参数无效，请从可信入口重新打开。',
         });
+      } else {
+        this.setData({ viewedOwnerUserId });
       }
     } else {
       viewedOwnerUserId = undefined;
+      this.setData({ viewedOwnerUserId: '' });
     }
   },
 
@@ -64,6 +91,15 @@ Page({
     void this.loadCard(true);
   },
 
+  handleDemoExchange() {
+    wx.showModal({
+      title: '交换功能演示',
+      content: '这是一张合成演示名片，当前不会创建好友申请或人脉记录。真实名片会在你确认后进入申请流程。',
+      showCancel: false,
+      confirmText: '我知道了',
+    });
+  },
+
   async loadCard(fromPullDown: boolean = false) {
     if (this.data.invalidOwner || this.data.status === 'LOADING') {
       if (fromPullDown) wx.stopPullDownRefresh();
@@ -74,14 +110,17 @@ Page({
         status: 'READY',
         card: OFFLINE_DEMO_CARD,
         cityLabel: cityDisplayName(OFFLINE_DEMO_CARD.cityId),
-        viewerMode: 'SELF',
-        message: 'SYNTHETIC · DEMO_ONLY',
+        viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
+        message: this.data.demoVisitorPreview
+          ? 'SYNTHETIC · DEMO_ONLY · 访客视角预览'
+          : 'SYNTHETIC · DEMO_ONLY',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
     }
     this.setData({ status: 'LOADING', message: '', card: null });
     if (!viewedOwnerUserId) {
+      const { getMyCard } = loadIdentityClient();
       const result = await getMyCard();
       if (!result.ok) {
         this.setData({ status: 'ERROR', message: result.message });
@@ -97,6 +136,7 @@ Page({
       return;
     }
 
+    const { getCardForViewer } = loadIdentityClient();
     const result = await getCardForViewer(viewedOwnerUserId);
     if (!result.ok) {
       this.setData({

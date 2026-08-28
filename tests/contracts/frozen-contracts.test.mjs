@@ -358,7 +358,7 @@ test('the generic share contract closes both card and event cold-start flows', (
   assert.match(eventEntry, /createShareEntryPage\('活动分享入口', 'EVENT'\)/);
 });
 
-test('execution evidence and visual tokens stay on the frozen values', () => {
+test('execution evidence stays frozen while visual tokens use the approved phase-one palette', () => {
   const schema = readJson('docs', 'contracts', 'execution-evidence.schema.json');
   assert.deepEqual(schema.properties.phase.enum, [
     'FOUNDATION', 'FEATURE_MODULE', 'FINAL_INTEGRATION',
@@ -371,8 +371,9 @@ test('execution evidence and visual tokens stay on the frozen values', () => {
     'PASS', 'FAIL', 'UNVERIFIED', 'NOT_APPLICABLE',
   ]);
   const tokens = read('miniprogram', 'shared', 'design-tokens', 'tokens.wxss').toUpperCase();
-  ['#173C32', '#F6F1E7', '#A67C3D', '#FCFBF7', '#1C2723'].forEach((color) =>
+  ['#F4EFE6', '#211E1A', '#8A6A36', '#FFFDF8', '#161412'].forEach((color) =>
     assert.match(tokens, new RegExp(color)));
+  assert.doesNotMatch(tokens, /--AB-COLOR-(?:GREEN|WINE|BURGUNDY)\b|#(?:173C32|102821|1D463B|7B3038|6B2637|70464A)/);
   assert.match(tokens, /MIN-HEIGHT: 88RPX/);
   assert.match(tokens, /PREFERS-REDUCED-MOTION/);
 });

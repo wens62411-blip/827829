@@ -1,12 +1,14 @@
 {
   "appid": "",
   "projectname": "ab-club-wechat-local-only",
-  "description": "LOCAL_ONLY：缺少真实 AppID，不可上传或发布",
+  "description": "LOCAL_ONLY：AppID 仅由忽略的本机私有配置提供；预览、上传与发布需独立验证",
   "compileType": "miniprogram",
   "miniprogramRoot": "miniprogram/",
   "cloudfunctionRoot": "cloudfunctions/",
   "setting": {
-    "useCompilerPlugins": ["typescript"],
+    "useCompilerPlugins": [
+      "typescript"
+    ],
     "es6": true,
     "enhance": true,
     "postcss": true,
@@ -24,7 +26,23 @@
         "packageJsonPath": "./package.json",
         "miniprogramNpmDistDir": "./miniprogram/"
       }
-    ]
+    ],
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "condition": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": []
+  },
+  "editorSetting": {}
 }

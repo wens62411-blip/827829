@@ -23,11 +23,12 @@ test('evidence label exposes all honest runtime modes', () => {
 test('visual baseline avoids prohibited patterns and supports accessibility preferences', () => {
   const appStyles = read('miniprogram/app.wxss');
   const tokens = read('miniprogram/shared/design-tokens/tokens.wxss');
-  assert.match(tokens, /#173C32/i);
-  assert.match(tokens, /#F6F1E7/i);
-  assert.match(tokens, /#A67C3D/i);
-  assert.match(tokens, /#FCFBF7/i);
-  assert.match(tokens, /#1C2723/i);
+  assert.match(tokens, /--ab-color-ivory:\s*#F4EFE6/i);
+  assert.match(tokens, /--ab-color-ink:\s*#211E1A/i);
+  assert.match(tokens, /--ab-color-champagne-deep:\s*#8A6A36/i);
+  assert.match(tokens, /--ab-color-paper-white:\s*#FFFDF8/i);
+  assert.match(tokens, /--ab-color-dark-canvas:\s*#161412/i);
+  assert.doesNotMatch(tokens, /--ab-color-(?:green|wine|burgundy)\b|#(?:173C32|102821|1D463B|7B3038|6B2637|70464A)/i);
   assert.match(tokens, /--ab-touch-target:\s*88rpx/);
   assert.match(appStyles, /prefers-reduced-motion/);
   assert.match(appStyles, /safe-area-inset-bottom|safe-area-inset-bottom/s);

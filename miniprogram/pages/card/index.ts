@@ -1,8 +1,14 @@
 import type { PublicCardProjection } from '../../shared/types/projections';
 import type { UtcInstant } from '../../shared/types/primitives';
 import { cityDisplayName, isSafeShareBearer, safeShareTitle, sanitizePublicCard, shareExpiry } from './services/card-presenter';
-import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS, OFFLINE_DEMO_REVIEW_ITEMS, isOfflineDemo } from './services/offline-demo';
+import {
+  OFFLINE_DEMO_CARD,
+  OFFLINE_DEMO_FIELDS,
+  OFFLINE_DEMO_SELECTED_LABELS,
+  isOfflineDemo,
+} from './services/offline-demo';
 import { forgetShareRevocationPointer, isSafeShareTokenId, rememberShareForRevocation } from './services/share-revocation-pointer';
+import { readCardThemePreference, type CardTheme } from './services/card-theme-preference';
 
 type IdentityClientModule = typeof import('./services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -33,7 +39,9 @@ Page({
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
     demoFields: OFFLINE_DEMO_FIELDS,
-    demoReviewItems: OFFLINE_DEMO_REVIEW_ITEMS,
+    demoSelectedLabels: OFFLINE_DEMO_SELECTED_LABELS,
+    demoGalleryUrls: [] as string[],
+    cardTheme: 'ivory' as CardTheme,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
     message: '',
     sharePreparing: false,
@@ -46,11 +54,17 @@ Page({
 
   onLoad() {
     const runtime = getCardRuntime();
-    this.setData({ runtimeMode: runtime.runtimeMode, demoMode: isOfflineDemo(runtime) });
+    this.setData({
+      runtimeMode: runtime.runtimeMode,
+      demoMode: isOfflineDemo(runtime),
+      cardTheme: readCardThemePreference(),
+    });
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
   },
 
   onShow() {
+    const cardTheme = readCardThemePreference();
+    if (cardTheme !== this.data.cardTheme) this.setData({ cardTheme });
     void this.loadCard();
   },
 

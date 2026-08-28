@@ -11,7 +11,7 @@ const componentRoots = [
   'miniprogram/components/ab-event-state',
 ];
 
-test('event components are native accessible components with dark mode and no gradients', () => {
+test('event components are native accessible components with dark mode and only a neutral photo shade', () => {
   for (const root of componentRoots) {
     const config = JSON.parse(read(`${root}/index.json`));
     const template = read(`${root}/index.wxml`);
@@ -19,7 +19,12 @@ test('event components are native accessible components with dark mode and no gr
     assert.equal(config.component, true, root);
     assert.match(template, /aria-(?:label|role)/, root);
     assert.match(styles, /prefers-color-scheme:\s*dark/, root);
-    assert.doesNotMatch(styles, /linear-gradient|radial-gradient|#(?:7c3aed|8b5cf6|a855f7)/i, root);
+    assert.doesNotMatch(styles, /radial-gradient|#(?:7c3aed|8b5cf6|a855f7)/i, root);
+    if (root === 'miniprogram/components/ab-city-hero') {
+      assert.match(styles, /\.hero__shade\s*\{[\s\S]*?background:\s*linear-gradient\(180deg,\s*rgba\(22,\s*20,\s*18,/i, root);
+    } else {
+      assert.doesNotMatch(styles, /linear-gradient/i, root);
+    }
   }
 });
 
@@ -34,12 +39,13 @@ test('event surfaces use the restrained editorial travel system with finite redu
   ];
   const styles = stylePaths.map((path) => read(path)).join('\n');
   assert.match(styles, /#f4efe5/i, 'warm ivory canvas');
-  assert.match(styles, /#173c32/i, 'deep forest green');
-  assert.match(styles, /#7b3038/i, 'restrained wine accent');
+  assert.match(styles, /#211e1a/i, 'ink primary');
+  assert.match(styles, /#8a6a36|#8a6538/i, 'champagne-gold accent');
+  assert.doesNotMatch(styles, /--ab-color-(?:green|wine|burgundy)\b|#(?:173c32|102821|1d463b|7b3038|6b2637|70464a)/i);
   assert.match(styles, /font-family:\s*Georgia[^;]*(?:Songti SC|STSong|SimSun)/i, 'editorial serif stack');
   assert.match(styles, /@keyframes\s+(?:events-editorial-rise|detail-photo-settle|card-photo-settle)/);
   assert.match(styles, /prefers-reduced-motion:\s*reduce/);
-  assert.doesNotMatch(styles, /animation-iteration-count:\s*infinite|box-shadow|linear-gradient|radial-gradient/i);
+  assert.doesNotMatch(styles, /animation-iteration-count:\s*infinite|radial-gradient|#(?:7c3aed|8b5cf6|a855f7)/i);
 });
 
 test('city switcher emits stable city selection and Hero has alt plus local failure fallback', () => {
@@ -57,62 +63,73 @@ test('city switcher emits stable city selection and Hero has alt plus local fail
   assert.match(heroTemplate, /binderror="onImageError"/);
   assert.match(heroTemplate, /bindload="onImageLoad"/);
   assert.match(heroTemplate, /PHOTO CREDIT · \{\{photoCredit\}\}/);
-  assert.match(heroTemplate, /图片加载失败.*无外链替代/s);
+  assert.match(heroTemplate, /本地图片加载失败/);
+  assert.match(heroTemplate, /wx:else[^>]*hero__fallback/);
+  assert.doesNotMatch(`${heroSource}\n${heroTemplate}`, /https?:\/\//);
   assert.match(heroSource, /imageFailed:\s*true/);
   assert.match(heroSource, /photoCredit:\s*\{\s*type:\s*String,\s*value:\s*''\s*\}/);
   assert.match(heroSource, /CLAIMED · DRAFT/);
   assert.doesNotMatch(heroTemplate, /已授权|已清权|HUMAN_REVIEWED/);
 });
 
-test('event discovery consumes frozen geography and keeps unsupported filters out of formal payload', () => {
+test('phase-one event preview consumes frozen geography without sending unsupported filters or signup fields', () => {
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
+  const geography = read('miniprogram/shared/constants/geography.ts');
   assert.match(source, /CITY_DIRECTORY/);
-  assert.match(source, /COUNTRY_DIRECTORY/);
-  assert.match(source, /REGION_DIRECTORY/);
-  assert.match(source, /callCloudAction\('geo\.listCities'/);
   assert.match(source, /callCloudAction\('event\.list'/);
-  assert.match(source, /eventRequestGeneration/);
-  assert.match(source, /if \(!isCurrent\(\)\) return/);
-  assert.match(source, /imageSrc:\s*`\/assets\/cities\/\$\{city\.id\}\.jpg`/);
+  assert.match(source, /let requestGeneration = 0/);
+  assert.match(source, /const generation = \+\+requestGeneration/);
+  assert.match(source, /if \(generation !== requestGeneration\) return/);
+  assert.equal((geography.match(/^\s+\{ id: CityId\./gm) ?? []).length, 13);
+  assert.equal((geography.match(/^\s+\{ id: CountryId\./gm) ?? []).length, 7);
 
-  const payloadBlock = source.slice(source.indexOf('const payload ='), source.indexOf("callCloudAction('event.list'"));
-  assert.match(payloadBlock, /cityId:\s*selected\.id/);
-  assert.match(payloadBlock, /limit:\s*20/);
-  assert.doesNotMatch(payloadBlock, /type|price|access|admission|organizer|capacity|participants/i);
+  const callStart = source.indexOf("callCloudAction('event.list'");
+  const callEnd = source.indexOf('if (generation !== requestGeneration)', callStart);
+  const payloadBlock = source.slice(callStart, callEnd);
+  assert.match(payloadBlock, /contractVersion:\s*'1\.0\.0'/);
+  assert.match(payloadBlock, /limit:\s*3/);
+  assert.doesNotMatch(payloadBlock, /cityId|type|price|access|admission|organizer|capacity|participants|registration/i);
 
-  for (const label of ['类型', '时间', '价格', '准入']) assert.match(template, new RegExp(`>${label}<`));
-  assert.match(template, /disabled="\{\{!extendedFiltersAvailable\}\}"/);
-  assert.match(template, /\{\{browseGlobal \? '只看当前城市' : '跨城浏览'\}\}/);
-  assert.match(template, /当前城市 DEMO_ONLY 详情与边界/);
-  assert.match(template, /真实微信支付 DISABLED|paymentGateLabel/);
+  assert.match(template, /查看 7 国 13 城覆盖范围/);
+  assert.match(source, /url:\s*'\/packageEvents\/pages\/city\/index'/);
+  assert.match(template, /第一阶段不做活动交易、商户入驻或报名闭环/);
+  assert.match(template, /活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段/);
+  assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:立即报名|提交报名|登记兴趣|立即支付|确认支付)/s);
+  assert.match(source, /showListFailure[\s\S]*runtimeMode:\s*RuntimeMode\.DEGRADED[\s\S]*events:\s*\[\]/);
+  assert.match(source, /正式请求失败后不会回退为合成活动/);
 });
 
-test('OFFLINE_DEMO renders one honest, navigable curation card for every frozen city', () => {
+test('OFFLINE_DEMO keeps the 13-city directory while the phase-one list shows only three honest curated previews', () => {
   const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
   const listSource = read('miniprogram/pages/events/index.ts');
   const listTemplate = read('miniprogram/pages/events/index.wxml');
   const detailSource = read('miniprogram/packageEvents/pages/event/index.ts');
+  const detailTemplate = read('miniprogram/packageEvents/pages/event/index.wxml');
 
   assert.match(demoSource, /CITY_DIRECTORY\.findIndex/);
   assert.match(demoSource, /for \(const city of CITY_DIRECTORY\)/);
   assert.match(demoSource, /eventId:\s*`demo:\$\{city\.id\}`/);
   assert.match(demoSource, /DEMO_ONLY.*不代表真实活动已排期/);
   assert.match(demoSource, /DISCOVER_DEMO_EVENTS/);
+  assert.equal((demoSource.match(/eventId:\s*'demo:discover:/g) ?? []).length, 3);
   assert.match(demoSource, /getDemoEventById/);
-  assert.match(listSource, /const DEMO_EVENTS = buildDemoEventCards\(\)/);
-  assert.match(listSource, /browseGlobal \|\| event\.eventId === `demo:\$\{selected\.id\}`/);
-  assert.match(listSource, /this\.data\.offlineDemo && eventId\.startsWith\('demo:'\)/);
-  assert.match(listSource, /demoCityId=\$\{encodeURIComponent\(eventId\.slice\(5\)\)\}/);
-  assert.match(listTemplate, /OFFLINE_DEMO · 策展预览/);
-  assert.match(listTemplate, /不代表 AB Club 已运营、已排期或开放报名/);
-  assert.match(detailSource, /makeDemoDetail\(query\.demoCityId\)/);
-  assert.match(detailSource, /makeDemoDetailByEventId\(query\.demoEventId\)/);
+  assert.match(listSource, /return DISCOVER_DEMO_EVENTS\.map/);
+  assert.match(listSource, /events:\s*buildDemoCards\(\)/);
+  assert.match(listSource, /eventId\.startsWith\('demo:'\)/);
+  assert.match(listSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
+  assert.match(listTemplate, /DEMO_ONLY/);
+  assert.match(listTemplate, /不代表真实排期、场地确认、合作关系或城市节点已运营/);
+  assert.match(listTemplate, /查看 7 国 13 城覆盖范围/);
+  assert.match(detailSource, /query\.demoCityId\s*\?\s*getDemoEventByCityId\(query\.demoCityId\)\s*:\s*undefined/);
+  assert.match(detailSource, /query\.demoEventId\s*\?\s*getDemoEventById\(query\.demoEventId\)\s*:\s*undefined/);
+  assert.match(detailSource, /detail:\s*toDemoDetail\(demo\)/);
   assert.match(detailSource, /displayId:\s*event\.eventId/);
   assert.match(detailSource, /title:\s*event\.title/);
-  assert.match(detailSource, /OFFLINE_DEMO · 当前不可提交/);
-  assert.match(detailSource, /canRegisterInterest:\s*false/);
-  assert.match(detailSource, /不会模拟报名或支付成功/);
+  assert.match(detailSource, /evidenceLabel:\s*'DEMO_ONLY'/);
+  assert.match(detailSource, /第一阶段只作信息预览，不开放活动报名、支付、签到、商户入驻或交易/);
+  assert.match(detailSource, /没有根据任意地址参数创建或替换活动身份/);
+  assert.doesNotMatch(`${listSource}\n${listTemplate}\n${detailSource}\n${detailTemplate}`, /event\.registerInterest|packageEvents\/pages\/enrollment|立即报名|提交报名|登记兴趣/);
   assert.doesNotMatch(demoSource, /HUMAN_REVIEWED|APPROVED|LIVE/);
 });
 
@@ -134,8 +151,9 @@ test('Art synthetic related event preserves its stable identity into event detai
   assert.match(artDemoSource, /summary:ART_RELATED_DEMO_EVENT\.summary/);
   assert.match(artDetailSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
   assert.doesNotMatch(artDetailSource, /demoCityId=\$\{encodeURIComponent\(cityId\)\}/);
-  assert.match(eventDetailSource, /makeDemoDetailByEventId\(query\.demoEventId\)/);
-  assert.match(eventDetailSource, /getDemoEventById\(eventId\)/);
+  assert.match(eventDetailSource, /query\.demoEventId\s*\?\s*getDemoEventById\(query\.demoEventId\)\s*:\s*undefined/);
+  assert.match(eventDetailSource, /detail:\s*toDemoDetail\(demo\)/);
+  assert.match(eventDetailSource, /if \(query\.demoEventId \|\| query\.demoCityId\)/);
 });
 
 test('OFFLINE_DEMO event routes defer cloud-client until after the formal-runtime guard', () => {
@@ -173,31 +191,40 @@ test('OFFLINE_DEMO event routes defer cloud-client until after the formal-runtim
 test('event cards expose evidence and never fabricate registrations, transactions, or partners', () => {
   const source = read('miniprogram/components/ab-event-card/index.ts');
   const template = read('miniprogram/components/ab-event-card/index.wxml');
+  const listSource = read('miniprogram/pages/events/index.ts');
   assert.match(source, /RecordOrigin\.SYNTHETIC/);
   assert.match(source, /DEMO_ONLY/);
   assert.match(source, /CONTENT_LIVE_UNVERIFIED/);
   assert.match(source, /VerificationState\.HUMAN_REVIEWED/);
   assert.match(template, /当地时间/);
-  assert.match(template, /报名方式/);
+  assert.match(template, /当前阶段/);
+  assert.match(template, /\{\{registrationLabel\}\}/);
+  assert.match(listSource, /registrationLabel:\s*'一期不开放报名'/);
   assert.match(template, /alt="\{\{coverAlt\}\}"/);
   assert.match(template, /binderror="onImageError"/);
+  assert.match(template, /查看方向详情/);
+  assert.doesNotMatch(template, /立即报名|提交报名|登记兴趣|立即支付|确认支付/);
   assert.doesNotMatch(`${source}\n${template}`, /报名人数|已售|成交|合作方|模拟支付成功/);
 });
 
-test('detail view exposes required facts while marking missing contract fields honestly', () => {
+test('phase-one detail exposes only preview facts, rights provenance, and an explicit no-signup boundary', () => {
   const source = read('miniprogram/packageEvents/pages/event/index.ts');
   const template = read('miniprogram/packageEvents/pages/event/index.wxml');
-  for (const marker of ['DEMO_ONLY', 'CONTENT_LIVE_UNVERIFIED', '来源字段未在冻结', '容量字段待合同扩展', '不得默认“两人成团”']) {
+  for (const marker of ['DEMO_ONLY', 'CONTENT_LIVE_UNVERIFIED', '本地合成策展文案', 'editorial-events manifest', '第一阶段只作信息预览']) {
     assert.match(source, new RegExp(marker));
   }
-  for (const label of ['主理人', '活动来源', '当地时间', 'IANA 时区', '地址范围', '准入', '报名方式', '容量', '最少成团人数', '图片权利', '图片来源 / 许可', '支付能力']) {
+  for (const label of ['状态', '当地时间', 'IANA 时区', '内容来源', '第一阶段边界']) {
     assert.match(template, new RegExp(label));
   }
-  assert.match(source, /describeTimezoneDifference/);
+  assert.match(source, /realRecord && humanReviewed \? 'HUMAN_REVIEWED' : 'CONTENT_LIVE_UNVERIFIED'/);
+  assert.match(source, /第一阶段仍只作公开信息展示；报名、支付与签到入口不会在本客户端开放/);
+  assert.match(template, /\{\{detail\.displayId\}\}/);
   assert.match(template, /alt="\{\{detail\.imageAlt\}\}"/);
   assert.match(template, /binderror="onImageError"/);
+  assert.match(template, /不会使用城市照片冒充具体活动/);
   assert.doesNotMatch(`${source}\n${template}`, /wx\.requestPayment|requestPayment/);
-  assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:立即支付|确认支付)/s);
+  assert.doesNotMatch(`${source}\n${template}`, /event\.registerInterest|packageEvents\/pages\/enrollment/);
+  assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:立即报名|提交报名|登记兴趣|立即支付|确认支付)/s);
 });
 
 test('interest writes cannot inject trusted fields and preserve idempotency keys across unknown results', () => {

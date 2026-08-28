@@ -21,7 +21,7 @@
     <button
       wx:for="{{options}}"
       wx:key="value"
-      class="privacy-field__option {{selectedVisibility === item.value ? 'privacy-field__option--selected' : ''}}"
+      class="privacy-field__option {{selectedVisibility === item.value ? 'privacy-field__option--selected' : ''}} {{disabled || sensitive ? 'privacy-field__option--disabled' : ''}}"
       plain="{{true}}"
       disabled="{{disabled || sensitive}}"
       data-visibility="{{item.value}}"

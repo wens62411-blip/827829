@@ -2,7 +2,7 @@
   "module": "admin",
   "phase": "FEATURE_MODULE",
   "contractVersion": "1.0.0",
-  "generatedAt": "2026-08-27T12:42:41.702Z",
+  "generatedAt": "2026-08-28T09:53:41.232Z",
   "overall": "BLOCKED",
   "gates": {
     "local": {
@@ -13,12 +13,12 @@
         "adminApi-only strict TypeScript compilation exited 0; npm run typecheck:miniprogram, npm run typecheck:cloud and npm run typecheck:contracts each exited 0 in the latest repository run.",
         "Frozen contract, route, default-entrypoint and cross-module-boundary tests exited 0: 24/24 passed. The final adminApi/index.js is byte-identical to an in-memory rebuild with the project esbuild settings, is self-contained, and its default main still returns NOT_IMPLEMENTED."
       ],
-      "note": "This is local module evidence only. The default production main remains NOT_IMPLEMENTED, no CloudBase adapter is bound, and the explicit fixture states productionData=false and humanOperationsTeamEstablished=false. Repository-wide typechecks pass, while the full build and conservative whole-miniprogram package estimate have separate failures recorded below."
+      "note": "This is local module evidence only. The default production main remains NOT_IMPLEMENTED, no CloudBase adapter is bound, and the explicit fixture states productionData=false and humanOperationsTeamEstablished=false. The 2026-08-28 repository-wide build and conservative package estimate pass, but they do not upgrade this module's production or operations evidence."
     },
     "devtoolsPreview": {
       "status": "UNVERIFIED",
       "evidence": [
-        "LOCAL_ONLY_NO_APPID: no WeChat Developer Tools preview, network trace or screenshot evidence is recorded."
+        "The local private project configuration contains the user-authorized AppID, but no WeChat Developer Tools preview, network trace or screenshot evidence is recorded."
       ]
     },
     "iosDevice": {
@@ -36,7 +36,7 @@
     "devVersionUpload": {
       "status": "UNVERIFIED",
       "evidence": [
-        "No AppID, bound CloudBase environment, production RBAC allowlist, development-version upload or remote transaction evidence is available."
+        "An authorized AppID exists only in local private configuration; no bound CloudBase environment, production RBAC allowlist, development-version upload or remote transaction evidence is available."
       ]
     },
     "release": {
@@ -156,8 +156,8 @@
     },
     {
       "id": "repository-wide-build-and-package",
-      "status": "FAIL",
-      "evidence": "npm run build exited 1 at check:cloud-runtime because the aggregate generated bundle set begins with stale out-of-scope cloudfunctions/_shared/auth/index.js; all three typecheck stages and validate (337/337) passed earlier in that same build. At observedAt=2026-08-27T12:42:26.118Z, npm run check:package separately exited 1 with sourceBytesExcludingBuiltNpm=722189, conservativeProjectedBytes=2123434 over sourceBudgetBytes=2097152, builtNpmPresent=false and devtoolsPackageGate=UNVERIFIED; this volatile whole-miniprogram estimate spans modules outside the admin ownership boundary."
+      "status": "PASS",
+      "evidence": "npm run build exited 0 on 2026-08-28: all three TypeScript projects passed, validate reported 337/337, Node reported 277 passed, 0 failed and 6 optional miniprogram-simulate skips because jsdom is not installed, aggregate cloud runtime hash 4f54b0888ea0693f6f062f4083a23a1d4567c9056d842942d7402bb1e98e24df matched, and the conservative static package estimate passed at 1995249 / 2097152 bytes. Developer Tools package measurement remains UNVERIFIED."
     }
   ],
   "knownGaps": [
@@ -166,7 +166,7 @@
     "Frozen OrganizerReviewResponse always requires PublicOrganizerProjection, whose state is APPROVED/HUMAN_REVIEWED. organizer.review therefore returns NOT_IMPLEMENTED for REJECT and REQUEST_CHANGES rather than fabricating a public approved organizer.",
     "The structured claim revocation proof binds the claim source/version and local reviewCaseId, but frozen shared projections expose no claim-to-review-case association proof. Real cross-module binding remains an integration requirement.",
     "No frozen admin actions exist for a standalone user view or mutation, city-node mutation, feature-flag read or mutation, orders, or refunds. The client exposes only the minimal redacted report target plus public city data and explicit unavailable/read-only states; it never invents the missing capabilities.",
-    "Repository-wide build currently stops at the aggregate cloud-runtime staleness check. At 2026-08-27T12:42:26.118Z the volatile whole-miniprogram conservative static estimate was 2123434 bytes against 2097152, and the actual Developer Tools package gate remains UNVERIFIED. This estimate spans modules outside the admin ownership boundary; no generated bundles or source files outside that boundary were changed to mask those failures.",
+    "The repository-wide build and conservative static package estimate pass as of 2026-08-28, but the actual Developer Tools package measurement remains UNVERIFIED and the remaining source-budget margin is 101903 bytes.",
     "Developer Tools preview, iOS, Android, real CloudBase concurrency, upload and release are UNVERIFIED.",
     "All local records are explicitly SYNTHETIC_TEST_FIXTURE with productionData=false and humanOperationsTeamEstablished=false. A developer clicking test controls is not represented as an established operations review team."
   ]

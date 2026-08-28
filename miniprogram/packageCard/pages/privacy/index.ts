@@ -48,8 +48,8 @@ const CONTRACT_PENDING_FIELDS: readonly PrivacyFieldView[] = [
     sensitive: false,
     helper: '不能把本地选择冒充服务端隐私设置。',
   },
-  ...['行业', '公司', '职位', '经历', '兴趣'].map((label, index) => ({
-    fieldKey: ['industry', 'company', 'position', 'experience', 'interests'][index] ?? `optional-${index}`,
+  ...['教育', '职业', '行业', '公司', '职位', '经历', '兴趣'].map((label, index) => ({
+    fieldKey: ['education', 'profession', 'industry', 'company', 'position', 'experience', 'interests'][index] ?? `optional-${index}`,
     label,
     value: '完整资料字段',
     visibility: '',

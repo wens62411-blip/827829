@@ -2,7 +2,7 @@
   "module": "art",
   "phase": "FEATURE_MODULE",
   "contractVersion": "1.0.0",
-  "generatedAt": "2026-08-27T11:48:00.000Z",
+  "generatedAt": "2026-08-28T09:53:41.232Z",
   "overall": "LOCAL_TEST_PASS",
   "gates": {
     "local": {
@@ -10,15 +10,15 @@
       "evidence": [
         "ART_SCOPED_PASS: npm run typecheck:miniprogram exited 0; isolated strict TypeScript for contentApi exited 0.",
         "ART_SCOPED_PASS: contentApi 17/17, art manifest/scope/client/screenshot 23/23, and miniprogram-simulate 6/6 tests passed.",
-        "REPOSITORY_SNAPSHOT_PASS: one full npm run build exited 0 with all TypeScript projects, 337/337 foundation validations, the cloud runtime hash gate and package estimate passing.",
-        "CURRENT_INTEGRATION_BLOCKER: the final npm run build rerun exited 1 only because 13 out-of-scope city JPG hashes no longer match their city asset manifest; art tests remained green."
+        "REPOSITORY_SNAPSHOT_PASS: npm run build exited 0 on 2026-08-28 with all TypeScript projects, 337/337 foundation validations, 277 Node tests passed, 0 failed and 6 optional miniprogram-simulate cases skipped because jsdom is not installed.",
+        "INTEGRATION_ASSET_PASS: all 13 city and 3 editorial event JPEGs are 1152x648 and match their SHA-256 plus source/license manifests; the earlier city hash mismatch is resolved."
       ],
       "note": "Feature evidence cannot exceed LOCAL_TEST_PASS; no Developer Tools, device, upload or release evidence exists."
     },
     "devtoolsPreview": {
       "status": "UNVERIFIED",
       "evidence": [
-        "LOCAL_ONLY_NO_APPID; no WeChat Developer Tools preview evidence."
+        "The local private project configuration contains the user-authorized AppID, but no WeChat Developer Tools compile or preview evidence has been produced."
       ]
     },
     "iosDevice": {
@@ -36,7 +36,7 @@
     "devVersionUpload": {
       "status": "UNVERIFIED",
       "evidence": [
-        "No AppID, upload key or authorized dev-version upload."
+        "An authorized AppID exists only in local private configuration; no upload key or Developer Tools dev-version upload evidence was produced."
       ]
     },
     "release": {
@@ -129,22 +129,21 @@
     {
       "id": "conservative-package-budget",
       "status": "PASS",
-      "evidence": "npm run check:package exited 0 at 2096508 / 2097152 bytes with no missing route files; this is a static source estimate, not Developer Tools evidence."
+      "evidence": "npm run check:package exited 0 on 2026-08-28 at 1995249 / 2097152 bytes with no missing route files; this is a static source estimate, not Developer Tools evidence."
     },
     {
       "id": "production-cloudbase-adapter",
       "status": "FAIL",
-      "evidence": "The seven-action createContentApiEndpoint is implemented and locally tested, but the deployable main remains the frozen NOT_IMPLEMENTED fallback because no authorized CloudBase repository, transaction, auth environment or AppID was supplied."
+      "evidence": "The seven-action createContentApiEndpoint is implemented and locally tested, but the deployable main remains the frozen NOT_IMPLEMENTED fallback because no authorized CloudBase repository, transaction or trusted authentication environment was supplied."
     }
   ],
   "knownGaps": [
     "No authorized CloudBase production repository, trusted-principal adapter or transaction runner is configured; direct deployment of the default contentApi main would return NOT_IMPLEMENTED.",
     "The frozen shared PublicContentProjection does not statically expose art provenance and category fields; the art module uses a backward-compatible local intersection extension without changing shared contracts.",
-    "The current whole-repository build is not green: the out-of-scope city asset manifest test reports hashMismatch for all 13 city JPG files. The art module did not modify those assets or their manifest.",
     "Developer Tools preview, iOS, Android, upload and production release remain UNVERIFIED.",
     "The four screenshots are local static render evidence only, not Mini Program runtime screenshots.",
     "Real content, human editorial review, third-party reports and public image permissions must be supplied and re-reviewed before replacing DEMO_ONLY fixtures.",
-    "The conservative package estimate passes with only 644 bytes of margin; actual subpackage output must be measured in WeChat Developer Tools.",
+    "The conservative package estimate passes with 101903 bytes of margin; actual subpackage output must still be measured in WeChat Developer Tools.",
     "The root test run skipped six out-of-scope card component simulations because root jsdom was unavailable; the art-owned nested miniprogram-simulate suite installed its own dependencies and passed 6/6.",
     "npm audit reports four high-severity transitive findings in the dev-only miniprogram-simulate test dependency chain; the runner processes only controlled repository fixtures, and npm offers no compatible automatic upgrade."
   ]

@@ -1,0 +1,154 @@
+{
+  "module": "red-team",
+  "phase": "FEATURE_MODULE",
+  "contractVersion": "1.0.0",
+  "generatedAt": "2026-08-27T18:14:34.135Z",
+  "overall": "BLOCKED",
+  "gates": {
+    "local": {
+      "status": "FAIL",
+      "evidence": [
+        "integration/reports/red-team/security-findings.md",
+        "integration/reports/red-team/contract-drift-report.md",
+        "integration/reports/red-team/test-summary.json"
+      ],
+      "note": "Four P0 findings are OPEN; eight contract-drift classes remain; the full node test command and the original card local gate fail. Current foundation validation, typecheck and static package checks pass, but do not clear the local gate."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": ["integration/reports/red-team/test-summary.json"],
+      "note": "No WeChat Developer Tools evidence; component simulation and static screenshots are not page E2E."
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": ["integration/reports/red-team/test-summary.json"],
+      "note": "No iOS device evidence."
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": ["integration/reports/red-team/test-summary.json"],
+      "note": "No Android device evidence."
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": ["integration/reports/red-team/test-summary.json"],
+      "note": "No upload evidence. The final empty AppID and local checks are not upload proof."
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": ["integration/reports/red-team/test-summary.json"],
+      "note": "No release evidence; unresolved P0 prohibits Prompt 08."
+    }
+  },
+  "artifacts": [
+    "integration/reports/red-team/security-findings.md",
+    "integration/reports/red-team/truth-boundary-report.md",
+    "integration/reports/red-team/contract-drift-report.md",
+    "integration/reports/red-team/asset-rights-report.md",
+    "integration/reports/red-team/test-summary.json",
+    "integration/reports/red-team/tests/approval-provenance-bypass.test.mjs",
+    "integration/reports/red-team/tests/admin-material-access-gap.test.mjs",
+    "integration/reports/red-team/tests/contract-drift.test.mjs",
+    "integration/reports/red-team/tests/demo-truth-boundaries.test.mjs",
+    "integration/reports/red-team/tests/object-purpose-boundaries.test.mjs",
+    "integration/reports/red-team/tests/truth-and-event-boundaries.test.mjs",
+    "integration/reports/red-team/tests/asset-and-client-boundaries.test.mjs",
+    "integration/reports/red-team/tests/fixtures/approved-without-review-log.json",
+    "integration/reports/red-team/proposals/red-team-public-claim-provenance.md",
+    "integration/reports/red-team/proposals/red-team-admin-material-access.md",
+    "integration/reports/red-team/proposals/red-team-public-content-review-gate.md",
+    "integration/reports/red-team/proposals/red-team-related-event-truth-gate.md",
+    "integration/reports/red-team/proposals/red-team-idempotency-openid.md",
+    "integration/reports/red-team/proposals/red-team-event-identifiers.md",
+    "integration/reports/red-team/proposals/red-team-city-rights-gate.md",
+    "integration/reports/red-team/proposals/red-team-evidence-schema.md",
+    "integration/reports/red-team/proposals/red-team-manifest-provenance.md",
+    "integration/reports/red-team/proposals/red-team-contract-single-source.md",
+    "integration/reports/red-team/proposals/red-team-client-accessibility.md",
+    "integration/reports/red-team/proposals/red-team-payment-contract.md",
+    "integration/reports/red-team/proposals/red-team-avatar-asset-ownership.md",
+    "integration/reports/red-team/proposals/red-team-media-purpose-binding.md",
+    "integration/reports/red-team/proposals/red-team-withdrawal-evidence-retention.md",
+    "integration/reports/red-team/proposals/red-team-final-integration-sequence.md",
+    "integration/reports/red-team/proposals/red-team-demo-mode-isolation.md",
+    "integration/reports/red-team/proposals/red-team-relationship-cache-invalidation.md",
+    "integration/reports/red-team/proposals/red-team-demo-event-identity.md",
+    "integration/reports/red-team/proposals/red-team-card-contract-gate.md"
+  ],
+  "checks": [
+    {
+      "id": "typecheck-current-worktree",
+      "status": "PASS",
+      "evidence": "Current npm run typecheck exits 0 after an out-of-scope tsconfig change; an earlier exit 1 is retained in test-summary.json as worktree-drift evidence."
+    },
+    {
+      "id": "foundation-current-validation",
+      "status": "PASS",
+      "evidence": "Final foundation validator reports 337 PASS and 0 FAIL; an earlier 336/337 AppID failure is retained in test-summary.json as dirty-tree history."
+    },
+    {
+      "id": "existing-full-regression-suite",
+      "status": "FAIL",
+      "evidence": "222 tests: 199 PASS, 17 FAIL, 6 SKIP. All failures are spawn EPERM in 10 esbuild-dependent files; failure is retained as failure."
+    },
+    {
+      "id": "sandbox-safe-regression-subset",
+      "status": "PASS",
+      "evidence": "203 tests: 197 PASS, 0 FAIL, 6 SKIP across 38 files after excluding 10 esbuild-dependent files; excluded files and skips remain UNVERIFIED."
+    },
+    {
+      "id": "red-team-isolated-reproduction",
+      "status": "FAIL",
+      "evidence": "24/24 red-team assertions passed and reproduced OPEN P0/P1/P2 conditions; this is failure evidence, not a cleared gate."
+    },
+    {
+      "id": "contract-drift",
+      "status": "FAIL",
+      "evidence": "Eight OPEN drift classes: four P1 including premature final-integration and provenance conflicts, plus four P2 schema/single-source issues."
+    },
+    {
+      "id": "truth-boundary",
+      "status": "FAIL",
+      "evidence": "Four P0 truth/review provenance paths plus demo-share and demo-event identity boundary failures remain reproducible."
+    },
+    {
+      "id": "asset-integrity",
+      "status": "PASS",
+      "evidence": "13 city JPG and one art fallback SVG match declared SHA-256; required local alt/source fields are present."
+    },
+    {
+      "id": "asset-rights-publishability",
+      "status": "FAIL",
+      "evidence": "City and art rights remain CLAIMED/DRAFT or human-review pending; metadata verification is not human approval."
+    },
+    {
+      "id": "secret-pii-static-scan",
+      "status": "PASS",
+      "evidence": "No credential pattern found; phone/ID/material locator matches are confined to explicit synthetic tests and invalid example fixtures. Binary/device/cloud logs remain UNVERIFIED."
+    },
+    {
+      "id": "package-static-estimate",
+      "status": "PASS",
+      "evidence": "Final source-only estimator exits 0 at 855806/2097152 bytes after detecting no registered TDesign runtime reference; built npm is absent and Developer Tools package/pruning remains UNVERIFIED."
+    },
+    {
+      "id": "cloud-production-enforcement",
+      "status": "UNVERIFIED",
+      "evidence": "Default cloud entrypoints fail closed as NOT_IMPLEMENTED; real CloudBase adapters, ACL, indexes, concurrency and logs were not available."
+    }
+  ],
+  "knownGaps": [
+    "unresolvedP0=4; all are OPEN and require original owner fixes plus RED_TEAM_B evidence.",
+    "contractDrift.total=8; current manifest schema cannot encode changedPaths or structured executions.",
+    "card original manifest has local FAIL and overall INCOMPLETE.",
+    "Current typecheck and foundation validation pass after out-of-scope dirty-tree changes; the full node test command still fails.",
+    "Developer Tools, iOS, Android, real CloudBase, upload and release are UNVERIFIED.",
+    "Network infrastructure and online network security are UNVERIFIED/OUT_OF_SCOPE by user request.",
+    "City/art human rights review is pending; source metadata checks do not approve rights.",
+    "Static source-only package estimate passes at 855806 bytes; final built npm is absent and this is not a Developer Tools main/subpackage result.",
+    "Fifty-five out-of-scope changed paths were audited as current input and preserved without modification; fingerprints are in test-summary.json.",
+    "A failed relationship refresh can retain cached FRIENDS_ONLY fields; the social owner must fix and RED_TEAM_B must verify invalidation.",
+    "Discover final composition exists before RED_TEAM_B eligibility or a FINAL_INTEGRATION manifest.",
+    "This RED_TEAM_A run stops before Prompt 08; integrationEligible=false."
+  ]
+}

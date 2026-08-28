@@ -195,6 +195,28 @@ test('profile card renders only normalized allow-listed fields and keeps owner r
   assert.match(template, /safeFields/);
 });
 
+test('profile custom theme, labels and gallery stay owner-only and never imitate verification', () => {
+  const source = read('miniprogram/components/ab-profile-card/index.ts');
+  const template = read('miniprogram/components/ab-profile-card/index.wxml');
+
+  for (const property of ['theme', 'selectedLabels', 'galleryUrls']) {
+    assert.match(source, new RegExp(`${property}: \\{ type:`));
+  }
+  for (const theme of ['ivory', 'ink', 'champagne', 'stone']) {
+    assert.match(source, new RegExp(`['"]${theme}['"]`));
+  }
+  assert.match(source, /viewerMode !== 'SELF'/);
+  assert.match(source, /wxfile:\\\/\\\/\|http:\\\/\\\/tmp\\\//);
+  assert.match(template, /wx:if="\{\{isSelf\}\}" class="profile-card__section profile-card__selected-labels"/);
+  assert.match(template, /wx:if="\{\{isSelf\}\}" class="profile-card__section profile-card__gallery-section"/);
+  assert.match(template, /自选内容 · 未认证 · 当前未保存到公开名片/);
+  assert.match(template, /class="profile-card__self-tag"/);
+  assert.doesNotMatch(template, /<ab-verified-tag[^>]*safeSelectedLabels/s);
+  assert.match(template, /binderror="handleGalleryError"/);
+  assert.match(source, /triggerEvent\('galleryerror', \{ index \}\)/);
+  assert.doesNotMatch(source, /triggerEvent\('galleryerror'[^)]*(?:url|galleryUrls)/s);
+});
+
 test('privacy field uses the frozen Visibility enum and explains all three meanings without guessing UNKNOWN', () => {
   const source = read('miniprogram/components/ab-privacy-field/index.ts');
   const template = read('miniprogram/components/ab-privacy-field/index.wxml');
@@ -246,18 +268,23 @@ test('share states distinguish success, expiry, revocation and failure without f
 });
 
 test('AB Club component styles avoid prohibited visual patterns and protect overflow', () => {
+  const profileStyles = read('miniprogram/components/ab-profile-card/index.wxss');
   const styles = [
-    read('miniprogram/components/ab-profile-card/index.wxss'),
+    profileStyles,
     read('miniprogram/components/ab-privacy-field/index.wxss'),
     read('miniprogram/components/ab-share-state/index.wxss'),
   ].join('\n');
 
-  assert.match(styles, /var\(--ab-color-green\)/);
+  assert.match(styles, /var\(--ab-color-ink\)/);
+  assert.match(styles, /var\(--ab-color-champagne-deep\)/);
   assert.match(styles, /var\(--ab-color-gold-soft\)/);
+  assert.doesNotMatch(styles, /--[\w-]*green\b|var\(--[\w-]*green\b/i);
   assert.match(styles, /overflow-wrap:\s*anywhere/);
   assert.match(styles, /minmax\(0, 1fr\)/);
-  assert.doesNotMatch(styles, /(?:linear|radial)-gradient|backdrop-filter|box-shadow/i);
+  assert.match(profileStyles, /\.profile-card__cover[\s\S]*linear-gradient/i);
+  assert.doesNotMatch(styles, /radial-gradient|backdrop-filter|box-shadow/i);
   assert.doesNotMatch(styles, /#(?:7c3aed|8b5cf6|a855f7)/i);
+  assert.doesNotMatch(profileStyles, />\s*(?:view|text|image|button|navigator|canvas)\b/i);
 });
 
 test('miniprogram-simulate execution gate', { skip: simulatorSkip }, () => {
@@ -309,6 +336,14 @@ componentTest('miniprogram-simulate covers profile properties, safe projection a
     ],
     pendingLabels: ['行业资历'],
     rejectedLabels: ['旧标签'],
+    selectedLabels: ['艺术', '艺术', '珠宝'],
+    galleryUrls: [
+      'https://cdn.example.test/work.jpg',
+      'wxfile://tmp/self-preview.jpg',
+      'http://unsafe.example.test/rejected.jpg',
+      'data:image/png;base64,rejected',
+    ],
+    theme: 'ink',
     maxVisibleClaims: 1,
   });
   component.attach(document.createElement('div'));
@@ -317,6 +352,9 @@ componentTest('miniprogram-simulate covers profile properties, safe projection a
   assert.equal(component.data.isSelf, true);
   assert.equal(component.data.safeClaims.length, 1);
   assert.deepEqual(component.data.safeFields.map((field) => field.key), ['industry', 'interests']);
+  assert.deepEqual(component.data.safeSelectedLabels, ['艺术', '珠宝']);
+  assert.equal(component.data.safeGallery.length, 2);
+  assert.equal(component.data.safeTheme, 'ink');
   assert.doesNotMatch(component.dom.textContent, /13800000000/);
   assert.match(component.dom.textContent, /审核中/);
 
@@ -361,6 +399,23 @@ componentTest('miniprogram-simulate covers empty card and image-failure fallback
   assert.equal(avatarErrorCount, 1);
   assert.match(brokenAvatar.dom.textContent, /Long-English-Name-With/);
   brokenAvatar.detach();
+
+  const stranger = simulate.render(profile, {
+    card: {
+      displayName: '陌生人视角',
+      avatarUrl: 'wxfile://tmp/private-avatar.jpg',
+      claims: [],
+    },
+    viewerMode: 'STRANGER',
+    selectedLabels: ['不应公开'],
+    galleryUrls: ['wxfile://tmp/private-gallery.jpg', 'https://cdn.example.test/private-gallery.jpg'],
+  });
+  stranger.attach(document.createElement('div'));
+  assert.equal(stranger.data.safeCard.avatarUrl, '');
+  assert.deepEqual(stranger.data.safeSelectedLabels, []);
+  assert.deepEqual(stranger.data.safeGallery, []);
+  assert.doesNotMatch(stranger.dom.textContent, /不应公开/);
+  stranger.detach();
 });
 
 componentTest('miniprogram-simulate covers privacy UNKNOWN, properties and safe change event', () => {

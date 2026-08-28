@@ -2,24 +2,25 @@
   "module": "events",
   "phase": "FEATURE_MODULE",
   "contractVersion": "1.0.0",
-  "generatedAt": "2026-08-27T12:55:11.161Z",
+  "generatedAt": "2026-08-28T09:53:41.232Z",
   "overall": "LOCAL_TEST_PASS",
   "gates": {
     "local": {
       "status": "PASS",
       "evidence": [
-        "npm ci exited 0 with 0 vulnerabilities on 2026-08-27",
-        "npm run typecheck:miniprogram exited 0 and npm run validate reported 337/337 pass on 2026-08-27",
-        "Event-focused suite exited 0: 23/23 pass, including frozen geography, transaction model, forgery denial, payment gate, restrained UI, WXML binding integrity, real-photo asset integrity and manifest honesty",
-        "Conservative package projection passed at 2096906 / 2097152 bytes; Developer Tools package result remains unverified",
-        "Workspace-wide npm run build was attempted but stopped before Node tests because a concurrently changed adminApi source invalidated the shared cloud-runtime hash; _shared and adminApi are outside this module's allowed write paths"
+        "npm run build exited 0 on 2026-08-28; all mini-program, cloud-function and contract TypeScript projects passed",
+        "npm run validate exited 0 with 337/337 validations passed",
+        "The full Node suite reported 277 passed, 0 failed and 6 optional miniprogram-simulate tests skipped because jsdom is not installed; the skipped simulator cases are not claimed as passed",
+        "Cloud runtime source SHA-256 4f54b0888ea0693f6f062f4083a23a1d4567c9056d842942d7402bb1e98e24df matched all 13 generated bundles",
+        "Conservative static package estimate passed at 1995249 / 2097152 bytes; actual WeChat Developer Tools package measurement remains UNVERIFIED",
+        "Manifest and file gates passed for all 13 city photographs and all 3 editorial event photographs: every local JPEG is 1152x648 and matches its SHA-256 plus Wikimedia Commons source/license evidence"
       ],
       "note": "LOCAL_TEST_PASS only. Default deployed eventApi main remains fail-closed until a CloudBase store and trusted runtime context are integrated."
     },
     "devtoolsPreview": {
       "status": "UNVERIFIED",
       "evidence": [
-        "LOCAL_ONLY_NO_APPID: no WeChat Developer Tools preview evidence"
+        "The local private project configuration contains the user-authorized AppID, but the desktop is locked and the WeChat Developer Tools IDE service port is closed; no compile or preview evidence was produced"
       ]
     },
     "iosDevice": {
@@ -37,7 +38,7 @@
     "devVersionUpload": {
       "status": "UNVERIFIED",
       "evidence": [
-        "No authorized AppID, CloudBase environment or dev-version upload evidence"
+        "An authorized AppID exists only in local private configuration; no Developer Tools dev-version upload or CloudBase deployment evidence was produced"
       ]
     },
     "release": {
@@ -59,6 +60,8 @@
     "miniprogram/components/ab-event-card/",
     "miniprogram/components/ab-event-state/",
     "miniprogram/assets/manifests/cities.json",
+    "miniprogram/assets/manifests/editorial-events.json",
+    "miniprogram/assets/editorial-events/",
     "LOCAL_RENDER_SCREENSHOT:E:/Temp/AB-Club-Beijing-Quiet-Imperial.local.png",
     "LOCAL_RENDER_SCREENSHOT:E:/Temp/AB-Club-Zurich-Alpine-Salon.local.png",
     "LOCAL_RENDER_SCREENSHOT:E:/Temp/AB-Club-Paris-Grand-Tour.local.png",
@@ -104,7 +107,12 @@
     {
       "id": "city-media-manifest",
       "status": "PASS",
-      "evidence": "13 corresponding-city real Wikimedia Commons photographs are local 288x162 JPEGs with no runtime hotlink. cities.json records each source page, landmark, author, exact CC license, download time, source SHA-256/dimensions, runtime SHA-256 and alt; source-page license evidence is verified while rights remain CLAIMED / DRAFT pending human review"
+      "evidence": "All 13 corresponding-city Wikimedia Commons photographs are local 1152x648 JPEGs with no runtime hotlink. Tests verify frozen city order, 1920/3840 Commons source width, download URL/source-dimension agreement, runtime dimensions, per-file SHA-256, actual JPEG dimensions, author, exact CC license and alt text; rights remain CLAIMED / DRAFT pending human review."
+    },
+    {
+      "id": "editorial-event-media-manifest",
+      "status": "PASS",
+      "evidence": "All 3 phase-one editorial event photographs are local 1152x648 JPEGs. The asset manifest quality gate verifies distinct files, SHA-256 and actual dimensions plus Wikimedia Commons source, author and CC license evidence; the images remain direction references for DEMO_ONLY activities, not proof of real scheduling or partnership."
     },
     {
       "id": "content-live",
@@ -128,7 +136,7 @@
     "The local event.list reference store scans candidate records and performs per-event approval reads; a production adapter must push filtering, authorization joins and cursor pagination into bounded database queries",
     "Real payment prerequisites, callback, reconciliation and refund SLA are unavailable; payment feature remains disabled",
     "City imagery now uses corresponding-city CC BY / CC BY-SA real photographs with source-page evidence, local copies and visible credit; rightsState remains CLAIMED and reviewStatus DRAFT until a human rights review approves publication",
-    "Workspace-wide npm run build is currently blocked by a stale shared cloud-runtime bundle after unrelated adminApi source changes; rebuilding cloudfunctions/_shared and non-events functions is outside this module's allowed write paths",
+    "Six optional miniprogram-simulate cases were skipped because jsdom is not installed; they are not claimed as simulator passes or page E2E evidence",
     "Developer Tools preview, device runs, upload and release remain UNVERIFIED"
   ]
 }

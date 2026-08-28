@@ -1,1 +1,237 @@
 @import "../../../pages/card/styles/card-theme.wxss";
+
+.share-page {
+  padding-top: 34rpx;
+}
+
+.share-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 28rpx;
+}
+
+.share-header__copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.share-header__crest {
+  width: 104rpx;
+  height: 104rpx;
+  flex: 0 0 104rpx;
+}
+
+.share-loading,
+.share-error,
+.share-page ab-profile-card {
+  display: block;
+  margin-top: 34rpx;
+}
+
+.share-notice,
+.share-inline-state,
+.share-footnote {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.share-notice {
+  margin-top: 22rpx;
+  padding: 18rpx 20rpx;
+  border-left: 4rpx solid var(--ab-color-champagne-deep);
+  background: #f0e8dc;
+  color: var(--ab-color-muted);
+  font-size: 22rpx;
+  line-height: 1.6;
+}
+
+.share-choice-card,
+.share-format-card {
+  box-sizing: border-box;
+  margin-top: 30rpx;
+  padding: 30rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: 20rpx;
+  background: var(--ab-color-paper);
+}
+
+.share-choice-card {
+  border-color: #3b352f;
+  background: var(--ab-color-ink);
+  color: var(--ab-color-paper);
+}
+
+.share-choice-card--quiet {
+  border-color: var(--ab-color-border);
+  background: var(--ab-color-paper);
+  color: var(--ab-color-ink);
+}
+
+.share-choice-card__eyebrow,
+.share-format-card__eyebrow,
+.share-choice-card__title,
+.share-format-card__title,
+.share-choice-card__copy,
+.share-format-card__copy,
+.share-choice__title,
+.share-choice__note {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.share-choice-card__eyebrow,
+.share-format-card__eyebrow {
+  color: var(--ab-color-gold-soft);
+  font-size: 19rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.share-choice-card__title,
+.share-format-card__title {
+  margin-top: 12rpx;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 36rpx;
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.share-choice-card__copy,
+.share-format-card__copy {
+  margin-top: 14rpx;
+  color: #cfc6ba;
+  font-size: 24rpx;
+  line-height: 1.68;
+}
+
+.share-choice-card--quiet .share-choice-card__copy,
+.share-format-card__copy {
+  color: var(--ab-color-muted);
+}
+
+.share-choice-list {
+  margin: 26rpx 0 30rpx;
+  border-top: 2rpx solid #49423a;
+}
+
+.share-choice {
+  display: flex;
+  gap: 20rpx;
+  padding: 22rpx 0;
+  border-bottom: 2rpx solid #49423a;
+}
+
+.share-choice__index {
+  flex: 0 0 42rpx;
+  color: var(--ab-color-gold-soft);
+  font-family: Georgia, serif;
+  font-size: 20rpx;
+}
+
+.share-choice > view {
+  min-width: 0;
+  flex: 1;
+}
+
+.share-choice__title {
+  font-size: 26rpx;
+  font-weight: 600;
+}
+
+.share-choice__note {
+  margin-top: 7rpx;
+  color: #bdb3a7;
+  font-size: 21rpx;
+  line-height: 1.55;
+}
+
+.share-return {
+  margin-top: 18rpx;
+  border-color: #746a5f;
+  color: var(--ab-color-paper);
+}
+
+.share-wechat-button {
+  gap: 12rpx;
+}
+
+.share-wechat-button image {
+  display: block;
+  width: 32rpx;
+  height: 32rpx;
+}
+
+.share-actions {
+  display: grid;
+  gap: 16rpx;
+  margin-top: 26rpx;
+}
+
+.share-format-card__eyebrow {
+  color: var(--ab-color-champagne-deep);
+}
+
+.share-format-card__title {
+  color: var(--ab-color-ink);
+}
+
+.share-inline-state {
+  margin-top: 20rpx;
+  padding: 16rpx 18rpx;
+  background: var(--ab-color-ivory);
+  color: var(--ab-color-muted);
+  font-size: 21rpx;
+  line-height: 1.55;
+}
+
+.share-inline-state--error {
+  border-left: 4rpx solid #8e4a3f;
+}
+
+.share-footnote {
+  margin-top: 30rpx;
+  padding-top: 22rpx;
+  border-top: 2rpx solid var(--ab-color-border);
+  color: var(--ab-color-muted);
+  font-size: 20rpx;
+  line-height: 1.62;
+}
+
+@media (prefers-color-scheme: dark) {
+  .share-choice-card--quiet,
+  .share-format-card {
+    border-color: var(--ab-color-dark-border);
+    background: var(--ab-color-dark-surface);
+  }
+
+  .share-choice-card--quiet,
+  .share-choice-card--quiet .share-choice-card__title,
+  .share-format-card__title {
+    color: var(--ab-color-dark-text);
+  }
+
+  .share-choice-card--quiet .share-choice-card__copy,
+  .share-format-card__copy,
+  .share-footnote {
+    color: var(--ab-color-dark-muted);
+  }
+
+  .share-notice,
+  .share-inline-state {
+    background: #2d2924;
+    color: var(--ab-color-dark-muted);
+  }
+}
+
+@media (max-width: 340px) {
+  .share-header {
+    align-items: center;
+  }
+
+  .share-header__crest {
+    width: 86rpx;
+    height: 86rpx;
+    flex-basis: 86rpx;
+  }
+}

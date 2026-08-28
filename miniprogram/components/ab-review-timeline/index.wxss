@@ -27,7 +27,7 @@
 .timeline__label { font-size: 28rpx; font-weight: 700; }
 .timeline__state { margin-top: 4rpx; color: var(--ab-color-muted); font-size: 22rpx; }
 .timeline__step--done .timeline__dot,
-.timeline__step--done .timeline__line { border-color: var(--ab-color-green); background: var(--ab-color-green); }
+.timeline__step--done .timeline__line { border-color: var(--ab-color-ink); background: var(--ab-color-ink); }
 .timeline__step--current .timeline__dot { border-color: var(--ab-color-gold); background: var(--ab-color-gold); }
 .timeline__step--future { opacity: 0.58; }
 

@@ -33,10 +33,10 @@ navigator,
   justify-content: space-between;
   min-height: var(--ab-touch-target);
   padding: var(--ab-space-3) var(--ab-space-4);
-  border: 2rpx solid var(--ab-color-green);
+  border: 2rpx solid var(--ab-color-ink);
   border-radius: var(--ab-radius-small);
   background: var(--ab-color-paper);
-  color: var(--ab-color-green);
+  color: var(--ab-color-ink);
   font-weight: 600;
 }
 

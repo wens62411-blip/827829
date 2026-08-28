@@ -32,6 +32,9 @@ const requiredAssetFields = [
   'downloadedAt',
   'sourceSha256',
   'sourceDimensions',
+  'originalDimensions',
+  'runtimeDimensions',
+  'downloadUrl',
   'sha256',
   'alt',
 ];
@@ -70,12 +73,12 @@ function validateManifest(candidate, checkFiles = false) {
   if (candidate?.pathTemplate !== '/assets/cities/{cityId}.jpg') errors.push('pathTemplate');
   if (candidate?.sourceProfile?.provider !== 'Wikimedia Commons') errors.push('sourceProfile.provider');
   if (candidate?.sourceProfile?.type !== 'PHOTOGRAPH') errors.push('sourceProfile.type');
-  if (candidate?.sourceProfile?.downloadMethod !== 'WIKIMEDIA_THUMBNAIL_1280px') {
+  if (candidate?.sourceProfile?.downloadMethod !== 'WIKIMEDIA_API_THUMBNAIL_1920px_AND_3840px') {
     errors.push('sourceProfile.downloadMethod');
   }
   if (candidate?.processingProfile?.runtimeFormat !== 'JPEG' ||
-      candidate?.processingProfile?.runtimeWidth !== 288 ||
-      candidate?.processingProfile?.runtimeHeight !== 162) {
+      candidate?.processingProfile?.runtimeWidth !== 1152 ||
+      candidate?.processingProfile?.runtimeHeight !== 648) {
     errors.push('processingProfile.runtime');
   }
   if (candidate?.rightsProfile?.rightsState !== 'CLAIMED') errors.push('rightsProfile.rightsState');
@@ -122,6 +125,27 @@ function validateManifest(candidate, checkFiles = false) {
         asset.sourceDimensions.some((value) => !Number.isInteger(value) || value <= 0)) {
       errors.push(`${asset.cityId}.sourceDimensions`);
     }
+    if (!Array.isArray(asset.originalDimensions) ||
+        asset.originalDimensions.length !== 2 ||
+        asset.originalDimensions.some((value) => !Number.isInteger(value) || value <= 0)) {
+      errors.push(`${asset.cityId}.originalDimensions`);
+    }
+    if (!Array.isArray(asset.runtimeDimensions) ||
+        asset.runtimeDimensions.length !== 2 ||
+        asset.runtimeDimensions[0] !== candidate.processingProfile.runtimeWidth ||
+        asset.runtimeDimensions[1] !== candidate.processingProfile.runtimeHeight) {
+      errors.push(`${asset.cityId}.runtimeDimensions`);
+    }
+    const requestedWidth = Number(new URL(asset.downloadUrl || 'https://invalid.local/').searchParams.get('width'));
+    if (!/^https:\/\/commons\.wikimedia\.org\/wiki\/Special:Redirect\/file\//i.test(asset.downloadUrl || '') ||
+        ![1920, 3840].includes(requestedWidth) ||
+        asset.sourceDimensions?.[0] !== requestedWidth) {
+      errors.push(`${asset.cityId}.downloadUrl`);
+    }
+    if (asset.originalDimensions?.[0] < asset.sourceDimensions?.[0] ||
+        asset.originalDimensions?.[1] < asset.sourceDimensions?.[1]) {
+      errors.push(`${asset.cityId}.originalDimensionsBelowSource`);
+    }
 
     if (checkFiles) {
       const filePath = join(repoRoot, 'miniprogram', ...localPath.slice(1).split('/'));
@@ -157,7 +181,13 @@ test('every city photograph keeps explicit real-photo provenance, author, licens
   assert.equal(new Set(manifest.assets.map((asset) => asset.sourcePage)).size, 13);
   for (const asset of manifest.assets) {
     assert.ok(manifest.licenseRegistry[asset.license]);
-    assert.equal(asset.sourceDimensions[0], 1280);
+    assert.ok([1920, 3840].includes(asset.sourceDimensions[0]));
+    assert.deepEqual(asset.runtimeDimensions, [1152, 648]);
+    assert.equal(
+      Number(new URL(asset.downloadUrl).searchParams.get('width')),
+      asset.sourceDimensions[0],
+      `${asset.cityId} source width must match its Commons download URL`,
+    );
     assert.match(asset.sourcePage, /wikimedia/i);
     assert.ok(asset.landmark.length > 1);
     assert.ok(asset.author.length > 1);
@@ -178,21 +208,24 @@ test('asset quality gate fails for every required per-city field omission', () =
 
 test('asset quality gate rejects hotlinks, search results, bad hashes, blank alt, and false approval', () => {
   const mutations = [
-    ['external path', (candidate) => { candidate.pathTemplate = 'https://example.com/{cityId}.jpg'; }, 'pathTemplate'],
-    ['search result', (candidate) => { candidate.assets[0].sourcePage = 'https://images.google.com/search?q=city'; }, 'sourcePage'],
-    ['blank alt', (candidate) => { candidate.assets[0].alt = ' '; }, '.alt'],
-    ['invalid hash', (candidate) => { candidate.assets[0].sha256 = 'bad'; }, '.sha256'],
-    ['invalid source hash', (candidate) => { candidate.assets[0].sourceSha256 = 'bad'; }, '.sourceSha256'],
-    ['wrong dimensions', (candidate) => { candidate.processingProfile.runtimeWidth += 1; }, 'dimensionMismatch'],
-    ['hotlink flag', (candidate) => { candidate.rightsProfile.externalHotlink = true; }, 'externalHotlink'],
-    ['false rights approval', (candidate) => { candidate.rightsProfile.rightsState = 'APPROVED'; }, 'rightsState'],
-    ['false human approval', (candidate) => { candidate.rightsProfile.reviewStatus = 'APPROVED'; }, 'reviewStatus'],
+    ['external path', (candidate) => { candidate.pathTemplate = 'https://example.com/{cityId}.jpg'; }, 'pathTemplate', false],
+    ['search result', (candidate) => { candidate.assets[0].sourcePage = 'https://images.google.com/search?q=city'; }, 'sourcePage', false],
+    ['blank alt', (candidate) => { candidate.assets[0].alt = ' '; }, '.alt', false],
+    ['invalid hash', (candidate) => { candidate.assets[0].sha256 = 'bad'; }, '.sha256', false],
+    ['valid-looking wrong local hash', (candidate) => { candidate.assets[0].sha256 = '0'.repeat(64); }, 'hashMismatch', true],
+    ['invalid source hash', (candidate) => { candidate.assets[0].sourceSha256 = 'bad'; }, '.sourceSha256', false],
+    ['wrong runtime profile dimensions', (candidate) => { candidate.processingProfile.runtimeWidth += 1; }, 'dimensionMismatch', true],
+    ['wrong per-asset runtime dimensions', (candidate) => { candidate.assets[0].runtimeDimensions[0] += 1; }, 'runtimeDimensions', false],
+    ['source/download width drift', (candidate) => { candidate.assets[0].downloadUrl = candidate.assets[0].downloadUrl.replace('width=1920', 'width=3840'); }, 'downloadUrl', false],
+    ['hotlink flag', (candidate) => { candidate.rightsProfile.externalHotlink = true; }, 'externalHotlink', false],
+    ['false rights approval', (candidate) => { candidate.rightsProfile.rightsState = 'APPROVED'; }, 'rightsState', false],
+    ['false human approval', (candidate) => { candidate.rightsProfile.reviewStatus = 'APPROVED'; }, 'reviewStatus', false],
   ];
-  for (const [label, mutate, expectedError] of mutations) {
+  for (const [label, mutate, expectedError, checkFiles] of mutations) {
     const candidate = structuredClone(manifest);
     mutate(candidate);
     assert.ok(
-      validateManifest(candidate, label === 'wrong dimensions').some((error) => error.includes(expectedError)),
+      validateManifest(candidate, checkFiles).some((error) => error.includes(expectedError)),
       `${label} must fail`,
     );
   }

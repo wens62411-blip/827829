@@ -14,7 +14,7 @@
   <view wx:if="{{canRetry || canForward}}" class="share-state__actions">
     <button
       wx:if="{{canRetry}}"
-      class="share-state__action share-state__action--retry"
+      class="share-state__action share-state__action--retry {{retryLocked || busy ? 'share-state__action--disabled' : ''}}"
       plain="{{true}}"
       disabled="{{retryLocked || busy}}"
       bindtap="handleRetry"
@@ -23,7 +23,7 @@
     </button>
     <button
       wx:if="{{canForward}}"
-      class="share-state__action share-state__action--forward"
+      class="share-state__action share-state__action--forward {{busy ? 'share-state__action--disabled' : ''}}"
       plain="{{true}}"
       open-type="share"
       disabled="{{busy}}"

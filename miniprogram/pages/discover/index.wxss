@@ -1,11 +1,719 @@
-.discover-page{min-height:100vh;background:#f6f1e7;color:#1c2723}.discover-hero{position:relative;height:900rpx;overflow:hidden;background:#173c32;color:#fcfbf7}.discover-hero__image{width:100%;height:100%;opacity:.72}.discover-hero__fallback{position:absolute;top:0;right:0;bottom:0;left:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16rpx;padding:40rpx;background:#173c32;color:#d8c197;font-size:22rpx;line-height:1.6;letter-spacing:.08em;text-align:center}.discover-hero__bar{position:absolute;top:0;right:0;left:0;display:flex;align-items:center;justify-content:space-between;padding:28rpx 32rpx}.discover-brandmark{display:block;flex:none;width:120rpx;height:120rpx}.discover-brandmark__fallback{display:flex;align-items:center;min-height:88rpx;color:#d8c197;font-family:Georgia,"Songti SC",serif;font-size:24rpx;font-weight:600;letter-spacing:.12em}.discover-hero__copy{position:absolute;right:36rpx;bottom:64rpx;left:36rpx;padding:40rpx 36rpx;background:rgba(16,40,33,.86)}
-.discover-hero__eyebrow,.discover-kicker{display:block;color:#a67c3d;font-size:20rpx;font-weight:700;letter-spacing:.16em}.discover-hero__eyebrow{color:#d8c197}.discover-hero__title{display:block;margin-top:24rpx;font-family:Georgia,"Songti SC",serif;font-size:58rpx;font-weight:500;line-height:1.25;letter-spacing:.02em;white-space:pre-line}.discover-hero__description{display:block;max-width:590rpx;margin-top:28rpx;color:rgba(252,251,247,.86);font-size:27rpx;line-height:1.75}
-.discover-runtime{display:flex;align-items:center;justify-content:space-between;gap:24rpx;margin:28rpx 32rpx 0;padding:24rpx;border-left:6rpx solid #a67c3d;background:#eee7da}.discover-runtime__label,.discover-runtime__text{display:block}.discover-runtime__label{font-size:24rpx;font-weight:700}.discover-runtime__text{margin-top:6rpx;color:#64716c;font-size:22rpx;line-height:1.55}.discover-runtime__mark{flex:none;color:#a67c3d;font-family:Georgia,serif;font-size:24rpx;letter-spacing:.12em}
-.discover-section{padding:88rpx 32rpx}.discover-heading{display:block;margin-top:18rpx;font-family:Georgia,"Songti SC",serif;font-size:48rpx;font-weight:500;line-height:1.3}.discover-heading--light{color:#fcfbf7}.discover-lead{display:block;margin-top:24rpx;color:#64716c;font-size:27rpx;line-height:1.8}.discover-journey{margin-top:52rpx;border-top:2rpx solid #d9d2c5}.discover-journey__item{display:flex;align-items:center;min-height:132rpx;border-bottom:2rpx solid #d9d2c5}.discover-journey__index{width:70rpx;color:#a67c3d;font-family:Georgia,serif;font-size:23rpx}.discover-journey__copy{flex:1}.discover-journey__title,.discover-journey__text{display:block}.discover-journey__title{font-family:"Songti SC",serif;font-size:31rpx;font-weight:600}.discover-journey__text{margin-top:8rpx;color:#64716c;font-size:23rpx}.discover-arrow{margin-left:20rpx;color:#173c32;font-size:42rpx;font-weight:300}
-.discover-section__head{display:flex;align-items:flex-end;justify-content:space-between;gap:24rpx}.discover-text-link{box-sizing:border-box;display:flex;align-items:center;flex:none;min-height:88rpx;padding:0 8rpx;border-bottom:2rpx solid #a67c3d;color:#173c32;font-size:24rpx}.discover-city-scroll{width:calc(100% + 32rpx);margin-top:44rpx}.discover-city-row{display:inline-flex;gap:20rpx;padding-right:32rpx}.discover-city-card{position:relative;display:inline-block;width:430rpx;height:292rpx;overflow:hidden;background:#173c32;color:#fcfbf7}.discover-city-card__image{width:100%;height:100%;opacity:.78}.discover-city-card__fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10rpx;width:100%;height:100%;padding:24rpx;background:#25473e;color:#d8c197;font-size:21rpx;text-align:center}.discover-city-card__caption{position:absolute;right:20rpx;bottom:20rpx;left:20rpx;padding:18rpx 20rpx;background:rgba(16,40,33,.82)}.discover-city-card__name,.discover-city-card__region{display:block}.discover-city-card__name{font-family:Georgia,"Songti SC",serif;font-size:34rpx}.discover-city-card__region{margin-top:4rpx;color:#d8c197;font-size:21rpx;letter-spacing:.12em}
-.discover-city-groups{margin-top:48rpx;border-top:2rpx solid #d9d2c5}.discover-city-group{display:flex;gap:24rpx;padding:24rpx 0;border-bottom:2rpx solid #d9d2c5}.discover-city-group__region{flex:none;width:112rpx;color:#a67c3d;font-size:23rpx;font-weight:700}.discover-city-group__cities{font-size:25rpx;line-height:1.6}.discover-rights{display:block;margin-top:24rpx;color:#787d79;font-size:20rpx;line-height:1.6}
-.discover-events{background:#173c32}.discover-section__head--light{color:#fcfbf7}.discover-kicker--gold{color:#d8c197}.discover-demo-chip{flex:none;padding:8rpx 14rpx;border:2rpx solid rgba(216,193,151,.62);color:#d8c197;font-size:20rpx}.discover-event{box-sizing:border-box;display:flex;align-items:flex-start;gap:22rpx;min-height:112rpx;padding:34rpx 0;border-bottom:2rpx solid rgba(252,251,247,.18);color:#fcfbf7}.discover-event__index{color:#d8c197;font-family:Georgia,serif;font-size:23rpx}.discover-event__body{flex:1}.discover-event__city,.discover-event__theme,.discover-event__meta{display:block}.discover-event__city{color:#d8c197;font-size:22rpx;letter-spacing:.12em}.discover-event__theme{margin-top:10rpx;font-family:"Songti SC",serif;font-size:31rpx;line-height:1.45}.discover-event__meta{margin-top:12rpx;color:rgba(252,251,247,.58);font-size:21rpx}.discover-event__arrow{color:#d8c197;font-size:28rpx}
-.discover-art{padding-right:0;padding-left:0}.discover-art__visual{position:relative;height:520rpx;margin:0 32rpx;overflow:hidden;background:#eee7da}.discover-art__image{width:100%;height:100%}.discover-art__fallback{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16rpx;width:100%;height:100%;padding:32rpx;background:#eee7da;color:#64716c;font-size:22rpx;line-height:1.6;text-align:center}.discover-art__notice{position:absolute;right:20rpx;bottom:20rpx;padding:10rpx 14rpx;background:rgba(252,251,247,.9);color:#64716c;font-size:19rpx}.discover-art__content{padding:48rpx 32rpx 0}.discover-art__list{margin-top:40rpx;border-top:2rpx solid #d9d2c5}.discover-art__item{display:flex;gap:24rpx;padding:26rpx 0;border-bottom:2rpx solid #d9d2c5}.discover-art__en{flex:none;width:150rpx;color:#a67c3d;font-family:Georgia,serif;font-size:19rpx;letter-spacing:.08em}.discover-art__name,.discover-art__description{display:block}.discover-art__name{font-family:"Songti SC",serif;font-size:29rpx}.discover-art__description{margin-top:6rpx;color:#64716c;font-size:22rpx}
-.discover-primary,.discover-outline{box-sizing:border-box;display:flex;align-items:center;justify-content:space-between;min-height:96rpx;margin-top:42rpx;padding:0 30rpx;font-size:27rpx;font-weight:600}.discover-primary{background:#173c32;color:#fcfbf7}.discover-primary--pressed,.discover-press{opacity:.76}.discover-trust{background:#102821;color:#fcfbf7}.discover-trust__text{display:block;margin-top:26rpx;color:rgba(252,251,247,.72);font-size:26rpx;line-height:1.8}.discover-trust__steps{display:flex;align-items:center;margin-top:48rpx}.discover-trust__step{display:flex;flex-direction:column;align-items:center;gap:10rpx;color:rgba(252,251,247,.78);font-size:21rpx}.discover-trust__step text:first-child{display:flex;align-items:center;justify-content:center;width:52rpx;height:52rpx;border:2rpx solid #d8c197;border-radius:50%;color:#d8c197;font-family:Georgia,serif}.discover-trust__line{flex:1;height:2rpx;margin:0 14rpx 34rpx;background:rgba(216,193,151,.42)}.discover-outline{justify-content:center;border:2rpx solid #d8c197;color:#fcfbf7}
-.discover-footer{padding:64rpx 32rpx 78rpx;text-align:center}.discover-footer__brand,.discover-footer__text{display:block}.discover-footer__brand{color:#173c32;font-family:Georgia,serif;font-size:34rpx;letter-spacing:.18em}.discover-footer__text{margin-top:16rpx;color:#787d79;font-size:17rpx;letter-spacing:.1em}
-@media(prefers-color-scheme:dark){.discover-page,.discover-section,.discover-art__content,.discover-footer{background:#102821;color:#fcfbf7}.discover-runtime,.discover-art__visual,.discover-art__fallback{background:#173c32}.discover-art__fallback,.discover-lead,.discover-journey__text,.discover-runtime__text,.discover-art__description,.discover-rights,.discover-footer__text{color:#c8cfc9}.discover-journey,.discover-journey__item,.discover-city-groups,.discover-city-group,.discover-art__list,.discover-art__item{border-color:#49645a}.discover-arrow,.discover-text-link,.discover-footer__brand{color:#d8c197}}
+.discover-page {
+  --discover-paper: var(--ab-color-paper);
+  --discover-ink: var(--ab-color-ink);
+  --discover-muted: #5f5a52;
+  --discover-line: var(--ab-color-border);
+  --discover-accent: #725126;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: var(--ab-color-ivory);
+  color: var(--discover-ink);
+}
+
+.discover-topbar {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  min-height: 152rpx;
+  padding: 28rpx 40rpx;
+  border-bottom: 2rpx solid var(--discover-line);
+  background: var(--ab-color-ivory);
+}
+
+.discover-brand {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 18rpx;
+}
+
+.discover-brandmark,
+.discover-brandmark__fallback {
+  width: 80rpx;
+  height: 80rpx;
+  flex: 0 0 80rpx;
+}
+
+.discover-brandmark {
+  display: block;
+}
+
+.discover-brandmark__fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid var(--ab-color-gold-soft);
+  border-radius: 50%;
+  color: var(--discover-ink);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 26rpx;
+}
+
+.discover-brand__copy {
+  min-width: 0;
+}
+
+.discover-brand__name,
+.discover-brand__note {
+  display: block;
+}
+
+.discover-global-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10rpx;
+  min-width: 132rpx;
+  min-height: 88rpx;
+  padding: 0 24rpx;
+  border: 2rpx solid var(--discover-line);
+  border-radius: 999rpx;
+  background: var(--discover-paper);
+  color: var(--discover-ink);
+  font-size: 21rpx;
+  font-weight: 650;
+  line-height: 1.2;
+}
+
+.discover-global-chip::after {
+  border: 0;
+}
+
+.discover-global-chip text + text {
+  padding-left: 10rpx;
+  border-left: 2rpx solid var(--discover-line);
+  color: var(--discover-accent);
+}
+
+.discover-brand__name {
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 30rpx;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+}
+
+.discover-brand__note {
+  margin-top: 5rpx;
+  color: var(--discover-muted);
+  font-size: 20rpx;
+  letter-spacing: 0.1em;
+}
+
+.discover-intro {
+  box-sizing: border-box;
+  max-width: 980rpx;
+  margin: 0 auto;
+  padding: 60rpx 40rpx 40rpx;
+}
+
+.discover-kicker,
+.discover-heading,
+.discover-lead,
+.discover-intro__title,
+.discover-intro__copy {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.discover-kicker {
+  color: var(--discover-accent);
+  font-size: 21rpx;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+}
+
+.discover-intro__title {
+  max-width: 680rpx;
+  margin-top: 18rpx;
+  font-family: Georgia, "Songti SC", "STSong", serif;
+  font-size: 62rpx;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.discover-intro__copy {
+  max-width: 640rpx;
+  margin-top: 18rpx;
+  color: var(--discover-muted);
+  font-size: 26rpx;
+  line-height: 1.7;
+}
+
+.discover-card-entry {
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: 88rpx minmax(0, 1fr);
+  gap: 28rpx;
+  max-width: 916rpx;
+  margin: 0 32rpx;
+  padding: 40rpx 8rpx;
+  border-top: 2rpx solid var(--discover-ink);
+  border-bottom: 2rpx solid var(--discover-line);
+}
+
+.discover-card-entry__index {
+  color: var(--discover-accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 36rpx;
+  letter-spacing: 0.08em;
+  line-height: 1.2;
+}
+
+.discover-card-entry__content {
+  min-width: 0;
+}
+
+.discover-card-entry__title,
+.discover-card-entry__copy {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.discover-card-entry__title {
+  max-width: 620rpx;
+  margin-top: 14rpx;
+  font-family: Georgia, "Songti SC", "STSong", serif;
+  font-size: 42rpx;
+  font-weight: 500;
+  line-height: 1.38;
+}
+
+.discover-card-entry__copy {
+  max-width: 640rpx;
+  margin-top: 14rpx;
+  color: var(--discover-muted);
+  font-size: 24rpx;
+  line-height: 1.68;
+}
+
+.discover-card-entry__actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24rpx;
+  margin-top: 30rpx;
+}
+
+.discover-card-entry__primary,
+.discover-card-entry__secondary {
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  font-size: 24rpx;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.discover-card-entry__primary {
+  min-width: 248rpx;
+  padding: 16rpx 28rpx;
+  border: 2rpx solid var(--discover-ink);
+  border-radius: 14rpx;
+  background: var(--discover-ink);
+  color: var(--discover-paper);
+}
+
+.discover-card-entry__secondary {
+  min-width: 224rpx;
+  padding: 16rpx 6rpx;
+  border-bottom: 2rpx solid var(--discover-accent);
+  color: var(--discover-ink);
+}
+
+.discover-card-entry__secondary text {
+  margin-left: 14rpx;
+  color: var(--discover-accent);
+  font-family: Georgia, serif;
+  font-size: 32rpx;
+}
+
+.discover-runtime {
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  gap: 16rpx;
+  max-width: 916rpx;
+  margin: 20rpx 32rpx 0;
+  padding: 18rpx 20rpx;
+  border-left: 6rpx solid var(--discover-accent);
+  background: #ebe3d6;
+}
+
+.discover-runtime__label {
+  flex: 0 0 auto;
+  color: var(--discover-accent);
+  font-size: 21rpx;
+  font-weight: 700;
+}
+
+.discover-runtime__text {
+  color: var(--discover-muted);
+  font-size: 21rpx;
+  line-height: 1.55;
+}
+
+.discover-section {
+  box-sizing: border-box;
+  max-width: 980rpx;
+  margin: 0 auto;
+  padding: 68rpx 32rpx 0;
+}
+
+.discover-section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 22rpx;
+}
+
+.discover-heading {
+  margin-top: 13rpx;
+  font-family: Georgia, "Songti SC", "STSong", serif;
+  font-size: 42rpx;
+  font-weight: 500;
+  line-height: 1.3;
+}
+
+.discover-lead {
+  max-width: 700rpx;
+  margin-top: 18rpx;
+  color: var(--discover-muted);
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.discover-demo-chip,
+.discover-section__aside {
+  flex: 0 0 auto;
+  color: var(--discover-accent);
+  font-size: 21rpx;
+  line-height: 1.45;
+  text-align: right;
+}
+
+.discover-demo-chip {
+  padding: 8rpx 12rpx;
+  border: 2rpx solid var(--discover-line);
+  letter-spacing: 0.08em;
+}
+
+.discover-people__list {
+  margin-top: 28rpx;
+  border-top: 2rpx solid var(--discover-line);
+}
+
+.discover-person {
+  display: flex;
+  align-items: center;
+  gap: 20rpx;
+  min-height: 150rpx;
+  padding: 24rpx 0;
+  border-bottom: 2rpx solid var(--discover-line);
+}
+
+.discover-person__avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 84rpx;
+  height: 84rpx;
+  flex: 0 0 84rpx;
+  border: 2rpx solid var(--ab-color-gold-soft);
+  border-radius: 50%;
+  background: var(--discover-paper);
+  color: var(--discover-ink);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 29rpx;
+}
+
+.discover-person__copy {
+  min-width: 0;
+  flex: 1;
+}
+
+.discover-person__topline {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 18rpx;
+}
+
+.discover-person__name,
+.discover-person__headline,
+.discover-person__reason,
+.discover-person__city {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.discover-person__name {
+  font-size: 28rpx;
+  font-weight: 650;
+}
+
+.discover-person__city {
+  color: var(--discover-accent);
+  font-size: 21rpx;
+}
+
+.discover-person__headline {
+  margin-top: 5rpx;
+  color: var(--discover-muted);
+  font-size: 23rpx;
+}
+
+.discover-person__reason {
+  margin-top: 10rpx;
+  color: var(--discover-ink);
+  font-size: 23rpx;
+  line-height: 1.55;
+}
+
+.discover-text-link {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 88rpx;
+  margin-top: 20rpx;
+  border-bottom: 2rpx solid var(--discover-accent);
+  color: var(--discover-ink);
+  font-size: 25rpx;
+  font-weight: 600;
+}
+
+.discover-text-link text {
+  color: var(--discover-accent);
+  font-size: 34rpx;
+}
+
+.discover-text-link--quiet {
+  color: var(--discover-muted);
+  font-size: 23rpx;
+  font-weight: 500;
+}
+
+.discover-gathering {
+  padding-top: 76rpx;
+}
+
+.discover-event-feature {
+  display: block;
+  margin-top: 28rpx;
+  overflow: hidden;
+  border: 2rpx solid var(--discover-line);
+  border-radius: 18rpx;
+  background: var(--discover-paper);
+  color: var(--discover-ink);
+}
+
+.discover-event-feature__media {
+  position: relative;
+  height: 248rpx;
+  overflow: hidden;
+  background: #d7d1c5;
+}
+
+.discover-event-feature__image,
+.discover-event-feature__fallback {
+  width: 100%;
+  height: 100%;
+}
+
+.discover-event-feature__image {
+  display: block;
+}
+
+.discover-event-feature__fallback {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12rpx;
+  padding: 26rpx;
+  color: var(--discover-muted);
+  font-size: 21rpx;
+  text-align: center;
+}
+
+.discover-event-feature__notice {
+  position: absolute;
+  top: 18rpx;
+  left: 18rpx;
+  padding: 9rpx 12rpx;
+  background: rgba(33, 30, 26, 0.82);
+  color: var(--discover-paper);
+  font-size: 20rpx;
+  letter-spacing: 0.08em;
+}
+
+.discover-event-feature__body {
+  padding: 26rpx;
+}
+
+.discover-event-feature__city,
+.discover-event-feature__title,
+.discover-event-feature__summary,
+.discover-event-feature__credit,
+.discover-event-feature__boundary {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.discover-event-feature__city {
+  color: var(--discover-accent);
+  font-size: 21rpx;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.discover-event-feature__title {
+  margin-top: 10rpx;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 34rpx;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.discover-event-feature__summary {
+  margin-top: 12rpx;
+  color: var(--discover-muted);
+  font-size: 23rpx;
+  line-height: 1.62;
+}
+
+.discover-event-feature__credit {
+  margin-top: 12rpx;
+  color: #6f685e;
+  font-size: 20rpx;
+  line-height: 1.5;
+}
+
+.discover-event-feature__boundary {
+  margin-top: 18rpx;
+  padding-top: 16rpx;
+  border-top: 2rpx solid var(--discover-line);
+  color: var(--discover-muted);
+  font-size: 20rpx;
+  line-height: 1.55;
+}
+
+.discover-art__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12rpx;
+  margin-top: 28rpx;
+}
+
+.discover-art__item {
+  box-sizing: border-box;
+  min-height: 164rpx;
+  padding: 20rpx 16rpx;
+  border: 2rpx solid var(--discover-line);
+  border-radius: 14rpx;
+  background: #f1ece2;
+}
+
+.discover-art__name,
+.discover-art__en,
+.discover-art__description {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.discover-art__name {
+  color: var(--discover-accent);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 29rpx;
+}
+
+.discover-art__en {
+  margin-top: 5rpx;
+  color: var(--discover-muted);
+  font-size: 20rpx;
+  letter-spacing: 0.06em;
+}
+
+.discover-art__description {
+  margin-top: 12rpx;
+  color: var(--discover-muted);
+  font-size: 21rpx;
+  line-height: 1.5;
+}
+
+.discover-city-media {
+  position: relative;
+  height: 220rpx;
+  margin-top: 28rpx;
+  overflow: hidden;
+  border-radius: 16rpx 16rpx 0 0;
+  background: #d7d1c5;
+}
+
+.discover-city-media__image,
+.discover-city-media__fallback,
+.discover-city-media__shade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.discover-city-media__image {
+  display: block;
+}
+
+.discover-city-media__fallback {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24rpx;
+  color: var(--discover-muted);
+  font-size: 22rpx;
+}
+
+.discover-city-media__shade {
+  background: linear-gradient(180deg, rgba(22, 20, 18, 0.06), rgba(22, 20, 18, 0.7));
+}
+
+.discover-city-media__label {
+  position: absolute;
+  right: 20rpx;
+  bottom: 18rpx;
+  left: 20rpx;
+  color: var(--ab-color-gold-soft);
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-align: right;
+}
+
+.discover-city-groups {
+  overflow: hidden;
+  border: 2rpx solid var(--discover-line);
+  border-top: 0;
+  border-radius: 0 0 16rpx 16rpx;
+  background: var(--discover-paper);
+}
+
+.discover-city-group {
+  display: grid;
+  grid-template-columns: 116rpx minmax(0, 1fr);
+  gap: 20rpx;
+  padding: 21rpx 22rpx;
+  border-bottom: 2rpx solid var(--discover-line);
+}
+
+.discover-city-group:last-child {
+  border-bottom: 0;
+}
+
+.discover-city-group__region {
+  color: var(--discover-accent);
+  font-size: 22rpx;
+  font-weight: 700;
+}
+
+.discover-city-group__cities {
+  font-size: 23rpx;
+  line-height: 1.6;
+}
+
+.discover-rights {
+  display: block;
+  margin-top: 18rpx;
+  color: var(--discover-muted);
+  font-size: 20rpx;
+  line-height: 1.6;
+}
+
+.discover-footer {
+  padding: 60rpx 32rpx 76rpx;
+  text-align: center;
+}
+
+.discover-footer__brand,
+.discover-footer__text {
+  display: block;
+}
+
+.discover-footer__brand {
+  font-family: Georgia, serif;
+  font-size: 31rpx;
+  letter-spacing: 0.16em;
+}
+
+.discover-footer__text {
+  margin-top: 13rpx;
+  color: var(--discover-muted);
+  font-size: 20rpx;
+  letter-spacing: 0.07em;
+  line-height: 1.5;
+}
+
+.discover-press {
+  opacity: 0.74;
+}
+
+@media (min-width: 700px) {
+  .discover-card-entry,
+  .discover-runtime {
+    margin-right: auto;
+    margin-left: auto;
+  }
+}
+
+@media (max-width: 340px) {
+  .discover-topbar,
+  .discover-section__head,
+  .discover-person__topline {
+    align-items: flex-start;
+  }
+
+  .discover-section__head,
+  .discover-person__topline {
+    flex-direction: column;
+  }
+
+  .discover-intro__title {
+    font-size: 46rpx;
+  }
+
+  .discover-art__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .discover-card-entry {
+    grid-template-columns: 1fr;
+    gap: 16rpx;
+  }
+
+  .discover-card-entry__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .discover-card-entry__primary,
+  .discover-card-entry__secondary {
+    width: 100%;
+  }
+
+  .discover-demo-chip,
+  .discover-section__aside {
+    text-align: left;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .discover-press {
+    opacity: 1;
+  }
+}

@@ -85,7 +85,7 @@ test('bootstrap registers and exposes a usable offline route without identity fa
   }
 });
 
-test('offline card surfaces label state, editable preview and non-successful share design', () => {
+test('offline card surfaces label state, editable preview, and explicitly labelled native sharing', () => {
   const cardSource = read('miniprogram/pages/card/index.ts');
   const meSource = read('miniprogram/pages/me/index.ts');
   const identitySource = read('miniprogram/pages/card/services/identity-client.ts');
@@ -100,7 +100,10 @@ test('offline card surfaces label state, editable preview and non-successful sha
   assert.match(mePage, /公开标签状态/);
   assert.match(editSource, /未保存：[\s\S]*?DEMO_ONLY/);
   assert.match(shareSource, /未创建分享：[\s\S]*?OFFLINE_DEMO/);
-  assert.match(sharePage, /不会创建真实分享/);
+  assert.match(shareSource, /SYNTHETIC · DEMO_ONLY[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/);
+  assert.match(sharePage, /<button\b[^>]*open-type="share"[^>]*>/);
+  assert.match(sharePage, /微信转发和本地海报可以实际操作/);
+  assert.match(sharePage, /不会产生真实会员、审核或人脉记录/);
   assert.doesNotMatch(sharePage, /demoMode[^\n]*分享成功/);
   for (const source of [cardSource, meSource]) {
     assert.doesNotMatch(source, /^import\s+\{[^\n]*\}\s+from\s+['"][^'"]*identity-client['"]/m);

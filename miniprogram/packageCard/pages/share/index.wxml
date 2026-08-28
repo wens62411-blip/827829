@@ -1,35 +1,49 @@
-<view class="card-page">
-  <text class="card-kicker">Secure Share</text>
-  <text class="card-title">分享与撤销</text>
-  <text class="card-subtitle">安全入口由高熵随机 token 解析；数据库只保存 hash。页面内的原始 token 不写本地存储、不写日志。</text>
-  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 不会创建真实分享</view>
+<view class="card-page share-page">
+  <view class="share-header">
+    <view class="share-header__copy">
+      <text class="card-kicker">SHARE YOUR INTRODUCTION</text>
+      <text class="card-title">分享我的名片</text>
+      <text class="card-subtitle">把一张清楚、克制的名片递给对方，是否发送仍由你在微信中确认。</text>
+    </view>
+    <image class="card-brand-crest share-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
+  </view>
 
-  <view wx:if="{{loadingCard}}" class="card-skeleton" aria-label="正在加载公开名片"></view>
-  <view wx:elif="{{pageError}}" class="card-panel card-panel--error">
-    <text class="card-panel__title">公开名片暂时不可用</text>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 可真实转发体验内容，人物资料为合成示例</view>
+
+  <view wx:if="{{loadingCard}}" class="card-skeleton share-loading" aria-label="正在加载名片"></view>
+  <view wx:elif="{{pageError}}" class="card-panel card-panel--error share-error">
+    <text class="card-panel__title">名片暂时不可用</text>
     <text class="card-panel__text">{{pageError}}</text>
-    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重试</button>
+    <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重新加载</button>
   </view>
 
-  <view wx:if="{{card}}" class="card-panel card-panel--accent">
-    <text class="card-panel__title">{{card.displayName}}</text>
-    <text class="card-panel__text">分享路径不会携带 OPENID、手机号、微信号、完整 profile ID 或客户端权限参数。</text>
+  <ab-profile-card
+    wx:elif="{{card}}"
+    card="{{card}}"
+    viewer-mode="SELF"
+    city-label="{{cityLabel}}"
+    theme="{{cardTheme}}"
+    show-default-actions="{{false}}"
+  />
+
+  <view wx:if="{{localNotice}}" class="share-notice" aria-live="polite">{{localNotice}}</view>
+
+  <view wx:if="{{demoMode && card}}" class="share-choice-card">
+    <text class="share-choice-card__eyebrow">SHARE PREVIEW</text>
+    <text class="share-choice-card__title">把名片递给微信好友</text>
+    <text class="share-choice-card__copy">体验版会真实打开微信转发面板；接收方看到的是这张明确标注的合成演示名片，不会被记录成真实会员或人脉。</text>
+    <view class="share-choice-list">
+      <view class="share-choice"><text class="share-choice__index">01</text><view><text class="share-choice__title">微信确认后才发送</text><text class="share-choice__note">页面只负责拉起系统面板，不会替你选择好友或自动发送。</text></view></view>
+      <view class="share-choice"><text class="share-choice__index">02</text><view><text class="share-choice__title">当前配色随卡片保留</text><text class="share-choice__note">象牙白、墨黑、香槟金与石灰灰会同步到接收页。</text></view></view>
+      <view class="share-choice"><text class="share-choice__index">03</text><view><text class="share-choice__title">可生成本地海报</text><text class="share-choice__note">海报明确标注演示边界，不包含私密资料或虚构二维码。</text></view></view>
+    </view>
+    <button class="card-button share-wechat-button" open-type="share"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>发送演示名片到微信</text></button>
+    <navigator class="card-link-button share-return" open-type="switchTab" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
   </view>
 
-  <view wx:if="{{localNotice}}" class="card-status card-status--error">{{localNotice}}</view>
-
-  <view wx:if="{{demoMode && card}}" class="card-panel card-panel--wine">
-    <text class="card-panel__eyebrow">SHARE PREVIEW</text>
-    <text class="card-panel__title">真实接入后的分享标准</text>
-    <view class="card-step"><text>01</text><view><text>创建限时入口</text><text>路径只携带高熵 token，不含身份和权限字段。</text></view></view>
-    <view class="card-step"><text>02</text><view><text>微信确认发送</text><text>打开系统转发面板不等于已送达，页面不会伪造成功。</text></view></view>
-    <view class="card-step"><text>03</text><view><text>随时撤销</text><text>过期、撤销、拉黑或关系变化后，再次打开会重新核验。</text></view></view>
-    <navigator class="card-link-button card-link-button--compact" open-type="switchTab" url="/pages/card/index" hover-class="none">返回示例名片 <text>›</text></navigator>
-  </view>
-
-  <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="card-panel">
-    <text class="card-panel__title">发现本机最近的分享入口</text>
-    <text class="card-panel__text">本机只保存了非秘密的 shareTokenId 作为撤销指针，没有保存原始 token，因此不能再次转发，但可以请求服务端撤销。</text>
+  <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="share-choice-card share-choice-card--quiet">
+    <text class="share-choice-card__title">有一个曾创建的入口</text>
+    <text class="share-choice-card__copy">它不能在本页再次发送，但仍可请求撤销。若只清除本机记录，旧入口可能继续有效到期。</text>
     <view class="card-stack">
       <button class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">撤销最近入口</button>
       <button class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
@@ -47,35 +61,37 @@
     bind:retry="handleShareRetry"
   />
 
-  <view wx:if="{{card && !demoMode}}" class="card-stack">
-    <button wx:if="{{(!shareState || shareState === 'REVOKED') && !hasRevocableShare}}" class="card-button" bindtap="createShare" loading="{{busyAction === 'CREATE'}}" disabled="{{busyAction !== ''}}">创建 7 天安全入口</button>
-    <button wx:if="{{hasRevocableShare && (shareState === 'SUCCESS' || shareState === 'ERROR')}}" class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">{{shareState === 'ERROR' ? '重试撤销入口' : '撤销当前入口'}}</button>
+  <view wx:if="{{card && !demoMode}}" class="share-actions">
+    <button wx:if="{{(!shareState || shareState === 'REVOKED') && !hasRevocableShare}}" class="card-button" bindtap="createShare" loading="{{busyAction === 'CREATE'}}" disabled="{{busyAction !== ''}}">创建 7 天分享入口</button>
+    <button wx:if="{{hasRevocableShare && (shareState === 'SUCCESS' || shareState === 'ERROR')}}" class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">{{shareState === 'ERROR' ? '重试撤销' : '撤销当前入口'}}</button>
     <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
   </view>
 
-  <view wx:if="{{!demoMode && shareState === 'SUCCESS'}}" class="card-panel">
-    <text class="card-panel__title">小程序码 scene</text>
-    <text class="card-panel__text">scene 只由短令牌构成，不携带身份或权限信息。历史小程序码每次打开都重新 resolve。</text>
-    <view wx:if="{{qrMessage}}" class="card-status {{qrState === 'ERROR' ? 'card-status--error' : qrState === 'SUCCESS' ? 'card-status--success' : ''}}">{{qrMessage}}</view>
+  <view wx:if="{{!demoMode && shareState === 'SUCCESS'}}" class="share-format-card">
+    <text class="share-format-card__eyebrow">WECHAT</text>
+    <text class="share-format-card__title">微信好友与小程序码</text>
+    <text class="share-format-card__copy">先由你确认发送对象；历史入口每次打开都会重新核验是否仍然有效。</text>
+    <view wx:if="{{qrMessage}}" class="share-inline-state {{qrState === 'ERROR' ? 'share-inline-state--error' : ''}}">{{qrMessage}}</view>
     <view class="card-stack">
-      <button class="card-button-secondary" bindtap="createQrScene" loading="{{busyAction === 'QR'}}" disabled="{{busyAction !== '' || qrState === 'SUCCESS'}}">{{qrState === 'ERROR' ? '重试生成小程序码' : qrState === 'SUCCESS' ? '小程序码资产已创建' : '生成小程序码'}}</button>
-      <button wx:if="{{qrState === 'ERROR'}}" class="card-button-secondary" open-type="share">降级为微信名片转发</button>
+      <button class="card-button-secondary" bindtap="createQrScene" loading="{{busyAction === 'QR'}}" disabled="{{busyAction !== '' || qrState === 'SUCCESS'}}">{{qrState === 'ERROR' ? '重试生成小程序码' : qrState === 'SUCCESS' ? '小程序码已准备' : '生成小程序码'}}</button>
+      <button wx:if="{{qrState === 'ERROR'}}" class="card-button card-button--share" open-type="share">分享给微信好友</button>
     </view>
   </view>
 
-  <view wx:if="{{card && !demoMode}}" class="card-panel">
-    <text class="card-panel__title">Canvas 2D 海报</text>
-    <text class="card-panel__text">海报只绘制 cards_public。当前合同没有小程序码资产 URL，因此海报会明确标注“不含小程序码”，不会绘制假码。</text>
+  <view wx:if="{{card}}" class="share-format-card">
+    <text class="share-format-card__eyebrow">POSTER</text>
+    <text class="share-format-card__title">生成名片海报</text>
+    <text class="share-format-card__copy">海报只展示当前名片内容；体验模式会明确标注合成演示，且不会伪造小程序码。</text>
     <view class="card-canvas-shell {{posterReady ? '' : 'card-hidden-canvas'}}">
       <canvas type="2d" id="cardPoster" class="card-poster-canvas"></canvas>
     </view>
-    <view wx:if="{{posterMessage}}" class="card-status {{albumDenied ? 'card-status--error' : ''}}">{{posterMessage}}</view>
+    <view wx:if="{{posterMessage}}" class="share-inline-state {{albumDenied ? 'share-inline-state--error' : ''}}">{{posterMessage}}</view>
     <view class="card-stack">
-      <button class="card-button-secondary" bindtap="generatePoster" loading="{{busyAction === 'POSTER'}}" disabled="{{busyAction !== ''}}">{{posterReady ? '重新生成海报' : '生成公开投影海报'}}</button>
+      <button class="card-button-secondary" bindtap="generatePoster" loading="{{busyAction === 'POSTER'}}" disabled="{{busyAction !== ''}}">{{posterReady ? '重新生成名片海报' : '生成名片海报'}}</button>
       <button wx:if="{{posterReady}}" class="card-button" bindtap="savePosterToAlbum" loading="{{busyAction === 'SAVE'}}" disabled="{{busyAction !== ''}}">保存到相册</button>
       <button wx:if="{{albumDenied}}" class="card-button-secondary" bindtap="openAlbumSettings">打开相册权限设置</button>
     </view>
   </view>
 
-  <view class="card-status">{{demoMode ? '离线演示没有原始 token、scene、海报文件或分享状态。' : '运行模式：' + runtimeMode + '。原始 token 与 scene 仅保留在当前页面内存。'}}</view>
+  <text class="share-footnote">{{demoMode ? '微信转发和本地海报可以实际操作；发送内容仍是 SYNTHETIC · DEMO_ONLY，不会产生真实会员、审核或人脉记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。'}}</text>
 </view>

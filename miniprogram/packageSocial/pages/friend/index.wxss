@@ -1,14 +1,14 @@
 .friend { box-sizing: border-box; min-height: 100vh; padding: 48rpx var(--ab-page-gutter); }
 .friend__eyebrow { display: block; color: var(--ab-color-gold); font-size: 22rpx; font-weight: 700; letter-spacing: 0.09em; }
-.friend__title { display: block; margin-top: 22rpx; color: var(--ab-color-green); font-family: Georgia, "Songti SC", serif; font-size: 46rpx; font-weight: 600; }
+.friend__title { display: block; margin-top: 22rpx; color: var(--ab-color-ink); font-family: Georgia, "Songti SC", serif; font-size: 46rpx; font-weight: 600; }
 .friend__lead { display: block; margin-top: 16rpx; color: var(--ab-color-muted); font-size: 26rpx; }
 .friend__notice, .friend__safety { margin-top: 30rpx; padding: 24rpx; border-left: 6rpx solid var(--ab-color-gold); background: var(--ab-color-paper); font-size: 25rpx; }
-.friend__text-button { min-height: 72rpx; margin: 14rpx 0 0; padding: 0; background: transparent; color: var(--ab-color-green); font-size: 26rpx; text-align: left; }
+.friend__text-button { min-height: var(--ab-touch-target); margin: 14rpx 0 0; padding: 0; background: transparent; color: var(--ab-color-ink); font-size: 26rpx; text-align: left; }
 .friend__text-button::after { border: 0; }
 .friend__card { margin-top: 34rpx; padding: 30rpx; border: 2rpx solid var(--ab-color-border); border-radius: var(--ab-radius-standard); background: var(--ab-color-paper); }
 .friend__profile { display: flex; align-items: center; gap: 20rpx; }
 .friend__avatar { display: flex; flex: 0 0 96rpx; align-items: center; justify-content: center; width: 96rpx; height: 96rpx; overflow: hidden; border-radius: 50%; background: var(--ab-color-ivory); }
-.friend__avatar--fallback { color: var(--ab-color-green); font-size: 24rpx; font-weight: 700; }
+.friend__avatar--fallback { color: var(--ab-color-ink); font-size: 24rpx; font-weight: 700; }
 .friend__identity { flex: 1; min-width: 0; }
 .friend__name, .friend__headline, .friend__bio, .friend__section-title, .friend__permission-label { display: block; }
 .friend__name { font-size: 34rpx; font-weight: 700; }
@@ -24,8 +24,8 @@
 .friend__actions { display: grid; grid-template-columns: 1fr 1fr; gap: 18rpx; margin-top: 30rpx; }
 .friend__button { box-sizing: border-box; min-height: 88rpx; border-radius: var(--ab-radius-small); font-size: 28rpx; font-weight: 700; }
 .friend__button::after { border: 0; }
-.friend__button--primary { width: 100%; margin-top: 18rpx; background: var(--ab-color-green); color: #fff; }
-.friend__button--quiet { border: 2rpx solid var(--ab-color-border); background: transparent; color: var(--ab-color-green); }
+.friend__button--primary { width: 100%; margin-top: 18rpx; background: var(--ab-color-ink); color: #fff; }
+.friend__button--quiet { border: 2rpx solid var(--ab-color-border); background: transparent; color: var(--ab-color-ink); }
 .friend__button--danger { border: 2rpx solid #9d3f36; background: transparent; color: #9d3f36; }
 .friend__button--text { grid-column: 1 / -1; background: transparent; color: var(--ab-color-muted); text-decoration: underline; }
 .friend__button[disabled] { opacity: 0.55; }

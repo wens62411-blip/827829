@@ -1,16 +1,21 @@
 :host {
   display: block;
   min-width: 0;
+  --privacy-accent: var(--ab-color-champagne-deep);
+  --privacy-ink: var(--ab-color-ink);
+  --privacy-muted: var(--ab-color-muted);
+  --privacy-paper: var(--ab-color-paper);
+  --privacy-line: var(--ab-color-border);
 }
 
 .privacy-field {
   box-sizing: border-box;
   min-width: 0;
   padding: var(--ab-space-4);
-  border: 2rpx solid var(--ab-color-border);
-  border-radius: var(--ab-radius-standard);
-  background: var(--ab-color-paper);
-  color: var(--ab-color-ink);
+  border: 2rpx solid var(--privacy-line);
+  border-radius: 4rpx;
+  background: var(--privacy-paper);
+  color: var(--privacy-ink);
 }
 
 .privacy-field__title-row {
@@ -31,27 +36,27 @@
 .privacy-field__required,
 .privacy-field__locked {
   padding: 2rpx 12rpx;
-  border: 2rpx solid var(--ab-color-border);
+  border: 2rpx solid var(--privacy-line);
   border-radius: 999rpx;
-  color: var(--ab-color-muted);
+  color: var(--privacy-muted);
   font-size: 22rpx;
 }
 
 .privacy-field__locked {
   border-color: var(--ab-color-gold-soft);
-  color: var(--ab-color-gold-brown);
+  color: var(--privacy-accent);
 }
 
 .privacy-field__helper {
   display: block;
   margin-top: var(--ab-space-1);
-  color: var(--ab-color-muted);
+  color: var(--privacy-muted);
   font-size: var(--ab-font-caption);
   overflow-wrap: anywhere;
 }
 
-.privacy-field__editor:not(:empty),
-.privacy-field__footer:not(:empty) {
+.privacy-field__editor,
+.privacy-field__footer {
   display: block;
   margin-top: var(--ab-space-3);
 }
@@ -61,8 +66,8 @@
   margin-top: var(--ab-space-3);
   padding: 18rpx var(--ab-space-3);
   border-left: 6rpx solid var(--ab-color-gold-soft);
-  background: var(--ab-color-ivory);
-  color: var(--ab-color-muted);
+  background: #f3ece2;
+  color: var(--privacy-muted);
   font-size: 26rpx;
   line-height: 1.55;
 }
@@ -84,20 +89,20 @@
   justify-content: space-between;
   margin: 0;
   padding: 18rpx var(--ab-space-3);
-  border: 2rpx solid var(--ab-color-border);
+  border: 2rpx solid var(--privacy-line);
   border-radius: var(--ab-radius-small);
   background: transparent;
-  color: var(--ab-color-ink);
+  color: var(--privacy-ink);
   line-height: 1.45;
   text-align: left;
 }
 
 .privacy-field__option--selected {
-  border-color: var(--ab-color-green);
-  background: var(--ab-color-ivory);
+  border-color: var(--privacy-accent);
+  background: #f3ece2;
 }
 
-.privacy-field__option[disabled] {
+.privacy-field__option--disabled {
   opacity: 1;
 }
 
@@ -115,7 +120,7 @@
 }
 
 .privacy-field__option-code {
-  color: var(--ab-color-gold-brown);
+  color: var(--privacy-accent);
   font-size: 22rpx;
   font-weight: 700;
   letter-spacing: 1rpx;
@@ -129,7 +134,7 @@
 
 .privacy-field__option-summary {
   margin-top: 6rpx;
-  color: var(--ab-color-muted);
+  color: var(--privacy-muted);
   font-size: 25rpx;
   line-height: 1.55;
 }
@@ -138,39 +143,44 @@
   width: 48rpx;
   flex: 0 0 48rpx;
   margin-left: var(--ab-space-3);
-  color: var(--ab-color-green);
+  color: var(--privacy-accent);
   font-size: 34rpx;
   text-align: center;
 }
 
 @media (prefers-color-scheme: dark) {
   .privacy-field {
-    border-color: var(--ab-color-dark-border);
-    background: var(--ab-color-dark-surface);
-    color: var(--ab-color-dark-text);
+    --privacy-accent: var(--ab-color-gold-soft);
+    --privacy-ink: var(--ab-color-dark-text);
+    --privacy-muted: var(--ab-color-dark-muted);
+    --privacy-paper: var(--ab-color-dark-surface);
+    --privacy-line: var(--ab-color-dark-border);
+    border-color: var(--privacy-line);
+    background: var(--privacy-paper);
+    color: var(--privacy-ink);
   }
 
   .privacy-field__required,
   .privacy-field__option {
-    border-color: var(--ab-color-dark-border);
+    border-color: var(--privacy-line);
   }
 
   .privacy-field__unknown,
   .privacy-field__private-note,
   .privacy-field__option--selected {
-    background: var(--ab-color-dark-canvas);
+    background: #2d2924;
   }
 
   .privacy-field__option,
   .privacy-field__option-title {
-    color: var(--ab-color-dark-text);
+    color: var(--privacy-ink);
   }
 
   .privacy-field__helper,
   .privacy-field__option-summary,
   .privacy-field__unknown,
   .privacy-field__private-note {
-    color: var(--ab-color-dark-muted);
+    color: var(--privacy-muted);
   }
 }
 

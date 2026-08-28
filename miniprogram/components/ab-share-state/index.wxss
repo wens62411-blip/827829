@@ -1,6 +1,11 @@
 :host {
   display: block;
   min-width: 0;
+  --share-accent: var(--ab-color-champagne-deep);
+  --share-ink: var(--ab-color-ink);
+  --share-muted: var(--ab-color-muted);
+  --share-paper: var(--ab-color-paper);
+  --share-line: var(--ab-color-border);
 }
 
 .share-state {
@@ -12,10 +17,10 @@
   align-items: center;
   justify-content: center;
   padding: var(--ab-space-6) var(--ab-space-4);
-  border: 2rpx solid var(--ab-color-border);
-  border-radius: var(--ab-radius-standard);
-  background: var(--ab-color-paper);
-  color: var(--ab-color-ink);
+  border: 2rpx solid var(--share-line);
+  border-radius: 4rpx;
+  background: var(--share-paper);
+  color: var(--share-ink);
   text-align: center;
 }
 
@@ -28,7 +33,7 @@
   justify-content: center;
   border: 2rpx solid var(--ab-color-gold-soft);
   border-radius: 50%;
-  color: var(--ab-color-green);
+  color: var(--share-accent);
   font-size: 44rpx;
   font-weight: 700;
 }
@@ -36,12 +41,12 @@
 .share-state--ERROR .share-state__mark,
 .share-state--EXPIRED .share-state__mark,
 .share-state--REVOKED .share-state__mark {
-  color: var(--ab-color-gold-brown);
+  color: var(--share-accent);
 }
 
 .share-state__eyebrow {
   margin-top: var(--ab-space-4);
-  color: var(--ab-color-gold-brown);
+  color: var(--share-accent);
   font-size: 22rpx;
   font-weight: 700;
   letter-spacing: 2rpx;
@@ -65,13 +70,13 @@
 .share-state__description {
   max-width: 560rpx;
   margin-top: 12rpx;
-  color: var(--ab-color-muted);
+  color: var(--share-muted);
   font-size: 28rpx;
   line-height: 1.65;
 }
 
-.share-state__detail:not(:empty),
-.share-state__slot-actions:not(:empty) {
+.share-state__detail,
+.share-state__slot-actions {
   display: block;
   width: 100%;
   margin-top: var(--ab-space-4);
@@ -92,29 +97,29 @@
   min-height: var(--ab-touch-target);
   margin: 0;
   padding: 0 var(--ab-space-3);
-  border: 2rpx solid var(--ab-color-green);
-  border-radius: var(--ab-radius-small);
-  color: var(--ab-color-green);
+  border: 2rpx solid var(--share-accent);
+  border-radius: 2rpx;
+  color: var(--share-accent);
   font-size: 28rpx;
   font-weight: 600;
   line-height: calc(var(--ab-touch-target) - 4rpx);
 }
 
 .share-state__action--forward {
-  background: var(--ab-color-green);
-  color: var(--ab-color-paper);
+  background: var(--share-accent);
+  color: var(--share-paper);
 }
 
-.share-state__action[disabled] {
-  border-color: var(--ab-color-border);
+.share-state__action--disabled {
+  border-color: var(--share-line);
   background: transparent;
-  color: var(--ab-color-muted);
+  color: var(--share-muted);
 }
 
 .share-state__assist {
   max-width: 560rpx;
   margin-top: var(--ab-space-3);
-  color: var(--ab-color-muted);
+  color: var(--share-muted);
   font-size: 25rpx;
 }
 
@@ -126,24 +131,29 @@
 
 @media (prefers-color-scheme: dark) {
   .share-state {
-    border-color: var(--ab-color-dark-border);
-    background: var(--ab-color-dark-surface);
-    color: var(--ab-color-dark-text);
+    --share-accent: var(--ab-color-gold-soft);
+    --share-ink: var(--ab-color-dark-text);
+    --share-muted: var(--ab-color-dark-muted);
+    --share-paper: var(--ab-color-dark-surface);
+    --share-line: var(--ab-color-dark-border);
+    border-color: var(--share-line);
+    background: var(--share-paper);
+    color: var(--share-ink);
   }
 
   .share-state__mark {
     border-color: var(--ab-color-gold-soft);
-    color: var(--ab-color-dark-text);
+    color: var(--share-ink);
   }
 
   .share-state__description,
   .share-state__assist {
-    color: var(--ab-color-dark-muted);
+    color: var(--share-muted);
   }
 
   .share-state__action {
     border-color: var(--ab-color-gold-soft);
-    color: var(--ab-color-dark-text);
+    color: var(--share-ink);
   }
 
   .share-state__action--forward {

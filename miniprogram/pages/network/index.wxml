@@ -1,1 +1,93 @@
-<view class="network ab-safe-bottom"><view class="network__topline"><text class="network__eyebrow">AB CLUB CONNECTIONS</text><ab-evidence-label mode="{{runtimeMode}}" /></view><text class="network__title">人脉</text><text class="network__lead">以城市、兴趣与可解释的共同点发现连接。“申请认识”仅建立 AB Club 平台关系，不会发起微信好友添加，也不提供站内聊天。</text><view wx:if="{{demoOnly}}" class="network__demo" aria-role="note"><text class="network__demo-kicker">SYNTHETIC · DEMO_ONLY</text><text class="network__demo-copy">以下人物、职业、城市关系与匹配理由均为脱敏合成演示，不是真实会员、合作方或签约关系；任何申请都不会被提交。</text></view><view wx:if="{{errorMessage}}" class="network__notice network__notice--error" aria-role="alert"><text>{{errorMessage}}</text><button class="network__retry" disabled="{{loading}}" bindtap="loadOverview">重新加载</button></view><view wx:elif="{{loading && !loaded}}" class="network__notice" aria-role="status">正在读取本人关系状态…</view><view class="network__grid"><navigator class="network__metric" url="/packageSocial/pages/requests/index" hover-class="none"><text class="network__metric-label">收到的申请</text><text class="network__metric-value">{{loaded ? incomingLoadedCount : '—'}}</text><text class="network__metric-note">仅本人可见 · 查看并处理</text></navigator><view class="network__metric"><text class="network__metric-label">已认识成员</text><text class="network__metric-value">{{loaded ? acceptedLoadedCount : '—'}}</text><text class="network__metric-note">本页已加载数量</text></view></view><view class="network__section"><view class="network__section-head"><text class="network__section-title">我的人脉</text><text class="network__section-note">只有已接受关系可解锁 FRIENDS_ONLY 字段</text></view><view wx:if="{{acceptedPreview.length}}" class="network__people"><navigator wx:for="{{acceptedPreview}}" wx:key="ownerUserId" class="network__person" url="/packageSocial/pages/friend/index?ownerUserId={{item.ownerUserId}}" hover-class="none" aria-label="查看与{{item.displayName}}的 AB Club 平台关系"><image wx:if="{{item.avatarUrl}}" class="network__avatar" src="{{item.avatarUrl}}" mode="aspectFill" /><view wx:else class="network__avatar network__avatar--fallback">AB</view><view class="network__identity"><text class="network__name">{{item.displayName}}</text><text wx:if="{{item.headline}}" class="network__headline">{{item.headline}}</text></view><text class="network__chevron" aria-hidden="true">›</text></navigator></view><view wx:elif="{{loaded}}" class="network__empty">还没有已接受的 AB Club 平台关系。</view></view><view wx:if="{{recommendations.length}}" class="network__section"><view class="network__section-head"><text class="network__section-title">为你引荐 · DEMO</text><text class="network__section-note">推荐只说明可解释的共同点，不代表身份核验、平台背书或真实合作。</text></view><view class="network__recommendations"><view wx:for="{{recommendations}}" wx:key="id" class="network__recommendation"><view class="network__rec-head"><view class="network__monogram">{{item.initials}}</view><view class="network__identity"><text class="network__name">{{item.displayName}}</text><text class="network__headline">{{item.role}}</text></view><text class="network__city">{{item.cityLine}}</text></view><text class="network__reason">{{item.reason}}</text><view class="network__chips"><text wx:for="{{item.interests}}" wx:for-item="interest" wx:key="*this" class="network__chip">{{interest}}</text></view><button class="network__demo-action" bindtap="onDemoRequest">申请认识（演示不提交）</button></view></view></view><view class="network__section"><text class="network__section-title">公开标签申请</text><text class="network__section-note">自述标签不会自动公开。只有人工审核结论为 APPROVED，且仍在有效期、符合目录资格并由本人选择公开时，才可展示为公开核验标签。</text><view class="network__actions"><navigator class="network__action" url="/packageSocial/pages/tag-apply/index" hover-class="none">发起标签申请</navigator><navigator class="network__action network__action--quiet" url="/packageSocial/pages/tag-status/index" hover-class="none">查看我的审核状态</navigator></view></view></view>
+<view class="network ab-safe-bottom">
+  <view class="network__status-line"><ab-evidence-label mode="{{runtimeMode}}" /></view>
+  <ab-brand-header
+    eyebrow="AB CLUB · CARD EXCHANGE"
+    title="名片交换"
+    subtitle="先看见彼此如何介绍自己，再决定是否建立 AB Club 平台关系。这里不会发起微信好友添加，也不提供站内聊天。"
+  />
+
+  <view class="network__card-first" aria-role="region" aria-label="数字名片快捷入口">
+    <navigator class="network__card-primary" open-type="switchTab" url="/pages/card/index" hover-class="network__pressed">
+      <image class="network__entry-icon network__entry-icon--light" src="/assets/icons/ui-card-light.png" mode="aspectFit" aria-hidden="true" /><view class="network__entry-copy"><text>打开我的数字名片</text><text>实时预览 · 编辑 · 分享</text></view><image class="network__entry-arrow network__entry-arrow--light" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+    </navigator>
+    <navigator class="network__card-secondary" url="/packageSocial/pages/requests/index" hover-class="network__pressed">
+      <image class="network__entry-icon" src="/assets/icons/ui-inbox.png" mode="aspectFit" aria-hidden="true" /><text class="network__entry-copy">查看收到的名片请求</text><image class="network__entry-arrow" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+    </navigator>
+  </view>
+
+  <view wx:if="{{demoOnly}}" class="network__demo" aria-role="note">
+    <text class="network__demo-kicker">SYNTHETIC · DEMO_ONLY</text>
+    <text class="network__demo-copy">以下人物、职业、城市关系与匹配理由均为脱敏合成演示，不是真实会员、合作方或签约关系；任何申请都不会被提交。</text>
+  </view>
+
+  <view wx:if="{{errorMessage}}" class="network__notice network__notice--error" aria-role="alert">
+    <text>{{errorMessage}}</text>
+    <button class="network__retry" disabled="{{loading}}" bindtap="loadOverview">重新加载</button>
+  </view>
+  <view wx:elif="{{loading && !loaded}}" class="network__notice" aria-role="status">正在读取本人关系状态…</view>
+
+  <view class="network__grid">
+    <navigator class="network__metric" url="/packageSocial/pages/requests/index" hover-class="none">
+      <text class="network__metric-label">收到的申请</text>
+      <text class="network__metric-value">{{loaded ? incomingLoadedCount : '—'}}</text>
+      <text class="network__metric-note">仅本人可见 · 查看并处理</text>
+    </navigator>
+    <view class="network__metric">
+      <text class="network__metric-label">已建立关系</text>
+      <text class="network__metric-value">{{loaded ? acceptedLoadedCount : '—'}}</text>
+      <text class="network__metric-note">双方接受后建立 · 本页已加载数量</text>
+    </view>
+  </view>
+
+  <view class="network__section">
+    <view class="network__section-head">
+      <text class="network__section-title">我的人脉</text>
+      <text class="network__section-note">只有双方接受后，才会建立 AB Club 平台关系并解锁 FRIENDS_ONLY 字段</text>
+    </view>
+    <view wx:if="{{acceptedPreview.length}}" class="network__people">
+      <navigator
+        wx:for="{{acceptedPreview}}"
+        wx:key="ownerUserId"
+        class="network__person"
+        url="/packageSocial/pages/friend/index?ownerUserId={{item.ownerUserId}}"
+        hover-class="none"
+        aria-label="查看与{{item.displayName}}的 AB Club 平台关系"
+      >
+        <image wx:if="{{item.avatarUrl}}" class="network__avatar" src="{{item.avatarUrl}}" mode="aspectFill" aria-label="{{item.displayName}}的头像" />
+        <view wx:else class="network__avatar network__avatar--fallback" aria-label="{{item.displayName}}的默认头像">{{item.avatarInitial}}</view>
+        <view class="network__identity"><text class="network__name">{{item.displayName}}</text><text wx:if="{{item.headline}}" class="network__headline">{{item.headline}}</text></view>
+        <image class="network__chevron-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+      </navigator>
+    </view>
+    <view wx:elif="{{loaded}}" class="network__empty">还没有已接受的 AB Club 平台关系。先分享你的数字名片，再等待对方确认。</view>
+  </view>
+
+  <view wx:if="{{recommendations.length}}" class="network__section network__section--secondary">
+    <view class="network__section-head">
+      <text class="network__section-title">为你引荐 · DEMO</text>
+      <text class="network__section-note">推荐只说明可解释的共同点，不代表身份核验、平台背书或真实合作。</text>
+    </view>
+    <view class="network__recommendations">
+      <view wx:for="{{recommendations}}" wx:key="id" class="network__recommendation">
+        <view class="network__rec-head">
+          <view class="network__monogram" aria-label="{{item.displayName}}的文字头像">{{item.initials}}</view>
+          <view class="network__identity"><text class="network__name">{{item.displayName}}</text><text class="network__headline">{{item.role}}</text></view>
+          <text class="network__city">{{item.cityLine}}</text>
+        </view>
+        <text class="network__reason">{{item.reason}}</text>
+        <view class="network__chips"><text wx:for="{{item.interests}}" wx:for-item="interest" wx:key="*this" class="network__chip">{{interest}}</text></view>
+        <button class="network__demo-action" bindtap="onDemoRequest">申请认识（演示不提交）</button>
+      </view>
+    </view>
+  </view>
+
+  <view class="network__section network__section--optional">
+    <text class="network__optional-kicker">OPTIONAL</text>
+    <text class="network__section-title">公开专业标签</text>
+    <text class="network__section-note">标签申请不是使用名片的前置条件。只有你主动申请且人工审核结论为 APPROVED 后，才可选择公开展示。</text>
+    <view class="network__actions">
+      <navigator class="network__action" url="/packageSocial/pages/tag-apply/index" hover-class="none">了解并发起申请</navigator>
+      <navigator class="network__action network__action--quiet" url="/packageSocial/pages/tag-status/index" hover-class="none">查看我的审核状态</navigator>
+    </view>
+  </view>
+</view>

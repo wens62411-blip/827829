@@ -1,0 +1,352 @@
+{
+  "runMode": "RED_TEAM_A",
+  "generatedAt": "2026-08-27T18:14:34.135Z",
+  "sourceRevision": "da8d5afda651d3396d26f082e4e24481d68850f4",
+  "sourceBranch": "main",
+  "baselineWorktreeState": "DIRTY_AND_CHANGED_DURING_AUDIT",
+  "writeBoundary": "integration/reports/red-team/**",
+  "currentWorktree": {
+    "redTeamWritesWithinBoundary": true,
+    "stabilizationCheckSeconds": 15,
+    "stableAtFinalSnapshot": true,
+    "trackedModifiedCount": 48,
+    "untrackedBusinessCount": 7,
+    "totalOutOfScopeChangedPaths": 55,
+    "trackedDiffStats": "48 files changed, 885 insertions, 507 deletions",
+    "trackedDiffSha256": "761fd8e8cc00429c826e31f6e57f2d36c9aa2f2fe37163d8775470a2fd57fa3f",
+    "trackedDiffHashMethod": "SHA-256 of UTF-8 LF-normalized git diff --binary text",
+    "untrackedManifestSha256": "3af4ef802c397913183f29df16efe6cd6921d031e52f263c39c156bbeac6ac46",
+    "observedAppId": "EMPTY",
+    "builtNpmPresent": false,
+    "handling": "All business changes were treated as read-only audit input and preserved. They were not created, reverted or approved by RED_TEAM_A.",
+    "observedOutOfScopeChangedPaths": [
+      "miniprogram/app.wxss",
+      "miniprogram/components/ab-verified-tag/index.json",
+      "miniprogram/components/ab-verified-tag/index.wxml",
+      "miniprogram/components/ab-verified-tag/index.wxss",
+      "miniprogram/assets/hero/zurich-960.jpg",
+      "miniprogram/assets/manifests/hero.json",
+      "miniprogram/components/ab-event-card/cloud-client-loader.ts",
+      "miniprogram/packageArt/data/demo.ts",
+      "miniprogram/packageArt/model.ts",
+      "miniprogram/packageArt/pages/channel/index.wxml",
+      "miniprogram/packageArt/pages/detail/index.ts",
+      "miniprogram/packageArt/pages/detail/index.wxml",
+      "miniprogram/packageArt/pages/intent/index.ts",
+      "miniprogram/packageArt/services/content-client.ts",
+      "miniprogram/packageCard/pages/edit/index.ts",
+      "miniprogram/packageCard/pages/edit/index.wxml",
+      "miniprogram/packageCard/pages/share/index.ts",
+      "miniprogram/packageCard/pages/share/index.wxml",
+      "miniprogram/packageCard/pages/view/index.ts",
+      "miniprogram/packageCard/pages/view/index.wxml",
+      "miniprogram/packageEvents/pages/city/index.ts",
+      "miniprogram/packageEvents/pages/enrollment/index.ts",
+      "miniprogram/packageEvents/pages/event/index.ts",
+      "miniprogram/packageEvents/pages/organizer/index.ts",
+      "miniprogram/pages/bootstrap/index.ts",
+      "miniprogram/pages/bootstrap/index.wxml",
+      "miniprogram/pages/bootstrap/index.wxss",
+      "miniprogram/pages/card/index.ts",
+      "miniprogram/pages/card/index.wxml",
+      "miniprogram/pages/card/services/identity-client.ts",
+      "miniprogram/pages/card/styles/card-theme.wxss",
+      "miniprogram/pages/discover/index.json",
+      "miniprogram/pages/discover/index.ts",
+      "miniprogram/pages/discover/index.wxml",
+      "miniprogram/pages/discover/index.wxss",
+      "miniprogram/pages/events/index.ts",
+      "miniprogram/pages/events/index.wxml",
+      "miniprogram/pages/me/index.json",
+      "miniprogram/pages/me/index.ts",
+      "miniprogram/pages/me/index.wxml",
+      "miniprogram/pages/network/index.ts",
+      "miniprogram/pages/network/index.wxml",
+      "miniprogram/pages/network/index.wxss",
+      "miniprogram/pages/network/services/social-client.ts",
+      "miniprogram/shared/services/cloud-client.ts",
+      "project.config.json",
+      "scripts/check-package.mjs",
+      "tests/components/events/events-ui.test.mjs",
+      "tests/components/foundation-components.test.mjs",
+      "tests/components/social/social-ui.test.mjs",
+      "tsconfig.miniprogram.json",
+      "miniprogram/components/ab-event-card/demo-data.ts",
+      "miniprogram/pages/card/services/offline-demo.ts",
+      "tests/components/card/offline-demo.test.mjs",
+      "tests/components/discover/home-page.test.mjs"
+    ],
+    "untrackedBusinessFileSha256": {
+      "miniprogram/assets/hero/zurich-960.jpg": "4348cc093352e7c13bc8bf6e5148b08580987ef13f3ca9e04f9a8669cd9101ae",
+      "miniprogram/assets/manifests/hero.json": "8c5461b9d6896fbb8132aff22662703dade9df8be14d4e5d0563fb89b179f872",
+      "miniprogram/components/ab-event-card/cloud-client-loader.ts": "6754ede425f8fe11b96dc5de3586e254893567fa528f713983b587e9d2197d43",
+      "miniprogram/components/ab-event-card/demo-data.ts": "9e7ab60c5066951607ff3194996bc75ebf5fd9e3c90df4ed2245fd0e8efa3ecd",
+      "miniprogram/pages/card/services/offline-demo.ts": "2205e5ee1e5507cb601a4abb88c2de7561e0a97e41eb597c0504949d456b55b7",
+      "tests/components/card/offline-demo.test.mjs": "2b7f6b4708b329a98bd9ebde5e0b9e789ac77a482650e888e0898c8c387827ec",
+      "tests/components/discover/home-page.test.mjs": "e252859d79ae67c016ae5967c4874d3cdc472d362ea1cf30144862dd8f1ff91c"
+    }
+  },
+  "environment": {
+    "os": "Microsoft Windows NT 10.0.26200.0",
+    "node": "v24.16.0",
+    "npm": "11.13.0",
+    "cwd": "E:\\Temp\\ab-club-wechat",
+    "frozenProjectMode": "LOCAL_ONLY_NO_APPID",
+    "observedProjectModeConflict": false,
+    "runtimeMode": "OFFLINE_DEMO",
+    "paymentCapability": "DISABLED",
+    "wechatDeveloperTools": false,
+    "iosDevice": false,
+    "androidDevice": false,
+    "cloudBaseRealEnvironment": false,
+    "networkSecurityScope": "OUT_OF_SCOPE_BY_USER"
+  },
+  "commands": [
+    {
+      "command": "npm run typecheck",
+      "exitCode": 1,
+      "status": "FAIL",
+      "details": "Earlier observation before the out-of-scope tsconfig range-exclusion change: three TS2322 timer errors.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "npm run typecheck",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Final snapshot: miniprogram, cloudfunctions and contract typechecks pass."
+    },
+    {
+      "command": "node scripts/validate-foundation.mjs",
+      "exitCode": 1,
+      "status": "FAIL",
+      "details": "Earlier dirty snapshot: 336 passed, 1 failed because project AppID was nonempty.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/validate-foundation.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Final snapshot: 337 passed, 0 failed; AppID is empty as required by LOCAL_ONLY_NO_APPID."
+    },
+    {
+      "command": "node scripts/check-cloud-runtime.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Checked-in bundles match TypeScript source SHA-256 4f54b0888ea0693f6f062f4083a23a1d4567c9056d842942d7402bb1e98e24df."
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Early snapshot: 2096905/2097152 bytes, 247-byte margin; superseded by later dirty-worktree changes.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 1,
+      "status": "FAIL",
+      "details": "Intermediate snapshot: 2134322/2097152 bytes, 37170 bytes over; superseded by later dependency/script changes.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Intermediate source-only snapshot: 734176/2097152 bytes; superseded by later dirty-worktree changes.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Intermediate snapshot after adding the local hero asset: 852907/2097152 bytes; superseded by later dirty-worktree changes.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Intermediate snapshot: 854028/2097152 bytes; built npm present and Developer Tools still UNVERIFIED; superseded by later dirty-worktree changes.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Intermediate snapshot: 855806/2097152 bytes with 1169 built files totaling 1490789 bytes present but excluded by the source-only estimator; superseded when the business-side built output was removed.",
+      "supersededByLaterDirtyWorktree": true
+    },
+    {
+      "command": "node scripts/check-package.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Final snapshot: source 855806 bytes, tdesignRuntimeReferenced=false, referencedDependencyBytes=0, projected 855806/2097152; built npm absent. Developer Tools package/pruning remains UNVERIFIED. An earlier dirty snapshot contained 1169 built files totaling 1490789 bytes and is retained as source-drift history."
+    },
+    {
+      "command": "node --test --test-isolation=none",
+      "exitCode": 1,
+      "status": "FAIL",
+      "details": "222 tests: 199 passed, 17 failed, 6 skipped. All 17 failures are spawn EPERM from esbuild-dependent tests across 10 files; failure is retained as failure and those formal files remain UNVERIFIED in this environment."
+    },
+    {
+      "command": "$excluded=<10 esbuild-dependent test files>; $safeTests=<all *.test.mjs except excluded>; node --test --test-isolation=none @safeTests",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "Sandbox-safe subset: 203 tests, 197 passed, 0 failed, 6 skipped across 38 files. The six miniprogram-simulate cases are UNVERIFIED because jsdom is unavailable; this is not page E2E evidence.",
+      "excludedFiles": [
+        "tests/cloud/admin/adapter-adversarial.test.mjs",
+        "tests/cloud/admin/auth-rbac.test.mjs",
+        "tests/cloud/admin/domain-audit.test.mjs",
+        "tests/cloud/admin/review-workflow.test.mjs",
+        "tests/cloud/content/content-api.test.mjs",
+        "tests/cloud/events/event-api.test.mjs",
+        "tests/components/art/intent-client-validation.test.mjs",
+        "tests/components/card/card-page-resilience.test.mjs",
+        "tests/components/card/card-services.test.mjs",
+        "tests/components/card/offline-demo.test.mjs"
+      ]
+    },
+    {
+      "command": "node --test --test-isolation=none integration/reports/red-team/tests/*.test.mjs",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "24/24 red-team assertions passed. Passing means OPEN failure conditions were reproduced; it does not close findings or upgrade the local gate."
+    },
+    {
+      "command": "credential, secret, phone, PRC identity-number, material locator and console scans",
+      "exitCode": 0,
+      "status": "PASS",
+      "details": "No credential or new production PII sample found. Phone/identity/material locator matches are confined to explicit synthetic tests; no console match in miniprogram/cloudfunctions. Binary, device and CloudBase logs remain UNVERIFIED."
+    }
+  ],
+  "manifestAudit": [
+    {
+      "module": "foundation",
+      "contractVersion": "1.0.0",
+      "overall": "LOCAL_TEST_PASS",
+      "local": "PASS",
+      "otherGates": "UNVERIFIED",
+      "checks": { "PASS": 3, "FAIL": 0, "UNVERIFIED": 0 },
+      "changedPathsPresent": false,
+      "currentRevalidation": "PASS"
+    },
+    {
+      "module": "card",
+      "contractVersion": "1.0.0",
+      "overall": "INCOMPLETE",
+      "local": "FAIL",
+      "otherGates": "UNVERIFIED",
+      "checks": { "PASS": 16, "FAIL": 4, "UNVERIFIED": 2 },
+      "changedPathsPresent": false
+    },
+    {
+      "module": "social-review",
+      "contractVersion": "1.0.0",
+      "overall": "LOCAL_TEST_PASS",
+      "local": "PASS",
+      "otherGates": "UNVERIFIED",
+      "checks": { "PASS": 7, "FAIL": 0, "UNVERIFIED": 0 },
+      "changedPathsPresent": false
+    },
+    {
+      "module": "events",
+      "contractVersion": "1.0.0",
+      "overall": "LOCAL_TEST_PASS",
+      "local": "PASS",
+      "otherGates": "UNVERIFIED",
+      "checks": { "PASS": 8, "FAIL": 0, "UNVERIFIED": 2 },
+      "changedPathsPresent": false
+    },
+    {
+      "module": "art",
+      "contractVersion": "1.0.0",
+      "overall": "LOCAL_TEST_PASS",
+      "local": "PASS",
+      "otherGates": "UNVERIFIED",
+      "checks": { "PASS": 13, "FAIL": 1, "UNVERIFIED": 0 },
+      "changedPathsPresent": false
+    },
+    {
+      "module": "admin",
+      "contractVersion": "1.0.0",
+      "overall": "BLOCKED",
+      "local": "PASS",
+      "otherGates": "UNVERIFIED",
+      "checks": { "PASS": 17, "FAIL": 2, "UNVERIFIED": 0 },
+      "changedPathsPresent": false
+    }
+  ],
+  "gates": {
+    "local": {
+      "status": "FAIL",
+      "evidence": [
+        "integration/reports/red-team/security-findings.md",
+        "integration/reports/red-team/contract-drift-report.md",
+        "integration/reports/red-team/tests/approval-provenance-bypass.test.mjs",
+        "integration/reports/red-team/tests/admin-material-access-gap.test.mjs",
+        "integration/reports/red-team/tests/object-purpose-boundaries.test.mjs",
+        "integration/reports/red-team/tests/demo-truth-boundaries.test.mjs"
+      ],
+      "note": "Four P0 remain OPEN; contractDrift.total=8; the full node test command exits 1 and the original card manifest local gate is FAIL."
+    },
+    "devtoolsPreview": {
+      "status": "UNVERIFIED",
+      "evidence": ["No WeChat Developer Tools evidence was available."],
+      "note": "miniprogram-simulate or static screenshots are not page E2E or Developer Tools preview evidence."
+    },
+    "iosDevice": {
+      "status": "UNVERIFIED",
+      "evidence": ["No iOS device run was available."],
+      "note": "Safe-area, touch, image and reduced-motion behavior remain unverified on iOS."
+    },
+    "androidDevice": {
+      "status": "UNVERIFIED",
+      "evidence": ["No Android device run was available."],
+      "note": "Touch, weak-network, image and reduced-motion behavior remain unverified on Android."
+    },
+    "devVersionUpload": {
+      "status": "UNVERIFIED",
+      "evidence": ["No dev-version upload was attempted."],
+      "note": "The final empty AppID and local checks are not upload evidence."
+    },
+    "release": {
+      "status": "UNVERIFIED",
+      "evidence": ["No release or deployment evidence exists."],
+      "note": "Four P0 findings, contract drift and required local failures prohibit Prompt 08."
+    }
+  },
+  "unverifiedItems": [
+    "Network infrastructure and online network security are OUT_OF_SCOPE by user request: no domain, TLS, port, live endpoint or production penetration checks",
+    "Ten esbuild-dependent formal test files fail to start in this sandbox with spawn EPERM",
+    "WeChat Developer Tools preview, authoritative main/subpackage size and unused-file pruning; final built npm is absent",
+    "iOS device safe-area, touch, image failure, reduced-motion and accessibility",
+    "Android device touch, weak-network, image failure, reduced-motion and accessibility",
+    "Real CloudBase auth context, ACL, storage URLs, transactions, indexes, concurrency and logs",
+    "Cross-module social invalidation consumption by identity share resolution",
+    "Relationship-cache invalidation after the other party or another device removes/blocks the relationship",
+    "Real QR generation and share cold-start on device",
+    "Binary/OCR and device/CloudBase log secret or PII scanning",
+    "Human review of all city and art rights claims",
+    "Real operations team, organizer, event supply and city LIVE status",
+    "Dev-version upload and release",
+    "Real payment order, callback, refund and reconciliation"
+  ],
+  "findingCounts": {
+    "P0": 4,
+    "P1": 13,
+    "P2": 12,
+    "total": 29,
+    "status": "OPEN"
+  },
+  "contractDrift": {
+    "P0": 0,
+    "P1": 4,
+    "P2": 4,
+    "total": 8,
+    "status": "FAIL"
+  },
+  "unresolvedP0": 4,
+  "integrationEligible": false,
+  "nextAllowedStep": "Return proposals to original module owners, rerun their contracts/components/cloud/negative tests, update original manifests, then invoke RED_TEAM_B only.",
+  "stopAfter": "07A"
+}

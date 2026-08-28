@@ -1,0 +1,23 @@
+<view
+  class="brand-header brand-header--{{theme}} {{compact ? 'brand-header--compact' : ''}}"
+  aria-role="banner"
+  aria-label="{{title || 'AB Club'}}"
+>
+  <view class="brand-header__mark">
+    <image
+      wx:if="{{!logoFailed}}"
+      class="brand-header__crest"
+      src="/assets/brand/ab-club-crest.png"
+      mode="aspectFit"
+      alt="AB Club 盾徽标志"
+      aria-label="AB Club 盾徽标志"
+      binderror="handleLogoError"
+    />
+    <text wx:else class="brand-header__fallback" aria-label="AB Club 标志加载失败，显示文字标识">AB CLUB</text>
+  </view>
+  <view class="brand-header__copy">
+    <text wx:if="{{eyebrow}}" class="brand-header__eyebrow">{{eyebrow}}</text>
+    <text wx:if="{{title}}" class="brand-header__title">{{title}}</text>
+    <text wx:if="{{subtitle}}" class="brand-header__subtitle">{{subtitle}}</text>
+  </view>
+</view>

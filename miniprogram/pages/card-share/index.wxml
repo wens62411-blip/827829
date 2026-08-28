@@ -1,6 +1,10 @@
-<view class="card-page">
-  <text class="card-kicker">Shared Card</text>
-  <text class="card-title">AB Club 数字名片</text>
+<view class="card-page share-entry-page">
+  <view class="share-entry-header">
+    <view><text class="card-kicker">SHARED DIGITAL INTRODUCTION</text><text class="card-title">AB Club 数字名片</text><text class="card-subtitle">一张清楚、克制的自我介绍。是否继续认识，由你决定。</text></view>
+    <image class="share-entry-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
+  </view>
+
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 这是真实转发的体验内容，不是真实会员资料</view>
 
   <ab-share-state
     state="{{state}}"
@@ -16,10 +20,13 @@
     card="{{card}}"
     viewer-mode="STRANGER"
     city-label="{{cityLabel}}"
+    fields="{{demoMode ? demoFields : []}}"
+    theme="{{cardTheme}}"
     max-visible-claims="3"
+    show-default-actions="{{false}}"
   />
 
-  <view class="card-status">每次回到本页或下拉刷新都会重新解析入口。好友删除或认证撤销后，旧页面不会继续沿用先前可见内容。</view>
+  <view class="card-status">{{demoMode ? '体验名片不建立账户、好友关系或认证；转发只传递这张已标注的合成卡片。' : '每次回到本页或下拉刷新都会重新解析入口。好友删除或认证撤销后，旧页面不会继续沿用先前可见内容。'}}</view>
 
   <view class="card-stack">
     <navigator class="card-link-button" open-type="switchTab" url="/pages/discover/index" hover-class="none">返回 AB Club</navigator>

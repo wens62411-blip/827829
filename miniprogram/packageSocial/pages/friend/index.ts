@@ -93,7 +93,7 @@ Page({
   onLoad(options: Record<string, string | undefined>) {
     const targetUserId = options.ownerUserId?.trim() ?? '';
     if (!targetUserId || targetUserId.length > 160) {
-      this.setData({ errorMessage: '缺少有效的成员标识，请从名片或“我的人脉”进入。' });
+      this.setData({ errorMessage: '缺少有效的成员标识，请从成员名片或发现页的连接入口进入。' });
       return;
     }
     this.setData({ targetUserId });

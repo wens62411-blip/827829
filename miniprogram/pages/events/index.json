@@ -3,8 +3,6 @@
   "enablePullDownRefresh": true,
   "backgroundTextStyle": "dark",
   "usingComponents": {
-    "ab-city-switcher": "/components/ab-city-switcher/index",
-    "ab-city-hero": "/components/ab-city-hero/index",
     "ab-event-card": "/components/ab-event-card/index",
     "ab-event-state": "/components/ab-event-state/index"
   }

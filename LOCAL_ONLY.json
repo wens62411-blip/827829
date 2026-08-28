@@ -1,8 +1,8 @@
 {
-  "mode": "LOCAL_ONLY",
+  "mode": "EXPERIENCE_ONLY",
   "appId": null,
   "cloudEnvironment": null,
-  "uploadAllowed": false,
+  "uploadAllowed": true,
   "releaseAllowed": false,
-  "reason": "LOCAL_ONLY_NO_APPID: no authorized WeChat AppID or CloudBase environment has been supplied."
+  "reason": "AUTHORIZED_EXPERIENCE_UPLOAD_ONLY: an AppID is configured only in the ignored local private file; CloudBase is not configured and public release remains disallowed."
 }

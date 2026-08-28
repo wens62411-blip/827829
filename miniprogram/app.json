@@ -1,12 +1,12 @@
 {
-  "entryPagePath": "pages/bootstrap/index",
+  "entryPagePath": "pages/discover/index",
   "pages": [
-    "pages/bootstrap/index",
     "pages/discover/index",
     "pages/events/index",
     "pages/card/index",
-    "pages/network/index",
     "pages/me/index",
+    "pages/network/index",
+    "pages/bootstrap/index",
     "pages/card-share/index",
     "pages/event-share/index"
   ],
@@ -37,8 +37,7 @@
       "pages": [
         "pages/city/index",
         "pages/event/index",
-        "pages/organizer/index",
-        "pages/enrollment/index"
+        "pages/organizer/index"
       ]
     },
     {
@@ -63,14 +62,6 @@
     }
   ],
   "preloadRule": {
-    "pages/discover/index": {
-      "network": "all",
-      "packages": ["art"]
-    },
-    "pages/events/index": {
-      "network": "all",
-      "packages": ["events"]
-    },
     "pages/card/index": {
       "network": "all",
       "packages": ["card"]
@@ -81,27 +72,47 @@
     }
   },
   "window": {
-    "navigationBarBackgroundColor": "#F6F1E7",
+    "navigationBarBackgroundColor": "#F4EFE6",
     "navigationBarTextStyle": "black",
     "navigationBarTitleText": "AB Club",
-    "backgroundColor": "#F6F1E7",
+    "backgroundColor": "#F4EFE6",
     "backgroundTextStyle": "dark"
   },
   "tabBar": {
-    "color": "#1C2723",
-    "selectedColor": "#173C32",
-    "backgroundColor": "#FCFBF7",
+    "color": "#756F66",
+    "selectedColor": "#98723A",
+    "backgroundColor": "#FFFDF8",
     "borderStyle": "white",
     "list": [
-      { "pagePath": "pages/discover/index", "text": "首页" },
-      { "pagePath": "pages/events/index", "text": "活动" },
-      { "pagePath": "pages/card/index", "text": "名片" },
-      { "pagePath": "pages/network/index", "text": "人脉" },
-      { "pagePath": "pages/me/index", "text": "我的" }
+      {
+        "pagePath": "pages/discover/index",
+        "text": "发现",
+        "iconPath": "assets/icons/tab-home.png",
+        "selectedIconPath": "assets/icons/tab-home-active.png"
+      },
+      {
+        "pagePath": "pages/events/index",
+        "text": "活动",
+        "iconPath": "assets/icons/tab-events.png",
+        "selectedIconPath": "assets/icons/tab-events-active.png"
+      },
+      {
+        "pagePath": "pages/card/index",
+        "text": "名片",
+        "iconPath": "assets/icons/tab-card.png",
+        "selectedIconPath": "assets/icons/tab-card-active.png"
+      },
+      {
+        "pagePath": "pages/me/index",
+        "text": "我的",
+        "iconPath": "assets/icons/tab-me.png",
+        "selectedIconPath": "assets/icons/tab-me-active.png"
+      }
     ]
   },
   "usingComponents": {
     "ab-page-state": "/components/ab-page-state/index",
+    "ab-brand-header": "/components/ab-brand-header/index",
     "ab-verified-tag": "/components/ab-verified-tag/index",
     "ab-city-status": "/components/ab-city-status/index",
     "ab-evidence-label": "/components/ab-evidence-label/index"

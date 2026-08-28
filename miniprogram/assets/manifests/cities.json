@@ -1,1 +1,351 @@
-{"schemaVersion":"1.2.0","generatedAt":"2026-08-27T12:46:39.876Z","evidenceStatus":"LICENSE_SOURCE_VERIFIED_HUMAN_REVIEW_PENDING","runtimePolicy":"LOCAL_FILES_ONLY_NO_HOTLINK","pathTemplate":"/assets/cities/{cityId}.jpg","licenseVerifiedAt":"2026-08-27T12:37:49.922Z","sourceProfile":{"provider":"Wikimedia Commons","type":"PHOTOGRAPH","downloadMethod":"WIKIMEDIA_THUMBNAIL_1280px"},"processingProfile":{"name":"QUIET_GRAND_TOUR_REAL_CITY_V1","runtimeFormat":"JPEG","runtimeWidth":288,"runtimeHeight":162,"note":"Real licensed city photographs; crop and warm color grade do not change depicted locations."},"rightsProfile":{"rightsState":"CLAIMED","reviewStatus":"DRAFT","licenseEvidenceState":"SOURCE_PAGE_VERIFIED","publicationPolicy":"HUMAN_RIGHTS_REVIEW_REQUIRED","attributionRequired":true,"externalHotlink":false},"licenseRegistry":{"CC BY 2.0":"https://creativecommons.org/licenses/by/2.0/","CC BY-SA 4.0":"https://creativecommons.org/licenses/by-sa/4.0/","CC BY 4.0":"https://creativecommons.org/licenses/by/4.0/","CC BY-SA 3.0":"https://creativecommons.org/licenses/by-sa/3.0/","CC BY 2.5":"https://creativecommons.org/licenses/by/2.5/","CC BY-SA 2.0":"https://creativecommons.org/licenses/by-sa/2.0/"},"assets":[{"cityId":"cn-beijing","landmark":"北京故宫","sourcePage":"https://commons.wikimedia.org/wiki/File:China_%28Beijing%29_Aerial_view_of_Forbidden_City_%2838884882275%29.jpg","author":"Güldem Üstün","license":"CC BY 2.0","downloadedAt":"2026-08-27T12:30:34.145Z","sourceSha256":"a85d09caeb2d940e41c3fd393dc5fdabe9415e38fa9b1a2b7ce0b7929a626705","sourceDimensions":[1280,805],"sha256":"9d0e651b893dac1c9f7a5e6bfc0121460a5c74e58cd9ecb9122e954ab0130a31","alt":"从高处俯瞰北京故宫红墙金瓦建筑群与城市天际线"},{"cityId":"cn-shanghai","landmark":"浦东陆家嘴天际线","sourcePage":"https://commons.wikimedia.org/wiki/File:Pudong_Shanghai_November_2017_panorama.jpg","author":"King of Hearts","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:30:34.452Z","sourceSha256":"a1ebb804857f02dd5e1384d1c58769242070de4d965807908a282368aa0bcc52","sourceDimensions":[1280,640],"sha256":"b33b6ed0fdd1bdd3cea501aad295268efb3545316a229b9a7979739d494bc89e","alt":"从外滩方向眺望上海浦东陆家嘴天际线，东方明珠与摩天楼临江而立"},{"cityId":"cn-guangzhou","landmark":"广州塔与珠江","sourcePage":"https://commons.wikimedia.org/wiki/File:Canton_Tower_20220626.jpg","author":"Tim Wu","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:30:34.914Z","sourceSha256":"cf08f31cab5cede63ac4476296774061ad5b1bd229cc67cbc379e2c4160b6452","sourceDimensions":[1280,853],"sha256":"d9049f02f779a31f303c57c41a49f570af50d0db5095053ad41f4900029f1d01","alt":"航拍广州塔与珠江两岸城市建筑"},{"cityId":"cn-shenzhen","landmark":"福田中央商务区","sourcePage":"https://commons.wikimedia.org/wiki/File:The_panorama_of_Futian_Shenzhen.jpg","author":"Charlie fong","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:30:35.286Z","sourceSha256":"9d3287e4970e1b6095a84e763adfc0e3b377ed20c28f2dd6ebd0cfcf930cc367","sourceDimensions":[1280,430],"sha256":"8e69c64cd0097a726d5a56e071837593ff5dbecb8cafa33bf5b19e47e1fac831","alt":"深圳福田中央商务区全景，平安金融中心高耸于城市天际线"},{"cityId":"cn-hangzhou","landmark":"西湖与远山","sourcePage":"https://commons.wikimedia.org/wiki/File:Aerial_panorama_of_West_Lake_and_its_surrounding_mountains._December_2023.jpg","author":"Wanderingchina","license":"CC BY 4.0","downloadedAt":"2026-08-27T12:30:35.899Z","sourceSha256":"9e799dae21e8da56c02706609ec65f55c4f1b81afde26faff7ee82c5399219d3","sourceDimensions":[1280,518],"sha256":"2a4dc8d41b26484a445723f31f008af3aef064e87a92c18e4f0adcd5633f484c","alt":"航拍杭州西湖、湖中岛屿与远山全景"},{"cityId":"ch-zurich","landmark":"利马特河与苏黎世老城","sourcePage":"https://commons.wikimedia.org/wiki/File:Panorama_Stadt_Z%C3%BCrich.jpg","author":"Beat Ruest","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:32:45.443Z","sourceSha256":"f223bd5464d7412b5f7ffe5fc5bb096fc0c60115d13982b3b9af6548de1019ed","sourceDimensions":[1280,631],"sha256":"888c0774b2f83859f251346628c6e78083e3dab319d63081c731efdd7dd6727c","alt":"苏黎世利马特河两岸老城全景，双塔大教堂与教堂尖顶映入河岸"},{"cityId":"it-milan","landmark":"米兰大教堂广场","sourcePage":"https://commons.wikimedia.org/wiki/File:Milano%2C_Duomo_with_Milan_Cathedral_and_Galleria_Vittorio_Emanuele_II%2C_2016.jpg","author":"Steffen Schmitz","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:32:47.339Z","sourceSha256":"b9e277605a14aff8019854918d42cd4c33f6d799d1c4caf47643b18cb23a7a30","sourceDimensions":[1280,750],"sha256":"c53ce9565d417737e522fb5442826d94e790b069b9431262f723bb5c2d719131","alt":"米兰大教堂与埃马努埃莱二世拱廊俯瞰大教堂广场"},{"cityId":"fr-paris","landmark":"清晨埃菲尔铁塔","sourcePage":"https://commons.wikimedia.org/wiki/File:Eiffel_tower_at_dawn_horizontal.jpg","author":"Nitot","license":"CC BY-SA 3.0","downloadedAt":"2026-08-27T12:35:21.097Z","sourceSha256":"4367efb2e2ffb3e6571f6d355ffd11f31ea94e6deb5a1073b4b3da813030a70b","sourceDimensions":[1280,853],"sha256":"90ebefc897f5229e664685d58902c8a91f58c71cbbfe806b4d293acfc09d0251","alt":"清晨从特罗卡德罗广场眺望巴黎埃菲尔铁塔"},{"cityId":"au-melbourne","landmark":"墨尔本滨水区与游艇码头","sourcePage":"https://commons.wikimedia.org/wiki/File:Melbourne_Docklands_-_Yarras_Edge_-_marina_panorama.jpg","author":"Diliff","license":"CC BY 2.5","downloadedAt":"2026-08-27T12:35:25.352Z","sourceSha256":"c7244edef0cfdd8f727219c6343b3417072c0dee24ffc74dd91d032662985c7a","sourceDimensions":[1280,321],"sha256":"5bb6ff1021cc746ddfc76176aeb81d68397c03fd3d2f3402bea52566d1757902","alt":"暮色中的墨尔本滨水区、游艇码头与城市天际线"},{"cityId":"au-sydney","landmark":"悉尼歌剧院与海港大桥","sourcePage":"https://commons.wikimedia.org/wiki/File:Sydney_Opera_House_and_Harbour_Bridge_Dusk_%283%29_2019-06-21.jpg","author":"Benh LIEU SONG","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:32:53.038Z","sourceSha256":"08577c2a247cf41576b1235f8965c4a00b23f27c510705f0de9e1e734b2ed533","sourceDimensions":[1280,506],"sha256":"6341dc3bfe2aaaaefb5b96e5798a606a51cdfcc3411fb91b5792e2c27d4e0bf5","alt":"暮色中的悉尼歌剧院与海港大桥横跨海湾"},{"cityId":"sg-singapore","landmark":"新加坡滨海湾","sourcePage":"https://commons.wikimedia.org/wiki/File:Singapore_Marina_Bay_Dusk_2018-02-27.jpg","author":"Benh LIEU SONG","license":"CC BY-SA 4.0","downloadedAt":"2026-08-27T12:36:16.070Z","sourceSha256":"9562d3d2702b07858b14fccda97dd6529d9f0d39742ee66bd24c9cb2f96def4c","sourceDimensions":[1280,482],"sha256":"3f33a1a19d33053e959c353153123ef47fadc5f872c3d099cc70e9c08800f42c","alt":"暮色中的新加坡滨海湾、滨海湾金沙与中央商务区天际线"},{"cityId":"ca-toronto","landmark":"多伦多滨水区与加拿大国家电视塔","sourcePage":"https://commons.wikimedia.org/wiki/File:Toronto_Waterfront%2C_CN_Tower_6277.jpg","author":"ImagePerson","license":"CC BY 4.0","downloadedAt":"2026-08-27T12:35:32.886Z","sourceSha256":"c2807aef69ee13d7116310fc3b21a51f3c8c03b86b0d30ab66cb943ab74e064e","sourceDimensions":[1280,852],"sha256":"5f72d102a6d604559ec6a7892415c3e42947080735d2deda56f627306d8795f9","alt":"多伦多滨水区与加拿大国家电视塔城市景观"},{"cityId":"ca-vancouver","landmark":"温哥华天际线与北岸山脉","sourcePage":"https://commons.wikimedia.org/wiki/File:Vancouver_Skyline_and_Mountains.jpg","author":"Kyle Pearce / DIY Genius","license":"CC BY-SA 2.0","downloadedAt":"2026-08-27T12:32:58.765Z","sourceSha256":"ece27fccbaddcff92ec00a6e91ae0da3736e3512a9953dffcf3b9cfa2896fad9","sourceDimensions":[1280,719],"sha256":"0bf23ba08f045b99c25902e59f76c1b0c6469530aeb03b14699067e40d8c8807","alt":"从伊丽莎白女王公园眺望温哥华天际线与积雪北岸山脉"}]}
+{
+  "schemaVersion": "1.2.0",
+  "generatedAt": "2026-08-28T09:24:48.122436Z",
+  "evidenceStatus": "LICENSE_SOURCE_VERIFIED_HUMAN_REVIEW_PENDING",
+  "runtimePolicy": "LOCAL_FILES_ONLY_NO_HOTLINK",
+  "pathTemplate": "/assets/cities/{cityId}.jpg",
+  "licenseVerifiedAt": "2026-08-28T09:24:48.122436Z",
+  "sourceProfile": {
+    "provider": "Wikimedia Commons",
+    "type": "PHOTOGRAPH",
+    "downloadMethod": "WIKIMEDIA_API_THUMBNAIL_1920px_AND_3840px"
+  },
+  "processingProfile": {
+    "name": "PREMIUM_CITY_EDITORIAL_CLEAR_V3",
+    "runtimeFormat": "JPEG",
+    "runtimeWidth": 1152,
+    "runtimeHeight": 648,
+    "jpegQuality": 40,
+    "note": "Licensed Commons derivatives center-cropped to 16:9 at 1152px; restrained desaturation, warm paper blend and package-aware progressive JPEG compression applied."
+  },
+  "rightsProfile": {
+    "rightsState": "CLAIMED",
+    "reviewStatus": "DRAFT",
+    "licenseEvidenceState": "SOURCE_PAGE_VERIFIED",
+    "publicationPolicy": "HUMAN_RIGHTS_REVIEW_REQUIRED",
+    "attributionRequired": true,
+    "externalHotlink": false
+  },
+  "licenseRegistry": {
+    "CC BY 2.0": "https://creativecommons.org/licenses/by/2.0/",
+    "CC BY-SA 4.0": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "CC BY 4.0": "https://creativecommons.org/licenses/by/4.0/",
+    "CC BY-SA 3.0": "https://creativecommons.org/licenses/by-sa/3.0/",
+    "CC BY 2.5": "https://creativecommons.org/licenses/by/2.5/",
+    "CC BY-SA 2.0": "https://creativecommons.org/licenses/by-sa/2.0/"
+  },
+  "assets": [
+    {
+      "cityId": "cn-beijing",
+      "landmark": "北京故宫",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:China_%28Beijing%29_Aerial_view_of_Forbidden_City_%2838884882275%29.jpg",
+      "author": "Güldem Üstün",
+      "license": "CC BY 2.0",
+      "downloadedAt": "2026-08-27T12:30:34.145Z",
+      "sourceSha256": "aabcd422b38372846a6af53bf2094e9ddf062a70b9ece4f9ebacee5a8db9205b",
+      "sourceDimensions": [
+        1920,
+        1207
+      ],
+      "sha256": "8f17307da4774d28450ef4a18d4d1d93f397e54c44452bf636c29b269a322074",
+      "alt": "从高处俯瞰北京故宫红墙金瓦建筑群与城市天际线",
+      "originalDimensions": [
+        3737,
+        2349
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/China_%28Beijing%29_Aerial_view_of_Forbidden_City_%2838884882275%29.jpg?width=1920"
+    },
+    {
+      "cityId": "cn-shanghai",
+      "landmark": "浦东陆家嘴天际线",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Pudong_Shanghai_November_2017_panorama.jpg",
+      "author": "King of Hearts",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:30:34.452Z",
+      "sourceSha256": "328c070529c599acc10b83f05901e231de088437788f02fdef6b828dcc2ca7eb",
+      "sourceDimensions": [
+        1920,
+        960
+      ],
+      "sha256": "cdf475945d6a28fc24cec49080c778cfb9eebdb3dca1a934cfcfc8ca93699f97",
+      "alt": "从外滩方向眺望上海浦东陆家嘴天际线，东方明珠与摩天楼临江而立",
+      "originalDimensions": [
+        10200,
+        5100
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Pudong_Shanghai_November_2017_panorama.jpg?width=1920"
+    },
+    {
+      "cityId": "cn-guangzhou",
+      "landmark": "广州塔与珠江",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Canton_Tower_20220626.jpg",
+      "author": "Tim Wu",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:30:34.914Z",
+      "sourceSha256": "ec05b15a7f0cd7dbfc6b891fa2821cb71f064711d24e6dc658177a7e3e25813d",
+      "sourceDimensions": [
+        1920,
+        1280
+      ],
+      "sha256": "d955ce6d0235b66a829f47111d596c67a537d5337ada08554d331183dffe86a7",
+      "alt": "航拍广州塔与珠江两岸城市建筑",
+      "originalDimensions": [
+        3980,
+        2653
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Canton_Tower_20220626.jpg?width=1920"
+    },
+    {
+      "cityId": "cn-shenzhen",
+      "landmark": "福田中央商务区",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:The_panorama_of_Futian_Shenzhen.jpg",
+      "author": "Charlie fong",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:30:35.286Z",
+      "sourceSha256": "586f6266f3796fa55806b743b25fc587072b250374427689f748319e850e1a63",
+      "sourceDimensions": [
+        1920,
+        645
+      ],
+      "sha256": "a8fa55e3cb1fb319b0701004e120536b865d1dd2bc0e0fe4db9a1e5cc34e9edb",
+      "alt": "深圳福田中央商务区全景，平安金融中心高耸于城市天际线",
+      "originalDimensions": [
+        4899,
+        1647
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/The_panorama_of_Futian_Shenzhen.jpg?width=1920"
+    },
+    {
+      "cityId": "cn-hangzhou",
+      "landmark": "西湖与远山",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Aerial_panorama_of_West_Lake_and_its_surrounding_mountains._December_2023.jpg",
+      "author": "Wanderingchina",
+      "license": "CC BY 4.0",
+      "downloadedAt": "2026-08-27T12:30:35.899Z",
+      "sourceSha256": "ed3f527739969662b8ba4aa446b36c86e5ae4d23544f281e32ebe1fafe618875",
+      "sourceDimensions": [
+        1920,
+        777
+      ],
+      "sha256": "bc10f54dfce469ee524cda641e93a6acd8c0d572755ef726f17c954fa3e1d9e4",
+      "alt": "航拍杭州西湖、湖中岛屿与远山全景",
+      "originalDimensions": [
+        8192,
+        3314
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Aerial_panorama_of_West_Lake_and_its_surrounding_mountains._December_2023.jpg?width=1920"
+    },
+    {
+      "cityId": "ch-zurich",
+      "landmark": "利马特河与苏黎世老城",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Panorama_Stadt_Z%C3%BCrich.jpg",
+      "author": "Beat Ruest",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:32:45.443Z",
+      "sourceSha256": "c587162840aff639aa2842d1f2bded2e8b1d08056d44f778e25895c15fda6fe4",
+      "sourceDimensions": [
+        1920,
+        947
+      ],
+      "sha256": "d2634f773919cf7b1fa3a4554d1de543dce6149468a81e73e636caa98dd2d0b6",
+      "alt": "苏黎世利马特河两岸老城全景，双塔大教堂与教堂尖顶映入河岸",
+      "originalDimensions": [
+        4320,
+        2130
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Panorama_Stadt_Z%C3%BCrich.jpg?width=1920"
+    },
+    {
+      "cityId": "it-milan",
+      "landmark": "米兰大教堂广场",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Milano%2C_Duomo_with_Milan_Cathedral_and_Galleria_Vittorio_Emanuele_II%2C_2016.jpg",
+      "author": "Steffen Schmitz",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:32:47.339Z",
+      "sourceSha256": "0ebeb376694a6f644b6b5fa1830cd59089ef887ea7ef2b8607fd581d0cf9e62b",
+      "sourceDimensions": [
+        1920,
+        1125
+      ],
+      "sha256": "69f58fc1db90f184c35db617da3e75f1273d06af082e4e93765125a1c531e44f",
+      "alt": "米兰大教堂与埃马努埃莱二世拱廊俯瞰大教堂广场",
+      "originalDimensions": [
+        3048,
+        1786
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Milano%2C_Duomo_with_Milan_Cathedral_and_Galleria_Vittorio_Emanuele_II%2C_2016.jpg?width=1920"
+    },
+    {
+      "cityId": "fr-paris",
+      "landmark": "清晨埃菲尔铁塔",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Eiffel_tower_at_dawn_horizontal.jpg",
+      "author": "Nitot",
+      "license": "CC BY-SA 3.0",
+      "downloadedAt": "2026-08-27T12:35:21.097Z",
+      "sourceSha256": "fd9e582bea85adc74df5bf1eec9c0bc5cc437d6c17a6f72eb9a494db36dd0b0f",
+      "sourceDimensions": [
+        1920,
+        1280
+      ],
+      "sha256": "3186d481dff673022f9e79d12be7c944c65d8e5badc4739ceda13aa83082de4b",
+      "alt": "清晨从特罗卡德罗广场眺望巴黎埃菲尔铁塔",
+      "originalDimensions": [
+        3504,
+        2336
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Eiffel_tower_at_dawn_horizontal.jpg?width=1920"
+    },
+    {
+      "cityId": "au-melbourne",
+      "landmark": "墨尔本滨水区与游艇码头",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Melbourne_Docklands_-_Yarras_Edge_-_marina_panorama.jpg",
+      "author": "Diliff",
+      "license": "CC BY 2.5",
+      "downloadedAt": "2026-08-27T12:35:25.352Z",
+      "sourceSha256": "d726caf34fb97a7ed295291793f51f7bb34d24efbb1bd426998e9419a35127e9",
+      "sourceDimensions": [
+        3840,
+        962
+      ],
+      "sha256": "66228215533d22e7702f296c5effed553cf058b7aedbb974c16a36da32724e68",
+      "alt": "暮色中的墨尔本滨水区、游艇码头与城市天际线",
+      "originalDimensions": [
+        4789,
+        1200
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Melbourne_Docklands_-_Yarras_Edge_-_marina_panorama.jpg?width=3840"
+    },
+    {
+      "cityId": "au-sydney",
+      "landmark": "悉尼歌剧院与海港大桥",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Sydney_Opera_House_and_Harbour_Bridge_Dusk_%283%29_2019-06-21.jpg",
+      "author": "Benh LIEU SONG",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:32:53.038Z",
+      "sourceSha256": "99871876491a0fa0bb36ed149b8915d096e0c9d26869bc167fbadf46bd163b01",
+      "sourceDimensions": [
+        1920,
+        759
+      ],
+      "sha256": "ecd791a6cf4374ee321b22ebee0c5eb54a8e79b3cc84b2f8c4a6fde1a0b58c88",
+      "alt": "暮色中的悉尼歌剧院与海港大桥横跨海湾",
+      "originalDimensions": [
+        7520,
+        2972
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Sydney_Opera_House_and_Harbour_Bridge_Dusk_%283%29_2019-06-21.jpg?width=1920"
+    },
+    {
+      "cityId": "sg-singapore",
+      "landmark": "新加坡滨海湾",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Singapore_Marina_Bay_Dusk_2018-02-27.jpg",
+      "author": "Benh LIEU SONG",
+      "license": "CC BY-SA 4.0",
+      "downloadedAt": "2026-08-27T12:36:16.070Z",
+      "sourceSha256": "402c4e6e99321947877472d1f412d1221d4a353d089e295354d0bbb84ed1f257",
+      "sourceDimensions": [
+        1920,
+        723
+      ],
+      "sha256": "bd58f8592e57561d2fcda62b787d088dce78152bfb1f47e7b01879ad0d92f798",
+      "alt": "暮色中的新加坡滨海湾、滨海湾金沙与中央商务区天际线",
+      "originalDimensions": [
+        8928,
+        3360
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Singapore_Marina_Bay_Dusk_2018-02-27.jpg?width=1920"
+    },
+    {
+      "cityId": "ca-toronto",
+      "landmark": "多伦多滨水区与加拿大国家电视塔",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Toronto_Waterfront%2C_CN_Tower_6277.jpg",
+      "author": "ImagePerson",
+      "license": "CC BY 4.0",
+      "downloadedAt": "2026-08-27T12:35:32.886Z",
+      "sourceSha256": "53b1e0e0f434ee890fe814a8ab820108a63fc0c7f7ff5eabb33fc27269448ccc",
+      "sourceDimensions": [
+        1920,
+        1278
+      ],
+      "sha256": "b99c00ab52897319a46a86dac550df44f60a10630bf0472b1b858237d9cd2192",
+      "alt": "多伦多滨水区与加拿大国家电视塔城市景观",
+      "originalDimensions": [
+        3666,
+        2440
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Toronto_Waterfront%2C_CN_Tower_6277.jpg?width=1920"
+    },
+    {
+      "cityId": "ca-vancouver",
+      "landmark": "温哥华天际线与北岸山脉",
+      "sourcePage": "https://commons.wikimedia.org/wiki/File:Vancouver_Skyline_and_Mountains.jpg",
+      "author": "Kyle Pearce / DIY Genius",
+      "license": "CC BY-SA 2.0",
+      "downloadedAt": "2026-08-27T12:32:58.765Z",
+      "sourceSha256": "250c57f212fbef88e0bd9b2566eabab3259022d4fad222af18b1209e0c3d6ffe",
+      "sourceDimensions": [
+        1920,
+        1078
+      ],
+      "sha256": "8a3d8ffced073c3833f7e786b7104e061a38969d05f09dd38dcc48378e02b191",
+      "alt": "从伊丽莎白女王公园眺望温哥华天际线与积雪北岸山脉",
+      "originalDimensions": [
+        4416,
+        2480
+      ],
+      "runtimeDimensions": [
+        1152,
+        648
+      ],
+      "downloadUrl": "https://commons.wikimedia.org/wiki/Special:Redirect/file/Vancouver_Skyline_and_Mountains.jpg?width=1920"
+    }
+  ]
+}

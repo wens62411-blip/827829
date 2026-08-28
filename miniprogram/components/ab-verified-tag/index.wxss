@@ -7,9 +7,9 @@
   align-items: center;
   min-height: 48rpx;
   padding: 0 16rpx;
-  border: 2rpx solid #246b4a;
-  border-radius: 4rpx;
-  color: #246b4a;
+  border: 2rpx solid #8a6538;
+  border-radius: 999rpx;
+  color: #8a6538;
   font-size: 22rpx;
   font-weight: 700;
   letter-spacing: 0.02em;
@@ -21,7 +21,7 @@
 
 @media (prefers-color-scheme: dark) {
   .verified-tag {
-    border-color: #7ac9a5;
-    color: #7ac9a5;
+    border-color: #d5bc8a;
+    color: #d5bc8a;
   }
 }
