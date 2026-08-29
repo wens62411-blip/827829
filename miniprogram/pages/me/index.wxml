@@ -1,9 +1,4 @@
 <view class="card-page me-page">
-  <ab-brand-header
-    eyebrow="PERSONAL SPACE"
-    title="我的"
-    subtitle="管理个人资料、数字名片与所在城市入口。"
-  />
   <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 所有资料均为合成示例</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton me-loading" aria-label="正在加载个人资料"></view>
@@ -20,21 +15,21 @@
       <view class="me-profile__avatar" aria-label="{{profile.displayName}}的文字头像">{{profileInitial}}</view>
       <view class="me-profile__identity">
         <text class="me-profile__name">{{profile.displayName}}</text>
-        <text class="me-profile__meta">{{hasProfileCity ? cityName : '尚未选择城市'}} · 名片资料由你管理</text>
+        <text class="me-profile__meta">{{hasProfileCity ? cityName : '尚未选择城市'}} · 我的名片</text>
         <text class="me-profile__completion">{{demoMode ? '示例资料' : '资料完整度 ' + completionPercent + '%'}}</text>
       </view>
       <navigator class="me-profile__edit" url="/packageCard/pages/edit/index" hover-class="me-pressed" aria-label="编辑我的名片资料"><image class="me-profile__edit-icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑</text></navigator>
     </view>
     <view wx:if="{{profile.phoneMasked}}" class="me-private-note" aria-role="note">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开名片。</view>
 
-    <view class="me-link-group" aria-role="region" aria-label="我的数字名片">
+    <view class="me-link-group" aria-role="region" aria-label="我的名片">
       <navigator class="me-link-row" url="/pages/card/index" hover-class="me-pressed">
-        <image class="me-link-row__icon" src="/assets/icons/ui-card.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">我的数字名片</text><text class="me-link-row__note">预览、编辑与分享</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+        <image class="me-link-row__icon" src="/assets/icons/ui-card.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">我的名片</text><text class="me-link-row__note">联系我 · 预览、编辑与分享</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
       </navigator>
     </view>
   </block>
 
-  <view class="me-city-group" aria-role="region" aria-label="所在城市群">
+  <view class="me-city-group" aria-role="region" aria-label="AB Club 支持的城市清单">
     <view wx:if="{{cityImageSrc && !cityImageFailed}}" class="me-city-group__art">
       <image
         class="me-city-group__image"
@@ -45,37 +40,21 @@
         binderror="handleCityImageError"
       />
       <view class="me-city-group__shade"></view>
-      <text class="me-city-group__city">CURRENT CITY · {{cityName}}</text>
+        <text class="me-city-group__city">CURRENT CITY · {{cityName || 'HANGZHOU'}}</text>
     </view>
     <view wx:else class="me-city-group__art me-city-group__art--fallback">
       <image class="me-city-group__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
-      <text class="me-city-group__city">CITY GROUP · TO BE SELECTED</text>
+      <text class="me-city-group__city">SUPPORTED CITIES · AB CLUB</text>
     </view>
 
     <view class="me-city-group__body">
       <view class="me-city-group__masthead">
-        <text class="me-city-group__kicker">MY LOCAL CIRCLE</text>
+        <text class="me-city-group__kicker">SUPPORTED CITIES</text>
         <text class="me-city-group__evidence">{{demoMode ? '本地示意' : '功能预告'}} · 待运营确认</text>
       </view>
       <text class="me-city-group__title">{{cityGroupTitle}}</text>
-      <text class="me-city-group__copy">
-        {{hasProfileCity ? '未来可接收当地艺术活动预告，并认识同城成员。当前不代表城市群已经开放或你已经加入。' : '先在名片资料中选择所在城市，再查看对应的 AB Club 城市群。'}}
-      </text>
-      <view class="me-city-group__actions">
-        <button
-          class="me-city-group__action me-city-group__action--primary"
-          plain="{{true}}"
-          bindtap="handleCityGroupApplication"
-          aria-label="申请加入当前城市群，当前不会真实提交"
-        >申请加入城市群 · 预告</button>
-        <navigator
-          class="me-city-group__action me-city-group__action--secondary"
-          url="/packageCard/pages/edit/index"
-          hover-class="me-pressed"
-          aria-label="前往个人资料切换所在城市"
-        >切换城市</navigator>
-      </view>
-      <text class="me-city-group__boundary" aria-live="polite">当前仅展示未来入口，申请不会真实提交；运营确认后才会提供受控入群方式，群二维码不公开。</text>
+      <text class="me-city-group__copy">{{supportedCities}}</text>
+      <text class="me-city-group__boundary" aria-live="polite">城市目录为本地演示，开放状态以 AB Club 后续公告为准。</text>
     </view>
   </view>
 
@@ -84,9 +63,6 @@
     <text class="me-section-heading__title">资料与设置</text>
   </view>
   <view class="me-link-group me-link-group--settings" aria-role="region" aria-label="资料与设置">
-    <navigator class="me-link-row" url="/packageCard/pages/edit/index" hover-class="me-pressed">
-      <image class="me-link-row__icon" src="/assets/icons/ui-settings.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">资料与名片</text><text class="me-link-row__note">填写、预览与保存</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
-    </navigator>
     <navigator class="me-link-row" url="/packageCard/pages/privacy/index" hover-class="me-pressed">
       <image class="me-link-row__icon" src="/assets/icons/ui-privacy.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">隐私与分享范围</text><text class="me-link-row__note">查看逐字段规则</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>

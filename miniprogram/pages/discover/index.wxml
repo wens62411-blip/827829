@@ -23,61 +23,65 @@
     </button>
   </view>
 
-  <view class="discover-intro">
-    <text class="discover-kicker">DIGITAL IDENTITY · CULTURAL CONNECTION</text>
-    <text class="discover-intro__title">让一张名片，成为一场好对话的开始。</text>
-    <text class="discover-intro__copy">面向全球华人的高端数字名片与艺术生活方式俱乐部。</text>
+  <view class="discover-hero" aria-role="region" aria-label="AB Club 数字名片入口">
+    <text class="discover-hero__eyebrow">AB CLUB · DIGITAL IDENTITY</text>
+    <text class="discover-hero__title">先让对方记住你。</text>
+    <text class="discover-hero__copy">一张清楚、克制的数字名片，连接全球华人的城市与兴趣。</text>
+    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="进入我的名片">
+      <text>进入我的名片</text>
+      <text class="discover-primary-action__arrow" aria-hidden="true">→</text>
+    </button>
+    <view class="discover-hero__rule" aria-hidden="true"></view>
+    <text
+      class="discover-runtime__label discover-runtime__label--hero"
+      aria-label="本地展示版本。SYNTHETIC · DEMO_ONLY。页面人物与活动均为合成示意，不代表真实排期、活动已开放或可以报名。"
+    >演示数据 · 仅用于本地体验</text>
   </view>
 
-  <view class="discover-card-entry" aria-role="region" aria-label="数字名片入口">
-    <view class="discover-card-entry__index" aria-hidden="true">01</view>
-    <view class="discover-card-entry__content">
-      <text class="discover-kicker">DIGITAL IDENTITY</text>
-      <text class="discover-card-entry__title">你的名字，值得被更好地介绍。</text>
-      <text class="discover-card-entry__copy">以克制的版式整理身份、经历与兴趣；创建、查看和分享名片统一在「我的」中管理。</text>
-    </view>
-  </view>
-
-  <view class="discover-runtime" aria-role="status">
-    <text class="discover-runtime__label">本地展示版本</text>
-    <text class="discover-runtime__text">页面人物与活动均为合成示意，不代表真实排期、活动已开放或可以报名。</text>
-  </view>
-
-  <view class="discover-section discover-people" aria-role="region" aria-label="值得认识的成员示意">
-    <view class="discover-section__head">
-      <view>
-        <text class="discover-kicker">SELECTED INTRODUCTIONS</text>
-        <text class="discover-heading">值得认识</text>
-      </view>
-      <text class="discover-demo-chip">SYNTHETIC</text>
-    </view>
-    <text class="discover-lead">不是公开社交广场，只因明确的城市、专业或兴趣共同点而出现。</text>
-    <view class="discover-people__list">
-      <view wx:for="{{memberEditorials}}" wx:key="displayName" class="discover-person">
-        <view class="discover-person__avatar" aria-label="{{item.displayName}}的文字头像">{{item.initials}}</view>
-        <view class="discover-person__copy">
-          <view class="discover-person__topline">
-            <text class="discover-person__name">{{item.displayName}}</text>
-            <text class="discover-person__city">{{item.cityLine}}</text>
-          </view>
-          <text class="discover-person__headline">{{item.headline}}</text>
-          <text class="discover-person__reason">{{item.commonGround}}</text>
-        </view>
+  <view
+    class="discover-card-entry"
+    aria-role="region"
+    aria-label="数字名片入口。创建、查看和分享名片统一在「我的」中管理"
+  >
+    <text class="discover-focus__index" aria-hidden="true">01</text>
+    <view class="discover-focus__body">
+      <text class="discover-focus__eyebrow">YOUR INTRODUCTION</text>
+      <text class="discover-focus__title">你的身份，值得被更好地介绍。</text>
+      <text class="discover-focus__copy">姓名、身份、城市，先把最重要的三件事说清楚。</text>
+      <view class="discover-focus__facts" aria-label="名片包含姓名、身份与城市">
+        <text>姓名</text><text>身份</text><text>城市</text>
       </view>
     </view>
-    <navigator class="discover-text-link discover-text-link--quiet" url="/pages/network/index" hover-class="discover-press">查看成员连接 <text>›</text></navigator>
+  </view>
+
+  <view class="discover-quick-links" aria-role="navigation" aria-label="探索 AB Club">
+    <navigator class="discover-quick-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">
+      <text class="discover-quick-link__index">02</text>
+      <view><text class="discover-quick-link__title">城市活动</text><text class="discover-quick-link__note">全球 13 城</text></view>
+      <text class="discover-quick-link__arrow" aria-hidden="true">↗</text>
+    </navigator>
+    <navigator class="discover-quick-link" url="/packageArt/pages/channel/index" hover-class="discover-press" aria-label="艺术、古董与珠宝。展览、收藏与对话">
+      <text class="discover-quick-link__index">03</text>
+      <view><text class="discover-quick-link__title">艺术与器物</text><text class="discover-quick-link__note">展览 · 收藏 · 对话</text></view>
+      <text class="discover-quick-link__arrow" aria-hidden="true">↗</text>
+    </navigator>
+    <navigator
+      class="discover-quick-link discover-quick-link--quiet discover-text-link--quiet"
+      url="/pages/network/index"
+      hover-class="discover-press"
+      aria-label="值得认识。不是公开社交广场，只因明确的城市、专业或兴趣共同点而出现。"
+    >
+      <text class="discover-quick-link__index">04</text>
+      <view><text class="discover-quick-link__title">值得认识</text><text class="discover-quick-link__note">按共同点建立连接</text></view>
+      <text class="discover-quick-link__arrow" aria-hidden="true">↗</text>
+    </navigator>
   </view>
 
   <view class="discover-section discover-gathering" aria-role="region" aria-label="全球城市艺术活动预览">
     <view class="discover-section__head">
-      <view>
-        <text class="discover-kicker">CURATED GATHERING</text>
-        <text class="discover-heading">全球城市艺术活动</text>
-      </view>
-      <text class="discover-demo-chip">DEMO_ONLY</text>
+      <view><text class="discover-section__eyebrow">CURATED GATHERING</text><text class="discover-heading">一场值得赴约的相遇</text></view>
+      <text class="discover-section__status" aria-label="DEMO_ONLY">演示</text>
     </view>
-    <text class="discover-lead">首页只保留一条策展预览，完整活动能力将在后续阶段逐步落地。</text>
-
     <navigator class="discover-event-feature" url="/packageEvents/pages/event/index?demoEventId={{primaryEvent.eventId}}" hover-class="discover-press">
       <view class="discover-event-feature__media">
         <image
@@ -93,47 +97,25 @@
           <text>AB CLUB · EVENT PREVIEW</text>
           <text>本地活动视觉暂不可用 · 不使用外链替代</text>
         </view>
-        <text class="discover-event-feature__notice">策展视觉参考</text>
+        <text class="discover-event-feature__notice">{{primaryEvent.cityName}} · {{primaryEvent.cardMeta}}</text>
       </view>
       <view class="discover-event-feature__body">
-        <text class="discover-event-feature__city">{{primaryEvent.cityName}} · {{primaryEvent.cardMeta}}</text>
         <text class="discover-event-feature__title">{{primaryEvent.title}}</text>
         <text class="discover-event-feature__summary">{{primaryEvent.summary}}</text>
-        <text class="discover-event-feature__credit">{{primaryEvent.coverCredit}}</text>
-        <text class="discover-event-feature__boundary">DEMO_ONLY · 不代表真实排期、活动已开放或可以报名</text>
+        <text
+          class="discover-event-feature__boundary"
+          aria-label="DEMO_ONLY · 不代表真实排期、活动已开放或可以报名"
+        >演示活动 · 仅作视觉预览</text>
       </view>
     </navigator>
-    <navigator class="discover-text-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">浏览城市活动入口 <text>›</text></navigator>
+    <navigator class="discover-text-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">浏览全部城市活动 <text>→</text></navigator>
   </view>
 
-  <view class="discover-section discover-art" aria-role="region" aria-label="艺术、古董与珠宝轻量入口">
+  <view id="global-city-directory" class="discover-section discover-cities" aria-role="region" aria-label="全球华人城市目录，7国13城 · 逐步开放">
     <view class="discover-section__head">
-      <view>
-        <text class="discover-kicker">ART &amp; OBJECTS</text>
-        <text class="discover-heading">艺术、古董与珠宝</text>
-      </view>
-      <text class="discover-section__aside">轻量入口</text>
-    </view>
-    <text class="discover-lead">作为数字名片之外的审美与专业兴趣入口，不在一期承担交易或商家入驻。</text>
-    <view class="discover-art__grid">
-      <view wx:for="{{artVerticals}}" wx:key="en" class="discover-art__item">
-        <text class="discover-art__name">{{item.name}}</text>
-        <text class="discover-art__en">{{item.en}}</text>
-        <text class="discover-art__description">{{item.description}}</text>
-      </view>
-    </view>
-    <navigator class="discover-text-link" url="/packageArt/pages/channel/index" hover-class="discover-press">进入艺术频道 <text>›</text></navigator>
-  </view>
-
-  <view id="global-city-directory" class="discover-section discover-cities" aria-role="region" aria-label="全球华人城市目录">
-    <view class="discover-section__head">
-      <view>
-        <text class="discover-kicker">GLOBAL DIRECTORY</text>
-        <text class="discover-heading">全球华人坐标</text>
-      </view>
+      <view><text class="discover-section__eyebrow">GLOBAL DIRECTORY</text><text class="discover-heading">全球城市坐标</text></view>
       <text class="discover-section__aside">7国13城 · 逐步开放</text>
     </view>
-    <text class="discover-lead">城市用于表达常驻与跨城联系；列入目录不等于当地节点已经运营。</text>
     <view class="discover-city-media">
       <image
         wx:if="{{!cityImageFailed}}"
@@ -154,11 +136,8 @@
         <text class="discover-city-group__cities">{{item.cities}}</text>
       </view>
     </view>
-    <text class="discover-rights">城市图片使用本地高清资源；正式发布前仍需完成人工版权复核，也不代表城市节点已运营。</text>
+    <text class="discover-rights">城市图片使用本地高清资源；正式发布前仍需完成人工版权复核。</text>
   </view>
 
-  <view class="discover-footer">
-    <text class="discover-footer__brand">AB CLUB</text>
-    <text class="discover-footer__text">GLOBAL CHINESE BUSINESS CARD · CITY CULTURE</text>
-  </view>
+  <view class="discover-footer" aria-hidden="true"><text>AB CLUB · GLOBAL CHINESE BUSINESS CARD</text></view>
 </view>

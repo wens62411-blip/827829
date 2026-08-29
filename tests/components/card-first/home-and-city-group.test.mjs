@@ -28,7 +28,7 @@ function hasGeographySummary(source) {
 }
 
 function cityGroupWindow(source) {
-  const anchor = source.search(/所在城市群|当前城市群|我的城市群/);
+  const anchor = source.search(/所在城市群|当前城市群|我的城市群|支持的城市清单/);
   if (anchor < 0) return '';
   return source.slice(Math.max(0, anchor - 600), Math.min(source.length, anchor + 3600));
 }
@@ -109,17 +109,20 @@ test('home has no slogan, public group QR, feed metrics, or direct-chat affordan
   assert.deepEqual(errors, []);
 });
 
-test('Me page exposes current city group plus apply and switch-city controls', () => {
+test('Me page exposes the supported city list and one card contact entry', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const actions = interactiveMarkup(template);
   const errors = [];
 
-  if (!/所在城市群|当前城市群|我的城市群/.test(template)) errors.push('“我的”页缺少所在城市群区块');
-  if (!actions.some((markup) => /申请加入|申请进入|加入城市群|提交加入意向/.test(markup))) {
-    errors.push('“我的”页缺少可操作的申请加入入口');
+  if (!/支持的城市清单/.test(template)) errors.push('“我的”页缺少支持的城市清单');
+  if (!actions.some((markup) => /我的名片/.test(markup) && /url="\/pages\/card\/index"/.test(markup))) {
+    errors.push('“我的”页缺少唯一的我的名片入口');
   }
-  if (!actions.some((markup) => /切换城市|更换城市|选择城市/.test(markup))) {
-    errors.push('“我的”页缺少可操作的切换城市入口');
+  if (actions.filter((markup) => /url="\/pages\/card\/index"/.test(markup)).length !== 1) {
+    errors.push('“我的”页应只保留一个我的名片入口');
+  }
+  if (actions.some((markup) => /申请加入|申请进入|加入城市群|提交加入意向|切换城市/.test(markup))) {
+    errors.push('“我的”页不应暴露城市群申请或切换城市动作');
   }
 
   assert.deepEqual(errors, []);

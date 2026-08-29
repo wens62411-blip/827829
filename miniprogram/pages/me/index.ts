@@ -31,10 +31,12 @@ interface CityGroupView {
 
 const EMPTY_CITY_GROUP: CityGroupView = {
   cityName: '',
-  cityGroupTitle: '选择你的 AB Club 城市群',
+  cityGroupTitle: 'AB Club 支持的城市清单',
   cityImageSrc: '',
   hasProfileCity: false,
 };
+
+const supportedCities = CITY_DIRECTORY.map((city) => city.name.zh).join('、');
 
 function displayInitial(displayName: string): string {
   return Array.from(displayName.trim())[0] ?? 'AB';
@@ -48,7 +50,7 @@ function resolveCityGroup(profile: ProfilePrivateDto | null): CityGroupView {
 
   return {
     cityName: city.name.zh,
-    cityGroupTitle: `AB Club ${city.name.zh}城市群`,
+    cityGroupTitle: 'AB Club 支持的城市清单',
     cityImageSrc: `/assets/cities/${city.id}.jpg`,
     hasProfileCity: true,
   };
@@ -66,6 +68,7 @@ Page({
     cityImageSrc: '',
     cityImageFailed: false,
     hasProfileCity: false,
+    supportedCities,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
     message: '',
   },
@@ -142,29 +145,4 @@ Page({
     this.setData({ cityImageFailed: true });
   },
 
-  /**
-   * UI-only boundary until a frozen city-group application action exists.
-   * This handler intentionally performs no local persistence or cloud write.
-   */
-  handleCityGroupApplication() {
-    if (!this.data.hasProfileCity) {
-      wx.showModal({
-        title: '尚未选择城市',
-        content: '请先通过“切换城市”完善名片中的所在城市。本次没有提交申请，也不会生成城市群成员状态。',
-        showCancel: false,
-        confirmText: '我知道了',
-      });
-      return;
-    }
-
-    const cityLabel = this.data.cityName ? `${this.data.cityName}城市群` : '当前城市群';
-    wx.showModal({
-      title: '申请尚未提交',
-      content: this.data.demoMode
-        ? `${cityLabel}当前仅为本地示意。开放状态与加入资格待运营确认，群二维码不会公开展示。`
-        : `${cityLabel}的申请接口尚未接入，本次操作没有提交。待运营确认开放状态与加入资格后，将由受信云端接口处理；群二维码不会公开展示。`,
-      showCancel: false,
-      confirmText: '我知道了',
-    });
-  },
 });

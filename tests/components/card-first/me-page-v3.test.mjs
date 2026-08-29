@@ -7,23 +7,24 @@ import { fileURLToPath } from 'node:url';
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = (path) => readFileSync(resolve(repoRoot, path), 'utf8');
 
-test('Me page uses the restrained personal-space hierarchy instead of a second full card', () => {
+test('Me page uses a direct profile hierarchy instead of a second full header', () => {
   const template = read('miniprogram/pages/me/index.wxml');
 
-  assert.match(template, /<ab-brand-header\b[\s\S]*?eyebrow="PERSONAL SPACE"[\s\S]*?title="我的"/);
+  assert.doesNotMatch(template, /<ab-brand-header\b/);
   assert.match(template, /class="me-profile"/);
   assert.doesNotMatch(template, /<ab-profile-card\b/);
   assert.doesNotMatch(template, /PRIVATE DESK|我的名片中心/);
 
   for (const label of [
-    '我的数字名片',
-    '资料与设置',
+    '我的名片',
+    '支持的城市清单',
     '公开标签状态',
   ]) {
     assert.match(template, new RegExp(label), `“我的”页缺少层级入口：${label}`);
   }
   assert.doesNotMatch(template, /收到的名片请求|我的人脉|\/pages\/network\/index/);
-  assert.match(template, /管理个人资料、数字名片与所在城市入口/);
+  assert.doesNotMatch(template, /管理个人资料、数字名片与所在城市入口/);
+  assert.doesNotMatch(template, /资料与名片/);
 });
 
 test('Me city group reuses shipped city photography and keeps operations-pending truth', () => {
@@ -34,7 +35,7 @@ test('Me city group reuses shipped city photography and keeps operations-pending
   assert.match(template, /binderror="handleCityImageError"/);
   assert.match(source, /cityImageSrc:\s*`\/assets\/cities\/\$\{city\.id\}\.jpg`/);
   assert.match(template, /待运营确认/);
-  assert.match(template, /申请不会真实提交/);
+  assert.match(template, /城市目录为本地演示/);
   assert.doesNotMatch(template, /申请成功|加入成功|城市群[^<\n]{0,20}\bLIVE\b/);
 });
 

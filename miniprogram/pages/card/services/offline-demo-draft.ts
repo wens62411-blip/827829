@@ -1,4 +1,4 @@
-import { CITY_DIRECTORY, type CityId } from '../../../shared/constants/geography';
+import { CITY_DIRECTORY, CityId, type CityId as CityIdValue } from '../../../shared/constants/geography';
 import type { PublicCardProjection } from '../../../shared/types/projections';
 import {
   OFFLINE_DEMO_CARD,
@@ -27,7 +27,7 @@ export interface OfflineDemoDraft {
   readonly displayName: string;
   readonly biography: string;
   readonly profession: string;
-  readonly cityId: CityId;
+  readonly cityId: CityIdValue;
   readonly selectedLabels: readonly string[];
   readonly showTags: boolean;
   readonly phone: string;
@@ -120,7 +120,7 @@ export function createDefaultOfflineDemoDraft(): OfflineDemoDraft {
     displayName: '林知遥',
     biography: OFFLINE_DEMO_CARD.biography ?? '',
     profession: OFFLINE_DEMO_CARD.headline ?? '',
-    cityId: OFFLINE_DEMO_CARD.cityId,
+    cityId: CityId.CN_HANGZHOU,
     selectedLabels: normalizeProfileLabels(OFFLINE_DEMO_SELECTED_LABELS),
     showTags: true,
     phone: '+41 44 555 01 10',
@@ -135,7 +135,7 @@ export function normalizeOfflineDemoDraft(value: unknown): OfflineDemoDraft {
   if (!value || typeof value !== 'object') return fallback;
   const input = value as Record<string, unknown>;
   const cityCandidate = typeof input.cityId === 'string' && CITY_IDS.has(input.cityId)
-    ? input.cityId as CityId
+    ? input.cityId as CityIdValue
     : fallback.cityId;
   const phone = normalizePhone(input.phone);
   const email = normalizeEmail(input.email);
@@ -161,6 +161,15 @@ export function readOfflineDemoDraft(): OfflineDemoDraft {
     return normalizeOfflineDemoDraft(stored);
   } catch (_error) {
     return createDefaultOfflineDemoDraft();
+  }
+}
+
+export function hasOfflineDemoDraft(): boolean {
+  try {
+    const stored = wx.getStorageSync<unknown>(OFFLINE_DEMO_DRAFT_STORAGE_KEY);
+    return Boolean(stored && typeof stored === 'object');
+  } catch (_error) {
+    return false;
   }
 }
 

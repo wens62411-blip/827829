@@ -11,7 +11,7 @@ const pageExpectations = {
   'miniprogram/pages/card/index.wxml': ['ui-edit.png', 'ui-share-light.png'],
   'miniprogram/pages/me/index.wxml': [
     'ui-edit.png', 'ui-card.png',
-    'ui-settings.png', 'ui-privacy.png', 'ui-share.png', 'ui-tag.png', 'ui-chevron.png',
+    'ui-privacy.png', 'ui-share.png', 'ui-tag.png', 'ui-chevron.png',
   ],
   'miniprogram/pages/network/index.wxml': ['ui-card-light.png', 'ui-inbox.png', 'ui-chevron.png'],
 };

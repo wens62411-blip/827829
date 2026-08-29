@@ -1,5 +1,22 @@
 import { RuntimeMode } from '../../shared/types/enums';
 import { DISCOVER_DEMO_EVENTS } from '../../components/ab-event-card/demo-data';
+import { isOfflineDemo } from '../card/services/offline-demo';
+import { hasOfflineDemoDraft } from '../card/services/offline-demo-draft';
+
+type IdentityClientModule = typeof import('../card/services/identity-client');
+declare const require: (path: string) => IdentityClientModule;
+
+function getDiscoverRuntime(): { readonly runtimeMode: string; readonly cloudConfigured: boolean } {
+  try {
+    const app = getApp<{ globalData?: { runtimeMode?: string; cloudEnvironmentConfigured?: boolean } }>();
+    return {
+      runtimeMode: app.globalData?.runtimeMode ?? RuntimeMode.OFFLINE_DEMO,
+      cloudConfigured: app.globalData?.cloudEnvironmentConfigured === true,
+    };
+  } catch (_error) {
+    return { runtimeMode: RuntimeMode.OFFLINE_DEMO, cloudConfigured: false };
+  }
+}
 
 interface EditorialEvent {
   readonly eventId: string;
@@ -24,29 +41,6 @@ const cityGroups = [
   { region: '加拿大', cities: '多伦多 · 温哥华' },
 ] as const;
 
-const memberEditorials = [
-  {
-    initials: '陈',
-    displayName: '陈言（示意）',
-    headline: '跨境品牌策略',
-    cityLine: '深圳 · 新加坡',
-    commonGround: '共同关注：品牌国际化与文化合作',
-  },
-  {
-    initials: '林',
-    displayName: '林澜（示意）',
-    headline: '艺术机构合作',
-    cityLine: '巴黎 · 苏黎世',
-    commonGround: '共同关注：艺术项目与长期收藏叙事',
-  },
-] as const;
-
-const artVerticals = [
-  { name: '艺术', en: 'ART', description: '展览、收藏与品牌合作' },
-  { name: '古董', en: 'ANTIQUES', description: '器物鉴赏与主题对话' },
-  { name: '珠宝', en: 'JEWELLERY', description: '设计、珍珠与线下品鉴' },
-] as const;
-
 const editorialAsset = {
   coverSrc: '/assets/editorial-events/jewelry-study.jpg',
   coverAlt: '珠宝博物馆展厅与陈列柜，用于收藏交流方向视觉参考',
@@ -67,13 +61,31 @@ Page({
   data: {
     runtimeMode: RuntimeMode.OFFLINE_DEMO,
     cityGroups,
-    memberEditorials,
     primaryEvent,
-    artVerticals,
     cityFeature,
+    openingCard: false,
     brandLogoFailed: false,
     eventImageFailed: false,
     cityImageFailed: false,
+  },
+
+  async openMyCard() {
+    if (this.data.openingCard) return;
+    this.setData({ openingCard: true });
+    try {
+      const runtime = getDiscoverRuntime();
+      let target = '/packageCard/pages/edit/index';
+      if (isOfflineDemo(runtime)) {
+        target = hasOfflineDemoDraft() ? '/pages/card/index' : target;
+      } else {
+        const { getMyProfile } = require('../card/services/identity-client');
+        const result = await getMyProfile();
+        target = result.ok ? '/pages/card/index' : target;
+      }
+      await wx.navigateTo({ url: target });
+    } finally {
+      this.setData({ openingCard: false });
+    }
   },
 
   handleImageError(event: WechatMiniprogram.CustomEvent) {
@@ -86,9 +98,7 @@ Page({
       this.setData({ eventImageFailed: true });
       return;
     }
-    if (imageKey === 'city') {
-      this.setData({ cityImageFailed: true });
-    }
+    if (imageKey === 'city') this.setData({ cityImageFailed: true });
   },
 
   scrollToCities() {
