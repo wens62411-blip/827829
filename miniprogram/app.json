@@ -109,7 +109,8 @@
     "ab-brand-header": "/components/ab-brand-header/index",
     "ab-verified-tag": "/components/ab-verified-tag/index",
     "ab-city-status": "/components/ab-city-status/index",
-    "ab-evidence-label": "/components/ab-evidence-label/index"
+    "ab-evidence-label": "/components/ab-evidence-label/index",
+    "loading-city": "/components/loading-city/index"
   },
   "style": "v2",
   "lazyCodeLoading": "requiredComponents",
