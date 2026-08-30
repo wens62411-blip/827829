@@ -62,9 +62,15 @@ Component({
 
     onLoadingComplete() {
       const { pendingPath } = this.data;
-      this.setData({ loadingVisible: false });
       if (pendingPath) {
-        wx.switchTab({ url: pendingPath });
+        // 先切页（转场层仍盖住屏幕），切完再淡出，避免淡出时露出旧页面造成闪烁
+        wx.switchTab({
+          url: pendingPath,
+          success: () => this.setData({ loadingVisible: false, pendingPath: '' }),
+          fail: () => this.setData({ loadingVisible: false, pendingPath: '' }),
+        });
+      } else {
+        this.setData({ loadingVisible: false });
       }
     },
   },
