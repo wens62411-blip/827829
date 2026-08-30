@@ -39,11 +39,11 @@ Component({
     visible: { type: Boolean, value: false, observer: 'onVisibleChange' },
     cityId: { type: String, value: '' },
     minDuration: { type: Number, value: 3000 },
-    maxDuration: { type: Number, value: 5000 },
+    maxDuration: { type: Number, value: 3000 },
   },
   data: {
     city: pickRandomCity() as LoadingCity,
-    progressDuration: 3500,
+    progressDuration: 3000,
   },
 
   lifetimes: {

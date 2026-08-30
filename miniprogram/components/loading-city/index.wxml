@@ -6,12 +6,8 @@
         class="loading-city__icon"
         src="{{city.iconPath}}"
         mode="aspectFit"
-        aria-label="{{city.zh}}地标线稿"
+        aria-hidden="true"
       />
-    </view>
-    <view class="loading-city__names">
-      <text class="loading-city__name">{{city.zh}}</text>
-      <text class="loading-city__name-en">{{city.en}}</text>
     </view>
     <view class="loading-city__divider" aria-hidden="true" />
     <view class="loading-city__brand">
