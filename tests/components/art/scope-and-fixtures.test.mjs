@@ -4,7 +4,9 @@ import { join, relative } from 'node:path';
 import test from 'node:test';
 
 const root = new URL('../../..', import.meta.url);
-const rootPath = decodeURIComponent(root.pathname.replace(/^\/(?:([A-Za-z]:))/, '$1')).replaceAll('/', '\\');
+const rootPath = process.platform === 'win32'
+  ? decodeURIComponent(root.pathname.replace(/^\/(?:([A-Za-z]:))/, '$1')).replaceAll('/', '\\')
+  : decodeURIComponent(root.pathname);
 const read = (...parts) => readFileSync(join(rootPath, ...parts), 'utf8');
 const readJson = (...parts) => JSON.parse(read(...parts));
 

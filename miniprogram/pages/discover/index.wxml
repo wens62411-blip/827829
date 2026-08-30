@@ -23,12 +23,12 @@
     </button>
   </view>
 
-  <view class="discover-hero" aria-role="region" aria-label="AB Club 数字名片入口">
-    <text class="discover-hero__eyebrow">AB CLUB · DIGITAL IDENTITY</text>
+  <view class="discover-hero" aria-role="region" aria-label="AB Club AI 赛博名片入口">
+    <text class="discover-hero__eyebrow">AB CLUB · AI CYBER CARD</text>
     <text class="discover-hero__title">先让对方记住你。</text>
-    <text class="discover-hero__copy">一张清楚、克制的数字名片，连接全球华人的城市与兴趣。</text>
-    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="进入我的名片">
-      <text>进入我的名片</text>
+    <text class="discover-hero__copy">AI 赛博名片 · 把身份，做成一件值得被收藏的数字作品</text>
+    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="生成我的 AI 赛博名片">
+      <text>生成我的 AI 赛博名片</text>
       <text class="discover-primary-action__arrow" aria-hidden="true">→</text>
     </button>
     <view class="discover-hero__rule" aria-hidden="true"></view>
@@ -36,45 +36,6 @@
       class="discover-runtime__label discover-runtime__label--hero"
       aria-label="本地展示版本。SYNTHETIC · DEMO_ONLY。页面人物与活动均为合成示意，不代表真实排期、活动已开放或可以报名。"
     >演示数据 · 仅用于本地体验</text>
-  </view>
-
-  <view
-    class="discover-card-entry"
-    aria-role="region"
-    aria-label="数字名片入口。创建、查看和分享名片统一在「我的」中管理"
-  >
-    <text class="discover-focus__index" aria-hidden="true">01</text>
-    <view class="discover-focus__body">
-      <text class="discover-focus__eyebrow">YOUR INTRODUCTION</text>
-      <text class="discover-focus__title">你的身份，值得被更好地介绍。</text>
-      <text class="discover-focus__copy">姓名、身份、城市，先把最重要的三件事说清楚。</text>
-      <view class="discover-focus__facts" aria-label="名片包含姓名、身份与城市">
-        <text>姓名</text><text>身份</text><text>城市</text>
-      </view>
-    </view>
-  </view>
-
-  <view class="discover-quick-links" aria-role="navigation" aria-label="探索 AB Club">
-    <navigator class="discover-quick-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">
-      <text class="discover-quick-link__index">02</text>
-      <view><text class="discover-quick-link__title">城市活动</text><text class="discover-quick-link__note">全球 13 城</text></view>
-      <text class="discover-quick-link__arrow" aria-hidden="true">↗</text>
-    </navigator>
-    <navigator class="discover-quick-link" url="/packageArt/pages/channel/index" hover-class="discover-press" aria-label="艺术、古董与珠宝。展览、收藏与对话">
-      <text class="discover-quick-link__index">03</text>
-      <view><text class="discover-quick-link__title">艺术与器物</text><text class="discover-quick-link__note">展览 · 收藏 · 对话</text></view>
-      <text class="discover-quick-link__arrow" aria-hidden="true">↗</text>
-    </navigator>
-    <navigator
-      class="discover-quick-link discover-quick-link--quiet discover-text-link--quiet"
-      url="/pages/network/index"
-      hover-class="discover-press"
-      aria-label="值得认识。不是公开社交广场，只因明确的城市、专业或兴趣共同点而出现。"
-    >
-      <text class="discover-quick-link__index">04</text>
-      <view><text class="discover-quick-link__title">值得认识</text><text class="discover-quick-link__note">按共同点建立连接</text></view>
-      <text class="discover-quick-link__arrow" aria-hidden="true">↗</text>
-    </navigator>
   </view>
 
   <view class="discover-section discover-gathering" aria-role="region" aria-label="全球城市艺术活动预览">

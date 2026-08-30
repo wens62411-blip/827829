@@ -45,7 +45,7 @@ const DEMO_COVERS: Readonly<Record<string, { src: string; alt: string; credit: s
     alt: '珠宝博物馆展厅与陈列柜，用于收藏交流方向视觉参考',
     credit: 'Hannolans · CC BY 4.0',
   },
-  'demo:discover:hangzhou-brand-art-dinner': {
+  'demo:discover:shanghai-brand-art-dinner': {
     src: '/assets/editorial-events/private-table.jpg',
     alt: '布置完成的餐桌与餐具，用于小型餐叙方向视觉参考',
     credit: 'Shixart1985 · CC BY 2.0',

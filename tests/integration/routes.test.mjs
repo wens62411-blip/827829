@@ -115,9 +115,7 @@ test('every registered route has TypeScript, JSON, WXML and WXSS files', () => {
   }
 });
 
-test('art is entered from Discover and share cold starts are main-package routes', () => {
-  const discover = readFileSync(new URL('pages/discover/index.wxml', miniRoot), 'utf8');
-  assert.match(discover, /\/packageArt\/pages\/channel\/index/);
+test('share cold starts are main-package routes', () => {
   assert.ok(app.pages.includes('pages/card-share/index'));
   assert.ok(app.pages.includes('pages/event-share/index'));
   const eventShare = readFileSync(new URL('pages/event-share/index.ts', miniRoot), 'utf8');

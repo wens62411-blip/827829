@@ -22,7 +22,7 @@ interface DemoRecommendation {
 const DEMO_RECOMMENDATIONS: readonly DemoRecommendation[] = [
   {
     id: 'demo-connector-singapore', initials: 'AC', displayName: 'Alex Chen（虚构演示）',
-    role: '跨境品牌策略 · 自述信息', cityLine: '深圳 ↔ 新加坡',
+    role: '跨境品牌策略 · 自述信息', cityLine: '杭州 ↔ 新加坡',
     reason: '匹配理由：共同关注全球品牌、同城私享活动与艺术机构合作。',
     interests: ['全球商业', '艺术合作', '同城活动'],
   },

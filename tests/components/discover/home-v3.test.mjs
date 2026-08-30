@@ -30,20 +30,19 @@ function contrastRatio(foreground, background) {
   return (Math.max(first, second) + 0.05) / (Math.min(first, second) + 0.05);
 }
 
-test('Discover v3 leads with brand and a restrained non-interactive card introduction', () => {
+test('Discover v3 leads with brand and a restrained hero card action', () => {
   const template = read('index.wxml');
-  const cardOffset = template.indexOf('class="discover-card-entry"');
-  const peopleOffset = template.indexOf('值得认识');
+  const heroOffset = template.indexOf('class="discover-hero"');
   const eventOffset = template.indexOf('全球城市艺术活动');
-  const artOffset = template.indexOf('艺术、古董与珠宝');
+  const cityOffset = template.indexOf('id="global-city-directory"');
 
-  assert.ok(cardOffset >= 0, '发现页缺少克制的数字名片入口');
-  assert.ok(peopleOffset > cardOffset, '值得认识必须位于数字名片入口之后');
-  assert.ok(eventOffset > cardOffset, '活动必须位于数字名片入口之后');
-  assert.ok(artOffset > cardOffset, '艺术垂类必须位于数字名片入口之后');
+  assert.ok(heroOffset >= 0, '发现页缺少主视觉区');
+  assert.ok(eventOffset > heroOffset, '活动必须位于主视觉之后');
+  assert.ok(cityOffset > eventOffset, '城市目录必须位于活动之后');
 
+  assert.doesNotMatch(template, /discover-card-entry|discover-quick-link|discover-focus/);
+  assert.doesNotMatch(template, /你的身份，值得被更好地介绍|值得认识|艺术与器物/);
   assert.doesNotMatch(template, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
-  assert.match(template, /创建、查看和分享名片统一在「我的」中管理/);
   assert.doesNotMatch(template, /discover-card__profile|discover-card__avatar|AB Club 示例名片/);
   assert.doesNotMatch(template, /discover-journey|discover-hero__image/);
 });
@@ -55,7 +54,6 @@ test('Discover v3 keeps people, gathering, art, and city modules intentionally l
   assert.doesNotMatch(template, /wx:for="\{\{secondaryEvents\}\}"|class="discover-event-list"/);
   assert.match(template, /DEMO_ONLY/);
   assert.match(template, /不代表(?:真实排期|活动已开放|可以报名)/);
-  assert.match(template, /不是公开社交广场/);
   assert.match(template, /7国13城 · 逐步开放/);
 });
 

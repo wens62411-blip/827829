@@ -22,19 +22,14 @@ test('Discover is an explicit offline editorial demo rather than a placeholder',
   assert.match(source, /title:\s*'AB Club · OFFLINE DEMO/);
 });
 
-test('Discover exposes a restrained card entry while network, event, and art stay secondary', () => {
+test('Discover keeps event entry restrained and numbered quick links removed', () => {
   const template = readPage('index.wxml');
 
-  for (const route of [
-    '/pages/network/index',
-    '/pages/events/index',
-    '/packageArt/pages/channel/index',
-  ]) {
-    assert.match(template, new RegExp(route.replaceAll('/', '\\/')));
-  }
-  assert.match(template, /艺术、古董与珠宝/);
+  assert.match(template, /\/pages\/events\/index/);
   assert.match(template, /packageEvents\/pages\/event\/index\?demoEventId=\{\{primaryEvent\.eventId\}\}/);
-  assert.match(template, /创建、查看和分享名片统一在「我的」中管理/);
+  assert.doesNotMatch(template, /discover-card-entry|discover-quick-link|discover-focus/);
+  assert.doesNotMatch(template, /\/pages\/network\/index/);
+  assert.doesNotMatch(template, /\/packageArt\//);
   assert.doesNotMatch(template, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
   assert.doesNotMatch(template, /discover-card__profile|discover-card__avatar|AB Club 示例名片/);
 });

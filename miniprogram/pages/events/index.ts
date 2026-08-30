@@ -72,13 +72,36 @@ const CATEGORY_DEFINITIONS: readonly Omit<ActivityCategoryView, 'selected'>[] = 
   { id: DemoEventCategoryId.BUSINESS, label: '商业交流', nameEn: 'DIALOGUE', description: '品牌与文化合作' },
 ];
 
+const FRONT_ROW_CITY_IDS: readonly CityId[] = [
+  CityId.CN_SHANGHAI,
+  CityId.CN_BEIJING,
+  CityId.CN_HANGZHOU,
+];
+
+/**
+ * 台北（中国台湾）属于筹备中的城市，尚未进入冻结的城市字典：
+ * 只在筛选器上露出，不提供可切换的活动数据。
+ */
+const PENDING_CITY_FILTERS: readonly CityFilterView[] = [
+  { id: 'cn-taipei', label: '台北', nameEn: 'TAIPEI, CHINA · 待开放', selected: false },
+];
+
 function buildCityFilters(selectedId: string): CityFilterView[] {
-  return CITY_DIRECTORY.map((city) => ({
-    id: city.id,
-    label: city.name.zh,
-    nameEn: city.name.en,
-    selected: city.id === selectedId,
-  }));
+  const frontRow = CITY_DIRECTORY.filter((city) =>
+    FRONT_ROW_CITY_IDS.includes(city.id as CityId),
+  );
+  const rest = CITY_DIRECTORY.filter(
+    (city) => !FRONT_ROW_CITY_IDS.includes(city.id as CityId),
+  );
+  return [
+    ...[...frontRow, ...rest].map((city) => ({
+      id: city.id,
+      label: city.name.zh,
+      nameEn: city.name.en,
+      selected: city.id === selectedId,
+    })),
+    ...PENDING_CITY_FILTERS,
+  ];
 }
 
 function buildCategoryFilters(selectedId: ActivityCategoryFilterId): ActivityCategoryView[] {
@@ -167,7 +190,7 @@ function buildDemoSections(cityId: string, categoryId: ActivityCategoryFilterId)
   };
 }
 
-const DEFAULT_CITY = CITY_DIRECTORY.find((city) => city.id === CityId.CH_ZURICH) ?? CITY_DIRECTORY[0];
+const DEFAULT_CITY = CITY_DIRECTORY.find((city) => city.id === CityId.CN_SHANGHAI) ?? CITY_DIRECTORY[0];
 if (!DEFAULT_CITY) throw new Error('Frozen city directory must include at least one city.');
 const INITIAL_SECTIONS = buildDemoSections(DEFAULT_CITY.id, ALL_CATEGORIES);
 
@@ -194,9 +217,9 @@ Page({
   },
 
   onLoad() {
-    const storedCityId = String(wx.getStorageSync('ab-events-city-id') || '');
-    const selected = CITY_DIRECTORY.find((city) => city.id === storedCityId) ?? DEFAULT_CITY;
-    this.applyDemoFilters(selected.id, ALL_CATEGORIES);
+    // 演示阶段：每次进入活动页都从默认城市上海开始，不沿用上一次的城市缓存。
+    wx.setStorageSync('ab-events-city-id', DEFAULT_CITY.id);
+    this.applyDemoFilters(DEFAULT_CITY.id, ALL_CATEGORIES);
     void this.refreshEvents();
   },
 

@@ -54,7 +54,6 @@ test('phase-one navigation opens on Discover and exposes only activity and Me be
   if (/url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//.test(discover)) {
     errors.push('发现首页仍绕过“我的”直接进入名片管理');
   }
-  if (!/创建、查看和分享名片统一在「我的」中管理/.test(discover)) errors.push('发现页没有说明名片入口位于“我的”');
   if (/<ab-profile-card\b/.test(discover)) errors.push('发现首页仍直接展示完整个人名片');
   if (app.pages.includes('pages/bootstrap/index')) errors.push('启动注册/介绍中转页仍被注册');
 
@@ -114,15 +113,14 @@ test('identity bootstrap is deferred until the user deliberately enters card cre
   );
 });
 
-test('network overview is reachable only as a quiet secondary entry from Discover', () => {
+test('network overview is no longer linked from Discover and other surfaces keep their rules', () => {
   const discover = read('miniprogram/pages/discover/index.wxml');
   const network = read('miniprogram/pages/network/index.wxml');
   const ownerCard = read('miniprogram/pages/card/index.wxml');
   const me = read('miniprogram/pages/me/index.wxml');
   const visitor = read('miniprogram/packageCard/pages/view/index.wxml');
 
-  assert.equal((discover.match(/url="\/pages\/network\/index"/g) ?? []).length, 1);
-  assert.match(discover, /discover-text-link--quiet[^>]*url="\/pages\/network\/index"/);
+  assert.equal((discover.match(/url="\/pages\/network\/index"/g) ?? []).length, 0);
   assert.match(network, /open-type="switchTab"[^>]*url="\/pages\/me\/index"/);
   assert.doesNotMatch(network, /url="\/pages\/card\/index"/);
   for (const [name, template] of Object.entries({ ownerCard, me, visitor })) {

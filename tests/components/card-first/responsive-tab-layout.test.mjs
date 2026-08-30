@@ -33,14 +33,11 @@ test('Discover reflows constrained content instead of relying on offsets', () =>
   assert.doesNotMatch(styles, /(?:left|right):\s*-\d/);
   assert.match(styles, /\.discover-brand\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?flex:\s*1 1 auto;/);
   assert.match(styles, /\.discover-global-chip\s*\{[\s\S]*?box-sizing:\s*border-box;[\s\S]*?margin:\s*0;/);
-  assert.match(styles, /\.discover-card-entry\s*\{[\s\S]*?width:\s*calc\(100% - 64rpx\);/);
   assert.match(styles, /\.discover-section__head > view\s*\{[\s\S]*?min-width:\s*0;/);
   assert.match(styles, /\.discover-event-feature__notice\s*\{[\s\S]*?max-width:\s*calc\(100% - 36rpx\);/);
 
   assert.match(narrow, /\.discover-topbar\s*\{[\s\S]*?flex-wrap:\s*wrap;/);
   assert.match(narrow, /\.discover-runtime\s*\{[\s\S]*?flex-direction:\s*column;/);
-  assert.match(narrow, /\.discover-art__grid\s*\{[\s\S]*?grid-template-columns:\s*1fr;/);
-  assert.match(narrow, /\.discover-card-entry\s*\{[\s\S]*?grid-template-columns:\s*1fr;/);
   assert.match(narrow, /\.discover-city-group\s*\{[\s\S]*?grid-template-columns:\s*92rpx minmax\(0, 1fr\);/);
 });
 

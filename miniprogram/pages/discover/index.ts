@@ -35,7 +35,7 @@ interface EditorialEvent {
 }
 
 const cityGroups = [
-  { region: '中国', cities: '北京 · 上海 · 广州 · 深圳 · 杭州' },
+  { region: '中国', cities: '北京 · 上海 · 杭州 · 广州 · 深圳 · 台北（中国台湾）' },
   { region: '欧洲', cities: '苏黎世 · 米兰 · 巴黎' },
   { region: '亚太', cities: '新加坡 · 墨尔本 · 悉尼' },
   { region: '加拿大', cities: '多伦多 · 温哥华' },

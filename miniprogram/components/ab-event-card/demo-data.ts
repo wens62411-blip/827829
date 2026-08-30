@@ -105,20 +105,20 @@ export function listActivityDemoEvents(
 
 const DISCOVER_DEMO_EVENT_DEFINITIONS = [
   {
+    eventId: 'demo:discover:shanghai-brand-art-dinner',
+    cityId: 'cn-shanghai',
+    title: '上海 · 品牌与艺术晚宴',
+    summary: '以上海城市文化为线索，呈现品牌、艺术与长期关系的策展式交流构想。',
+    cardIndex: '01',
+    cardMeta: '跨界交流 · 预约制',
+  },
+  {
     eventId: 'demo:discover:zurich-private-collection',
     cityId: 'ch-zurich',
     title: '私人收藏与家族传承对话',
     summary: '以公开知识框架讨论收藏叙事与家族传承，不提供鉴定、交易或真实资源承诺。',
-    cardIndex: '01',
-    cardMeta: '小型圆桌 · 邀请制',
-  },
-  {
-    eventId: 'demo:discover:hangzhou-brand-art-dinner',
-    cityId: 'cn-hangzhou',
-    title: '西湖边的品牌与艺术晚宴',
-    summary: '以杭州城市文化为线索，呈现品牌、艺术与长期关系的策展式交流构想。',
     cardIndex: '02',
-    cardMeta: '跨界交流 · 预约制',
+    cardMeta: '小型圆桌 · 邀请制',
   },
   {
     eventId: 'demo:discover:singapore-founders-night',
@@ -153,8 +153,8 @@ export const DISCOVER_DEMO_EVENTS: readonly DiscoverDemoEventPresentation[] =
   DISCOVER_DEMO_EVENT_DEFINITIONS.map(makeDiscoverDemoEvent);
 
 export const ART_RELATED_DEMO_EVENT: DemoEventPresentation = (() => {
-  const city = CITY_DIRECTORY.find((candidate) => candidate.id === CityId.CN_SHENZHEN);
-  if (!city) throw new Error('Frozen city directory must include Shenzhen for the Art demo event.');
+  const city = CITY_DIRECTORY.find((candidate) => candidate.id === CityId.CN_HANGZHOU);
+  if (!city) throw new Error('Frozen city directory must include Hangzhou for the Art demo event.');
   return {
     eventId: 'event_demo_art_reading_001',
     cityId: city.id,

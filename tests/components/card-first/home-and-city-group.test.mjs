@@ -54,7 +54,7 @@ function unnegatedPositiveClaims(source) {
   return [...new Set(findings)];
 }
 
-test('home explains the card but keeps management inside Me while events, art, network, and city scope remain visible', () => {
+test('home keeps card management inside Me while events and city scope remain visible', () => {
   const template = read('miniprogram/pages/discover/index.wxml');
   const geography = read('miniprogram/shared/constants/geography.ts');
   const actions = interactiveMarkup(template);
@@ -62,23 +62,14 @@ test('home explains the card but keeps management inside Me while events, art, n
 
   const cardActions = actions.filter((markup) => /^\/(?:pages\/card\/index|packageCard\/pages\/(?:edit|view|share)\/index)/.test(attribute(markup, 'url')));
   if (cardActions.length) errors.push(`首页不应绕过“我的”直达名片管理，当前为 ${cardActions.length} 个`);
-  if (!/创建、查看和分享名片统一在「我的」中管理/.test(template)) errors.push('首页没有说明名片管理入口位于“我的”');
 
   const eventActions = actions.filter((markup) => /^\/(?:pages\/events|packageEvents\/pages\/event)\//.test(attribute(markup, 'url')));
   if (!eventActions.length) errors.push('首页缺少轻量活动入口');
 
-  const artActions = actions.filter((markup) => /^\/packageArt\//.test(attribute(markup, 'url')));
-  if (!artActions.length) errors.push('首页缺少艺术频道轻入口');
-
-  const networkActions = actions.filter((markup) => /^\/pages\/network\//.test(attribute(markup, 'url')));
-  if (networkActions.length !== 1) errors.push(`首页人脉入口应克制为一个，当前为 ${networkActions.length} 个`);
-  if (networkActions.some((markup) => /primary/i.test(attribute(markup, 'class')))) {
-    errors.push('首页人脉入口不应使用主动作视觉层级');
-  }
-
   if (!hasGeographySummary(template)) errors.push('首页未明确展示 7 国 13 城摘要');
   if (constantObjectSize(geography, 'CountryId') !== 7) errors.push('冻结地理常量不是 7 个国家');
   if (constantObjectSize(geography, 'CityId') !== 13) errors.push('冻结地理常量不是 13 座城市');
+  if (!/杭州/.test(geography)) errors.push('城市目录缺少杭州');
 
   assert.deepEqual(errors, []);
 });

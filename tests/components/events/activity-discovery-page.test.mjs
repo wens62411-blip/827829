@@ -32,7 +32,9 @@ test('top city rail exposes the frozen thirteen-city directory without inventing
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
 
-  assert.match(source, /CITY_DIRECTORY\.map\(\(city\) =>/);
+  assert.match(source, /const frontRow = CITY_DIRECTORY\.filter\(\(city\) =>/);
+  assert.match(source, /const rest = CITY_DIRECTORY\.filter\(/);
+  assert.match(source, /\[\.\.\.frontRow, \.\.\.rest\]\.map\(\(city\) =>/);
   assert.match(source, /cityFilters:\s*buildCityFilters\(DEFAULT_CITY\.id\)/);
   assert.match(template, /wx:for="\{\{cityFilters\}\}"/);
   assert.match(template, /查看 7 国 13 城完整目录/);
