@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">广州 · 小蛮腰</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Canton Tower twisted body -->
+    <ellipse cx="100" cy="52" rx="18" ry="8" stroke="#98723A"/>
+    <ellipse cx="100" cy="148" rx="34" ry="10" stroke="#98723A"/>
+    <path d="M82 56 Q62 100 66 148" stroke-width="1.5"/>
+    <path d="M118 56 Q138 100 134 148" stroke-width="1.5"/>
+    <path d="M88 54 Q74 100 78 148" stroke-width="1.5"/>
+    <path d="M112 54 Q126 100 122 148" stroke-width="1.5"/>
+    <!-- lattice cross lines -->
+    <path d="M78 90 L122 100 M76 110 L124 120" stroke-width="1"/>
+    <path d="M100 52 V32" stroke-width="1.5"/>
+    <path d="M30 170 H170" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

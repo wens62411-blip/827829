@@ -1,0 +1,24 @@
+<view class="custom-tab-bar" aria-label="底部导航">
+  <view class="custom-tab-bar__safe" aria-hidden="true" />
+  <view class="custom-tab-bar__items">
+    <view
+      wx:for="{{list}}"
+      wx:key="index"
+      class="custom-tab-bar__item {{selected === index ? 'custom-tab-bar__item--active' : ''}}"
+      data-index="{{index}}"
+      data-path="{{item.pagePath}}"
+      bindtap="switchTab"
+      aria-role="button"
+      aria-label="{{item.text}}"
+    >
+      <image
+        class="custom-tab-bar__icon"
+        src="{{selected === index ? item.selectedIconPath : item.iconPath}}"
+        mode="aspectFit"
+        aria-hidden="true"
+      />
+      <text class="custom-tab-bar__text">{{item.text}}</text>
+    </view>
+  </view>
+  <loading-city visible="{{loadingVisible}}" bind:complete="onLoadingComplete" />
+</view>

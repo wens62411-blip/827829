@@ -57,6 +57,13 @@ const cityFeature = {
   alt: '苏黎世利马特河两岸老城全景，用于全球城市目录视觉参考',
 } as const;
 
+function updateTabBarSelected(page: unknown, index: number) {
+  const tabBar = typeof (page as { getTabBar?: () => { setData: (data: Record<string, unknown>) => void } | undefined }).getTabBar === 'function'
+    ? (page as { getTabBar: () => { setData: (data: Record<string, unknown>) => void } | undefined }).getTabBar()
+    : null;
+  if (tabBar) tabBar.setData({ selected: index });
+}
+
 Page({
   data: {
     runtimeMode: RuntimeMode.OFFLINE_DEMO,
@@ -67,6 +74,10 @@ Page({
     brandLogoFailed: false,
     eventImageFailed: false,
     cityImageFailed: false,
+  },
+
+  onShow() {
+    updateTabBarSelected(this, 0);
   },
 
   async openMyCard() {

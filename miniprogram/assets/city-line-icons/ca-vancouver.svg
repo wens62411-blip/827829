@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">温哥华 · 加拿大广场</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Canada Place sails -->
+    <path d="M40 170 Q48 90 80 170"/>
+    <path d="M72 170 Q84 80 120 170" stroke="#98723A"/>
+    <path d="M108 170 Q124 90 156 170"/>
+    <!-- building base -->
+    <path d="M40 170 H156"/>
+    <path d="M44 170 V140 H152 V170" stroke-width="1.5"/>
+    <!-- mountains -->
+    <path d="M120 72 L144 36 L168 72" stroke-width="1.5"/>
+    <path d="M152 84 L172 52 L192 84" stroke-width="1.5"/>
+    <!-- water -->
+    <path d="M16 170 H184" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

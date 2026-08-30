@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">米兰 · 大教堂</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Duomo facade base -->
+    <path d="M44 170 V80 H156 V170"/>
+    <!-- roof peaks -->
+    <path d="M44 80 L100 34 L156 80" stroke="#98723A"/>
+    <!-- central spire -->
+    <path d="M100 34 V18 M94 24 H106 M96 30 H104" stroke="#98723A"/>
+    <!-- pinnacles -->
+    <path d="M64 80 V62 M84 80 V58 M116 80 V58 M136 80 V62" stroke-width="1.5"/>
+    <!-- windows/arches -->
+    <path d="M60 110 V140 M80 110 V140 M120 110 V140 M140 110 V140" stroke-width="1.5"/>
+    <path d="M56 110 Q60 100 64 110 M76 110 Q80 100 84 110 M116 110 Q120 100 124 110 M136 110 Q140 100 144 110" stroke-width="1.5"/>
+    <path d="M44 170 H156" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

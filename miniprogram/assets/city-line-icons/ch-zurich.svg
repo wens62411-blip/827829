@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">苏黎世 · 双塔与湖</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Grossmünster towers -->
+    <path d="M64 170 V84 L76 68 L88 84 V170"/>
+    <path d="M112 170 V92 L124 76 L136 92 V170"/>
+    <path d="M64 100 H88 M64 120 H88 M112 108 H136 M112 128 H136" stroke-width="1"/>
+    <!-- spires -->
+    <path d="M76 68 V54 M124 76 V62" stroke="#98723A"/>
+    <!-- lake -->
+    <path d="M20 170 H180" stroke="#98723A" stroke-width="1.5"/>
+    <path d="M28 178 H80 M120 178 H172" stroke-width="1"/>
+    <!-- mountains -->
+    <path d="M148 84 L168 52 L188 84" stroke-width="1.5"/>
+  </g>
+</svg>

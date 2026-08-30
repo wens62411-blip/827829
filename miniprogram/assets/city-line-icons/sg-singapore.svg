@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">新加坡 · 滨海湾金沙</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- three towers -->
+    <path d="M54 170 V60 H74 V170"/>
+    <path d="M90 170 V52 H110 V170"/>
+    <path d="M126 170 V60 H146 V170"/>
+    <!-- sky park -->
+    <path d="M46 60 Q100 38 154 60" stroke="#98723A"/>
+    <path d="M46 60 H154" stroke="#98723A" stroke-width="1.5"/>
+    <!-- tower lines -->
+    <path d="M54 80 H74 M54 110 H74 M54 140 H74" stroke-width="1"/>
+    <path d="M90 72 H110 M90 102 H110 M90 132 H110" stroke-width="1"/>
+    <path d="M126 80 H146 M126 110 H146 M126 140 H146" stroke-width="1"/>
+    <!-- water -->
+    <path d="M20 170 H180" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

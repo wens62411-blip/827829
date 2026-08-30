@@ -1,0 +1,22 @@
+<view class="loading-city {{visible ? 'loading-city--visible' : ''}}" aria-hidden="{{!visible}}">
+  <view class="loading-city__backdrop" aria-hidden="true" />
+  <view class="loading-city__stage">
+    <view class="loading-city__icon-ring">
+      <image
+        class="loading-city__icon"
+        src="{{city.iconPath}}"
+        mode="aspectFit"
+        aria-label="{{city.zh}}地标线稿"
+      />
+    </view>
+    <view class="loading-city__names">
+      <text class="loading-city__name">{{city.zh}}</text>
+      <text class="loading-city__name-en">{{city.en}}</text>
+    </view>
+    <view class="loading-city__divider" aria-hidden="true" />
+    <view class="loading-city__brand">
+      <text class="loading-city__brand-name">AB CLUB</text>
+      <text class="loading-city__brand-tag">COLLECTING CITIES & IDENTITIES</text>
+    </view>
+  </view>
+</view>

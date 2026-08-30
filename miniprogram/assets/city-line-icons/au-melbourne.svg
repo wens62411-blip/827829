@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">墨尔本 · 弗林德斯车站</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Station facade -->
+    <path d="M32 170 V88 H168 V170"/>
+    <path d="M32 88 L100 48 L168 88" stroke="#98723A"/>
+    <!-- central dome/tower -->
+    <path d="M88 88 V60 H112 V88"/>
+    <path d="M88 60 L100 44 L112 60" stroke="#98723A"/>
+    <!-- arches -->
+    <path d="M48 170 V120 Q60 108 72 120 V170" stroke-width="1.5"/>
+    <path d="M84 170 V120 Q96 108 108 120 V170" stroke-width="1.5"/>
+    <path d="M120 170 V120 Q132 108 144 120 V170" stroke-width="1.5"/>
+    <!-- tram line -->
+    <path d="M20 170 H180" stroke="#98723A" stroke-width="1.5"/>
+    <path d="M38 178 H90 M116 178 H166" stroke-width="1"/>
+  </g>
+</svg>

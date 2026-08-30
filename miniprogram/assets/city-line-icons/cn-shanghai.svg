@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">上海 · 东方明珠</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Oriental Pearl spheres -->
+    <circle cx="100" cy="62" r="18"/>
+    <circle cx="100" cy="108" r="28"/>
+    <circle cx="100" cy="156" r="16" stroke="#98723A"/>
+    <!-- columns -->
+    <path d="M86 80 L86 124 M114 80 L114 124"/>
+    <path d="M78 136 L78 170 M122 136 L122 170"/>
+    <!-- skyline -->
+    <path d="M32 170 H56 V140 H72 V170 M128 170 V150 H144 V170 M160 170 V132 H176 V170" stroke-width="1.5"/>
+    <path d="M24 170 H176" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">深圳 · 平安金融中心</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- main tower -->
+    <path d="M88 170 V42 L100 32 L112 42 V170"/>
+    <path d="M88 60 H112 M88 90 H112 M88 120 H112 M88 150 H112" stroke-width="1"/>
+    <!-- accent top -->
+    <path d="M100 32 V20" stroke="#98723A"/>
+    <circle cx="100" cy="16" r="3" stroke="#98723A"/>
+    <!-- surrounding skyline -->
+    <path d="M44 170 V100 H60 V170 M140 170 V116 H156 V170" stroke-width="1.5"/>
+    <path d="M28 170 H172" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

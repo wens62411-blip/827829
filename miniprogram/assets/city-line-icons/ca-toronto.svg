@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">多伦多 · CN塔</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- CN Tower -->
+    <path d="M92 170 V28 L100 16 L108 28 V170"/>
+    <ellipse cx="100" cy="52" rx="14" ry="5" stroke="#98723A"/>
+    <ellipse cx="100" cy="88" rx="12" ry="4" stroke-width="1.5"/>
+    <ellipse cx="100" cy="124" rx="10" ry="3.5" stroke-width="1.5"/>
+    <path d="M100 16 V8" stroke="#98723A"/>
+    <!-- skyline -->
+    <path d="M36 170 V108 H56 V170 M144 170 V116 H164 V170" stroke-width="1.5"/>
+    <path d="M20 170 H180" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

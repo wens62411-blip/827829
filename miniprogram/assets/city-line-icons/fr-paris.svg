@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">巴黎 · 埃菲尔铁塔</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Eiffel tower -->
+    <path d="M68 170 L100 20 L132 170"/>
+    <path d="M76 130 H124 M84 90 H116 M92 55 H108"/>
+    <path d="M80 130 Q100 110 120 130" stroke-width="1"/>
+    <path d="M88 90 Q100 78 112 90" stroke-width="1"/>
+    <!-- Seine arc -->
+    <path d="M20 170 Q40 150 60 170" stroke="#98723A"/>
+    <path d="M140 170 Q160 150 180 170" stroke="#98723A"/>
+    <path d="M20 170 H180" stroke="#98723A" stroke-width="1.5"/>
+    <!-- ground detail -->
+    <path d="M42 178 H80 M124 178 H162" stroke-width="1"/>
+  </g>
+</svg>

@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200" role="img" aria-labelledby="title">
+  <title id="title">悉尼 · 歌剧院与海港大桥</title>
+  <g stroke="#756F66" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <!-- Opera House sails -->
+    <path d="M28 170 Q40 90 72 170"/>
+    <path d="M60 170 Q80 70 124 170"/>
+    <path d="M104 170 Q130 80 160 170"/>
+    <!-- Harbour Bridge arch -->
+    <path d="M20 104 Q100 8 180 104" stroke="#98723A"/>
+    <path d="M20 104 V170 M180 104 V170" stroke="#98723A" stroke-width="1.5"/>
+    <!-- water -->
+    <path d="M16 170 H184" stroke="#98723A" stroke-width="1.5"/>
+  </g>
+</svg>

@@ -224,6 +224,8 @@ Page({
   },
 
   onShow() {
+    const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
+    if (tabBar) tabBar.setData({ selected: 1 });
     if (!this.data.offlineDemo) return;
     const storedCityId = String(wx.getStorageSync('ab-events-city-id') || '');
     if (storedCityId && storedCityId !== this.data.selectedCityId) {
