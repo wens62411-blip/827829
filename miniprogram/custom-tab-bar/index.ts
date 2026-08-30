@@ -26,6 +26,8 @@ const TAB_LIST: readonly TabItem[] = [
   },
 ] as const;
 
+let introShown = false;
+
 Component({
   options: {
     styleIsolation: 'apply-shared',
@@ -35,6 +37,15 @@ Component({
     loadingVisible: false,
     list: TAB_LIST,
     pendingPath: '',
+  },
+
+  lifetimes: {
+    attached() {
+      // 冷启动入场动画：一次进程只放一次，避免开发者热重载反复弹
+      if (introShown) return;
+      introShown = true;
+      this.setData({ loadingVisible: true });
+    },
   },
 
   methods: {
