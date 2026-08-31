@@ -3,13 +3,90 @@
 .me-page {
   padding-top: 32rpx;
   /* 自定义 TabBar 是 fixed 浮层，微信不再预留底部空间，需手动留出导航条高度(100rpx)+安全区 */
-  padding-bottom: calc(128rpx + env(safe-area-inset-bottom));
+  padding-bottom: calc(112rpx + env(safe-area-inset-bottom));
   overflow-x: hidden;
 }
 
 .me-loading,
 .me-error {
   margin-top: 36rpx;
+}
+
+/* 真实空状态：用户尚未创建名片。默认路径不放任何示例人物的姓名/头像/城市 */
+.me-empty {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 48rpx;
+  padding: 56rpx 32rpx 40rpx;
+  border: 2rpx solid var(--ab-color-border);
+  border-radius: 20rpx;
+  background: var(--ab-color-paper);
+  text-align: center;
+}
+
+.me-empty__avatar {
+  box-sizing: border-box;
+  width: 128rpx;
+  height: 128rpx;
+  margin-bottom: 28rpx;
+  border: 2rpx dashed var(--ab-color-gold-soft);
+  border-radius: 50%;
+  background: var(--ab-color-ivory);
+}
+
+.me-empty__title,
+.me-empty__subtitle {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.me-empty__title {
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 40rpx;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ab-color-ink);
+}
+
+.me-empty__subtitle {
+  margin-top: 14rpx;
+  font-size: 25rpx;
+  line-height: 1.6;
+  color: var(--ab-color-muted);
+}
+
+.me-empty__cta {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 96rpx;
+  margin-top: 36rpx;
+  padding: 0 56rpx;
+  border-radius: 999rpx;
+  background: var(--ab-color-gold);
+  color: var(--ab-color-ivory);
+  font-size: 30rpx;
+  font-weight: 500;
+  letter-spacing: 2rpx;
+}
+
+/* 示例名片：次级文本入口，用户主动点击才展示，避免与主动作争夺注意力 */
+.me-empty__sample {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 88rpx;
+  margin-top: 8rpx;
+  padding: 0 12rpx;
+  color: var(--ab-color-gold);
+  font-size: 26rpx;
+  text-decoration: underline;
+  text-underline-offset: 6rpx;
 }
 
 .me-profile {
@@ -433,6 +510,24 @@
   .me-link-row__arrow,
   .me-section-heading__kicker {
     color: var(--ab-color-gold-soft);
+  }
+
+  .me-empty {
+    border-color: var(--ab-color-dark-border);
+    background: var(--ab-color-dark-surface);
+  }
+
+  .me-empty__avatar {
+    border-color: var(--ab-color-gold-soft);
+    background: var(--ab-color-dark-canvas);
+  }
+
+  .me-empty__title {
+    color: var(--ab-color-dark-text);
+  }
+
+  .me-empty__subtitle {
+    color: var(--ab-color-dark-muted);
   }
 }
 

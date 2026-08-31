@@ -1,7 +1,13 @@
 <view class="card-page me-page">
-  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 所有资料均为合成示例</view>
-
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton me-loading" aria-label="正在加载个人资料"></view>
+
+  <view wx:elif="{{status === 'EMPTY'}}" class="me-empty" aria-role="region" aria-label="尚未创建名片">
+    <view class="me-empty__avatar" aria-hidden="true"></view>
+    <text class="me-empty__title">创建你的第一张名片</text>
+    <text class="me-empty__subtitle">一张名片，开启你的 Digital Life</text>
+    <navigator class="me-empty__cta" url="/packageCard/pages/edit/index" hover-class="me-pressed" aria-label="去创建我的名片">去创建 →</navigator>
+    <view class="me-empty__sample" bindtap="viewSampleCard" aria-role="button" aria-label="查看示例名片">看看示例名片</view>
+  </view>
 
   <view wx:elif="{{status === 'ERROR'}}" class="card-panel card-panel--error me-error">
     <text class="card-panel__title">资料暂时不可用</text>
@@ -16,7 +22,7 @@
       <view class="me-profile__identity">
         <text class="me-profile__name">{{profile.displayName}}</text>
         <text class="me-profile__meta">{{hasProfileCity ? cityName : '尚未选择城市'}} · 我的名片</text>
-        <text class="me-profile__completion">{{demoMode ? '示例资料' : '资料完整度 ' + completionPercent + '%'}}</text>
+        <text class="me-profile__completion">资料完整度 {{completionPercent}}%</text>
       </view>
       <navigator class="me-profile__edit" url="/packageCard/pages/edit/index" hover-class="me-pressed" aria-label="编辑我的名片资料"><image class="me-profile__edit-icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑</text></navigator>
     </view>
@@ -50,7 +56,7 @@
     <view class="me-city-group__body">
       <view class="me-city-group__masthead">
         <text class="me-city-group__kicker">SUPPORTED CITIES</text>
-        <text class="me-city-group__evidence">{{demoMode ? '本地示意' : '功能预告'}} · 待运营确认</text>
+        <text class="me-city-group__evidence">功能预告 · 待运营确认</text>
       </view>
       <text class="me-city-group__title">{{cityGroupTitle}}</text>
       <text class="me-city-group__copy">{{supportedCities}}</text>
@@ -74,5 +80,5 @@
     </navigator>
   </view>
 
-  <view class="me-evidence-footer" aria-role="note">{{demoMode ? 'SYNTHETIC · DEMO_ONLY：本页不会建立账户、保存资料、提交审核、加入城市群或生成真实分享。' : '真实资料读取失败时不会用示例替代；城市群申请当前仍为功能预告。'}}</view>
+  <view class="me-evidence-footer" aria-role="note">真实资料读取失败时不会用示例替代；城市群申请当前仍为功能预告。</view>
 </view>

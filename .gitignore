@@ -6,6 +6,7 @@ miniprogram_npm/
 coverage/
 *.log
 project.private.config.json
+.tools/
 .codex/.env
 .env
 .env.*

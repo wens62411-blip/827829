@@ -2,6 +2,7 @@ import { CITY_DIRECTORY } from '../../shared/constants/geography';
 import type { ProfilePrivateDto } from '../../shared/types/projections';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../card/services/offline-demo';
 import { readOfflineDemoDraft } from '../card/services/offline-demo-draft';
+import { hasOfflineDemoDraft } from '../card/services/offline-demo-draft';
 
 type IdentityClientModule = typeof import('../card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -69,7 +70,7 @@ Page({
     cityImageFailed: false,
     hasProfileCity: false,
     supportedCities,
-    status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
+    status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'EMPTY' | 'ERROR',
     message: '',
   },
 
@@ -94,6 +95,21 @@ Page({
       return;
     }
     if (this.data.demoMode) {
+      // 默认路径必须是用户自己的数据：本地没有保存过草稿 = 尚未创建名片，
+      // 展示真实空状态，绝不用示例人物（姓名/头像/城市）占用「我的」。
+      if (!hasOfflineDemoDraft()) {
+        this.setData({
+          profile: null,
+          completionPercent: 0,
+          profileInitial: '',
+          cityImageFailed: false,
+          ...EMPTY_CITY_GROUP,
+          status: 'EMPTY',
+          message: '',
+        });
+        if (fromPullDown) wx.stopPullDownRefresh();
+        return;
+      }
       const draft = readOfflineDemoDraft();
       const profile: ProfilePrivateDto = {
         ...OFFLINE_DEMO_PROFILE,
@@ -108,7 +124,7 @@ Page({
         cityImageFailed: false,
         ...resolveCityGroup(profile),
         status: 'READY',
-        message: 'SYNTHETIC · DEMO_ONLY',
+        message: '',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
@@ -117,16 +133,17 @@ Page({
     const { getMyProfile } = loadIdentityClient();
     const result = await getMyProfile();
     if (!result.ok) {
+      // NOT_FOUND = 用户尚未创建名片，属于真实空状态，不应渲染成错误页，
+      // 更不能用示例资料顶替，否则用户会以为自己的名片被别人占用。
+      const isNotFound = result.code === 'NOT_FOUND';
       this.setData({
         profile: null,
         completionPercent: 0,
-        profileInitial: 'AB',
+        profileInitial: isNotFound ? '' : 'AB',
         cityImageFailed: false,
         ...EMPTY_CITY_GROUP,
-        status: 'ERROR',
-        message: result.code === 'NOT_FOUND'
-          ? '尚未建立个人资料，请先完成最小资料。'
-          : result.message,
+        status: isNotFound ? 'EMPTY' : 'ERROR',
+        message: isNotFound ? '' : result.message,
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
@@ -145,6 +162,11 @@ Page({
 
   handleCityImageError() {
     this.setData({ cityImageFailed: true });
+  },
+
+  // 示例名片：仅在用户主动点击后展示，绝不出现在默认路径上
+  viewSampleCard() {
+    wx.navigateTo({ url: '/packageCard/pages/view/index?preview=STRANGER' });
   },
 
 });
