@@ -2,7 +2,8 @@
   --canvas: #f4efe5; --paper: #fffdf8; --ink: #211e1a; --muted: #625d55;
   --line: #d8d0c3; --gold: #8a6538; --gold-soft: #e7d5b2;
   box-sizing: border-box; width: 100%; min-height: 100vh; overflow-x: hidden;
-  padding-bottom: calc(40rpx + env(safe-area-inset-bottom)); background: var(--canvas); color: var(--ink);
+  /* 自定义 TabBar 是 fixed 浮层，微信不再预留底部空间，需手动留出导航条高度(100rpx)+安全区 */
+  padding-bottom: calc(128rpx + env(safe-area-inset-bottom)); background: var(--canvas); color: var(--ink);
 }
 .events-page button, .events-page view, .events-page text, .events-page scroll-view { box-sizing: border-box; min-width: 0; }
 .events-brand__name, .events-brand__note, .events-kicker, .events-hero__title, .events-hero__copy,

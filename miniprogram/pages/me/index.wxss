@@ -2,7 +2,8 @@
 
 .me-page {
   padding-top: 32rpx;
-  padding-bottom: calc(112rpx + env(safe-area-inset-bottom));
+  /* 自定义 TabBar 是 fixed 浮层，微信不再预留底部空间，需手动留出导航条高度(100rpx)+安全区 */
+  padding-bottom: calc(128rpx + env(safe-area-inset-bottom));
   overflow-x: hidden;
 }
 
