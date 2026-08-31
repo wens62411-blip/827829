@@ -14,6 +14,18 @@ const OFFLINE_DEMO_DRAFT_CONTRACT_VERSION = 1;
 const CITY_IDS = new Set<string>(CITY_DIRECTORY.map((city) => city.id));
 const CONTROL_OR_FORMAT_CHARACTER = /[\p{Cc}\p{Cf}]/u;
 
+// 遗留演示占位名：旧版本曾把示例名片默认写成这些中文/示例名，升级后本机存储里可能仍残留，
+// 导致新版本读到的还是旧名。读到这些名时一次性重置为当前默认（Display Name）。
+const LEGACY_DEMO_DISPLAY_NAMES: ReadonlySet<string> = new Set([
+  '林知遥',
+  '林志瑶',
+  'AB Club 示例会员',
+]);
+
+function isLegacyDemoDisplayName(name: string): boolean {
+  return LEGACY_DEMO_DISPLAY_NAMES.has(name);
+}
+
 type PublicContactKey = 'phone' | 'email';
 
 export interface OfflineDemoPublicField {
@@ -158,7 +170,14 @@ export function readOfflineDemoDraft(): OfflineDemoDraft {
   try {
     const stored = wx.getStorageSync<unknown>(OFFLINE_DEMO_DRAFT_STORAGE_KEY);
     if (!stored || typeof stored !== 'object') return createDefaultOfflineDemoDraft();
-    return normalizeOfflineDemoDraft(stored);
+    const normalized = normalizeOfflineDemoDraft(stored);
+    if (isLegacyDemoDisplayName(normalized.displayName)) {
+      // 旧版本残留的示例占位名：重置为当前默认（Display Name）并写回，避免反复显示旧名。
+      const fresh = createDefaultOfflineDemoDraft();
+      writeOfflineDemoDraft(fresh);
+      return fresh;
+    }
+    return normalized;
   } catch (_error) {
     return createDefaultOfflineDemoDraft();
   }

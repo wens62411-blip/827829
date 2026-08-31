@@ -110,6 +110,42 @@ test('offline draft persists a sanitized allowlist and showTags is the only publ
   }
 });
 
+test('legacy demo display names are self-healed to the current default on read', async () => {
+  const storageKey = 'ab.club.card.offline-demo-draft.v1';
+  const storage = new Map();
+  globalThis.wx = {
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
+    setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
+  };
+  try {
+    const draft = await loadBundledTypeScript('miniprogram/pages/card/services/offline-demo-draft.ts');
+
+    // 旧版本残留在本机存储里的示例名：读到后应一次性重置为当前默认 Display Name，并写回存储。
+    storage.set(storageKey, {
+      contractVersion: 1,
+      displayName: '林知遥',
+      biography: '',
+      profession: '',
+      cityId: 'CN_HANGZHOU',
+      selectedLabels: [],
+      showTags: true,
+      phone: '',
+      email: '',
+      showPhone: false,
+      showEmail: false,
+    });
+    const healed = draft.readOfflineDemoDraft();
+    assert.equal(healed.displayName, 'Display Name');
+    assert.equal(storage.get(storageKey).displayName, 'Display Name');
+
+    // 非遗留名（用户自己填的）不应被误重置。
+    storage.set(storageKey, { ...healed, displayName: 'My Own Name' });
+    assert.equal(draft.readOfflineDemoDraft().displayName, 'My Own Name');
+  } finally {
+    delete globalThis.wx;
+  }
+});
+
 test('offline editor adds, removes, previews, and saves custom labels without a cloud write', async () => {
   const storage = new Map();
   globalThis.wx = {
