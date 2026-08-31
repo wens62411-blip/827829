@@ -113,6 +113,5 @@
     "loading-city": "/components/loading-city/index"
   },
   "style": "v2",
-  "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"
 }
