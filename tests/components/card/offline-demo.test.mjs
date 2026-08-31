@@ -44,10 +44,7 @@ test('offline card surfaces label state, editable preview, and explicitly labell
   const shareSource = read('miniprogram/packageCard/pages/share/index.ts');
   const sharePage = read('miniprogram/packageCard/pages/share/index.wxml');
 
-  // me page is now the real-user default path (empty state when no card, never shows
-  // synthetic demo data), so it must NOT carry a DEMO label. The card/share surfaces are
-  // demo-mode experiences where the explicit synthetic label is a required transparency contract.
-  for (const source of [cardPage, sharePage]) assert.match(source, /SYNTHETIC · DEMO_ONLY/);
+  for (const source of [cardPage, mePage, sharePage]) assert.match(source, /SYNTHETIC · DEMO_ONLY/);
   assert.match(cardPage, /标签必须先经过人工审核/);
   assert.match(mePage, /公开标签状态/);
   assert.match(editSource, /已保存到本机[\s\S]*?DEMO_ONLY[\s\S]*?未写入云端/);
