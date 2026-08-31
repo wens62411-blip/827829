@@ -2,6 +2,7 @@ import { CITY_DIRECTORY } from '../../shared/constants/geography';
 import type { ProfilePrivateDto } from '../../shared/types/projections';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../card/services/offline-demo';
 import { readOfflineDemoDraft } from '../card/services/offline-demo-draft';
+import { hasLocalIdentity, readLocalIdentity } from '../card/services/local-identity';
 
 type IdentityClientModule = typeof import('../card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -62,6 +63,7 @@ Page({
     completionPercent: 0,
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
+    localIdentityReady: false,
     profileInitial: 'AB',
     cityName: '',
     cityGroupTitle: EMPTY_CITY_GROUP.cityGroupTitle,
@@ -94,6 +96,27 @@ Page({
       return;
     }
     if (this.data.demoMode) {
+      const local = hasLocalIdentity() ? readLocalIdentity() : null;
+      if (local) {
+        const profile: ProfilePrivateDto = {
+          ...OFFLINE_DEMO_PROFILE,
+          displayName: local.displayName,
+          cityId: local.cityId,
+          biography: local.biography,
+        };
+        this.setData({
+          profile,
+          completionPercent: 100,
+          profileInitial: displayInitial(profile.displayName),
+          cityImageFailed: false,
+          ...resolveCityGroup(profile),
+          status: 'READY',
+          localIdentityReady: true,
+          message: '已保存为本机名片，仅保存在这台设备。',
+        });
+        if (fromPullDown) wx.stopPullDownRefresh();
+        return;
+      }
       const draft = readOfflineDemoDraft();
       const profile: ProfilePrivateDto = {
         ...OFFLINE_DEMO_PROFILE,
@@ -108,7 +131,7 @@ Page({
         cityImageFailed: false,
         ...resolveCityGroup(profile),
         status: 'READY',
-        message: 'SYNTHETIC · DEMO_ONLY',
+        message: '体验版 · 示例内容',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;

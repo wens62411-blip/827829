@@ -193,6 +193,6 @@ test('owner card makes edit and share clear while network stays out of the owner
   assert.match(template, /gallery-urls="\{\{demoGalleryUrls\}\}"/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
   assert.match(template, /标签必须先经过人工审核/);
-  assert.match(template, /SYNTHETIC · DEMO_ONLY/);
+  assert.match(template, /体验版/);
   assert.doesNotMatch(template, /一键分享的安全预览|WECHAT SHARE|安全转发|OPENID|小程序码|海报|token/i);
 });

@@ -34,7 +34,7 @@ test('Me city group reuses shipped city photography and keeps operations-pending
   assert.match(template, /src="\{\{cityImageSrc\}\}"/);
   assert.match(template, /binderror="handleCityImageError"/);
   assert.match(source, /cityImageSrc:\s*`\/assets\/cities\/\$\{city\.id\}\.jpg`/);
-  assert.match(template, /待运营确认/);
+  assert.match(template, /逐步开放/);
   assert.match(template, /城市目录为本地演示/);
   assert.doesNotMatch(template, /申请成功|加入成功|城市群[^<\n]{0,20}\bLIVE\b/);
 });

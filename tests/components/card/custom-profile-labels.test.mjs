@@ -143,7 +143,7 @@ test('offline editor adds, removes, previews, and saves custom labels without a 
 
     await page.saveProfile.call(page);
     assert.equal(page.data.status, 'SAVED');
-    assert.match(page.data.message, /本机.*DEMO_ONLY/);
+    assert.match(page.data.message, /本机.*体验版/);
     const persisted = [...storage.values()].find((value) => value?.contractVersion === 1);
     assert.ok(persisted);
     assert.deepEqual(persisted.selectedLabels, page.data.selectedLabels);

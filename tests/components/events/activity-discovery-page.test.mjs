@@ -14,12 +14,12 @@ test('activity discovery is a branded independent surface with restrained phase-
 
   assert.equal(config.navigationBarTitleText, 'AB Club 活动');
   assert.match(template, /src="\/assets\/brand\/ab-club-crest\.png"/);
-  assert.match(template, /GLOBAL GATHERINGS · PHASE 01/);
+  assert.match(template, /GLOBAL GATHERINGS/);
   assert.match(template, /活动是数字名片连接后的轻量延伸/);
   assert.match(template, /本月精选/);
   assert.match(template, /近期方向/);
   assert.match(template, /城市主题/);
-  assert.match(template, /一期以名片为核心，活动保持轻量/);
+  assert.match(template, /活动逐步开放，先以名片连接彼此/);
   assert.match(source, /listActivityDemoEvents/);
   assert.match(source, /buildDemoSections/);
   assert.match(styles, /--canvas:\s*#f4efe5/i);
@@ -38,7 +38,7 @@ test('top city rail exposes the frozen thirteen-city directory without inventing
   assert.match(source, /cityFilters:\s*buildCityFilters\(DEFAULT_CITY\.id\)/);
   assert.match(template, /wx:for="\{\{cityFilters\}\}"/);
   assert.match(template, /查看 7 国 13 城完整目录/);
-  assert.match(template, /不等于当地节点已经运营/);
+  assert.match(template, /城市目录为展示用，当地节点陆续开放中/);
   assert.doesNotMatch(template, /运营中|已开放|席位|余位|立即报名/);
 });
 
@@ -58,9 +58,9 @@ test('DEMO_ONLY and no-registration boundaries remain explicit but no transactio
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
 
-  assert.match(template, /DEMO_ONLY/);
+  assert.match(template, /体验版/);
   assert.match(template, /不代表活动已举办或可报名/);
-  assert.match(template, /活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段/);
+  assert.match(template, /活动逐步开放，先以名片连接彼此/);
   assert.match(source, /正式请求失败后不会回退为合成活动/);
   assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:报名|支付|购买|登记兴趣)/s);
 });

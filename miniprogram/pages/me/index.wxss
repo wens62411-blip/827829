@@ -392,6 +392,41 @@
   line-height: 1.62;
 }
 
+.me-register-cta {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 18rpx;
+  margin-top: 28rpx;
+  padding: 28rpx 26rpx;
+  border: 2rpx solid var(--ab-color-gold-soft);
+  border-radius: 20rpx;
+  background: var(--ab-color-ivory);
+}
+
+.me-register-cta__head {
+  display: block;
+  min-width: 0;
+}
+
+.me-register-cta__title {
+  display: block;
+  color: var(--ab-color-ink);
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 30rpx;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.me-register-cta__copy {
+  display: block;
+  margin-top: 10rpx;
+  color: var(--ab-color-muted);
+  font-size: 22rpx;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
+}
+
 .me-pressed {
   opacity: 0.72;
 }
@@ -426,6 +461,15 @@
   .me-link-row,
   .me-evidence-footer {
     border-color: var(--ab-color-dark-border);
+  }
+
+  .me-register-cta {
+    border-color: var(--ab-color-gold-soft);
+    background: var(--ab-color-dark-surface);
+  }
+
+  .me-register-cta__copy {
+    color: var(--ab-color-dark-muted);
   }
 
   .me-profile__edit,

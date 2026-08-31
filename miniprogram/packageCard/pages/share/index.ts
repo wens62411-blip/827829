@@ -145,7 +145,7 @@ function drawPublicPoster(
     context.fillStyle = POSTER_PALETTE.gold;
     context.font = '600 16px sans-serif';
     context.textAlign = 'right';
-    context.fillText('SYNTHETIC · DEMO_ONLY', 588, 118);
+    context.fillText('体验版', 588, 118);
     context.textAlign = 'left';
   }
 
@@ -200,7 +200,7 @@ function drawPublicPoster(
   const footerLines = wrapText(
     context,
     demoMode
-      ? 'SYNTHETIC · DEMO_ONLY：人物与资料均为合成体验内容，不代表真实会员。海报不含小程序码。'
+      ? '体验版：人物与资料均为合成体验内容，不代表真实会员。海报不含小程序码。'
       : '此海报只包含当前公开名片，不包含任何私密资料。当前版本的海报不含小程序码，请使用微信名片转发入口。',
     536,
     3,
@@ -280,7 +280,7 @@ Page({
         cardTheme: demoSnapshot.cardTheme,
         cityLabel: cityDisplayName(demoSnapshot.card.cityId),
         loadingCard: false,
-        localNotice: 'DEMO_ONLY：可以真实拉起微信转发与生成本地海报；发送的是合成演示名片，不会创建会员关系或云端分享记录。',
+        localNotice: '体验版：可真实拉起微信转发与生成本地海报；发送的是体验内容，不会创建会员关系或云端分享记录。',
         shareCoverState: 'LOADING',
         shareCoverMessage: '正在生成微信分享卡片…',
         shareCoverPath: '',
@@ -481,7 +481,7 @@ Page({
       || this.sharePageUnloaded
     ) return;
     if (this.data.demoMode) {
-      this.setData({ localNotice: '未创建分享：OFFLINE_DEMO 不会生成或保存任何入口。' });
+      this.setData({ localNotice: '未创建分享：体验版不会生成或保存任何入口。' });
       return;
     }
     const lifecycleGeneration = this.sharePageGeneration;

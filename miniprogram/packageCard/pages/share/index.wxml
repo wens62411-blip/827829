@@ -8,7 +8,7 @@
     <image class="card-brand-crest share-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
 
-  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 可真实转发体验内容，人物资料为合成示例</view>
+  <view wx:if="{{demoMode}}" class="card-demo-ribbon">体验版 · 可真实转发体验内容，人物资料为合成示例</view>
 
   <view wx:if="{{loadingCard}}" class="card-skeleton share-loading" aria-label="正在加载名片"></view>
   <view wx:elif="{{pageError}}" class="card-panel card-panel--error share-error">
@@ -118,5 +118,5 @@
     </view>
   </view>
 
-  <text class="share-footnote">{{demoMode ? '微信转发和本地海报可以实际操作；发送内容仍是 SYNTHETIC · DEMO_ONLY，不会产生真实会员、审核或人脉记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。'}}</text>
+  <text class="share-footnote">{{demoMode ? '微信转发和本地海报可以实际操作；发送的是体验版内容，不会产生真实会员、审核或人脉记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。'}}</text>
 </view>

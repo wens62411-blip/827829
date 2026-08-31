@@ -51,21 +51,21 @@ export type AddProfileLabelResult =
   | { readonly ok: true; readonly labels: string[] }
   | { readonly ok: false; readonly code: ProfileLabelFailureCode; readonly labels: string[] };
 
-function compactText(value: unknown, maximumLength: number): string {
+export function compactText(value: unknown, maximumLength: number): string {
   if (typeof value !== 'string') return '';
   return Array.from(value.replace(/[\r\n\t]+/g, ' ').replace(/\s{2,}/g, ' ').trim())
     .slice(0, maximumLength)
     .join('');
 }
 
-function normalizePhone(value: unknown): string {
+export function normalizePhone(value: unknown): string {
   const candidate = compactText(value, 24);
   return candidate.length >= 6 && /^\+?[0-9](?:[0-9 ()-]*[0-9])$/.test(candidate)
     ? candidate
     : '';
 }
 
-function normalizeEmail(value: unknown): string {
+export function normalizeEmail(value: unknown): string {
   const candidate = compactText(value, 72);
   if (!candidate || /\s/.test(candidate)) return '';
   const parts = candidate.split('@');
@@ -117,7 +117,7 @@ export function addProfileLabel(currentValues: unknown, candidate: unknown): Add
 export function createDefaultOfflineDemoDraft(): OfflineDemoDraft {
   return {
     contractVersion: OFFLINE_DEMO_DRAFT_CONTRACT_VERSION,
-    displayName: '林知遥',
+    displayName: 'Display Name',
     biography: OFFLINE_DEMO_CARD.biography ?? '',
     profession: OFFLINE_DEMO_CARD.headline ?? '',
     cityId: CityId.CN_HANGZHOU,

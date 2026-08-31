@@ -44,12 +44,12 @@ test('offline card surfaces label state, editable preview, and explicitly labell
   const shareSource = read('miniprogram/packageCard/pages/share/index.ts');
   const sharePage = read('miniprogram/packageCard/pages/share/index.wxml');
 
-  for (const source of [cardPage, mePage, sharePage]) assert.match(source, /SYNTHETIC · DEMO_ONLY/);
+  for (const source of [cardPage, mePage, sharePage]) assert.match(source, /体验版/);
   assert.match(cardPage, /标签必须先经过人工审核/);
   assert.match(mePage, /公开标签状态/);
-  assert.match(editSource, /已保存到本机[\s\S]*?DEMO_ONLY[\s\S]*?未写入云端/);
-  assert.match(shareSource, /未创建分享：[\s\S]*?OFFLINE_DEMO/);
-  assert.match(shareSource, /SYNTHETIC · DEMO_ONLY[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/);
+  assert.match(editSource, /已保存到本机[\s\S]*?体验版[\s\S]*?未写入云端/);
+  assert.match(shareSource, /未创建分享：[\s\S]*?体验版/);
+  assert.match(shareSource, /体验版[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/);
   assert.match(sharePage, /<button\b[^>]*open-type="share"[^>]*>/);
   assert.match(sharePage, /微信转发和本地海报可以实际操作/);
   assert.match(sharePage, /不会产生真实会员、审核或人脉记录/);

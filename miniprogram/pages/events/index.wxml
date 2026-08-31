@@ -15,7 +15,7 @@
   </view>
 
   <view class="events-hero" aria-role="region" aria-label="AB Club 活动">
-    <text class="events-kicker">GLOBAL GATHERINGS · PHASE 01</text>
+    <text class="events-kicker">GLOBAL GATHERINGS</text>
     <text class="events-hero__title">在城市与艺术之间，留下一次值得赴约的相遇。</text>
     <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。先选城市，再从艺术、古董、珠宝与克制的商业对话中浏览演示方向。</text>
   </view>
@@ -37,7 +37,7 @@
 
     <view class="filter-heading filter-heading--category">
       <view><text class="section-heading__eyebrow">CURATED CATEGORIES</text><text class="filter-heading__title">活动分类</text></view>
-      <text class="filter-heading__summary">{{visibleEventCount}} 个 DEMO</text>
+      <text class="filter-heading__summary">{{visibleEventCount}} 个活动</text>
     </view>
     <scroll-view class="category-rail" scroll-x="true" enable-flex="true" show-scrollbar="false" aria-label="按类型筛选">
       <view class="category-list">
@@ -46,7 +46,7 @@
         </button>
       </view>
     </scroll-view>
-    <view wx:if="{{offlineDemo}}" class="demo-notice" aria-role="note"><text class="demo-notice__label">OFFLINE_DEMO · SYNTHETIC</text><text>以下均为演示内容；卡片可打开稳定详情，但不代表活动已举办或可报名。</text></view>
+    <view wx:if="{{offlineDemo}}" class="demo-notice" aria-role="note"><text class="demo-notice__label">体验版</text><text>以下为示例内容；卡片可打开稳定详情，但不代表活动已举办或可报名。</text></view>
   </view>
 
   <view wx:if="{{loading}}" class="events-loading" aria-role="status">正在读取公开活动…</view>
@@ -58,7 +58,7 @@
       <template is="event-list" data="{{items: featuredEvents}}" />
     </view>
     <view class="events-section events-section--upcoming" aria-role="region" aria-label="近期方向">
-      <view class="section-heading"><view><text class="section-heading__eyebrow">COMING INTO VIEW</text><text class="section-heading__title">近期方向</text></view><text class="section-heading__side">DEMO_ONLY</text></view>
+      <view class="section-heading"><view><text class="section-heading__eyebrow">COMING INTO VIEW</text><text class="section-heading__title">近期方向</text></view><text class="section-heading__side">体验版</text></view>
       <text class="events-section__lead">日期、场地与合作方仍待后续人工确认。</text>
       <template is="event-list" data="{{items: upcomingEvents}}" />
     </view>
@@ -69,6 +69,6 @@
     </view>
   </block>
 
-  <view class="city-directory-note" aria-role="note"><text>城市目录不等于当地节点已经运营。</text><button bindtap="openCityDirectory">查看 7 国 13 城完整目录 ›</button></view>
-  <view class="events-policy" aria-role="note"><text class="events-policy__eyebrow">PHASE 01 BOUNDARY</text><text class="events-policy__title">一期以名片为核心，活动保持轻量。</text><text>活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段。</text><text class="events-policy__detail">所有 OFFLINE_DEMO · SYNTHETIC 内容须在人工审核后替换。</text></view>
+  <view class="city-directory-note" aria-role="note"><text>城市目录为展示用，当地节点陆续开放中。</text><button bindtap="openCityDirectory">查看 7 国 13 城完整目录 ›</button></view>
+  <view class="events-policy" aria-role="note"><text class="events-policy__title">活动逐步开放，先以名片连接彼此。</text><text>报名、支付与签到等能力会随运营推进陆续上线。</text></view>
 </view>

@@ -22,7 +22,7 @@ test('global and native-tab page styles prevent horizontal and safe-area clippin
   assert.match(appStyles, /page\s*\{[\s\S]*?width:\s*100%;[\s\S]*?overflow-x:\s*hidden;/);
   assert.match(appStyles, /button,[\s\S]*?navigator\s*\{[\s\S]*?box-sizing:\s*border-box;[\s\S]*?max-width:\s*100%;/);
   assert.match(appStyles, /\.ab-safe-bottom\s*\{[\s\S]*?padding-bottom:\s*calc\([^;]*safe-area-inset-bottom[^;]*\);/);
-  assert.match(meStyles, /\.me-page\s*\{[\s\S]*?padding-bottom:\s*calc\(112rpx \+ env\(safe-area-inset-bottom\)\);[\s\S]*?overflow-x:\s*hidden;/);
+  assert.match(meStyles, /\.me-page\s*\{[\s\S]*?padding-bottom:\s*calc\(128rpx \+ env\(safe-area-inset-bottom\)\);[\s\S]*?overflow-x:\s*hidden;/);
   assert.deepEqual(app.tabBar.list.map(({ text }) => text), ['发现', '活动', '我的']);
 });
 

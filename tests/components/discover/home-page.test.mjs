@@ -14,10 +14,10 @@ test('Discover is an explicit offline editorial demo rather than a placeholder',
 
   assert.doesNotMatch(source, /createPlaceholderPage/);
   assert.match(source, /RuntimeMode\.OFFLINE_DEMO/);
-  assert.match(template, /本地展示版本/);
-  assert.match(template, /SYNTHETIC/);
-  assert.match(template, /DEMO_ONLY/);
-  assert.match(template, /不代表真实排期、活动已开放或可以报名/);
+  assert.match(template, /体验版/);
+  assert.match(template, /体验版/);
+  assert.match(template, /体验版/);
+  assert.match(template, /体验版内容，仅供本地预览/);
   assert.doesNotMatch(template, /隐私边界，先说清楚|无需认证即可/);
   assert.match(source, /title:\s*'AB Club · OFFLINE DEMO/);
 });

@@ -52,8 +52,8 @@ test('Discover v3 keeps people, gathering, art, and city modules intentionally l
 
   assert.equal(eventDetailLinks(template).length, 1, '首页只应保留一张精选活动卡');
   assert.doesNotMatch(template, /wx:for="\{\{secondaryEvents\}\}"|class="discover-event-list"/);
-  assert.match(template, /DEMO_ONLY/);
-  assert.match(template, /不代表(?:真实排期|活动已开放|可以报名)/);
+  assert.match(template, /体验版/);
+  assert.match(template, /体验版内容，仅供本地预览/);
   assert.match(template, /7国13城 · 逐步开放/);
 });
 

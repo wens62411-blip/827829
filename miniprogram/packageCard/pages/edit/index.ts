@@ -25,6 +25,13 @@ import {
   writeOfflineDemoDraft,
 } from '../../../pages/card/services/offline-demo-draft';
 import { buildOfflineDemoSharePath } from '../../../pages/card/services/offline-demo-share-snapshot';
+import {
+  LOCAL_IDENTITY_CONTRACT_VERSION,
+  hasLocalIdentity,
+  readLocalIdentity,
+  saveLocalIdentity,
+  type LocalIdentity,
+} from '../../../pages/card/services/local-identity';
 
 type EditorMode = 'PREVIEW' | 'EDIT';
 
@@ -160,6 +167,8 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
+    localIdentityReady: false,
+    registerMode: false,
     profile: null as ProfilePrivateDto | null,
     creatingProfile: false,
     status: 'LOADING' as 'LOADING' | 'READY' | 'SAVING' | 'ERROR' | 'SAVED' | 'PROJECTION_PENDING',
@@ -236,10 +245,64 @@ Page({
     writeCardThemePreference(theme as CardTheme);
   },
 
-  onLoad() {
+  onLoad(query: Record<string, string | undefined> = {}) {
     const cardTheme = readCardThemePreference();
     const runtime = getRuntimeEvidence();
     const demoMode = isOfflineDemo(runtime);
+    const localReady = hasLocalIdentity();
+    const registerMode = query.register === '1';
+    if (localReady || registerMode) {
+      const identity = localReady ? readLocalIdentity() : null;
+      const displayName = identity?.displayName ?? '';
+      const biography = identity?.biography ?? '';
+      const profession = identity?.profession ?? '';
+      const cityIndex = identity ? CITY_IDS.indexOf(identity.cityId) : -1;
+      const selectedLabels = identity ? [...identity.selectedLabels] : [];
+      const phone = identity?.phone ?? '';
+      const email = identity?.email ?? '';
+      const showPhone = identity?.showPhone ?? false;
+      const showEmail = identity?.showEmail ?? false;
+      const showTags = identity?.showTags ?? true;
+      const myDraft: DraftInput = {
+        displayName,
+        biography,
+        cityIndex,
+        profession,
+        selectedLabels,
+        phone,
+        email,
+        showPhone,
+        showEmail,
+        avatarUrl: '',
+      };
+      this.setData({
+        runtimeMode: runtime.runtimeMode,
+        demoMode: true,
+        localIdentityReady: true,
+        registerMode: Boolean(registerMode) && !localReady,
+        cardTheme,
+        themeOptions: makeThemeOptions(cardTheme),
+        status: 'READY',
+        editorMode: 'PREVIEW',
+        displayName,
+        biography,
+        biographyLength: biography.length,
+        cityIndex,
+        profession,
+        selectedLabels,
+        phone,
+        email,
+        showPhone,
+        showEmail,
+        contactMessage: '',
+        showTags,
+        previewSelectedLabels: [],
+        previewPublicLabels: showTags ? selectedLabels : [],
+        ...makePreview(myDraft),
+        message: localReady ? '' : '第一次建立名片：资料只保存在这台设备，不会上传或生成真实账户。',
+      });
+      return;
+    }
     if (demoMode) {
       const storedDraft = readOfflineDemoDraft();
       const cityIndex = CITY_IDS.indexOf(storedDraft.cityId);
@@ -279,7 +342,7 @@ Page({
         previewSelectedLabels: [],
         previewPublicLabels: storedDraft.showTags ? selectedLabels : [],
         ...makePreview(demoDraft),
-        message: 'DEMO_ONLY：名片可保存为本机体验草稿，不会写入云端。',
+        message: '体验版：名片可保存为本机体验草稿，不会写入云端。',
       });
       return;
     }
@@ -555,6 +618,53 @@ Page({
 
   async saveProfile() {
     if (this.data.status === 'SAVING') return;
+    if (this.data.localIdentityReady || this.data.registerMode) {
+      const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
+      const phone = normalizeDraftPhone(this.data.phone);
+      const email = normalizeDraftEmail(this.data.email);
+      const displayName = compactDraftText(this.data.displayName, 60);
+      if (!displayName) {
+        this.setData({ status: 'ERROR', message: '请填写公开称呼。' });
+        return;
+      }
+      if (this.data.phone.trim() && !phone) {
+        this.setData({ status: 'ERROR', contactMessage: '请填写有效电话号码，或留空。', message: '电话格式需要检查。' });
+        return;
+      }
+      if (this.data.email.trim() && !email) {
+        this.setData({ status: 'ERROR', contactMessage: '请填写有效邮箱地址，或留空。', message: '邮箱格式需要检查。' });
+        return;
+      }
+      const identity: LocalIdentity = {
+        contractVersion: LOCAL_IDENTITY_CONTRACT_VERSION,
+        displayName,
+        biography: this.data.biography.trim(),
+        profession: compactDraftText(this.data.profession, 80),
+        cityId: (cityId ?? CITY_DIRECTORY[0].id) as CityId,
+        selectedLabels: this.data.selectedLabels,
+        showTags: this.data.showTags,
+        phone,
+        email,
+        showPhone: this.data.showPhone,
+        showEmail: this.data.showEmail,
+        registeredAt: new Date().toISOString(),
+      };
+      if (!saveLocalIdentity(identity)) {
+        this.setData({ status: 'ERROR', message: '本机名片保存失败，请检查存储空间后重试。' });
+        return;
+      }
+      this.setData({
+        status: 'SAVED',
+        editorMode: 'PREVIEW',
+        localIdentityReady: true,
+        registerMode: false,
+        phone,
+        email,
+        contactMessage: '',
+        message: '已保存到本机名片，仅保存在这台设备。',
+      });
+      return;
+    }
     if (this.data.demoMode) {
       const current = readOfflineDemoDraft();
       const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
@@ -599,7 +709,7 @@ Page({
         phone,
         email,
         contactMessage: '',
-        message: '已保存到本机 SYNTHETIC · DEMO_ONLY 体验草稿；未写入云端。',
+        message: '已保存到本机体验版草稿；未写入云端。',
       });
       return;
     }

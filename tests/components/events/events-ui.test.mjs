@@ -94,7 +94,7 @@ test('phase-one event preview consumes frozen geography without sending unsuppor
   assert.match(template, /查看 7 国 13 城完整目录/);
   assert.match(source, /url:\s*`\/packageEvents\/pages\/city\/index\?cityId=\$\{encodeURIComponent\(this\.data\.selectedCityId\)\}`/);
   assert.match(template, /先选城市，再从艺术、古董、珠宝/);
-  assert.match(template, /活动报名、支付、签到、主理人招募、商户入驻与交易撮合均不属于第一阶段/);
+  assert.match(template, /活动逐步开放，先以名片连接彼此/);
   assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:立即报名|提交报名|登记兴趣|立即支付|确认支付)/s);
   assert.match(source, /showListFailure[\s\S]*runtimeMode:\s*RuntimeMode\.DEGRADED[\s\S]*featuredEvents:\s*\[\]/);
   assert.match(source, /正式请求失败后不会回退为合成活动/);
@@ -129,7 +129,7 @@ test('OFFLINE_DEMO keeps the 13-city directory and provides stable city-category
   assert.match(listSource, /cityThemeEvents/);
   assert.match(listSource, /eventId\.startsWith\('demo:'\)/);
   assert.match(listSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
-  assert.match(listTemplate, /DEMO_ONLY/);
+  assert.match(listTemplate, /体验版/);
   assert.match(listTemplate, /不代表活动已举办或可报名/);
   assert.match(listTemplate, /查看 7 国 13 城完整目录/);
   assert.match(detailSource, /const demoCityId = decodeRouteParam\(query\.demoCityId\)/);

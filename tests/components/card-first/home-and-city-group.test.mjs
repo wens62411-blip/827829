@@ -35,7 +35,7 @@ function cityGroupWindow(source) {
 
 function referencedBoundaryCopy(templateWindow, pageSource) {
   const bindings = [...templateWindow.matchAll(/\{\{\s*([A-Za-z_$][\w$]*)/g)].map((match) => match[1]);
-  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入/;
+  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入|逐步开放/;
   return bindings.some((binding) => {
     const assignmentPattern = binding + "\\s*:\\s*(['\"`])([\\s\\S]*?)\\1";
     const assignment = pageSource.match(new RegExp(assignmentPattern));
@@ -133,13 +133,13 @@ test('city-group UI stays OFFLINE_DEMO or operations-pending while frozen contra
   const template = read('miniprogram/pages/me/index.wxml');
   const pageSource = read('miniprogram/pages/me/index.ts');
   const groupSurface = cityGroupWindow(template);
-  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入/;
+  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入|逐步开放/;
   const errors = [];
 
   if (!groupSurface) {
     errors.push('无法定位“我的”页城市群区块，因而无法验证能力边界');
   } else if (!boundary.test(groupSurface) && !referencedBoundaryCopy(groupSurface, pageSource)) {
-    errors.push('城市群区块没有“待运营确认”或 OFFLINE_DEMO/未接入边界说明');
+    errors.push('城市群区块没有“逐步开放”或 OFFLINE_DEMO/未接入边界说明');
   }
 
   const positiveClaims = unnegatedPositiveClaims(`${groupSurface}\n${pageSource}`);

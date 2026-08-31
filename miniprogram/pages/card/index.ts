@@ -15,6 +15,13 @@ import {
   readOfflineDemoDraft,
   type OfflineDemoPublicField,
 } from './services/offline-demo-draft';
+import {
+  hasLocalIdentity,
+  materializeLocalIdentityCard,
+  materializeLocalIdentityFields,
+  publicLabelsForLocalIdentity,
+  readLocalIdentity,
+} from './services/local-identity';
 
 type IdentityClientModule = typeof import('./services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -44,6 +51,7 @@ Page({
     card: null as PublicCardProjection | null,
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
+    localIdentityReady: false,
     demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
     demoSelectedLabels: [...OFFLINE_DEMO_SELECTED_LABELS] as string[],
     demoGalleryUrls: [] as string[],
@@ -88,6 +96,21 @@ Page({
       return;
     }
     if (this.data.demoMode) {
+      const local = hasLocalIdentity() ? readLocalIdentity() : null;
+      if (local) {
+        const localCard = materializeLocalIdentityCard(local);
+        this.setData({
+          card: localCard,
+          demoFields: materializeLocalIdentityFields(local),
+          demoSelectedLabels: publicLabelsForLocalIdentity(local),
+          cityLabel: cityDisplayName(local.cityId),
+          status: 'READY',
+          localIdentityReady: true,
+          message: '',
+        });
+        if (fromPullDown) wx.stopPullDownRefresh();
+        return;
+      }
       const draft = readOfflineDemoDraft();
       const demoCard = materializeOfflineDemoCard(draft);
       this.setData({
@@ -96,7 +119,7 @@ Page({
         demoSelectedLabels: publicLabelsForDraft(draft),
         cityLabel: cityDisplayName(demoCard.cityId),
         status: 'READY',
-        message: 'SYNTHETIC · DEMO_ONLY：示例不会保存、分享或进入审核。',
+        message: '体验版 · 示例内容，不会写入云端。',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;

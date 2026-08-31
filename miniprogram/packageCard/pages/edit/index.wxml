@@ -13,7 +13,8 @@
     <button class="card-editor-tab {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-role="tab" aria-selected="{{editorMode === 'EDIT'}}">编辑内容</button>
   </view>
 
-  <view wx:if="{{demoMode}}" class="card-editor-evidence">SYNTHETIC · DEMO_ONLY · 当前内容只保存为本机体验草稿</view>
+  <view wx:if="{{demoMode && !localIdentityReady}}" class="card-editor-evidence">体验版 · 当前内容只保存为本机体验草稿</view>
+  <view wx:elif="{{localIdentityReady}}" class="card-editor-evidence">本机名片 · 内容保存在这台设备，不会上传或生成真实账户。</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载资料"></view>
   <view wx:elif="{{status === 'ERROR' && !profile && !creatingProfile}}" class="card-panel card-panel--error">
@@ -198,9 +199,9 @@
       <view wx:if="{{message && (status === 'ERROR' || status === 'SAVED' || status === 'PROJECTION_PENDING')}}" class="card-status {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : 'card-status--success'}}" aria-live="polite">{{message}}</view>
 
       <view class="card-editor-savebar">
-        <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{demoMode ? '完成本页预览' : creatingProfile ? '创建我的名片' : '保存名片'}}</button>
+        <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{localIdentityReady ? '保存名片' : (registerMode ? '创建我的名片' : (demoMode ? '完成本页预览' : (creatingProfile ? '创建我的名片' : '保存名片')))}}</button>
         <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode">查看实时效果</button>
-        <text class="card-editor-savebar__note">标签与图片仅用于本机体验预览；标签会保存进 DEMO_ONLY 草稿，但不会被冒充为人工认证。</text>
+        <text class="card-editor-savebar__note">标签与图片仅用于本机体验预览，不会被冒充为人工认证。</text>
       </view>
     </view>
   </block>

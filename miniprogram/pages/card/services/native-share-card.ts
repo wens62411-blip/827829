@@ -170,7 +170,7 @@ export function drawNativeShareCard(
     context.textAlign = 'right';
     context.fillStyle = '#9A773C';
     context.font = '500 10px sans-serif';
-    context.fillText('SYNTHETIC · DEMO_ONLY', 564, 49);
+    context.fillText('体验版', 564, 49);
     context.textAlign = 'left';
   }
 

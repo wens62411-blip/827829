@@ -34,14 +34,14 @@
     <view class="discover-hero__rule" aria-hidden="true"></view>
     <text
       class="discover-runtime__label discover-runtime__label--hero"
-      aria-label="本地展示版本。SYNTHETIC · DEMO_ONLY。页面人物与活动均为合成示意，不代表真实排期、活动已开放或可以报名。"
-    >演示数据 · 仅用于本地体验</text>
+      aria-label="体验版内容，仅供本地预览"
+    >体验版</text>
   </view>
 
   <view class="discover-section discover-gathering" aria-role="region" aria-label="全球城市艺术活动预览">
     <view class="discover-section__head">
       <view><text class="discover-section__eyebrow">CURATED GATHERING</text><text class="discover-heading">一场值得赴约的相遇</text></view>
-      <text class="discover-section__status" aria-label="DEMO_ONLY">演示</text>
+      <text class="discover-section__status" aria-label="体验版">体验版</text>
     </view>
     <navigator class="discover-event-feature" url="/packageEvents/pages/event/index?demoEventId={{primaryEvent.eventId}}" hover-class="discover-press">
       <view class="discover-event-feature__media">
@@ -65,8 +65,8 @@
         <text class="discover-event-feature__summary">{{primaryEvent.summary}}</text>
         <text
           class="discover-event-feature__boundary"
-          aria-label="DEMO_ONLY · 不代表真实排期、活动已开放或可以报名"
-        >演示活动 · 仅作视觉预览</text>
+          aria-label="体验版活动，仅供预览"
+        >体验版活动 · 仅供预览</text>
       </view>
     </navigator>
     <navigator class="discover-text-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">浏览全部城市活动 <text>→</text></navigator>
