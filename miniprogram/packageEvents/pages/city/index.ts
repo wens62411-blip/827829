@@ -11,6 +11,10 @@ RuntimeMode,
 } from '../../../shared/types/enums';
 import type { OperationalState as OperationalStateValue } from '../../../shared/types/enums';
 import { createRequestId } from '../../../shared/utils/request-id';
+import {
+safeGetStorageSync,
+safeSetStorageSync,
+} from '../../../shared/utils/safe-storage';
 import { getCityMediaPresentation } from '../../../components/ab-city-hero/city-media';
 import { getEventCloudClient } from '../../../components/ab-event-card/cloud-client-loader';
 interface DirectoryCityView {
@@ -100,7 +104,7 @@ nodeOperationalLabel: '筹备中',
 nodeOrganizerLabel: '主理人未提供',
 },
 onLoad(query: Record<string, string | undefined>) {
-const stored = wx.getStorageSync('ab-events-city-id') as string;
+const stored = safeGetStorageSync('ab-events-city-id', INITIAL_SELECTED.id);
 const requested = query.cityId || stored;
 const selected = this.data.cities.find((city) => city.id === requested);
 if (selected) this.selectCityView(selected);
@@ -140,7 +144,7 @@ void this.refreshNode(selected);
 },
 selectCityView(city: DirectoryCityView) {
 nodeRequestGeneration += 1;
-wx.setStorageSync('ab-events-city-id', city.id);
+safeSetStorageSync('ab-events-city-id', city.id);
 this.setData({
 selectedCityId: city.id,
 hero: makeHero(city, LOCAL_RUNTIME.cloudEnvironmentConfigured),

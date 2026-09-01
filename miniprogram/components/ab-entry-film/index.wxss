@@ -1,0 +1,407 @@
+.entry-film {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 9999;
+  overflow: hidden;
+  background: #40372f;
+  color: #f4efe6;
+  transform: translate3d(0, 0, 0);
+  transition: transform 460ms cubic-bezier(0.7, 0, 0.22, 1), opacity 360ms ease;
+}
+
+.entry-film--exiting {
+  opacity: 0;
+  transform: translate3d(0, -101%, 0);
+}
+
+.entry-film__skip {
+  position: absolute;
+  right: 34rpx;
+  bottom: calc(42rpx + env(safe-area-inset-bottom));
+  z-index: 10;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 152rpx;
+  min-height: 88rpx;
+  margin: 0;
+  padding: 8rpx;
+  border: 0;
+  background: transparent;
+}
+
+.entry-film__skip::after { border: 0; }
+
+.entry-film__skip-label {
+  box-sizing: border-box;
+  display: flex;
+  width: 136rpx;
+  height: 64rpx;
+  align-items: center;
+  justify-content: center;
+  border: 2rpx solid rgba(255, 255, 255, 0.82);
+  border-radius: 999rpx;
+  background: rgba(255, 255, 255, 0.055);
+  box-shadow: 0 3rpx 12rpx rgba(17, 14, 12, 0.14);
+  color: rgba(255, 255, 255, 0.94);
+  font-size: 26rpx;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-shadow: 0 1rpx 4rpx rgba(20, 16, 13, 0.38);
+  transition: background 120ms ease, opacity 120ms ease;
+}
+
+.entry-film__skip--pressed .entry-film__skip-label {
+  background: rgba(255, 255, 255, 0.14);
+  opacity: 0.88;
+}
+
+.entry-film__city-scene,
+.entry-film__city-image,
+.entry-film__city-preload,
+.entry-film__city-shade,
+.entry-film__editorial,
+.entry-film__objects,
+.entry-film__manor,
+.entry-film__flash {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.entry-film__city-scene { overflow: hidden; background: #332c27; }
+.entry-film__city-preload { z-index: -1; opacity: 0; pointer-events: none; }
+.entry-film__city-shade { background: linear-gradient(180deg, rgba(56, 45, 37, 0.28) 0%, rgba(56, 45, 37, 0.08) 45%, rgba(48, 39, 32, 0.9) 100%); }
+
+.entry-film__city-rule {
+  position: absolute;
+  top: 116rpx;
+  bottom: 252rpx;
+  left: 48rpx;
+  width: 8rpx;
+  background: #b58a3a;
+}
+
+.entry-film__header-line {
+  position: absolute;
+  top: 42rpx;
+  right: 46rpx;
+  left: 46rpx;
+  height: 2rpx;
+  background: rgba(244, 239, 230, 0.72);
+}
+
+.entry-film__city-meta { color: #dec89c; }
+
+.entry-film__city-title {
+  position: absolute;
+  right: 46rpx;
+  bottom: 154rpx;
+  left: 94rpx;
+}
+
+.entry-film__city-en {
+  display: block;
+  font-family: Georgia, 'Times New Roman', Songti SC, STSong, serif;
+  font-size: 86rpx;
+  line-height: 0.92;
+  letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+
+.entry-film__city-meta {
+  display: flex;
+  align-items: center;
+  gap: 22rpx;
+  margin-top: 28rpx;
+  font-size: 21rpx;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+}
+
+.entry-film__city-meta-rule { width: 80rpx; height: 2rpx; background: #dec89c; }
+
+.entry-film__editorial,
+.entry-film__objects {
+  overflow: hidden;
+  background: linear-gradient(145deg, #5b5148 0%, #443b34 52%, #332c27 100%);
+  animation: entryFilmSceneIn 180ms ease-out both;
+}
+
+.entry-film__editorial-line {
+  position: absolute;
+  top: 2.85vh;
+  right: 46rpx;
+  left: 46rpx;
+  z-index: 4;
+  height: 2rpx;
+  background: #aa8448;
+}
+
+.entry-film__editorial-title {
+  position: absolute;
+  top: 12.75vh;
+  right: 46rpx;
+  left: 46rpx;
+  z-index: 2;
+  font-family: Georgia, 'Times New Roman', Songti SC, STSong, serif;
+  line-height: 0.96;
+  letter-spacing: -0.025em;
+  animation: entryFilmTitleRise 560ms cubic-bezier(0.22, 1, 0.36, 1) 80ms both;
+}
+
+.entry-film__editorial-title-line { display: block; }
+.entry-film__editorial-title--collector { font-size: 59rpx; }
+.entry-film__editorial-title--certificates { top: 13.4vh; font-size: 78rpx; }
+
+.entry-film__photo-window {
+  position: absolute;
+  top: 30.7vh;
+  right: 46rpx;
+  left: 46rpx;
+  height: 51.4vh;
+  overflow: hidden;
+  background: #3d3630;
+  box-shadow: 0 30rpx 70rpx rgba(44, 34, 27, 0.24);
+}
+
+.entry-film__photo,
+.entry-film__photo-shade,
+.entry-film__photo-curtain,
+.entry-film__grain,
+.entry-film__manor-photo,
+.entry-film__manor-shade,
+.entry-film__object-image,
+.entry-film__object-shade {
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.entry-film__photo {
+  animation: entryFilmPhotoPush 1600ms cubic-bezier(0.42, 0, 0.58, 1) both;
+}
+
+.entry-film__photo--certificates { object-position: 50% 27%; }
+.entry-film__photo-shade { background: linear-gradient(180deg, rgba(73, 59, 49, 0.04) 0%, transparent 57%, rgba(55, 45, 37, 0.72) 100%); }
+
+.entry-film__photo-curtain {
+  z-index: 3;
+  box-sizing: border-box;
+  border-left: 4rpx solid #c49a57;
+  background: #443b34;
+  transform: translate3d(0, 0, 0);
+  animation: entryFilmCurtainReveal 650ms cubic-bezier(0.65, 0, 0.2, 1) 250ms both;
+}
+
+.entry-film__grain {
+  z-index: 5;
+  opacity: 0.12;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(0deg, transparent 0, transparent 6rpx, rgba(222, 200, 156, 0.07) 8rpx), repeating-linear-gradient(90deg, transparent 0, transparent 12rpx, rgba(244, 239, 230, 0.04) 14rpx);
+}
+
+.entry-film__objects-title {
+  position: absolute;
+  top: 9.2vh;
+  left: 46rpx;
+  font-family: Georgia, 'Times New Roman', Songti SC, STSong, serif;
+  font-size: 70rpx;
+  line-height: 0.93;
+  animation: entryFilmTitleRise 520ms cubic-bezier(0.22, 1, 0.36, 1) 60ms both;
+}
+
+.entry-film__objects-title-line { display: block; }
+.entry-film__objects-title-line--emphasis { font-style: italic; }
+
+.entry-film__object-panels {
+  position: absolute;
+  top: 21.3vh;
+  right: 34rpx;
+  bottom: 16.3vh;
+  left: 34rpx;
+  display: flex;
+  gap: 10rpx;
+  overflow: hidden;
+}
+
+.entry-film__object-panel {
+  position: relative;
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  border: 2rpx solid rgba(222, 200, 156, 0.26);
+  background: #332c27;
+  opacity: 0;
+  transform: translate3d(0, 108%, 0);
+  animation: entryFilmPanelRise 650ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.entry-film__object-panel--one { animation-delay: 80ms; }
+.entry-film__object-panel--two { animation-delay: 270ms; }
+.entry-film__object-panel--three { animation-delay: 460ms; }
+
+.entry-film__object-image {
+  animation: entryFilmPanelPush 1450ms ease-out both;
+}
+
+.entry-film__object-shade { background: linear-gradient(180deg, transparent 54%, rgba(53, 43, 35, 0.8) 100%); }
+
+.entry-film__object-label {
+  position: absolute;
+  right: 16rpx;
+  bottom: 28rpx;
+  left: 16rpx;
+  z-index: 2;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 30rpx;
+}
+
+.entry-film__object-label-text { display: block; }
+.entry-film__object-panel--three .entry-film__object-label { font-size: 24rpx; }
+
+.entry-film__manor {
+  overflow: hidden;
+  background: #3d3630;
+  animation: entryFilmSceneIn 200ms ease-out both;
+}
+
+.entry-film__manor-photo { animation: entryFilmManorPush 1000ms cubic-bezier(0.42, 0, 0.58, 1) both; }
+.entry-film__manor-shade { background: linear-gradient(180deg, rgba(34, 30, 27, 0.28) 0%, rgba(34, 30, 27, 0.04) 44%, rgba(23, 21, 18, 0.3) 100%); }
+
+.entry-film__crest-ring {
+  position: absolute;
+  top: 11.4vh;
+  left: 50%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 354rpx;
+  height: 354rpx;
+  margin-left: -177rpx;
+  border: 2rpx solid rgba(222, 200, 156, 0.5);
+  border-radius: 50%;
+  opacity: 0;
+  animation: entryFilmCrestRise 720ms cubic-bezier(0.16, 1, 0.3, 1) 240ms both;
+}
+
+.entry-film__crest-image { width: 286rpx; height: 286rpx; }
+
+.entry-film__manor-rule {
+  position: absolute;
+  right: 46rpx;
+  bottom: 4vh;
+  left: 46rpx;
+  height: 2rpx;
+  background: rgba(222, 200, 156, 0.62);
+  opacity: 0;
+  animation: entryFilmSceneIn 500ms ease-out 520ms both;
+}
+
+.entry-film__fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22rpx;
+  background: #40372f;
+  color: #dec89c;
+  font-size: 20rpx;
+  letter-spacing: 0.12em;
+}
+
+.entry-film__fallback-crest { width: 220rpx; height: 220rpx; }
+.entry-film__fallback-line--secondary { color: rgba(244, 239, 230, 0.72); letter-spacing: 0.04em; }
+
+.entry-film__flash {
+  z-index: 9;
+  background: #eadbc0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 72ms linear;
+}
+
+.entry-film__flash--visible { opacity: 0.94; }
+
+@keyframes entryFilmSceneIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes entryFilmTitleRise {
+  from { opacity: 0; transform: translate3d(0, 28rpx, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes entryFilmPhotoPush {
+  from { transform: scale(1.055); }
+  to { transform: scale(1.018); }
+}
+
+@keyframes entryFilmCurtainReveal {
+  from { transform: translate3d(0, 0, 0); }
+  to { transform: translate3d(103%, 0, 0); }
+}
+
+@keyframes entryFilmPanelRise {
+  from { opacity: 0.18; transform: translate3d(0, 108%, 0); }
+  to { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes entryFilmPanelPush {
+  from { transform: scale(1.07); }
+  to { transform: scale(1.025); }
+}
+
+@keyframes entryFilmManorPush {
+  from { transform: scale(1.01); }
+  to { transform: scale(1.055); }
+}
+
+@keyframes entryFilmCrestRise {
+  from { opacity: 0; transform: translate3d(0, 32rpx, 0) scale(0.92); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
+}
+
+@media (max-width: 340px) {
+  .entry-film__city-en { font-size: 72rpx; }
+  .entry-film__editorial-title--collector { font-size: 54rpx; }
+  .entry-film__editorial-title--certificates { font-size: 70rpx; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entry-film,
+  .entry-film__editorial,
+  .entry-film__objects,
+  .entry-film__photo,
+  .entry-film__photo-curtain,
+  .entry-film__editorial-title,
+  .entry-film__objects-title,
+  .entry-film__object-panel,
+  .entry-film__object-image,
+  .entry-film__manor,
+  .entry-film__manor-photo,
+  .entry-film__crest-ring,
+  .entry-film__manor-rule,
+  .entry-film__flash { animation: none; transition-duration: 1ms; }
+
+  .entry-film__photo-curtain { display: none; }
+  .entry-film__object-panel, .entry-film__crest-ring { opacity: 1; transform: none; }
+  .entry-film__skip--pressed { opacity: 1; }
+}

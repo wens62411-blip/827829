@@ -32,6 +32,7 @@ function contrastRatio(foreground, background) {
 
 test('Discover v3 leads with brand and a restrained hero card action', () => {
   const template = read('index.wxml');
+  const styles = read('index.wxss');
   const heroOffset = template.indexOf('class="discover-hero"');
   const eventOffset = template.indexOf('全球城市艺术活动');
   const cityOffset = template.indexOf('id="global-city-directory"');
@@ -45,6 +46,9 @@ test('Discover v3 leads with brand and a restrained hero card action', () => {
   assert.doesNotMatch(template, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
   assert.doesNotMatch(template, /discover-card__profile|discover-card__avatar|AB Club 示例名片/);
   assert.doesNotMatch(template, /discover-journey|discover-hero__image/);
+  assert.match(template, /class="discover-primary-action__label">生成我的 AI 赛博名片<\/text>/);
+  assert.match(styles, /\.discover-topbar\s*\{[^}]*box-sizing:\s*border-box;/);
+  assert.match(styles, /\.discover-primary-action__label\s*\{[^}]*text-align:\s*center;[^}]*white-space:\s*nowrap;/);
 });
 
 test('Discover v3 keeps people, gathering, art, and city modules intentionally lightweight', () => {
@@ -52,8 +56,9 @@ test('Discover v3 keeps people, gathering, art, and city modules intentionally l
 
   assert.equal(eventDetailLinks(template).length, 1, '首页只应保留一张精选活动卡');
   assert.doesNotMatch(template, /wx:for="\{\{secondaryEvents\}\}"|class="discover-event-list"/);
-  assert.match(template, /体验版/);
-  assert.match(template, /体验版内容，仅供本地预览/);
+  assert.match(template, /本机预览/);
+  assert.match(template, /内容预览/);
+  assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览|仅做数据示例/);
   assert.match(template, /7国13城 · 逐步开放/);
 });
 

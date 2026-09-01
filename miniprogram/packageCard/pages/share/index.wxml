@@ -8,13 +8,15 @@
     <image class="card-brand-crest share-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
 
-  <view wx:if="{{demoMode}}" class="card-demo-ribbon">体验版 · 可真实转发体验内容，人物资料为合成示例</view>
+  <view wx:if="{{localIdentityReady}}" class="card-demo-ribbon">本机名片 · 非云端账户</view>
+  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">本机预览 · 人物资料为合成示例</view>
 
   <view wx:if="{{loadingCard}}" class="card-skeleton share-loading" aria-label="正在加载名片"></view>
   <view wx:elif="{{pageError}}" class="card-panel card-panel--error share-error">
     <text class="card-panel__title">名片暂时不可用</text>
     <text class="card-panel__text">{{pageError}}</text>
     <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重新加载</button>
+    <navigator wx:if="{{demoMode && !localIdentityReady}}" class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index?register=1" hover-class="none">建立我的名片</navigator>
   </view>
 
   <ab-profile-card
@@ -24,7 +26,7 @@
     city-label="{{cityLabel}}"
     fields="{{demoMode ? demoFields : []}}"
     public-labels="{{demoPublicLabels}}"
-    allow-public-contacts="{{demoMode}}"
+    allow-public-contacts="{{demoMode && !localIdentityReady}}"
     theme="{{cardTheme}}"
     show-default-actions="{{false}}"
   />
@@ -56,14 +58,14 @@
   <view wx:if="{{demoMode && card}}" class="share-choice-card">
     <text class="share-choice-card__eyebrow">SHARE PREVIEW</text>
     <text class="share-choice-card__title">把名片递给微信好友</text>
-    <text class="share-choice-card__copy">上方就是好友接收视角。体验版会真实打开微信转发面板；接收方看到的是这张明确标注的合成演示名片，不会被记录成真实会员或人脉。</text>
+    <text class="share-choice-card__copy">{{localIdentityReady ? '上方就是好友接收视角。公开分享不会包含电话或邮箱，发送仍由你在微信中确认。' : '上方就是好友接收视角。发送时会打开微信转发面板；接收方看到的是明确标注的合成示例名片，不会被记录成真实会员或人脉。'}}</text>
     <view class="share-choice-list">
       <view class="share-choice"><text class="share-choice__index">01</text><view><text class="share-choice__title">微信确认后才发送</text><text class="share-choice__note">页面只负责拉起系统面板，不会替你选择好友或自动发送。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">02</text><view><text class="share-choice__title">当前配色随卡片保留</text><text class="share-choice__note">象牙白、墨黑、香槟金与石灰灰会同步到接收页。</text></view></view>
-      <view class="share-choice"><text class="share-choice__index">03</text><view><text class="share-choice__title">可生成本地海报</text><text class="share-choice__note">海报明确标注演示边界，不包含私密资料或虚构二维码。</text></view></view>
+      <view class="share-choice"><text class="share-choice__index">03</text><view><text class="share-choice__title">可生成本地海报</text><text class="share-choice__note">{{localIdentityReady ? '海报只使用公开字段，不包含电话、邮箱或虚构二维码。' : '海报明确标注合成示例，不包含私密资料或虚构二维码。'}}</text></view></view>
     </view>
-    <button class="card-button share-wechat-button" open-type="share" disabled="{{shareCoverState !== 'READY'}}"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>{{shareCoverState === 'READY' ? '发送演示名片到微信' : '正在准备分享卡片'}}</text></button>
-    <navigator class="card-link-button share-return" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
+    <button class="card-button share-wechat-button" open-type="share" disabled="{{shareCoverState === 'LOADING'}}"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>{{shareCoverState === 'LOADING' ? '正在准备分享卡片' : (localIdentityReady ? '发送本机名片到微信' : '发送示例名片到微信')}}</text></button>
+    <button class="card-link-button share-return" bindtap="returnToOwnerCard">返回我的名片</button>
   </view>
 
   <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="share-choice-card share-choice-card--quiet">
@@ -81,7 +83,7 @@
     title="{{shareTitle}}"
     description="{{shareDescription}}"
     allow-retry="{{shareState === 'ERROR' && !busyAction}}"
-    allow-forward="{{shareState === 'SUCCESS' && shareCoverState === 'READY'}}"
+    allow-forward="{{shareState === 'SUCCESS' && shareCoverState !== 'LOADING'}}"
     busy="{{busyAction !== ''}}"
     bind:retry="handleShareRetry"
   />
@@ -106,7 +108,7 @@
   <view wx:if="{{card}}" class="share-format-card">
     <text class="share-format-card__eyebrow">POSTER</text>
     <text class="share-format-card__title">生成名片海报</text>
-    <text class="share-format-card__copy">海报只展示当前名片内容；体验模式会明确标注合成演示，且不会伪造小程序码。</text>
+    <text class="share-format-card__copy">{{localIdentityReady ? '海报只展示本机名片的公开内容，不包含电话、邮箱，也不会伪造小程序码。' : '海报只展示当前名片内容；合成示例会被明确标注，且不会伪造小程序码。'}}</text>
     <view class="card-canvas-shell {{posterReady ? '' : 'card-hidden-canvas'}}">
       <canvas type="2d" id="cardPoster" class="card-poster-canvas"></canvas>
     </view>
@@ -118,5 +120,5 @@
     </view>
   </view>
 
-  <text class="share-footnote">{{demoMode ? '微信转发和本地海报可以实际操作；发送的是体验版内容，不会产生真实会员、审核或人脉记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。'}}</text>
+  <text class="share-footnote">{{localIdentityReady ? '电话和邮箱不会随卡片发送；发送是否完成以微信确认界面为准。' : (demoMode ? '微信转发和本地海报可以试用；发送的是合成示例，不会产生真实会员、审核或人脉记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。')}}</text>
 </view>

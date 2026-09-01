@@ -18,6 +18,8 @@ test('verified tag is visible only for human reviewed APPROVED claims', () => {
 test('evidence label exposes all honest runtime modes', () => {
   const source = read('miniprogram/components/ab-evidence-label/index.ts');
   for (const mode of ['LIVE', 'DEGRADED', 'OFFLINE_DEMO']) assert.match(source, new RegExp(mode));
+  for (const label of ['正式服务', '服务受限', '本机预览']) assert.match(source, new RegExp(label));
+  assert.doesNotMatch(read('miniprogram/components/ab-evidence-label/index.wxml'), /OFFLINE_DEMO|DEMO_ONLY|SYNTHETIC/);
 });
 
 test('visual baseline avoids prohibited patterns and supports accessibility preferences', () => {

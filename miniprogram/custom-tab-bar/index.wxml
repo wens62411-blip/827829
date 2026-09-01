@@ -1,5 +1,4 @@
-<view class="custom-tab-bar" aria-label="底部导航">
-  <view class="custom-tab-bar__safe" aria-hidden="true" />
+<view wx:if="{{!hidden}}" class="custom-tab-bar" aria-label="底部导航">
   <view class="custom-tab-bar__items">
     <view
       wx:for="{{list}}"
@@ -20,5 +19,6 @@
       <text class="custom-tab-bar__text">{{item.text}}</text>
     </view>
   </view>
+  <view class="custom-tab-bar__safe" aria-hidden="true" />
   <loading-city visible="{{loadingVisible}}" bind:complete="onLoadingComplete" />
 </view>

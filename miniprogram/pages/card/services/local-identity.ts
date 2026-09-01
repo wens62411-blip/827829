@@ -1,6 +1,13 @@
 import { CITY_DIRECTORY, type CityId as CityIdValue } from '../../../shared/constants/geography';
-import type { PublicCardProjection } from '../../../shared/types/projections';
-import { OFFLINE_DEMO_CARD, OFFLINE_DEMO_FIELDS } from './offline-demo';
+import { RecordOrigin, VerificationState, Visibility } from '../../../shared/types/enums';
+import type {
+  CardId,
+  OptimisticVersion,
+  ProfileId,
+  UserId,
+  UtcInstant,
+} from '../../../shared/types/primitives';
+import type { ProfilePrivateDto, PublicCardProjection } from '../../../shared/types/projections';
 import {
   compactText,
   normalizeEmail,
@@ -13,6 +20,10 @@ export const LOCAL_IDENTITY_STORAGE_KEY = 'ab.club.local-identity.v1';
 export const LOCAL_IDENTITY_CONTRACT_VERSION = 1;
 
 const CITY_IDS = new Set<string>(CITY_DIRECTORY.map((city) => city.id));
+const LOCAL_CARD_ID = 'card_local_device_identity' as CardId;
+const LOCAL_PROFILE_ID = 'profile_local_device_identity' as ProfileId;
+const LOCAL_USER_ID = 'user_local_device_identity' as UserId;
+const LOCAL_VERSION = 1 as OptimisticVersion;
 
 /**
  * A user-owned identity persisted only on the local device in OFFLINE_DEMO mode.
@@ -99,11 +110,32 @@ export function clearLocalIdentity(): boolean {
 
 export function materializeLocalIdentityCard(value: LocalIdentity): PublicCardProjection {
   return {
-    ...OFFLINE_DEMO_CARD,
+    cardId: LOCAL_CARD_ID,
+    ownerUserId: LOCAL_USER_ID,
     displayName: value.displayName,
-    headline: value.profession,
+    ...(value.profession ? { headline: value.profession } : {}),
     biography: value.biography,
     cityId: value.cityId,
+    visibility: Visibility.PUBLIC,
+    claims: [],
+    origin: RecordOrigin.REAL,
+    verificationState: VerificationState.USER_DECLARED,
+    version: LOCAL_VERSION,
+    createdAt: value.registeredAt as UtcInstant,
+    updatedAt: value.registeredAt as UtcInstant,
+  };
+}
+
+export function materializeLocalIdentityProfile(value: LocalIdentity): ProfilePrivateDto {
+  return {
+    profileId: LOCAL_PROFILE_ID,
+    userId: LOCAL_USER_ID,
+    displayName: value.displayName,
+    cityId: value.cityId,
+    biography: value.biography,
+    version: LOCAL_VERSION,
+    createdAt: value.registeredAt as UtcInstant,
+    updatedAt: value.registeredAt as UtcInstant,
   };
 }
 
@@ -117,21 +149,10 @@ function publicContact(
 }
 
 export function materializeLocalIdentityFields(value: LocalIdentity): OfflineDemoPublicField[] {
-  const baseFields: OfflineDemoPublicField[] = OFFLINE_DEMO_FIELDS.map((field) => ({
-    key: field.key,
-    label: field.label,
-    value: field.value,
-  }));
-  const professionIndex = baseFields.findIndex((field) => field.key === 'profession');
-  if (professionIndex >= 0) {
-    baseFields[professionIndex] = {
-      key: 'profession',
-      label: '职业',
-      value: value.profession,
-    };
-  }
   return [
-    ...baseFields,
+    ...(value.profession
+      ? [{ key: 'profession', label: '职业', value: value.profession }]
+      : []),
     ...publicContact('phone', '电话', value.phone, value.showPhone),
     ...publicContact('email', '邮箱', value.email, value.showEmail),
   ];

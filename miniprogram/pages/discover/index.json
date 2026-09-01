@@ -1,6 +1,7 @@
 {
-  "navigationBarTitleText": "发现",
-  "navigationBarBackgroundColor": "#F4EFE6",
-  "navigationBarTextStyle": "black",
-  "enablePullDownRefresh": false
+  "navigationStyle": "custom",
+  "enablePullDownRefresh": false,
+  "usingComponents": {
+    "ab-entry-film": "/components/ab-entry-film/index"
+  }
 }

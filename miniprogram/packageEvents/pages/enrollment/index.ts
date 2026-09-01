@@ -50,7 +50,7 @@ if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
 this.setData({
 stateKind: 'OFFLINE',
 stateTitle: '正式兴趣登记未连接',
-stateDescription: 'OFFLINE_DEMO 不会模拟登记、满员、支付或成功状态。',
+stateDescription: '本机预览不会模拟登记、满员、支付或成功状态。',
 });
 return;
 }

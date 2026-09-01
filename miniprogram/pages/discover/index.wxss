@@ -13,6 +13,7 @@
 }
 
 .discover-topbar {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -38,7 +39,7 @@
   justify-content: center;
   border: 2rpx solid var(--ab-color-gold-soft);
   border-radius: 50%;
-  color: var(--discover-ink);
+  color: var(--ab-color-champagne-deep);
   font-family: var(--ab-font-display);
   font-size: 26rpx;
 }
@@ -120,12 +121,13 @@
 .discover-primary-action {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 20rpx;
   box-sizing: border-box;
   width: 100%;
   max-width: 540rpx;
   min-height: 96rpx;
-  margin-top: 36rpx;
+  margin: 36rpx 0 0;
   padding: 0 28rpx;
   border-radius: 6rpx;
   background: var(--discover-ink);
@@ -134,7 +136,14 @@
   font-weight: 650;
 }
 
-.discover-primary-action__arrow { font-size: 34rpx; }
+.discover-primary-action__label {
+  display: block;
+  min-width: 0;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.discover-primary-action__arrow { flex: 0 0 auto; font-size: 34rpx; }
 
 .discover-hero__rule { width: 100%; max-width: 540rpx; height: 2rpx; margin-top: 36rpx; background: var(--discover-line); }
 
@@ -216,6 +225,7 @@
   .discover-topbar { flex-wrap: wrap; }
   .discover-global-chip { min-width: 120rpx; padding: 0 14rpx; }
   .discover-hero__title { font-size: 50rpx; }
+  .discover-primary-action { gap: 14rpx; padding-right: 20rpx; padding-left: 20rpx; font-size: 24rpx; }
   .discover-runtime { flex-direction: column; }
   .discover-city-group { grid-template-columns: 92rpx minmax(0, 1fr); gap: 12rpx; padding-right: 16rpx; padding-left: 16rpx; }
 }

@@ -119,7 +119,7 @@ Page({
         demoSelectedLabels: publicLabelsForDraft(draft),
         cityLabel: cityDisplayName(demoCard.cityId),
         status: 'READY',
-        message: '体验版 · 示例内容，不会写入云端。',
+        message: '本机预览 · 当前为合成示例，不会写入云端。',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
@@ -157,7 +157,7 @@ Page({
   async prepareWechatShare() {
     if (this.data.sharePreparing || this.data.shareRevoking || !this.data.card || transientShare) return;
     if (this.data.demoMode) {
-      this.setData({ shareHint: 'DEMO_ONLY：未创建分享入口。' });
+      this.setData({ shareHint: '本机预览：未创建分享入口。' });
       return;
     }
     this.setData({ sharePreparing: true, shareReady: false, shareHint: '正在创建一次安全分享入口…' });
@@ -201,7 +201,7 @@ Page({
   async revokePreparedShare() {
     if (this.data.shareRevoking || !this.data.card || !transientShare) return;
     if (this.data.demoMode) {
-      this.setData({ shareHint: 'DEMO_ONLY：没有可撤销的真实分享入口。' });
+      this.setData({ shareHint: '本机预览：没有可撤销的真实分享入口。' });
       return;
     }
     this.setData({ shareRevoking: true, shareReady: false, shareHint: '正在请求撤销当前入口…' });

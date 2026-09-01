@@ -17,7 +17,7 @@
   <view class="events-hero" aria-role="region" aria-label="AB Club 活动">
     <text class="events-kicker">GLOBAL GATHERINGS</text>
     <text class="events-hero__title">在城市与艺术之间，留下一次值得赴约的相遇。</text>
-    <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。先选城市，再从艺术、古董、珠宝与克制的商业对话中浏览演示方向。</text>
+    <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。先选城市，再从艺术、古董、珠宝与克制的商业对话中浏览活动方向。</text>
   </view>
 
   <view class="event-filters" aria-role="region" aria-label="城市和活动类型">
@@ -46,7 +46,7 @@
         </button>
       </view>
     </scroll-view>
-    <view wx:if="{{offlineDemo}}" class="demo-notice" aria-role="note"><text class="demo-notice__label">体验版</text><text>以下为示例内容；卡片可打开稳定详情，但不代表活动已举办或可报名。</text></view>
+    <view wx:if="{{offlineDemo}}" class="demo-notice" aria-role="note"><text class="demo-notice__label">本机预览</text><text>当前不开放报名；日期、场地与合作方以后续公告为准。</text></view>
   </view>
 
   <view wx:if="{{loading}}" class="events-loading" aria-role="status">正在读取公开活动…</view>
@@ -54,11 +54,11 @@
   <block wx:else>
     <view class="events-section events-section--featured" aria-role="region" aria-label="本月精选">
       <view class="section-heading"><view><text class="section-heading__eyebrow">EDITOR'S SELECTION</text><text class="section-heading__title">本月精选</text></view><ab-evidence-label mode="{{runtimeMode}}" /></view>
-      <text class="events-section__lead">{{selectedCityLabel}}的重点策展模板，点击卡片可查看完整演示详情。</text>
+      <text class="events-section__lead">{{selectedCityLabel}}的重点策展方向，点击卡片可查看完整说明。</text>
       <template is="event-list" data="{{items: featuredEvents}}" />
     </view>
     <view class="events-section events-section--upcoming" aria-role="region" aria-label="近期方向">
-      <view class="section-heading"><view><text class="section-heading__eyebrow">COMING INTO VIEW</text><text class="section-heading__title">近期方向</text></view><text class="section-heading__side">体验版</text></view>
+      <view class="section-heading"><view><text class="section-heading__eyebrow">COMING INTO VIEW</text><text class="section-heading__title">近期方向</text></view><text class="section-heading__side">预告</text></view>
       <text class="events-section__lead">日期、场地与合作方仍待后续人工确认。</text>
       <template is="event-list" data="{{items: upcomingEvents}}" />
     </view>

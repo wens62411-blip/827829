@@ -33,7 +33,7 @@ if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
 this.setData({
 stateKind: 'OFFLINE',
 stateTitle: '正式主理人资料未连接',
-stateDescription: '当前 OFFLINE_DEMO 不会伪造已认证主理人。',
+stateDescription: '当前为本机预览，未连接已认证主理人资料。',
 });
 return;
 }

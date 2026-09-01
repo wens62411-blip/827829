@@ -16,8 +16,8 @@
   </view>
 
   <view wx:if="{{demoOnly}}" class="network__demo" aria-role="note">
-    <text class="network__demo-kicker">SYNTHETIC · DEMO_ONLY</text>
-    <text class="network__demo-copy">以下人物、职业、城市关系与匹配理由均为脱敏合成演示，不是真实会员、合作方或签约关系；任何申请都不会被提交。</text>
+    <text class="network__demo-kicker">本机预览 · 非真实会员</text>
+    <text class="network__demo-copy">以下人物、职业、城市关系与匹配理由均为合成示例，不是真实会员、合作方或签约关系；任何申请都不会被提交。</text>
   </view>
 
   <view wx:if="{{errorMessage}}" class="network__notice network__notice--error" aria-role="alert">
@@ -64,7 +64,7 @@
 
   <view wx:if="{{recommendations.length}}" class="network__section network__section--secondary">
     <view class="network__section-head">
-      <text class="network__section-title">为你引荐 · DEMO</text>
+      <text class="network__section-title">为你引荐 · 关系预览</text>
       <text class="network__section-note">推荐只说明可解释的共同点，不代表身份核验、平台背书或真实合作。</text>
     </view>
     <view class="network__recommendations">
@@ -76,7 +76,7 @@
         </view>
         <text class="network__reason">{{item.reason}}</text>
         <view class="network__chips"><text wx:for="{{item.interests}}" wx:for-item="interest" wx:key="*this" class="network__chip">{{interest}}</text></view>
-        <button class="network__demo-action" bindtap="onDemoRequest">申请认识（演示不提交）</button>
+        <button class="network__demo-action" bindtap="onDemoRequest">申请认识（仅预览）</button>
       </view>
     </view>
   </view>

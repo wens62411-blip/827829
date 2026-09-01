@@ -1,10 +1,53 @@
 import { RuntimeMode } from '../../shared/types/enums';
 import { DISCOVER_DEMO_EVENTS } from '../../components/ab-event-card/demo-data';
 import { isOfflineDemo } from '../card/services/offline-demo';
-import { hasOfflineDemoDraft } from '../card/services/offline-demo-draft';
+import { hasLocalIdentity } from '../card/services/local-identity';
 
 type IdentityClientModule = typeof import('../card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
+
+interface EntryFilmApp {
+  consumeEntryFilmLaunch?: () => boolean;
+}
+
+function consumeColdStartEntryFilm(): boolean {
+  try {
+    return getApp<EntryFilmApp>().consumeEntryFilmLaunch?.() === true;
+  } catch (_error) {
+    return false;
+  }
+}
+
+const initialColdStartEntryFilm = consumeColdStartEntryFilm();
+let coldStartEntryFilmAvailable = initialColdStartEntryFilm;
+
+function claimColdStartEntryFilmForPage(): boolean {
+  const shouldShow = coldStartEntryFilmAvailable;
+  coldStartEntryFilmAvailable = false;
+  return shouldShow;
+}
+
+interface DiscoverTabBar {
+  setData(data: { readonly selected: number; readonly hidden: boolean }): void;
+}
+
+interface DiscoverPageWithTabBar {
+  getTabBar?: () => DiscoverTabBar | undefined;
+}
+
+function readNavigationSafeHeight(): number {
+  try {
+    const windowInfo = typeof wx.getWindowInfo === 'function'
+      ? wx.getWindowInfo()
+      : wx.getSystemInfoSync();
+    const statusBarHeight = Number(windowInfo.statusBarHeight ?? 20);
+    const menuButton = wx.getMenuButtonBoundingClientRect();
+    const capsuleGap = Math.max(0, menuButton.top - statusBarHeight);
+    return Math.ceil(Math.max(statusBarHeight + 44, menuButton.bottom + capsuleGap));
+  } catch (_error) {
+    return 64;
+  }
+}
 
 function getDiscoverRuntime(): { readonly runtimeMode: string; readonly cloudConfigured: boolean } {
   try {
@@ -35,7 +78,7 @@ interface EditorialEvent {
 }
 
 const cityGroups = [
-  { region: '中国', cities: '北京 · 上海 · 杭州 · 广州 · 深圳 · 台北（中国台湾）' },
+  { region: '中国', cities: '北京 · 上海 · 杭州 · 广州 · 深圳' },
   { region: '欧洲', cities: '苏黎世 · 米兰 · 巴黎' },
   { region: '亚太', cities: '新加坡 · 墨尔本 · 悉尼' },
   { region: '加拿大', cities: '多伦多 · 温哥华' },
@@ -57,11 +100,12 @@ const cityFeature = {
   alt: '苏黎世利马特河两岸老城全景，用于全球城市目录视觉参考',
 } as const;
 
-function updateTabBarSelected(page: unknown, index: number) {
-  const tabBar = typeof (page as { getTabBar?: () => { setData: (data: Record<string, unknown>) => void } | undefined }).getTabBar === 'function'
-    ? (page as { getTabBar: () => { setData: (data: Record<string, unknown>) => void } | undefined }).getTabBar()
+function updateTabBarPresentation(page: unknown, index: number, hidden: boolean) {
+  const pageWithTabBar = page as DiscoverPageWithTabBar;
+  const tabBar = typeof pageWithTabBar.getTabBar === 'function'
+    ? pageWithTabBar.getTabBar()
     : null;
-  if (tabBar) tabBar.setData({ selected: index });
+  if (tabBar) tabBar.setData({ selected: index, hidden });
 }
 
 Page({
@@ -74,10 +118,28 @@ Page({
     brandLogoFailed: false,
     eventImageFailed: false,
     cityImageFailed: false,
+    showEntryFilm: initialColdStartEntryFilm,
+    navigationSafeHeight: readNavigationSafeHeight(),
+  },
+
+  onLoad() {
+    const showEntryFilm = claimColdStartEntryFilmForPage();
+    if (showEntryFilm !== this.data.showEntryFilm) this.setData({ showEntryFilm });
   },
 
   onShow() {
-    updateTabBarSelected(this, 0);
+    updateTabBarPresentation(this, 0, this.data.showEntryFilm);
+  },
+
+  onReady() {
+    updateTabBarPresentation(this, 0, this.data.showEntryFilm);
+  },
+
+  handleEntryFilmComplete() {
+    if (!this.data.showEntryFilm) return;
+    this.setData({ showEntryFilm: false }, () => {
+      updateTabBarPresentation(this, 0, false);
+    });
   },
 
   async openMyCard() {
@@ -87,7 +149,9 @@ Page({
       const runtime = getDiscoverRuntime();
       let target = '/packageCard/pages/edit/index';
       if (isOfflineDemo(runtime)) {
-        target = hasOfflineDemoDraft() ? '/pages/card/index' : target;
+        target = hasLocalIdentity()
+          ? '/pages/card/index'
+          : '/packageCard/pages/edit/index?register=1';
       } else {
         const { getMyProfile } = require('../card/services/identity-client');
         const result = await getMyProfile();
@@ -121,7 +185,7 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: 'AB Club · OFFLINE DEMO · 全球华人文化与连接',
+      title: 'AB Club · 全球华人文化与连接',
       path: '/pages/discover/index',
     };
   },

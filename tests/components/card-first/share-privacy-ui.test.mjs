@@ -16,9 +16,9 @@ test('share page presents the card and human-facing sharing choices', () => {
   assert.match(template, /fields="\{\{demoMode \? demoFields : \[\]\}\}"/);
   assert.match(template, /好友接收视角/);
   assert.match(template, /微信好友|生成名片海报|撤销/);
-  assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送演示名片到微信/);
+  assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送示例名片到微信/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
-  assert.match(template, /真实打开微信转发面板|实际操作/);
+  assert.match(template, /打开微信转发面板|可以试用/);
   assert.equal(config.usingComponents?.['ab-profile-card'], '/components/ab-profile-card/index');
   assert.doesNotMatch(template, /OPENID|profile ID|PUBLIC PROJECTION|小程序码 scene|Canvas 2D|高熵 token/);
 });

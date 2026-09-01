@@ -1,4 +1,5 @@
 import { ReviewStatus, VerificationState } from '../../shared/types/enums';
+import { containsControlOrFormatCharacter } from '../../pages/card/services/profile-label-safety';
 
 type ViewerMode = 'SELF' | 'FRIEND' | 'STRANGER';
 type CardTheme = 'ivory' | 'ink' | 'champagne' | 'stone';
@@ -220,7 +221,7 @@ function normalizePublicLabels(value: unknown): string[] {
   for (const entry of value) {
     if (typeof entry !== 'string') continue;
     const label = entry.trim();
-    if (!label || /[\p{Cc}\p{Cf}]/u.test(label) || Array.from(label).length > 10) continue;
+    if (!label || containsControlOrFormatCharacter(label) || Array.from(label).length > 10) continue;
     const key = label.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);

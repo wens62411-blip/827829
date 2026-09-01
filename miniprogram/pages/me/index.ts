@@ -1,8 +1,12 @@
 import { CITY_DIRECTORY } from '../../shared/constants/geography';
 import type { ProfilePrivateDto } from '../../shared/types/projections';
-import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../card/services/offline-demo';
-import { readOfflineDemoDraft } from '../card/services/offline-demo-draft';
-import { hasLocalIdentity, readLocalIdentity } from '../card/services/local-identity';
+import { isOfflineDemo } from '../card/services/offline-demo';
+import {
+  hasLocalIdentity,
+  materializeLocalIdentityProfile,
+  readLocalIdentity,
+  type LocalIdentity,
+} from '../card/services/local-identity';
 
 type IdentityClientModule = typeof import('../card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -38,9 +42,17 @@ const EMPTY_CITY_GROUP: CityGroupView = {
 };
 
 const supportedCities = CITY_DIRECTORY.map((city) => city.name.zh).join('、');
+const supportedCityNames = CITY_DIRECTORY.map((city) => city.name.zh);
 
 function displayInitial(displayName: string): string {
   return Array.from(displayName.trim())[0] ?? 'AB';
+}
+
+function localIdentityCompletion(identity: LocalIdentity): number {
+  return Math.min(100, 60
+    + (identity.biography ? 20 : 0)
+    + (identity.profession ? 10 : 0)
+    + (identity.selectedLabels.length ? 10 : 0));
 }
 
 function resolveCityGroup(profile: ProfilePrivateDto | null): CityGroupView {
@@ -71,6 +83,7 @@ Page({
     cityImageFailed: false,
     hasProfileCity: false,
     supportedCities,
+    supportedCityNames,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
     message: '',
   },
@@ -82,7 +95,7 @@ Page({
 
   onShow() {
     const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
-    if (tabBar) tabBar.setData({ selected: 2 });
+    if (tabBar) tabBar.setData({ selected: 2, hidden: false });
     void this.loadProfile();
   },
 
@@ -98,40 +111,29 @@ Page({
     if (this.data.demoMode) {
       const local = hasLocalIdentity() ? readLocalIdentity() : null;
       if (local) {
-        const profile: ProfilePrivateDto = {
-          ...OFFLINE_DEMO_PROFILE,
-          displayName: local.displayName,
-          cityId: local.cityId,
-          biography: local.biography,
-        };
+        const profile = materializeLocalIdentityProfile(local);
         this.setData({
           profile,
-          completionPercent: 100,
+          completionPercent: localIdentityCompletion(local),
           profileInitial: displayInitial(profile.displayName),
           cityImageFailed: false,
           ...resolveCityGroup(profile),
           status: 'READY',
           localIdentityReady: true,
-          message: '已保存为本机名片，仅保存在这台设备。',
+          message: '',
         });
         if (fromPullDown) wx.stopPullDownRefresh();
         return;
       }
-      const draft = readOfflineDemoDraft();
-      const profile: ProfilePrivateDto = {
-        ...OFFLINE_DEMO_PROFILE,
-        displayName: draft.displayName,
-        cityId: draft.cityId,
-        biography: draft.biography,
-      };
       this.setData({
-        profile,
-        completionPercent: 72,
-        profileInitial: displayInitial(profile.displayName),
+        profile: null,
+        completionPercent: 0,
+        profileInitial: 'AB',
         cityImageFailed: false,
-        ...resolveCityGroup(profile),
+        ...EMPTY_CITY_GROUP,
         status: 'READY',
-        message: '体验版 · 示例内容',
+        localIdentityReady: false,
+        message: '',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;

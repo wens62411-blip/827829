@@ -8,7 +8,8 @@
     <image class="card-brand-crest visitor-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
 
-  <view wx:if="{{demoMode}}" class="card-demo-ribbon">SYNTHETIC · DEMO_ONLY · 非真实会员</view>
+  <view wx:if="{{localIdentityReady}}" class="card-demo-ribbon">本机名片 · 非云端账户</view>
+  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">本机预览 · 合成示例 · 非真实会员</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton visitor-loading" aria-label="正在加载名片"></view>
 
@@ -42,5 +43,5 @@
     </view>
   </ab-profile-card>
 
-  <text class="visitor-footnote">{{demoMode ? '示例只用于查看名片样式，不代表真实账户、好友关系或认证状态。' : '名片内容与可见范围会随双方关系变化重新刷新。'}}</text>
+  <text class="visitor-footnote">{{localIdentityReady ? '公开分享不会包含电话或邮箱。' : (demoMode ? '示例只用于查看名片样式，不代表真实账户、好友关系或认证状态。' : '名片内容与可见范围会随双方关系变化重新刷新。')}}</text>
 </view>

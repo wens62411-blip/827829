@@ -12,6 +12,8 @@
   --card-accent-soft: #e5d4b2;
   --card-cover-a: #d2ccc1;
   --card-cover-b: #f0ece4;
+  --card-avatar-paper: #fffdf8;
+  --card-avatar-ink: #725126;
   position: relative;
   box-sizing: border-box;
   min-width: 0;
@@ -80,12 +82,17 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx solid var(--card-accent);
+  border: 2rpx solid var(--ab-color-gold);
   border-radius: 50%;
-  color: var(--card-accent);
+  color: var(--ab-color-champagne-deep);
   font-family: Georgia, "Songti SC", serif;
   font-size: 22rpx;
   font-weight: 700;
+}
+
+.profile-card--theme-ink .profile-card__crest-fallback {
+  border-color: var(--ab-color-gold-soft);
+  color: var(--ab-color-gold-soft);
 }
 
 .profile-card__edition {
@@ -165,25 +172,20 @@
 .profile-card__avatar {
   box-sizing: border-box;
   display: block;
-  border: 8rpx solid var(--card-paper);
-  background: var(--card-cover-a);
+  border: 8rpx solid var(--card-avatar-paper);
+  background: var(--card-avatar-paper);
 }
 
 .profile-card__avatar--fallback {
   display: flex;
   align-items: center;
   justify-content: center;
-  background: var(--card-ink);
-  color: var(--card-paper);
+  background: var(--card-avatar-paper);
+  color: var(--card-avatar-ink);
   font-family: Georgia, "Songti SC", serif;
   font-size: 48rpx;
   font-weight: 650;
   letter-spacing: 2rpx;
-}
-
-.profile-card--theme-ink .profile-card__avatar--fallback {
-  background: var(--card-accent);
-  color: #211e1a;
 }
 
 .profile-card__identity {

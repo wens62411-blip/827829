@@ -35,6 +35,7 @@ test('top city rail exposes the frozen thirteen-city directory without inventing
   assert.match(source, /const frontRow = CITY_DIRECTORY\.filter\(\(city\) =>/);
   assert.match(source, /const rest = CITY_DIRECTORY\.filter\(/);
   assert.match(source, /\[\.\.\.frontRow, \.\.\.rest\]\.map\(\(city\) =>/);
+  assert.doesNotMatch(source, /PENDING_CITY_FILTERS|cn-taipei|台北/);
   assert.match(source, /cityFilters:\s*buildCityFilters\(DEFAULT_CITY\.id\)/);
   assert.match(template, /wx:for="\{\{cityFilters\}\}"/);
   assert.match(template, /查看 7 国 13 城完整目录/);
@@ -58,8 +59,8 @@ test('DEMO_ONLY and no-registration boundaries remain explicit but no transactio
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
 
-  assert.match(template, /体验版/);
-  assert.match(template, /不代表活动已举办或可报名/);
+  assert.match(template, /本机预览/);
+  assert.match(template, /当前不开放报名/);
   assert.match(template, /活动逐步开放，先以名片连接彼此/);
   assert.match(source, /正式请求失败后不会回退为合成活动/);
   assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:报名|支付|购买|登记兴趣)/s);
@@ -75,7 +76,7 @@ test('city and category controls rebuild all three event modules from one stable
   }
   assert.match(source, /selectCity[\s\S]*applyDemoFilters\(cityId, this\.data\.selectedCategoryId\)/);
   assert.match(source, /selectCategory[\s\S]*applyDemoFilters\(this\.data\.selectedCityId, categoryId\)/);
-  assert.match(source, /wx\.setStorageSync\('ab-events-city-id', city\.id\)/);
+  assert.match(source, /safeSetStorageSync\('ab-events-city-id', city\.id\)/);
   assert.match(source, /featuredEvents:[\s\S]*upcomingEvents:[\s\S]*cityThemeEvents:/);
   assert.match(demoSource, /demo:activity:\$\{city\.id\}:\$\{category\[0\]\}:\$\{section\[0\]\}/);
   assert.match(demoSource, /getDemoEventById[\s\S]*listActivityDemoEvents\(\)\.find/);
@@ -128,6 +129,6 @@ test('every generated city-category-section ID resolves to the same stable demo 
   for (const event of events) {
     assert.equal(event.eventId, `demo:activity:${event.cityId}:${event.categoryId}:${event.sectionId}`);
     assert.deepEqual(catalog.getDemoEventById(event.eventId), event);
-    assert.match(event.summary, /^DEMO_ONLY/);
+    assert.match(event.summary, /^活动方向/);
   }
 });

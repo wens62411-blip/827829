@@ -110,7 +110,7 @@ test('OFFLINE_DEMO keeps the 13-city directory and provides stable city-category
   assert.match(demoSource, /CITY_DIRECTORY\.findIndex/);
   assert.match(demoSource, /for \(const city of CITY_DIRECTORY\)/);
   assert.match(demoSource, /eventId:\s*`demo:\$\{city\.id\}`/);
-  assert.match(demoSource, /DEMO_ONLY.*不代表真实活动已排期/);
+  assert.match(demoSource, /活动方向.*不代表真实活动已排期/);
   assert.match(demoSource, /DISCOVER_DEMO_EVENTS/);
   assert.equal((demoSource.match(/eventId:\s*'demo:discover:/g) ?? []).length, 3);
   assert.match(demoSource, /getDemoEventById/);
@@ -129,8 +129,8 @@ test('OFFLINE_DEMO keeps the 13-city directory and provides stable city-category
   assert.match(listSource, /cityThemeEvents/);
   assert.match(listSource, /eventId\.startsWith\('demo:'\)/);
   assert.match(listSource, /demoEventId=\$\{encodeURIComponent\(eventId\)\}/);
-  assert.match(listTemplate, /体验版/);
-  assert.match(listTemplate, /不代表活动已举办或可报名/);
+  assert.match(listTemplate, /本机预览/);
+  assert.match(listTemplate, /当前不开放报名/);
   assert.match(listTemplate, /查看 7 国 13 城完整目录/);
   assert.match(detailSource, /const demoCityId = decodeRouteParam\(query\.demoCityId\)/);
   assert.match(detailSource, /const demoEventId = decodeRouteParam\(query\.demoEventId\)/);
@@ -139,8 +139,9 @@ test('OFFLINE_DEMO keeps the 13-city directory and provides stable city-category
   assert.match(detailSource, /decodeURIComponent\(value\)/);
   assert.match(detailSource, /detail:\s*toDemoDetail\(demo\)/);
   assert.match(detailSource, /displayId:\s*event\.eventId/);
+  assert.match(detailSource, /displayIdLabel:\s*'活动方向'/);
   assert.match(detailSource, /title:\s*event\.title/);
-  assert.match(detailSource, /evidenceLabel:\s*'DEMO_ONLY'/);
+  assert.match(detailSource, /evidenceLabel:\s*'活动方向'/);
   assert.match(detailSource, /第一阶段只作信息预览，不开放活动报名、支付、签到、商户入驻或交易/);
   assert.match(detailSource, /没有根据任意地址参数创建或替换活动身份/);
   assert.doesNotMatch(`${listSource}\n${listTemplate}\n${detailSource}\n${detailTemplate}`, /event\.registerInterest|packageEvents\/pages\/enrollment|立即报名|提交报名|登记兴趣/);
@@ -156,8 +157,8 @@ test('Art synthetic related event preserves its stable identity into event detai
   assert.match(demoSource, /ART_RELATED_DEMO_EVENT/);
   assert.match(demoSource, /eventId:\s*'event_demo_art_reading_001'/);
   assert.match(demoSource, /cityId:\s*city\.id/);
-  assert.match(demoSource, /title:\s*'作品资料阅读会（DEMO_ONLY）'/);
-  assert.match(demoSource, /summary:\s*'合成线下活动，不代表真实排期或官方合作。'/);
+  assert.match(demoSource, /title:\s*'作品资料阅读会（活动方向）'/);
+  assert.match(demoSource, /summary:\s*'活动方向，仅用于浏览，不代表真实排期或官方合作。'/);
   assert.match(demoSource, /REGISTERED_DEMO_EVENTS[\s\S]*ART_RELATED_DEMO_EVENT/);
   assert.match(artDemoSource, /eventId:ART_RELATED_DEMO_EVENT\.eventId/);
   assert.match(artDemoSource, /cityId:ART_RELATED_DEMO_EVENT\.cityId/);
@@ -208,8 +209,8 @@ test('event cards expose evidence and never fabricate registrations, transaction
   const template = read('miniprogram/components/ab-event-card/index.wxml');
   const listSource = read('miniprogram/pages/events/index.ts');
   assert.match(source, /RecordOrigin\.SYNTHETIC/);
-  assert.match(source, /DEMO_ONLY/);
-  assert.match(source, /CONTENT_LIVE_UNVERIFIED/);
+  assert.match(source, /合成示例/);
+  assert.match(source, /公开内容 · 待核验/);
   assert.match(source, /VerificationState\.HUMAN_REVIEWED/);
   assert.match(template, /当地时间/);
   assert.match(template, /当前阶段/);
@@ -225,7 +226,7 @@ test('event cards expose evidence and never fabricate registrations, transaction
 test('phase-one detail exposes only preview facts, rights provenance, and an explicit no-signup boundary', () => {
   const source = read('miniprogram/packageEvents/pages/event/index.ts');
   const template = read('miniprogram/packageEvents/pages/event/index.wxml');
-  for (const marker of ['DEMO_ONLY', 'CONTENT_LIVE_UNVERIFIED', '本地合成策展文案', 'editorial-events manifest', '第一阶段只作信息预览']) {
+  for (const marker of ['活动方向', 'CONTENT_LIVE_UNVERIFIED', '本地合成策展文案', 'editorial-events manifest', '第一阶段只作信息预览']) {
     assert.match(source, new RegExp(marker));
   }
   for (const label of ['状态', '当地时间', 'IANA 时区', '内容来源', '第一阶段边界']) {
@@ -233,7 +234,7 @@ test('phase-one detail exposes only preview facts, rights provenance, and an exp
   }
   assert.match(source, /realRecord && humanReviewed \? 'HUMAN_REVIEWED' : 'CONTENT_LIVE_UNVERIFIED'/);
   assert.match(source, /第一阶段仍只作公开信息展示；报名、支付与签到入口不会在本客户端开放/);
-  assert.match(template, /\{\{detail\.displayId\}\}/);
+  assert.match(template, /\{\{detail\.displayIdLabel\}\}/);
   assert.match(template, /alt="\{\{detail\.imageAlt\}\}"/);
   assert.match(template, /binderror="onImageError"/);
   assert.match(template, /不会使用城市照片冒充具体活动/);

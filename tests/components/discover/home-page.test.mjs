@@ -14,12 +14,12 @@ test('Discover is an explicit offline editorial demo rather than a placeholder',
 
   assert.doesNotMatch(source, /createPlaceholderPage/);
   assert.match(source, /RuntimeMode\.OFFLINE_DEMO/);
-  assert.match(template, /体验版/);
-  assert.match(template, /体验版/);
-  assert.match(template, /体验版/);
-  assert.match(template, /体验版内容，仅供本地预览/);
+  assert.match(template, /本机预览/);
+  assert.match(template, /内容预览/);
+  assert.match(template, /当前不开放报名/);
+  assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览|仅做数据示例/);
   assert.doesNotMatch(template, /隐私边界，先说清楚|无需认证即可/);
-  assert.match(source, /title:\s*'AB Club · OFFLINE DEMO/);
+  assert.match(source, /title:\s*'AB Club · 全球华人文化与连接'/);
 });
 
 test('Discover keeps event entry restrained and numbered quick links removed', () => {

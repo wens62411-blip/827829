@@ -12,15 +12,24 @@ import {
   type OfflineDemoPublicField,
 } from './offline-demo-draft';
 import { OFFLINE_DEMO_FIELDS } from './offline-demo';
+import {
+  materializeLocalIdentityCard,
+  materializeLocalIdentityFields,
+  normalizeLocalIdentity,
+  publicLabelsForLocalIdentity,
+  type LocalIdentity,
+} from './local-identity';
 
 export const OFFLINE_DEMO_SHARE_PATH_BUDGET = 960;
 
 const SHARE_PATH = '/pages/card-share/index';
-const SNAPSHOT_VERSION = 1;
+const DEMO_SNAPSHOT_VERSION = 1;
+const LOCAL_SNAPSHOT_VERSION = 2;
 const BASE64_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 const CITY_IDS = new Set<string>(CITY_DIRECTORY.map((city) => city.id));
 const THEMES = new Set<CardTheme>(['ivory', 'ink', 'champagne', 'stone']);
-const PAYLOAD_KEYS = ['b', 'c', 'e', 'h', 'l', 'n', 'p', 't', 'v'] as const;
+const DEMO_PAYLOAD_KEYS = ['b', 'c', 'e', 'h', 'l', 'n', 'p', 't', 'v'] as const;
+const LOCAL_PAYLOAD_KEYS = ['b', 'c', 'h', 'l', 'n', 'r', 's', 't', 'v'] as const;
 
 interface CompactSnapshotPayload {
   readonly v: 1;
@@ -34,7 +43,22 @@ interface CompactSnapshotPayload {
   readonly t: CardTheme;
 }
 
+interface CompactLocalSnapshotPayload {
+  readonly v: 2;
+  readonly s: 'LOCAL';
+  readonly n: string;
+  readonly h: string;
+  readonly b: string;
+  readonly c: string;
+  readonly l: readonly string[];
+  readonly t: CardTheme;
+  readonly r: string;
+}
+
+type AnyCompactSnapshotPayload = CompactSnapshotPayload | CompactLocalSnapshotPayload;
+
 export interface OfflineDemoShareSnapshot {
+  readonly source: 'DEMO' | 'LOCAL';
   readonly card: PublicCardProjection;
   readonly fields: readonly OfflineDemoPublicField[];
   readonly publicLabels: readonly string[];
@@ -158,8 +182,8 @@ function checksum(bytes: readonly number[]): string {
 function isExactPayload(value: unknown): value is CompactSnapshotPayload {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   const input = value as Record<string, unknown>;
-  if (Object.keys(input).sort().join(',') !== [...PAYLOAD_KEYS].sort().join(',')) return false;
-  if (input.v !== SNAPSHOT_VERSION) return false;
+  if (Object.keys(input).sort().join(',') !== [...DEMO_PAYLOAD_KEYS].sort().join(',')) return false;
+  if (input.v !== DEMO_SNAPSHOT_VERSION) return false;
   if (
     typeof input.n !== 'string' || !input.n || Array.from(input.n).length > 60
     || typeof input.h !== 'string' || Array.from(input.h).length > 80
@@ -173,10 +197,27 @@ function isExactPayload(value: unknown): value is CompactSnapshotPayload {
   return JSON.stringify(normalizedLabels) === JSON.stringify(input.l);
 }
 
+function isExactLocalPayload(value: unknown): value is CompactLocalSnapshotPayload {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
+  const input = value as Record<string, unknown>;
+  if (Object.keys(input).sort().join(',') !== [...LOCAL_PAYLOAD_KEYS].sort().join(',')) return false;
+  if (input.v !== LOCAL_SNAPSHOT_VERSION || input.s !== 'LOCAL') return false;
+  if (
+    typeof input.n !== 'string' || !input.n || Array.from(input.n).length > 60
+    || typeof input.h !== 'string' || Array.from(input.h).length > 80
+    || typeof input.b !== 'string' || Array.from(input.b).length > 240
+    || typeof input.c !== 'string' || !CITY_IDS.has(input.c)
+    || typeof input.t !== 'string' || !THEMES.has(input.t as CardTheme)
+    || typeof input.r !== 'string' || !Number.isFinite(Date.parse(input.r))
+  ) return false;
+  const normalizedLabels = normalizeProfileLabels(input.l);
+  return JSON.stringify(normalizedLabels) === JSON.stringify(input.l);
+}
+
 function compactPayload(draftValue: unknown, theme: CardTheme): CompactSnapshotPayload {
   const draft = normalizeOfflineDemoDraft(draftValue);
   return {
-    v: SNAPSHOT_VERSION,
+    v: DEMO_SNAPSHOT_VERSION,
     n: draft.displayName,
     h: draft.profession,
     b: draft.biography,
@@ -185,6 +226,21 @@ function compactPayload(draftValue: unknown, theme: CardTheme): CompactSnapshotP
     e: draft.showEmail ? draft.email : '',
     l: publicLabelsForDraft(draft),
     t: normalizeCardTheme(theme),
+  };
+}
+
+function compactLocalPayload(identityValue: unknown, theme: CardTheme): CompactLocalSnapshotPayload {
+  const identity = normalizeLocalIdentity(identityValue);
+  return {
+    v: LOCAL_SNAPSHOT_VERSION,
+    s: 'LOCAL',
+    n: identity.displayName,
+    h: identity.profession,
+    b: identity.biography,
+    c: identity.cityId,
+    l: publicLabelsForLocalIdentity(identity),
+    t: normalizeCardTheme(theme),
+    r: identity.registeredAt,
   };
 }
 
@@ -214,6 +270,44 @@ function decodeContactFields(payload: CompactSnapshotPayload): OfflineDemoPublic
   ));
 }
 
+function localIdentityFromPayload(payload: CompactLocalSnapshotPayload): LocalIdentity {
+  return normalizeLocalIdentity({
+    contractVersion: 1,
+    displayName: payload.n,
+    profession: payload.h,
+    biography: payload.b,
+    cityId: payload.c as CityId,
+    phone: '',
+    email: '',
+    showPhone: false,
+    showEmail: false,
+    selectedLabels: payload.l,
+    showTags: payload.l.length > 0,
+    registeredAt: payload.r,
+  });
+}
+
+function snapshotFromPayload(payload: AnyCompactSnapshotPayload): OfflineDemoShareSnapshot {
+  if (payload.v === LOCAL_SNAPSHOT_VERSION) {
+    const identity = localIdentityFromPayload(payload);
+    return {
+      source: 'LOCAL',
+      card: materializeLocalIdentityCard(identity),
+      fields: materializeLocalIdentityFields(identity),
+      publicLabels: publicLabelsForLocalIdentity(identity),
+      cardTheme: payload.t,
+    };
+  }
+  const draft = draftFromPayload(payload);
+  return {
+    source: 'DEMO',
+    card: materializeOfflineDemoCard(draft),
+    fields: decodeContactFields(payload),
+    publicLabels: publicLabelsForDraft(draft),
+    cardTheme: payload.t,
+  };
+}
+
 export function encodeOfflineDemoShareSnapshot(draftValue: unknown, theme: CardTheme): string {
   const bytes = encodeUtf8(JSON.stringify(compactPayload(draftValue, theme)));
   return `${bytesToBase64Url(bytes)}.${checksum(bytes)}`;
@@ -225,6 +319,19 @@ export function buildOfflineDemoSharePath(
 ): BuildOfflineDemoSharePathResult {
   const encodedSnapshot = encodeOfflineDemoShareSnapshot(draftValue, theme);
   const path = `${SHARE_PATH}?demo=1&snapshot=${encodedSnapshot}`;
+  if (path.length > OFFLINE_DEMO_SHARE_PATH_BUDGET) {
+    return { ok: false, code: 'PATH_TOO_LONG', pathLength: path.length };
+  }
+  return { ok: true, path, encodedSnapshot };
+}
+
+export function buildLocalIdentitySharePath(
+  identityValue: LocalIdentity,
+  theme: CardTheme,
+): BuildOfflineDemoSharePathResult {
+  const bytes = encodeUtf8(JSON.stringify(compactLocalPayload(identityValue, theme)));
+  const encodedSnapshot = `${bytesToBase64Url(bytes)}.${checksum(bytes)}`;
+  const path = `${SHARE_PATH}?local=1&snapshot=${encodedSnapshot}`;
   if (path.length > OFFLINE_DEMO_SHARE_PATH_BUDGET) {
     return { ok: false, code: 'PATH_TOO_LONG', pathLength: path.length };
   }
@@ -249,16 +356,12 @@ export function decodeOfflineDemoShareSnapshot(
   if (!json) return { ok: false, code: 'MALFORMED' };
   try {
     const payload: unknown = JSON.parse(json);
-    if (!isExactPayload(payload)) return { ok: false, code: 'MALFORMED' };
-    const draft = draftFromPayload(payload);
+    if (!isExactPayload(payload) && !isExactLocalPayload(payload)) {
+      return { ok: false, code: 'MALFORMED' };
+    }
     return {
       ok: true,
-      snapshot: {
-        card: materializeOfflineDemoCard(draft),
-        fields: decodeContactFields(payload),
-        publicLabels: publicLabelsForDraft(draft),
-        cardTheme: payload.t,
-      },
+      snapshot: snapshotFromPayload(payload),
     };
   } catch (_error) {
     return { ok: false, code: 'MALFORMED' };
@@ -272,9 +375,18 @@ export function createOfflineDemoShareSnapshot(
   const payload = compactPayload(draftValue, theme);
   const draft = draftFromPayload(payload);
   return {
+    source: 'DEMO',
     card: materializeOfflineDemoCard(draft),
     fields: decodeContactFields(payload),
     publicLabels: publicLabelsForDraft(draft),
     cardTheme: payload.t,
   };
+}
+
+
+export function createLocalIdentityShareSnapshot(
+  identityValue: LocalIdentity,
+  theme: CardTheme,
+): OfflineDemoShareSnapshot {
+  return snapshotFromPayload(compactLocalPayload(identityValue, theme));
 }

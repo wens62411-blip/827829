@@ -1,2 +1,1 @@
-<text class="evidence evidence--{{tone}}" aria-label="运行模式 {{label}}">{{label}}</text>
-
+<text class="evidence evidence--{{tone}}" aria-label="运行状态 {{label}}">{{label}}</text>

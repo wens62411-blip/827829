@@ -82,4 +82,12 @@ Page({
   handleUnavailableChange() {
     this.setData({ message: '此设置尚无冻结 action 可提交，未发生任何保存。' });
   },
+
+  returnToEditor() {
+    if (getCurrentPages().length > 1) {
+      void wx.navigateBack();
+      return;
+    }
+    void wx.redirectTo({ url: '/packageCard/pages/edit/index' });
+  },
 });

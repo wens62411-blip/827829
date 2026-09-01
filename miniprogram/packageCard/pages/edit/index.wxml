@@ -1,20 +1,37 @@
 <view class="card-page card-editor-page card-editor-page--{{cardTheme}}">
   <view class="card-editor-header">
+    <view class="card-editor-header__toolbar">
+      <image wx:if="{{!brandLogoFailed}}" class="card-editor-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 金色盾徽标志" binderror="onBrandLogoError" />
+      <view wx:else class="card-editor-header__crest-fallback" aria-label="AB Club 金色文字标识">AB</view>
+    </view>
     <view class="card-editor-header__copy">
       <text class="card-kicker">ONE TEMPLATE · HIGH CONTROL</text>
-      <text class="card-title">我的数字名片</text>
-      <text class="card-subtitle">像职业资料页一样清楚，比传统名片更安静、更有个人表达。</text>
+      <text class="card-title">{{registerMode ? '建立我的名片' : '我的数字名片'}}</text>
+      <text class="card-subtitle">{{registerMode ? '先填写最小必要信息，保存后即可在本机查看和分享。' : '像职业资料页一样清楚，比传统名片更安静、更有个人表达。'}}</text>
     </view>
-    <image class="card-editor-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
 
-  <view class="card-editor-tabs" aria-role="tablist" aria-label="名片编辑视图">
-    <button class="card-editor-tab {{editorMode === 'PREVIEW' ? 'card-editor-tab--active' : ''}}" data-mode="PREVIEW" bindtap="setEditorMode" aria-role="tab" aria-selected="{{editorMode === 'PREVIEW'}}">名片预览</button>
-    <button class="card-editor-tab {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-role="tab" aria-selected="{{editorMode === 'EDIT'}}">编辑内容</button>
+  <view class="card-editor-tabs" aria-role="group" aria-label="名片预览、编辑与分享操作">
+    <button class="card-editor-tab {{editorMode === 'PREVIEW' ? 'card-editor-tab--active' : ''}}" data-mode="PREVIEW" bindtap="setEditorMode" aria-pressed="{{editorMode === 'PREVIEW'}}">名片预览</button>
+    <button class="card-editor-tab card-editor-tab--bordered {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-pressed="{{editorMode === 'EDIT'}}">编辑内容</button>
+    <button
+      class="card-editor-tab card-editor-tab--bordered card-editor-tab--share"
+      bindtap="saveAndOpenShare"
+      disabled="{{status === 'LOADING' || status === 'SAVING' || saveAndShareBusy || !(profile || creatingProfile || localIdentityReady || registerMode)}}"
+      aria-label="{{status === 'LOADING' ? '名片正在加载' : (saveAndShareBusy ? '正在保存并准备分享我的名片' : '保存当前编辑并分享我的名片')}}"
+      aria-busy="{{saveAndShareBusy}}"
+    >{{status === 'LOADING' ? '名片加载中…' : (saveAndShareBusy ? '准备分享…' : '分享我的名片')}}</button>
   </view>
 
-  <view wx:if="{{demoMode && !localIdentityReady}}" class="card-editor-evidence">体验版 · 当前内容只保存为本机体验草稿</view>
-  <view wx:elif="{{localIdentityReady}}" class="card-editor-evidence">本机名片 · 内容保存在这台设备，不会上传或生成真实账户。</view>
+  <view wx:if="{{registerMode}}" class="card-editor-evidence">本机名片 · 保存后只保存在这台设备</view>
+  <view wx:elif="{{demoMode && !localIdentityReady}}" class="card-editor-evidence">本机预览 · 当前为合成示例，只保存在这台设备</view>
+  <view wx:elif="{{localIdentityReady}}" class="card-editor-evidence">本机名片 · 当前只保存在这台设备。</view>
+
+  <view
+    wx:if="{{(profile || creatingProfile || localIdentityReady || registerMode) && message && (status === 'ERROR' || status === 'SAVED' || status === 'PROJECTION_PENDING')}}"
+    class="card-status card-editor-action-feedback {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : 'card-status--success'}}"
+    aria-live="assertive"
+  >{{message}}</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载资料"></view>
   <view wx:elif="{{status === 'ERROR' && !profile && !creatingProfile}}" class="card-panel card-panel--error">
@@ -23,7 +40,7 @@
     <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重新加载</button>
   </view>
 
-  <block wx:if="{{profile || creatingProfile}}">
+  <block wx:if="{{profile || creatingProfile || localIdentityReady || registerMode}}">
     <view wx:if="{{editorMode === 'PREVIEW'}}" class="card-editor-preview" aria-role="region" aria-label="名片实时预览">
       <ab-profile-card
         card="{{previewCard}}"
@@ -38,7 +55,7 @@
       />
       <view class="card-editor-preview__actions">
         <button class="card-button" data-mode="EDIT" bindtap="setEditorMode">编辑这张名片</button>
-        <navigator class="card-link-button" url="/pages/card/index" hover-class="none">返回我的名片</navigator>
+        <button class="card-link-button" bindtap="returnToOwnerCard">返回我的名片</button>
       </view>
       <text class="card-editor-preview__note">这里只预览已经打开“对外展示”的标签；关闭后，访客和分享名片都会隐藏。</text>
     </view>
@@ -51,7 +68,11 @@
         </view>
         <view class="card-theme-live card-theme-live--{{cardTheme}}" aria-role="img" aria-label="当前名片配色实时预览">
           <view class="card-theme-live__topline">
-            <view class="card-theme-live__brand"><image class="card-theme-live__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" aria-hidden="true" /><text>AB Club</text></view>
+            <view class="card-theme-live__brand">
+              <image wx:if="{{!brandLogoFailed}}" class="card-theme-live__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" aria-hidden="true" binderror="onBrandLogoError" />
+              <text wx:else class="card-theme-live__crest-fallback" aria-hidden="true">AB</text>
+              <text>AB Club</text>
+            </view>
             <text>LIVE PREVIEW</text>
           </view>
           <view class="card-theme-live__identity">
@@ -80,17 +101,18 @@
         <view class="card-editor-avatar-row">
           <image wx:if="{{localAvatarUsable}}" class="card-editor-avatar" src="{{localAvatarPath}}" mode="aspectFill" binderror="onAvatarImageError" />
           <view wx:else class="card-editor-avatar card-editor-avatar--fallback">{{previewInitial}}</view>
-          <button class="card-editor-upload" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{status === 'SAVING'}}">选择头像</button>
+          <button wx:if="{{!localIdentityReady && !registerMode}}" class="card-editor-upload" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{status === 'SAVING'}}">选择头像</button>
+          <text wx:else class="card-editor-avatar-note">当前使用文字头像；图片头像将在云端账户接入后开放。</text>
         </view>
 
         <view class="card-field">
-          <view class="card-field__label"><text>昵称</text><text class="card-field__hint">最多 60 字</text></view>
-          <input class="card-input" value="{{displayName}}" maxlength="60" bindinput="onDisplayNameInput" disabled="{{status === 'SAVING'}}" placeholder="你的公开称呼" />
+          <view class="card-field__label"><text>昵称</text><text class="card-field__hint">最多 {{(localIdentityReady || registerMode) ? 24 : 60}} 字</text></view>
+          <input class="card-input" value="{{displayName}}" maxlength="{{(localIdentityReady || registerMode) ? 24 : 60}}" bindinput="onDisplayNameInput" disabled="{{status === 'SAVING'}}" placeholder="你的公开称呼" />
         </view>
 
         <view class="card-field">
-          <view class="card-field__label"><text>一句话身份</text><text class="card-field__hint">例如职业与方向</text></view>
-          <input class="card-input" value="{{profession}}" maxlength="80" bindinput="onProfessionInput" disabled="{{status === 'SAVING'}}" placeholder="独立品牌创始人 · 跨文化商业连接者" />
+          <view class="card-field__label"><text>一句话身份</text><text class="card-field__hint">最多 {{(localIdentityReady || registerMode) ? 32 : 80}} 字</text></view>
+          <input class="card-input" value="{{profession}}" maxlength="{{(localIdentityReady || registerMode) ? 32 : 80}}" bindinput="onProfessionInput" disabled="{{status === 'SAVING'}}" placeholder="独立品牌创始人 · 跨文化商业连接者" />
         </view>
 
         <view class="card-field">
@@ -106,7 +128,7 @@
           <view><text class="card-editor-section__eyebrow">CONTACT</text><text class="card-editor-section__title">联系方式</text></view>
           <text class="card-editor-section__hint">选填 · 独立公开</text>
         </view>
-        <text class="card-editor-contact-intro">电话与邮箱分别控制。只有填写有效内容并打开对应开关，才会出现在访客名片、微信分享卡片和接收页。</text>
+        <text class="card-editor-contact-intro">{{(localIdentityReady || registerMode) ? '开关只控制当前设备上的本机名片预览；电话和邮箱不会进入微信分享卡片、接收页或海报。' : '电话与邮箱分别控制。只有填写有效内容并打开对应开关，才会出现在访客名片、微信分享卡片和接收页。'}}</text>
         <view class="card-editor-contact-grid">
           <view class="card-editor-contact-card">
             <view class="card-field card-editor-contact-field">
@@ -114,7 +136,7 @@
               <input class="card-input" value="{{phone}}" maxlength="24" bindinput="onPhoneInput" disabled="{{status === 'SAVING'}}" placeholder="+41 44 555 01 10" />
             </view>
             <view class="card-editor-contact-visibility">
-              <view><text class="card-editor-contact-visibility__title">对外展示电话</text><text class="card-editor-contact-visibility__note">关闭后不会进入分享内容</text></view>
+              <view><text class="card-editor-contact-visibility__title">{{(localIdentityReady || registerMode) ? '在本机名片中显示电话' : '对外展示电话'}}</text><text class="card-editor-contact-visibility__note">{{(localIdentityReady || registerMode) ? '仅当前设备可见；分享时自动移除' : '关闭后不会进入分享内容'}}</text></view>
               <switch color="#a67c3f" checked="{{showPhone}}" data-module="phone" bindchange="onModuleToggle" />
             </view>
           </view>
@@ -124,7 +146,7 @@
               <input class="card-input" value="{{email}}" maxlength="72" bindinput="onEmailInput" disabled="{{status === 'SAVING'}}" placeholder="name@example.com" />
             </view>
             <view class="card-editor-contact-visibility">
-              <view><text class="card-editor-contact-visibility__title">对外展示邮箱</text><text class="card-editor-contact-visibility__note">关闭后不会进入分享内容</text></view>
+              <view><text class="card-editor-contact-visibility__title">{{(localIdentityReady || registerMode) ? '在本机名片中显示邮箱' : '对外展示邮箱'}}</text><text class="card-editor-contact-visibility__note">{{(localIdentityReady || registerMode) ? '仅当前设备可见；分享时自动移除' : '关闭后不会进入分享内容'}}</text></view>
               <switch color="#a67c3f" checked="{{showEmail}}" data-module="email" bindchange="onModuleToggle" />
             </view>
           </view>
@@ -137,9 +159,9 @@
           <view><text class="card-editor-section__eyebrow">ABOUT</text><text class="card-editor-section__title">自由填写内容</text></view>
           <text class="card-editor-section__hint">平台不限制表达方式</text>
         </view>
-        <textarea class="card-textarea card-editor-free-copy" value="{{biography}}" maxlength="240" bindinput="onBiographyInput" disabled="{{status === 'SAVING'}}" placeholder="写下你的经历、关注方向、可提供的资源，或想认识怎样的人。" />
+        <textarea class="card-textarea card-editor-free-copy" value="{{biography}}" maxlength="{{(localIdentityReady || registerMode) ? 72 : 240}}" bindinput="onBiographyInput" disabled="{{status === 'SAVING'}}" placeholder="写下你的经历、关注方向、可提供的资源，或想认识怎样的人。" />
         <view class="card-editor-copy-tools">
-          <text class="card-counter">{{biographyLength}} / 240</text>
+          <text class="card-counter">{{biographyLength}} / {{(localIdentityReady || registerMode) ? 72 : 240}}</text>
           <button class="card-editor-ai" bindtap="generateIntroductionDraft" loading="{{generatingIntroduction}}" disabled="{{generatingIntroduction || status === 'SAVING'}}">AI 辅助润色</button>
         </view>
         <text wx:if="{{introductionNote}}" class="card-editor-inline-note">{{introductionNote}}</text>
@@ -172,7 +194,7 @@
         </view>
       </view>
 
-      <view class="card-editor-section">
+      <view wx:if="{{!localIdentityReady && !registerMode}}" class="card-editor-section">
         <view class="card-editor-section__heading">
           <view><text class="card-editor-section__eyebrow">GALLERY</text><text class="card-editor-section__title">展示图片</text></view>
           <text class="card-editor-section__hint">生活、作品或项目</text>
@@ -193,15 +215,14 @@
           <text class="card-editor-section__hint">自由开关</text>
         </view>
         <view class="card-editor-switch-row"><view><text>对外展示个人标签</text><text class="card-editor-switch-note">关闭后，本人预览、访客页与分享名片全部隐藏</text></view><switch color="#a67c3f" checked="{{showTags}}" data-module="tags" bindchange="onModuleToggle" /></view>
-        <view class="card-editor-switch-row"><text>显示图片</text><switch color="#a67c3f" checked="{{showGallery}}" data-module="gallery" bindchange="onModuleToggle" /></view>
+        <view wx:if="{{!localIdentityReady && !registerMode}}" class="card-editor-switch-row"><text>显示图片</text><switch color="#a67c3f" checked="{{showGallery}}" data-module="gallery" bindchange="onModuleToggle" /></view>
       </view>
 
-      <view wx:if="{{message && (status === 'ERROR' || status === 'SAVED' || status === 'PROJECTION_PENDING')}}" class="card-status {{status === 'ERROR' || status === 'PROJECTION_PENDING' ? 'card-status--error' : 'card-status--success'}}" aria-live="polite">{{message}}</view>
-
       <view class="card-editor-savebar">
-        <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING'}}">{{localIdentityReady ? '保存名片' : (registerMode ? '创建我的名片' : (demoMode ? '完成本页预览' : (creatingProfile ? '创建我的名片' : '保存名片')))}}</button>
-        <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode">查看实时效果</button>
-        <text class="card-editor-savebar__note">标签与图片仅用于本机体验预览，不会被冒充为人工认证。</text>
+        <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">{{localIdentityReady ? '保存名片' : (registerMode ? '创建我的名片' : (demoMode ? '完成本页预览' : (creatingProfile ? '创建我的名片' : '保存名片')))}}</button>
+        <button class="card-button-secondary" bindtap="saveAndOpenShare" loading="{{saveAndShareBusy}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">分享我的名片</button>
+        <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode" disabled="{{status === 'SAVING' || saveAndShareBusy}}">查看实时效果</button>
+        <text class="card-editor-savebar__note">标签与图片仅用于本机预览，不会被冒充为人工认证。</text>
       </view>
     </view>
   </block>

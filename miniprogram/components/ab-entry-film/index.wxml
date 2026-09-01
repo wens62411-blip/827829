@@ -1,0 +1,110 @@
+<view
+  wx:if="{{visible}}"
+  class="entry-film {{exiting ? 'entry-film--exiting' : ''}}"
+  catchtap="handleTap"
+  catchtouchmove="blockTouchMove"
+  aria-role="group"
+  aria-label="AB Club 开场动画，轻触空白区域进入下一幕"
+>
+  <button
+    class="entry-film__skip"
+    catchtap="handleSkip"
+    hover-class="entry-film__skip--pressed"
+    aria-label="跳过开场动画并进入发现首页"
+  ><text class="entry-film__skip-label">跳过</text></button>
+  <view wx:if="{{sceneIndex === 0}}" class="entry-film__city-scene">
+    <image
+      class="entry-film__city-image"
+      src="{{city.imagePath}}"
+      mode="aspectFill"
+      fade-in="{{false}}"
+      alt="{{city.zh}}城市画面"
+      binderror="handleImageError"
+    />
+    <image
+      class="entry-film__city-preload"
+      src="{{nextCity.imagePath}}"
+      mode="aspectFill"
+      fade-in="{{false}}"
+      aria-hidden="true"
+    />
+    <view class="entry-film__city-shade" aria-hidden="true" />
+    <view class="entry-film__city-rule" aria-hidden="true" />
+    <view class="entry-film__header-line" aria-hidden="true" />
+    <view class="entry-film__city-title">
+      <text class="entry-film__city-en">{{city.en}}</text>
+      <view class="entry-film__city-meta">
+        <text>{{city.zh}}</text><view class="entry-film__city-meta-rule" aria-hidden="true" /><text>{{city.country}}</text>
+      </view>
+    </view>
+  </view>
+
+  <view wx:elif="{{sceneIndex === 1 && !imageFailed}}" class="entry-film__editorial entry-film__editorial--collector">
+    <view class="entry-film__editorial-line" aria-hidden="true" />
+    <view class="entry-film__editorial-title entry-film__editorial-title--collector">
+      <text class="entry-film__editorial-title-line">Collectors gather</text>
+      <text class="entry-film__editorial-title-line">timeless vintage</text>
+      <text class="entry-film__editorial-title-line">treasures from</text>
+      <text class="entry-film__editorial-title-line">across the world</text>
+    </view>
+    <view class="entry-film__photo-window">
+      <image class="entry-film__photo" src="/assets/entry-film/collector-photo.jpg" mode="aspectFill" fade-in="{{false}}" alt="全球古董收藏者与珍藏" binderror="handleImageError" />
+      <view class="entry-film__photo-shade" aria-hidden="true" />
+      <view class="entry-film__photo-curtain" aria-hidden="true" />
+    </view>
+    <view class="entry-film__grain" aria-hidden="true" />
+  </view>
+
+  <view wx:elif="{{sceneIndex === 2 && !imageFailed}}" class="entry-film__editorial entry-film__editorial--certificates">
+    <view class="entry-film__editorial-line" aria-hidden="true" />
+    <view class="entry-film__editorial-title entry-film__editorial-title--certificates">
+      <text class="entry-film__editorial-title-line">Financial stock</text>
+      <text class="entry-film__editorial-title-line">certificates</text>
+    </view>
+    <view class="entry-film__photo-window">
+      <image class="entry-film__photo entry-film__photo--certificates" src="/assets/entry-film/certificates-photo.jpg" mode="aspectFill" fade-in="{{false}}" alt="装裱陈列的历史金融股票证书" binderror="handleImageError" />
+      <view class="entry-film__photo-shade" aria-hidden="true" />
+      <view class="entry-film__photo-curtain" aria-hidden="true" />
+    </view>
+    <view class="entry-film__grain" aria-hidden="true" />
+  </view>
+
+  <view wx:elif="{{sceneIndex === 3 && !imageFailed}}" class="entry-film__objects">
+    <view class="entry-film__editorial-line" aria-hidden="true" />
+    <view class="entry-film__objects-title"><text class="entry-film__objects-title-line">Objects,</text><text class="entry-film__objects-title-line entry-film__objects-title-line--emphasis">held in time.</text></view>
+    <view class="entry-film__object-panels">
+      <view class="entry-film__object-panel entry-film__object-panel--one">
+        <image class="entry-film__object-image" src="/assets/entry-film/telephone-panel.jpg" mode="aspectFill" fade-in="{{false}}" alt="古董电话" binderror="handleImageError" />
+        <view class="entry-film__object-shade" aria-hidden="true" />
+        <view class="entry-film__object-label"><text class="entry-film__object-label-text">Telephone</text></view>
+      </view>
+      <view class="entry-film__object-panel entry-film__object-panel--two">
+        <image class="entry-film__object-image" src="/assets/entry-film/cameras-panel.jpg" mode="aspectFill" fade-in="{{false}}" alt="古董相机收藏" binderror="handleImageError" />
+        <view class="entry-film__object-shade" aria-hidden="true" />
+        <view class="entry-film__object-label"><text class="entry-film__object-label-text">Cameras</text></view>
+      </view>
+      <view class="entry-film__object-panel entry-film__object-panel--three">
+        <image class="entry-film__object-image" src="/assets/entry-film/large-format-panel.jpg" mode="aspectFill" fade-in="{{false}}" alt="大型座机相机" binderror="handleImageError" />
+        <view class="entry-film__object-shade" aria-hidden="true" />
+        <view class="entry-film__object-label"><text class="entry-film__object-label-text">Large-format</text></view>
+      </view>
+    </view>
+    <view class="entry-film__grain" aria-hidden="true" />
+  </view>
+
+  <view wx:elif="{{!imageFailed}}" class="entry-film__manor">
+    <image class="entry-film__manor-photo" src="/assets/entry-film/manor-background.jpg" mode="aspectFill" fade-in="{{false}}" alt="AB Club 欧式庄园开启画面" binderror="handleImageError" />
+    <view class="entry-film__manor-shade" aria-hidden="true" />
+    <view class="entry-film__crest-ring">
+      <image class="entry-film__crest-image" src="/assets/brand/ab-club-crest.png" mode="aspectFit" fade-in="{{false}}" alt="AB Club 盾徽标志" />
+    </view>
+    <view class="entry-film__manor-rule" aria-hidden="true" />
+    <view class="entry-film__grain" aria-hidden="true" />
+  </view>
+  <view wx:else class="entry-film__fallback" aria-role="img" aria-label="入场画面暂不可用，动画将继续播放">
+    <image wx:if="{{sceneIndex === 4}}" class="entry-film__fallback-crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
+    <text class="entry-film__fallback-line">AB CLUB · CULTURAL EDIT</text><text class="entry-film__fallback-line entry-film__fallback-line--secondary">画面暂不可用 · 即将进入下一幕</text>
+  </view>
+
+  <view class="entry-film__flash {{fastFlash ? 'entry-film__flash--visible' : ''}}" aria-hidden="true" />
+</view>

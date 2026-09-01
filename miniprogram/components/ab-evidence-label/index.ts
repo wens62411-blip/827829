@@ -1,9 +1,9 @@
 import { RuntimeMode } from '../../shared/types/enums';
 
 const LABELS = {
-  LIVE: { label: 'LIVE', tone: 'live' },
-  DEGRADED: { label: 'DEGRADED', tone: 'degraded' },
-  OFFLINE_DEMO: { label: 'OFFLINE_DEMO', tone: 'offline' },
+  LIVE: { label: '正式服务', tone: 'live' },
+  DEGRADED: { label: '服务受限', tone: 'degraded' },
+  OFFLINE_DEMO: { label: '本机预览', tone: 'offline' },
 } as const;
 
 Component({

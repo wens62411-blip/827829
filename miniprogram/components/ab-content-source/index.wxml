@@ -1,4 +1,4 @@
-<view class="source" aria-role="group" aria-label="内容来源"><view class="source__topline"><text class="source__title">{{sourceTitle || '来源信息不可用'}}</text><view class="source__labels" aria-label="记录来源 {{recordOrigin}}；证据范围 {{evidenceScope}}"><text>{{recordOrigin || 'UNKNOWN'}}</text><text wx:if="{{evidenceScope}}">{{evidenceScope}}</text></view></view><text wx:if="{{sourceUrl}}" class="source__url">{{sourceUrl}}</text><text wx:else class="source__missing">缺少来源链接，当前记录不应作为完整公开内容展示。</text><button
+<view class="source" aria-role="group" aria-label="内容来源"><view class="source__topline"><text class="source__title">{{sourceTitle || '来源信息不可用'}}</text><view class="source__labels" aria-label="记录来源 {{recordOriginLabel}}；内容范围 {{evidenceScopeLabel}}"><text>{{recordOriginLabel}}</text><text wx:if="{{evidenceScopeLabel}}">{{evidenceScopeLabel}}</text></view></view><text wx:if="{{sourceUrl}}" class="source__url">来源链接已记录，可复制查看</text><text wx:else class="source__missing">缺少来源链接，当前记录不应作为完整公开内容展示。</text><button
     wx:if="{{sourceUrl}}"
     class="source__copy ab-motion"
     hover-class="source__copy--pressed"

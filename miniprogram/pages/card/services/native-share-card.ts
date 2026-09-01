@@ -26,6 +26,28 @@ export interface NativeShareCardContent {
 
 type CanvasContext = WechatMiniprogram.CanvasRenderingContext.CanvasRenderingContext2D;
 
+interface WindowMetricsApi {
+  readonly getWindowInfo?: () => { readonly pixelRatio?: number };
+  readonly getSystemInfoSync?: () => { readonly pixelRatio?: number };
+}
+
+function readPixelRatio(read: (() => { readonly pixelRatio?: number }) | undefined): number | undefined {
+  if (typeof read !== 'function') return undefined;
+  try {
+    const value = read().pixelRatio;
+    return typeof value === 'number' && Number.isFinite(value) && value > 0 ? value : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+export function resolveNativeShareCardPixelRatio(api: WindowMetricsApi = wx): number {
+  const pixelRatio = readPixelRatio(api.getWindowInfo?.bind(api))
+    ?? readPixelRatio(api.getSystemInfoSync?.bind(api))
+    ?? 1;
+  return Math.max(1, Math.min(3, pixelRatio));
+}
+
 function compactText(value: unknown, maxLength: number): string {
   if (typeof value !== 'string') return '';
   return Array.from(value.replace(/[\u0000-\u001f\u007f]/g, '').replace(/\s+/g, ' ').trim())
@@ -143,7 +165,7 @@ export function drawNativeShareCard(
   input: NativeShareCardInput,
 ): NativeShareCardContent {
   const content = normalizeNativeShareCard(input);
-  const pixelRatio = Math.max(1, Math.min(3, wx.getWindowInfo().pixelRatio));
+  const pixelRatio = resolveNativeShareCardPixelRatio();
   canvas.width = NATIVE_SHARE_CARD_WIDTH * pixelRatio;
   canvas.height = NATIVE_SHARE_CARD_HEIGHT * pixelRatio;
   const context = canvas.getContext('2d');
@@ -170,7 +192,7 @@ export function drawNativeShareCard(
     context.textAlign = 'right';
     context.fillStyle = '#9A773C';
     context.font = '500 10px sans-serif';
-    context.fillText('体验版', 564, 49);
+    context.fillText('本机预览', 564, 49);
     context.textAlign = 'left';
   }
 

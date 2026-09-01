@@ -14,7 +14,7 @@ const CITY_LIST: readonly LoadingCity[] = CITY_DIRECTORY.map((city) => ({
   iconPath: `/assets/city-line-icons/${city.id}.svg`,
 }));
 
-let activeTimer: number | null = null;
+const activeTimers = new WeakMap<object, ReturnType<typeof setTimeout>>();
 
 function pickRandomCity(preferredId?: string): LoadingCity {
   if (preferredId) {
@@ -24,11 +24,11 @@ function pickRandomCity(preferredId?: string): LoadingCity {
   return CITY_LIST[Math.floor(Math.random() * CITY_LIST.length)]!;
 }
 
-function clearActiveTimer() {
-  if (activeTimer !== null) {
-    clearTimeout(activeTimer);
-    activeTimer = null;
-  }
+function clearActiveTimer(instance: object) {
+  const timer = activeTimers.get(instance);
+  if (timer === undefined) return;
+  clearTimeout(timer);
+  activeTimers.delete(instance);
 }
 
 Component({
@@ -48,13 +48,13 @@ Component({
 
   lifetimes: {
     detached() {
-      clearActiveTimer();
+      clearActiveTimer(this);
     },
   },
 
   methods: {
     onVisibleChange(newVal: boolean) {
-      clearActiveTimer();
+      clearActiveTimer(this);
       if (!newVal) return;
 
       const min = Math.max(0, this.data.minDuration);
@@ -63,10 +63,12 @@ Component({
       const city = pickRandomCity(this.data.cityId || undefined);
       this.setData({ city, progressDuration: duration });
 
-      activeTimer = setTimeout(() => {
-        activeTimer = null;
+      const timer = setTimeout(() => {
+        if (activeTimers.get(this) !== timer) return;
+        activeTimers.delete(this);
         this.triggerEvent('complete', { cityId: city.id, zh: city.zh, en: city.en });
-      }, duration) as unknown as number;
+      }, duration);
+      activeTimers.set(this, timer);
     },
   },
 });

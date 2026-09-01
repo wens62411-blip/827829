@@ -87,8 +87,8 @@ export function listActivityDemoEvents(
           cityNameEn: city.name.en,
           timezone: city.timezone,
           title: `${city.name.zh} · ${category[2][section[2]]}`,
-          summary: `DEMO_ONLY · ${category[3]} 不代表真实排期、场地或合作关系。`,
-          localTimeLabel: 'DEMO · 日期与场地待确认',
+          summary: `活动方向 · ${category[3]} 不代表真实排期、场地或合作关系。`,
+          localTimeLabel: '日期与场地待确认',
           categoryId: category[0],
           categoryLabel: category[1],
           sectionId: section[0],
@@ -142,8 +142,8 @@ function makeDiscoverDemoEvent(
     cityNameEn: city.name.en,
     timezone: city.timezone,
     title: definition.title,
-    summary: `DEMO_ONLY · ${definition.summary} 本条仅为本地策展预览。`,
-    localTimeLabel: 'DEMO · 日期与场地待确认',
+    summary: `活动方向 · ${definition.summary} 日期、场地与合作方尚待确认。`,
+    localTimeLabel: '日期与场地待确认',
     cardIndex: definition.cardIndex,
     cardMeta: definition.cardMeta,
   };
@@ -161,9 +161,9 @@ export const ART_RELATED_DEMO_EVENT: DemoEventPresentation = (() => {
     cityName: city.name.zh,
     cityNameEn: city.name.en,
     timezone: city.timezone,
-    title: '作品资料阅读会（DEMO_ONLY）',
-    summary: '合成线下活动，不代表真实排期或官方合作。',
-    localTimeLabel: 'DEMO · 日期与场地待确认',
+    title: '作品资料阅读会（活动方向）',
+    summary: '活动方向，仅用于浏览，不代表真实排期或官方合作。',
+    localTimeLabel: '日期与场地待确认',
   };
 })();
 
@@ -185,8 +185,8 @@ export function getDemoEventByCityId(value: string): DemoEventPresentation | und
     cityNameEn: city.name.en,
     timezone: city.timezone,
     title: `${city.name.zh} · ${concept[0]}`,
-    summary: `DEMO_ONLY · ${concept[1]} 本条仅为本地策展预览，不代表真实活动已排期。`,
-    localTimeLabel: 'DEMO · 日期与场地待确认',
+    summary: `活动方向 · ${concept[1]} 日期、场地与合作方尚待确认，不代表真实活动已排期。`,
+    localTimeLabel: '日期与场地待确认',
   };
 }
 

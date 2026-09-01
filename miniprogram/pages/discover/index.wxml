@@ -1,5 +1,6 @@
+<ab-entry-film wx:if="{{showEntryFilm}}" bind:complete="handleEntryFilmComplete" />
 <view class="discover-page ab-safe-bottom">
-  <view class="discover-topbar">
+  <view class="discover-topbar" style="padding-top: {{navigationSafeHeight}}px">
     <view class="discover-brand">
       <image
         wx:if="{{!brandLogoFailed}}"
@@ -28,20 +29,20 @@
     <text class="discover-hero__title">先让对方记住你。</text>
     <text class="discover-hero__copy">AI 赛博名片 · 把身份，做成一件值得被收藏的数字作品</text>
     <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="生成我的 AI 赛博名片">
-      <text>生成我的 AI 赛博名片</text>
+      <text class="discover-primary-action__label">生成我的 AI 赛博名片</text>
       <text class="discover-primary-action__arrow" aria-hidden="true">→</text>
     </button>
     <view class="discover-hero__rule" aria-hidden="true"></view>
     <text
       class="discover-runtime__label discover-runtime__label--hero"
-      aria-label="体验版内容，仅供本地预览"
-    >体验版</text>
+      aria-label="当前内容为本机预览"
+    >本机预览</text>
   </view>
 
   <view class="discover-section discover-gathering" aria-role="region" aria-label="全球城市艺术活动预览">
     <view class="discover-section__head">
       <view><text class="discover-section__eyebrow">CURATED GATHERING</text><text class="discover-heading">一场值得赴约的相遇</text></view>
-      <text class="discover-section__status" aria-label="体验版">体验版</text>
+      <text class="discover-section__status">内容预览</text>
     </view>
     <navigator class="discover-event-feature" url="/packageEvents/pages/event/index?demoEventId={{primaryEvent.eventId}}" hover-class="discover-press">
       <view class="discover-event-feature__media">
@@ -65,8 +66,8 @@
         <text class="discover-event-feature__summary">{{primaryEvent.summary}}</text>
         <text
           class="discover-event-feature__boundary"
-          aria-label="体验版活动，仅供预览"
-        >体验版活动 · 仅供预览</text>
+          aria-label="当前活动不开放报名"
+        >当前不开放报名 · 信息以后续公告为准</text>
       </view>
     </navigator>
     <navigator class="discover-text-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">浏览全部城市活动 <text>→</text></navigator>

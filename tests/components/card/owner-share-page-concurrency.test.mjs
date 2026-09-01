@@ -128,11 +128,13 @@ function createCanvas(label) {
   return { label, width: 0, height: 0, getContext: () => context };
 }
 
-function installWx(cardTheme) {
+function installWx(cardTheme, localIdentity) {
   const calls = [];
   const savedPaths = [];
   globalThis.wx = {
-    getStorageSync() { return cardTheme; },
+    getStorageSync(key) {
+      return key === 'ab.club.local-identity.v1' ? localIdentity : cardTheme;
+    },
     hideShareMenu(input) { calls.push(['hideShareMenu', input]); },
     showShareMenu(input) { calls.push(['showShareMenu', input]); },
     showToast(input) { calls.push(['showToast', input]); },
@@ -349,7 +351,7 @@ test('one page unloading cannot clear another page canvas or block its album sav
   }
 });
 
-test('offline demo opens native WeChat sharing, keeps the selected theme, and builds its poster without cloud writes', async () => {
+test('first-time offline users must establish their own card before sharing', async () => {
   const { calls } = installWx('ink');
   let cloudReads = 0;
   globalThis.__AB_OWNER_SHARE_TEST_HOOKS__ = {
@@ -374,17 +376,70 @@ test('offline demo opens native WeChat sharing, keeps the selected theme, and bu
     await settle();
 
     assert.equal(page.data.demoMode, true);
-    assert.equal(page.data.cardTheme, 'ink');
-    assert.match(page.data.localNotice, /真实拉起微信转发/);
-    const sharePath = page.onShareAppMessage.call(page).path;
-    assert.match(sharePath, /^\/pages\/card-share\/index\?demo=1&snapshot=[A-Za-z0-9_-]+\.[0-9a-f]{8}$/);
-    assert.doesNotMatch(sharePath, /林知遥|demo@|\+41/);
-    assert.equal(calls.filter(([name]) => name === 'showShareMenu').length, 1);
+    assert.equal(page.data.localIdentityReady, false);
+    assert.equal(page.data.card, null);
+    assert.match(page.data.pageError, /请先建立自己的名片/);
+    assert.equal(page.data.localNotice, '');
+    assert.equal(calls.filter(([name]) => name === 'showShareMenu').length, 0);
+    assert.equal(cloudReads, 0, 'first-time offline sharing must not read from cloud');
 
-    await page.generatePoster.call(page);
-    assert.equal(cloudReads, 0, 'demo poster must use the already-labelled synthetic card');
-    assert.equal(page.data.posterReady, true);
-    assert.equal(page.data.posterPath, 'tmp://demo.png');
+    const fallbackShare = page.onShareAppMessage.call(page);
+    assert.equal(fallbackShare.path, '/pages/card/index');
+    assert.doesNotMatch(JSON.stringify(fallbackShare), /林知遥|demo@|\+41/);
+  } finally {
+    delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('offline owner share prefers the registered local identity and exports no private contacts', async () => {
+  const localIdentity = {
+    contractVersion: 1,
+    displayName: '本机填写者',
+    biography: '',
+    profession: '独立策展人',
+    cityId: 'cn-shenzhen',
+    selectedLabels: ['策展', '珠宝'],
+    showTags: true,
+    phone: '+86 138 0013 8000',
+    email: 'private@example.com',
+    showPhone: true,
+    showEmail: true,
+    registeredAt: '2026-08-31T08:00:00.000Z',
+  };
+  installWx('stone', localIdentity);
+  let cloudReads = 0;
+  globalThis.__AB_OWNER_SHARE_TEST_HOOKS__ = {
+    runtimeEvidence: { runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false },
+    revocationPointer: undefined,
+    remembered: [],
+    forgotten: 0,
+    getMyPublicCard: async () => {
+      cloudReads += 1;
+      return cardResult('unexpected');
+    },
+    createCardShare: async () => { throw new Error('local identity must not create a cloud share'); },
+    createCardQrScene: async () => { throw new Error('local identity must not create a QR scene'); },
+    revokeCardShare: async () => { throw new Error('local identity must not revoke a cloud share'); },
+  };
+
+  try {
+    const definition = await loadOwnerSharePage();
+    const page = instantiate(definition);
+    page.canvasForTest = createCanvas('local');
+    page.onLoad.call(page);
+    await settle();
+
+    assert.equal(cloudReads, 0);
+    assert.equal(page.data.localIdentityReady, true);
+    assert.equal(page.data.card.displayName, localIdentity.displayName);
+    assert.equal(page.data.card.biography, '');
+    assert.deepEqual(page.data.demoFields, [{ key: 'profession', label: '职业', value: '独立策展人' }]);
+    assert.doesNotMatch(JSON.stringify(page.data), /138 0013 8000|private@example\.com|AB Atelier|合成示例/);
+    const sharePath = page.onShareAppMessage.call(page).path;
+    assert.match(sharePath, /^\/pages\/card-share\/index\?local=1&snapshot=/);
+    assert.doesNotMatch(sharePath, /138|private|example/);
   } finally {
     delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
     delete globalThis.Page;

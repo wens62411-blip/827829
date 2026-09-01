@@ -212,7 +212,7 @@ test('explicit demo share opens only in offline demo, keeps theme, and never res
     assert.equal(page.data.demoMode, true);
     assert.equal(page.data.state, 'SUCCESS');
     assert.equal(page.data.cardTheme, 'champagne');
-    assert.match(page.data.stateDescription, /合成演示/);
+    assert.match(page.data.stateDescription, /合成示例/);
     const forwardedPath = page.onShareAppMessage.call(page).path;
     assert.match(forwardedPath, /^\/pages\/card-share\/index\?demo=1&snapshot=[A-Za-z0-9_-]+\.[0-9a-f]{8}$/);
     assert.doesNotMatch(forwardedPath, /林知遥|demo@|\+41/);
@@ -240,7 +240,7 @@ test('demo query is rejected outside offline demo', async () => {
     assert.equal(page.data.demoMode, false);
     assert.equal(page.data.state, 'ERROR');
     assert.equal(page.data.allowForward, false);
-    assert.match(page.data.stateDescription, /不接受演示名片入口/);
+    assert.match(page.data.stateDescription, /不接受示例名片入口/);
     assert.equal(wxCalls.filter(([name]) => name === 'showShareMenu').length, 0);
   } finally {
     delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;
@@ -292,6 +292,63 @@ test('a demo snapshot cold start restores only its explicit public labels and fa
     assert.deepEqual(tampered.data.demoPublicLabels, []);
     assert.equal(tampered.data.allowForward, false);
     assert.match(tampered.data.stateDescription, /不完整或被修改/);
+    assert.ok(wxCalls.filter(([name]) => name === 'showShareMenu').length >= 1);
+  } finally {
+    delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('a local identity cold start restores only public user input and never carries private contacts or demo fixtures', async () => {
+  const wxCalls = installWx();
+  globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__ = {
+    runtimeEvidence: { runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false },
+    resolveCardShare: async () => success('unexpected'),
+  };
+
+  try {
+    const [definition, snapshotService] = await Promise.all([
+      loadCardSharePage(),
+      loadBundledTypeScript('miniprogram/pages/card/services/offline-demo-share-snapshot.ts'),
+    ]);
+    const identity = {
+      contractVersion: 1,
+      displayName: '本机填写者',
+      biography: '',
+      profession: '独立策展人',
+      cityId: 'cn-shenzhen',
+      selectedLabels: ['策展', '珠宝'],
+      showTags: true,
+      phone: '+86 138 0013 8000',
+      email: 'private@example.com',
+      showPhone: true,
+      showEmail: true,
+      registeredAt: '2026-08-31T08:00:00.000Z',
+    };
+    const built = snapshotService.buildLocalIdentitySharePath(identity, 'stone');
+    assert.equal(built.ok, true);
+    const encoded = built.path.match(/[?&]snapshot=([^&]+)/)?.[1];
+    assert.ok(encoded);
+
+    const received = instantiate(definition);
+    received.onLoad.call(received, { local: '1', snapshot: encoded });
+    assert.equal(received.data.state, 'SUCCESS');
+    assert.equal(received.data.localIdentityMode, true);
+    assert.equal(received.data.demoMode, false);
+    assert.equal(received.data.card.displayName, identity.displayName);
+    assert.equal(received.data.card.biography, '');
+    assert.doesNotMatch(`${received.data.card.cardId} ${received.data.card.ownerUserId}`, /synthetic|demo/i);
+    assert.deepEqual(received.data.demoPublicLabels, ['策展', '珠宝']);
+    assert.deepEqual(received.data.demoFields, [{ key: 'profession', label: '职业', value: '独立策展人' }]);
+    assert.doesNotMatch(JSON.stringify(received.data), /138 0013 8000|private@example\.com|AB Atelier|合成示例/);
+    assert.equal(received.onShareAppMessage.call(received).path, built.path);
+
+    const tampered = instantiate(definition);
+    tampered.onLoad.call(tampered, { local: '1', snapshot: `${encoded.slice(0, -1)}x` });
+    assert.equal(tampered.data.state, 'ERROR');
+    assert.equal(tampered.data.card, null);
+    assert.equal(tampered.data.allowForward, false);
     assert.ok(wxCalls.filter(([name]) => name === 'showShareMenu').length >= 1);
   } finally {
     delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;

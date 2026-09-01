@@ -132,9 +132,9 @@ Page({
       clearWeakNetworkTimer();
       this.setData({
         state: items.length === 0 ? 'EMPTY' : 'READY',
-        stateTitle: items.length === 0 ? '此分类暂无演示内容' : '',
+        stateTitle: items.length === 0 ? '此分类暂无内容' : '',
         stateDescription: items.length === 0
-          ? '当前是明确标识的 OFFLINE_DEMO，不会用其他分类内容填充空列表。'
+          ? '当前为本机预览，此分类没有内容，不会用其他分类内容填充。'
           : '',
         retryable: false,
         weakNetwork: false,
@@ -150,7 +150,7 @@ Page({
       this.setData({
         state: 'ERROR',
         stateTitle: '内容服务尚未连接',
-        stateDescription: '当前运行模式不允许读取正式内容；不会回退到合成数据。',
+        stateDescription: '当前运行模式不允许读取正式内容；不会使用合成示例替代。',
         retryable: false,
         weakNetwork: false,
       });

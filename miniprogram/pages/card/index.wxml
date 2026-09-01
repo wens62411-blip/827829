@@ -39,7 +39,7 @@
   </view>
 
   <view wx:if="{{card}}" class="card-truth-note" aria-role="note">
-    <text>{{localIdentityReady ? '本机名片 · 当前以你填写的内容展示，不会写入云端。' : (demoMode ? '体验版 · 名片可保存在本机体验；分享页可实际发送当前公开字段的体验快照，不会写入云端。' : '名片按当前可见范围显示；分享操作在独立页面完成。')}}</text>
+    <text>{{localIdentityReady ? '本机名片 · 当前展示你填写的内容，并只保存在这台设备。' : (demoMode ? '本机预览 · 当前为合成示例，不代表真实会员；分享页可试用当前公开字段的发送效果。' : '名片按当前可见范围显示；分享操作在独立页面完成。')}}</text>
     <text>认证完全可选；标签必须先经过人工审核，才会公开显示。</text>
   </view>
 </view>

@@ -40,8 +40,9 @@ test('card editor follows the approved one-template high-control concept', () =>
   assert.match(template, /bindtap="toggleProfileTag"/);
   assert.match(template, /bindtap="chooseGalleryImages"/);
   assert.match(template, /标签与图片.*仅.*预览/, '不能把尚未持久化的标签和图片冒充已保存');
-  assert.equal((template.match(/aria-role="tab"/g) ?? []).length, 2, '两个编辑视图都应声明为 tab');
-  assert.match(styles, /\.card-editor-tab[\s\S]*min-height:\s*var\(--ab-touch-target\)/);
+  assert.equal((template.match(/aria-pressed="\{\{editorMode === '(?:PREVIEW|EDIT)'\}\}"/g) ?? []).length, 2, '两个编辑视图都应暴露真实按下态');
+  assert.doesNotMatch(template, /aria-role="tab"|aria-selected=/, '混合分享动作的按钮组不应伪装成纯 tablist');
+  assert.match(styles, /\.card-editor-tab[\s\S]*min-height:\s*104rpx/);
   assert.match(styles, /\.card-editor-ai[\s\S]*min-height:\s*var\(--ab-touch-target\)/);
 });
 
@@ -57,11 +58,15 @@ test('card editor theme control matches the approved live-preview geometry', () 
   const themeOptionRule = cssRule(styles, '.card-theme-option', /border:\s*0/);
   assert.match(themeOptionRule, /min-height:\s*100rpx/);
   assert.match(themeOptionRule, /background:\s*transparent/);
+  assert.match(themeOptionRule, /text-align:\s*center/);
   assert.doesNotMatch(themeOptionRule, /(?:^|\n)\s*(?:border:\s*[1-9]\d*rpx|box-shadow\s*:)/);
   const swatchRule = cssRule(styles, '.card-theme-option__swatch', /height:\s*46rpx/);
   assert.match(swatchRule, /width:\s*46rpx/);
   assert.match(swatchRule, /border-radius:\s*50%/);
   assert.match(styles, /\.card-theme-option--selected \.card-theme-option__swatch\s*\{[\s\S]*?box-shadow:/);
+  assert.match(styles, /--editor-gold:\s*var\(--ab-color-gold\)/);
+  assert.match(cssRule(styles, '.card-theme-option--selected', /box-shadow:/), /box-shadow:\s*inset 0 -3rpx 0 var\(--editor-gold\)/);
+  assert.match(cssRule(styles, '.card-theme-option--selected .card-theme-option__swatch', /box-shadow:/), /0 0 0 6rpx var\(--editor-gold\)/);
 
   assert.equal((template.match(/class="card-editor-workspace"/g) ?? []).length, 1, '编辑态应使用一个大面板');
   assert.ok((template.match(/class="card-editor-section(?:\s|\")/g) ?? []).length >= 5, '大面板内应用分隔区段组织内容');
@@ -72,6 +77,31 @@ test('card editor theme control matches the approved live-preview geometry', () 
 
   assert.doesNotMatch(styles, /color-mix\s*\(/i, 'WXSS 不依赖 color-mix');
   assert.doesNotMatch(styles, /background(?:-image)?\s*:\s*url\s*\(/i, '品牌图标应使用本地 image 节点');
+});
+
+test('avatar surfaces stay ivory across every card theme', () => {
+  const editorStyles = read('miniprogram/packageCard/pages/edit/index.wxss');
+  const profileStyles = read('miniprogram/components/ab-profile-card/index.wxss');
+
+  assert.match(editorStyles, /--theme-live-avatar-bg:\s*#fffdf8/);
+  assert.match(editorStyles, /--theme-live-avatar-ink:\s*#725126/);
+  const liveAvatarRule = cssRule(editorStyles, '.card-theme-live__avatar');
+  assert.match(liveAvatarRule, /background:\s*var\(--theme-live-avatar-bg\)/);
+  assert.match(liveAvatarRule, /color:\s*var\(--theme-live-avatar-ink\)/);
+  for (const theme of ['ink', 'champagne', 'stone']) {
+    const themeRule = cssRule(editorStyles, `.card-theme-live--${theme}`);
+    assert.doesNotMatch(themeRule, /--theme-live-avatar-(?:bg|ink|line)\s*:/, `${theme} 主题不得反转头像配色`);
+  }
+
+  assert.match(profileStyles, /--card-avatar-paper:\s*#fffdf8/);
+  assert.match(profileStyles, /--card-avatar-ink:\s*#725126/);
+  const profileAvatarRule = cssRule(profileStyles, '.profile-card__avatar', /background:/);
+  assert.match(profileAvatarRule, /border:\s*8rpx solid var\(--card-avatar-paper\)/);
+  assert.match(profileAvatarRule, /background:\s*var\(--card-avatar-paper\)/);
+  const fallbackRule = cssRule(profileStyles, '.profile-card__avatar--fallback');
+  assert.match(fallbackRule, /background:\s*var\(--card-avatar-paper\)/);
+  assert.match(fallbackRule, /color:\s*var\(--card-avatar-ink\)/);
+  assert.doesNotMatch(profileStyles, /\.profile-card--theme-ink\s+\.profile-card__avatar--fallback/, '墨黑主题不得再覆盖头像为反差色');
 });
 
 test('theme preference is written by edit and restored across owner, preview, and share card surfaces', () => {

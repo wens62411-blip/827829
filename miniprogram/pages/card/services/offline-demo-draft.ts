@@ -5,6 +5,7 @@ import {
   OFFLINE_DEMO_FIELDS,
   OFFLINE_DEMO_SELECTED_LABELS,
 } from './offline-demo';
+import { containsControlOrFormatCharacter } from './profile-label-safety';
 
 export const MAX_PROFILE_LABELS = 5;
 export const MAX_PROFILE_LABEL_CHARACTERS = 10;
@@ -12,7 +13,6 @@ export const MAX_PROFILE_LABEL_CHARACTERS = 10;
 const OFFLINE_DEMO_DRAFT_STORAGE_KEY = 'ab.club.card.offline-demo-draft.v1';
 const OFFLINE_DEMO_DRAFT_CONTRACT_VERSION = 1;
 const CITY_IDS = new Set<string>(CITY_DIRECTORY.map((city) => city.id));
-const CONTROL_OR_FORMAT_CHARACTER = /[\p{Cc}\p{Cf}]/u;
 
 // 遗留演示占位名：旧版本曾把示例名片默认写成这些中文/示例名，升级后本机存储里可能仍残留，
 // 导致新版本读到的还是旧名。读到这些名时一次性重置为当前默认（Display Name）。
@@ -92,7 +92,7 @@ export function validateProfileLabel(value: unknown): ProfileLabelValidation {
   if (typeof value !== 'string') return { ok: false, code: 'EMPTY' };
   const trimmed = value.trim();
   if (!trimmed) return { ok: false, code: 'EMPTY' };
-  if (CONTROL_OR_FORMAT_CHARACTER.test(trimmed)) return { ok: false, code: 'CONTROL_CHARACTER' };
+  if (containsControlOrFormatCharacter(trimmed)) return { ok: false, code: 'CONTROL_CHARACTER' };
   if (Array.from(trimmed).length > MAX_PROFILE_LABEL_CHARACTERS) {
     return { ok: false, code: 'TOO_LONG' };
   }

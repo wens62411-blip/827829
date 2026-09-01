@@ -33,7 +33,7 @@
       <text class="detail__city">{{detail.cityName}} / {{detail.cityNameEn}}</text>
       <text class="detail__title">{{detail.title}}</text>
       <text class="detail__summary">{{detail.summary}}</text>
-      <text class="detail__id">{{detail.displayId}}</text>
+      <text class="detail__id">{{detail.displayIdLabel}}</text>
     </view>
 
     <view class="fact-section" aria-role="region" aria-label="活动方向信息">

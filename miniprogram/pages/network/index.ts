@@ -21,19 +21,19 @@ interface DemoRecommendation {
 
 const DEMO_RECOMMENDATIONS: readonly DemoRecommendation[] = [
   {
-    id: 'demo-connector-singapore', initials: 'AC', displayName: 'Alex Chen（虚构演示）',
+    id: 'demo-connector-singapore', initials: 'AC', displayName: 'Alex Chen（非真实会员）',
     role: '跨境品牌策略 · 自述信息', cityLine: '杭州 ↔ 新加坡',
     reason: '匹配理由：共同关注全球品牌、同城私享活动与艺术机构合作。',
     interests: ['全球商业', '艺术合作', '同城活动'],
   },
   {
-    id: 'demo-collector-zurich', initials: 'LM', displayName: 'Léa Martin（虚构演示）',
+    id: 'demo-collector-zurich', initials: 'LM', displayName: 'Léa Martin（非真实会员）',
     role: '收藏研究 · 自述信息', cityLine: '巴黎 ↔ 苏黎世',
     reason: '匹配理由：共同关注古董资料研究、珠宝品鉴与欧洲城市节点。',
     interests: ['古董资料', '珠宝品鉴', '欧洲节点'],
   },
   {
-    id: 'demo-curator-sydney', initials: 'JW', displayName: 'Jordan Wu（虚构演示）',
+    id: 'demo-curator-sydney', initials: 'JW', displayName: 'Jordan Wu（非真实会员）',
     role: '文化项目策划 · 自述信息', cityLine: '悉尼 ↔ 墨尔本',
     reason: '匹配理由：共同关注艺术活动策划、跨城会员连接与线下交流。',
     interests: ['艺术策划', '澳洲节点', '会员连接'],
@@ -104,7 +104,7 @@ Page({
         acceptedPreview: [],
         incomingLoadedCount: 0,
         acceptedLoadedCount: 0,
-        errorMessage: '当前模式未连接正式人脉服务；不会回退到演示关系或伪造申请结果。',
+        errorMessage: '当前模式未连接正式人脉服务；不会显示合成关系或伪造申请结果。',
       });
       wx.stopPullDownRefresh();
       return;
@@ -135,6 +135,6 @@ Page({
   },
 
   onDemoRequest() {
-    wx.showToast({ title: 'DEMO_ONLY：未提交申请', icon: 'none', duration: 2400 });
+    wx.showToast({ title: '本机预览：未提交申请', icon: 'none', duration: 2400 });
   },
 });

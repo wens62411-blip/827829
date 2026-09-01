@@ -15,6 +15,12 @@ import {
   readOfflineDemoDraft,
   type OfflineDemoPublicField,
 } from '../../../pages/card/services/offline-demo-draft';
+import {
+  materializeLocalIdentityCard,
+  materializeLocalIdentityFields,
+  publicLabelsForLocalIdentity,
+  readLocalIdentity,
+} from '../../../pages/card/services/local-identity';
 
 type IdentityClientModule = typeof import('../../../pages/card/services/identity-client');
 declare const require: (path: string) => IdentityClientModule;
@@ -48,6 +54,7 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
+    localIdentityReady: false,
     demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
     demoPublicLabels: [] as string[],
     card: null as PublicCardProjection | null,
@@ -106,9 +113,12 @@ Page({
   },
 
   handleDemoExchange() {
+    const localIdentityReady = this.data.localIdentityReady;
     wx.showModal({
-      title: '交换功能演示',
-      content: '这是一张合成演示名片，当前不会创建好友申请或人脉记录。真实名片会在你确认后进入申请流程。',
+      title: localIdentityReady ? '人脉功能尚未开放' : '交换功能说明',
+      content: localIdentityReady
+        ? '这张本机名片尚未接入云端人脉申请；本次点击不会提交申请，也不会创建好友关系。'
+        : '这是一张合成示例名片，当前不会创建好友申请或人脉记录。真实名片会在你确认后进入申请流程。',
       showCancel: false,
       confirmText: '我知道了',
     });
@@ -127,6 +137,27 @@ Page({
       && this.viewedOwnerUserId === viewedOwnerUserId
     );
     if (this.data.demoMode && !viewedOwnerUserId) {
+      const localIdentity = readLocalIdentity();
+      if (localIdentity) {
+        const localCard = materializeLocalIdentityCard(localIdentity);
+        const localFields = materializeLocalIdentityFields(localIdentity);
+        this.setData({
+          status: 'READY',
+          card: localCard,
+          demoFields: this.data.demoVisitorPreview
+            ? localFields.filter((field) => field.key !== 'phone' && field.key !== 'email')
+            : localFields,
+          demoPublicLabels: publicLabelsForLocalIdentity(localIdentity),
+          cityLabel: cityDisplayName(localCard.cityId),
+          viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
+          localIdentityReady: true,
+          message: this.data.demoVisitorPreview
+            ? '本机名片 · 离线访客预览 · 联系方式不对外展示'
+            : '本机名片 · 仅保存在这台设备',
+        });
+        if (fromPullDown) wx.stopPullDownRefresh();
+        return;
+      }
       const draft = readOfflineDemoDraft();
       const demoCard = materializeOfflineDemoCard(draft);
       this.setData({
@@ -136,9 +167,10 @@ Page({
         demoPublicLabels: publicLabelsForDraft(draft),
         cityLabel: cityDisplayName(demoCard.cityId),
         viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
+        localIdentityReady: false,
         message: this.data.demoVisitorPreview
-          ? 'SYNTHETIC · DEMO_ONLY · 访客视角预览'
-          : 'SYNTHETIC · DEMO_ONLY',
+          ? '本机预览 · 合成示例 · 访客视角'
+          : '本机预览 · 合成示例',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;

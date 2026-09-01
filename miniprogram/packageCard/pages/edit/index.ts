@@ -24,7 +24,10 @@ import {
   readOfflineDemoDraft,
   writeOfflineDemoDraft,
 } from '../../../pages/card/services/offline-demo-draft';
-import { buildOfflineDemoSharePath } from '../../../pages/card/services/offline-demo-share-snapshot';
+import {
+  buildLocalIdentitySharePath,
+  buildOfflineDemoSharePath,
+} from '../../../pages/card/services/offline-demo-share-snapshot';
 import {
   LOCAL_IDENTITY_CONTRACT_VERSION,
   hasLocalIdentity,
@@ -50,6 +53,9 @@ interface DraftInput {
 
 const CITY_NAMES = CITY_DIRECTORY.map((city) => `${city.name.zh} · ${city.name.en}`);
 const CITY_IDS = CITY_DIRECTORY.map((city) => city.id);
+const LOCAL_DISPLAY_NAME_LIMIT = 24;
+const LOCAL_PROFESSION_LIMIT = 32;
+const LOCAL_BIOGRAPHY_LIMIT = 72;
 
 const IDENTITY_LABELS = [
   '海归',
@@ -112,6 +118,15 @@ function uniqueLabels(values: readonly string[]): string[] {
   return normalizeProfileLabels(values);
 }
 
+function showShareToast(title: string): void {
+  if (typeof wx.showToast !== 'function') return;
+  wx.showToast({
+    title,
+    icon: 'none',
+    duration: 2400,
+  });
+}
+
 function makeTagOptions(values: readonly string[], selectedLabels: readonly string[]) {
   const selected = new Set(selectedLabels);
   return values.map((label) => ({ label, selected: selected.has(label) }));
@@ -164,6 +179,9 @@ const EMPTY_DRAFT: DraftInput = {
 };
 
 Page({
+  openedForRegistration: false,
+  editorPageUnloaded: true,
+  saveOperationGeneration: 0,
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
@@ -171,6 +189,8 @@ Page({
     registerMode: false,
     profile: null as ProfilePrivateDto | null,
     creatingProfile: false,
+    saveAndShareBusy: false,
+    brandLogoFailed: false,
     status: 'LOADING' as 'LOADING' | 'READY' | 'SAVING' | 'ERROR' | 'SAVED' | 'PROJECTION_PENDING',
     message: '',
     editorMode: 'PREVIEW' as EditorMode,
@@ -246,11 +266,14 @@ Page({
   },
 
   onLoad(query: Record<string, string | undefined> = {}) {
+    this.editorPageUnloaded = false;
+    this.saveOperationGeneration += 1;
     const cardTheme = readCardThemePreference();
     const runtime = getRuntimeEvidence();
     const demoMode = isOfflineDemo(runtime);
     const localReady = hasLocalIdentity();
     const registerMode = query.register === '1';
+    this.openedForRegistration = registerMode && !localReady;
     if (localReady || registerMode) {
       const identity = localReady ? readLocalIdentity() : null;
       const displayName = identity?.displayName ?? '';
@@ -278,12 +301,13 @@ Page({
       this.setData({
         runtimeMode: runtime.runtimeMode,
         demoMode: true,
-        localIdentityReady: true,
+        localIdentityReady: localReady,
+        creatingProfile: !localReady,
         registerMode: Boolean(registerMode) && !localReady,
         cardTheme,
         themeOptions: makeThemeOptions(cardTheme),
         status: 'READY',
-        editorMode: 'PREVIEW',
+        editorMode: localReady ? 'PREVIEW' : 'EDIT',
         displayName,
         biography,
         biographyLength: biography.length,
@@ -299,7 +323,7 @@ Page({
         previewSelectedLabels: [],
         previewPublicLabels: showTags ? selectedLabels : [],
         ...makePreview(myDraft),
-        message: localReady ? '' : '第一次建立名片：资料只保存在这台设备，不会上传或生成真实账户。',
+        message: localReady ? '' : '第一次建立名片：填写后将保存在这台设备。',
       });
       return;
     }
@@ -342,7 +366,7 @@ Page({
         previewSelectedLabels: [],
         previewPublicLabels: storedDraft.showTags ? selectedLabels : [],
         ...makePreview(demoDraft),
-        message: '体验版：名片可保存为本机体验草稿，不会写入云端。',
+        message: '本机预览：当前为合成示例，可保存到这台设备，不会写入云端。',
       });
       return;
     }
@@ -353,6 +377,15 @@ Page({
       themeOptions: makeThemeOptions(cardTheme),
     });
     void this.loadProfile();
+  },
+
+  onUnload() {
+    this.editorPageUnloaded = true;
+    this.saveOperationGeneration += 1;
+  },
+
+  isEditorOperationActive(generation: number): boolean {
+    return !this.editorPageUnloaded && this.saveOperationGeneration === generation;
   },
 
   async loadProfile() {
@@ -561,6 +594,10 @@ Page({
     this.syncPreview({ avatarUrl: '' });
   },
 
+  onBrandLogoError() {
+    if (!this.data.brandLogoFailed) this.setData({ brandLogoFailed: true });
+  },
+
   chooseGalleryImages() {
     const remaining = Math.max(0, 4 - this.data.galleryImages.length);
     if (!remaining) {
@@ -606,64 +643,89 @@ Page({
       profession: this.data.profession,
       interests: this.data.selectedLabels.join('、'),
     });
-    this.syncPreview({ biography: draft.text });
+    const biography = compactDraftText(
+      draft.text,
+      this.data.localIdentityReady || this.data.registerMode
+        ? LOCAL_BIOGRAPHY_LIMIT
+        : 240,
+    );
+    this.syncPreview({ biography });
     this.setData({
       generatingIntroduction: false,
-      biographyLength: draft.text.length,
+      biographyLength: biography.length,
       introductionNote: draft.source === 'AI'
         ? '已生成可编辑草稿，请在保存前确认内容。'
         : '已根据你填写的身份和标签整理出可编辑草稿。',
     });
   },
 
-  async saveProfile() {
-    if (this.data.status === 'SAVING') return;
+  async saveProfile(): Promise<boolean> {
+    const saveGeneration = this.saveOperationGeneration;
+    if (!this.isEditorOperationActive(saveGeneration) || this.data.status === 'SAVING') return false;
     if (this.data.localIdentityReady || this.data.registerMode) {
       const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
       const phone = normalizeDraftPhone(this.data.phone);
       const email = normalizeDraftEmail(this.data.email);
-      const displayName = compactDraftText(this.data.displayName, 60);
+      const displayName = compactDraftText(this.data.displayName, LOCAL_DISPLAY_NAME_LIMIT);
+      const biography = this.data.biography.trim();
       if (!displayName) {
         this.setData({ status: 'ERROR', message: '请填写公开称呼。' });
-        return;
+        return false;
+      }
+      if (!cityId) {
+        this.setData({ status: 'ERROR', message: '请选择所在城市。' });
+        return false;
+      }
+      if (Array.from(biography).length > LOCAL_BIOGRAPHY_LIMIT) {
+        this.setData({ status: 'ERROR', message: `自我介绍最多 ${LOCAL_BIOGRAPHY_LIMIT} 字。` });
+        return false;
       }
       if (this.data.phone.trim() && !phone) {
         this.setData({ status: 'ERROR', contactMessage: '请填写有效电话号码，或留空。', message: '电话格式需要检查。' });
-        return;
+        return false;
       }
       if (this.data.email.trim() && !email) {
         this.setData({ status: 'ERROR', contactMessage: '请填写有效邮箱地址，或留空。', message: '邮箱格式需要检查。' });
-        return;
+        return false;
       }
       const identity: LocalIdentity = {
         contractVersion: LOCAL_IDENTITY_CONTRACT_VERSION,
         displayName,
-        biography: this.data.biography.trim(),
-        profession: compactDraftText(this.data.profession, 80),
-        cityId: (cityId ?? CITY_DIRECTORY[0].id) as CityId,
+        biography,
+        profession: compactDraftText(this.data.profession, LOCAL_PROFESSION_LIMIT),
+        cityId: cityId as CityId,
         selectedLabels: this.data.selectedLabels,
         showTags: this.data.showTags,
         phone,
         email,
         showPhone: this.data.showPhone,
         showEmail: this.data.showEmail,
-        registeredAt: new Date().toISOString(),
+        registeredAt: readLocalIdentity()?.registeredAt ?? new Date().toISOString(),
       };
+      const sharePreflight = buildLocalIdentitySharePath(identity, this.data.cardTheme);
+      if (!sharePreflight.ok) {
+        this.setData({
+          status: 'ERROR',
+          message: '名片内容超出微信分享路径预算，请精简个人简介后再保存。',
+        });
+        return false;
+      }
       if (!saveLocalIdentity(identity)) {
         this.setData({ status: 'ERROR', message: '本机名片保存失败，请检查存储空间后重试。' });
-        return;
+        return false;
       }
       this.setData({
         status: 'SAVED',
         editorMode: 'PREVIEW',
         localIdentityReady: true,
+        creatingProfile: false,
         registerMode: false,
         phone,
         email,
         contactMessage: '',
         message: '已保存到本机名片，仅保存在这台设备。',
       });
-      return;
+      return true;
     }
     if (this.data.demoMode) {
       const current = readOfflineDemoDraft();
@@ -672,11 +734,11 @@ Page({
       const email = normalizeDraftEmail(this.data.email);
       if (this.data.phone.trim() && !phone) {
         this.setData({ status: 'ERROR', contactMessage: '请填写有效电话号码，或留空。', message: '电话格式需要检查。' });
-        return;
+        return false;
       }
       if (this.data.email.trim() && !email) {
         this.setData({ status: 'ERROR', contactMessage: '请填写有效邮箱地址，或留空。', message: '邮箱格式需要检查。' });
-        return;
+        return false;
       }
       const draft = {
         ...current,
@@ -697,11 +759,11 @@ Page({
           status: 'ERROR',
           message: '名片内容超出微信分享路径预算，请精简个人简介后再保存。',
         });
-        return;
+        return false;
       }
       if (!writeOfflineDemoDraft(draft)) {
-        this.setData({ status: 'ERROR', message: '本机体验草稿保存失败，请检查存储空间后重试。' });
-        return;
+        this.setData({ status: 'ERROR', message: '本机名片草稿保存失败，请检查存储空间后重试。' });
+        return false;
       }
       this.setData({
         status: 'SAVED',
@@ -709,34 +771,34 @@ Page({
         phone,
         email,
         contactMessage: '',
-        message: '已保存到本机体验版草稿；未写入云端。',
+        message: '已保存到本机预览草稿；未写入云端。',
       });
-      return;
+      return true;
     }
 
     const profile = this.data.profile;
     if (!profile && !this.data.creatingProfile) {
       this.setData({ status: 'ERROR', message: '资料版本尚未加载，请重新进入后再保存。' });
-      return;
+      return false;
     }
     const displayName = compactDraftText(this.data.displayName, 60);
     const biography = this.data.biography.trim();
     if (!displayName) {
       this.setData({ status: 'ERROR', message: '请填写公开称呼。' });
-      return;
+      return false;
     }
     if (biography.length > 240) {
       this.setData({ status: 'ERROR', message: '自由介绍不能超过 240 个字符。' });
-      return;
+      return false;
     }
     const selectedCityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
     if (!selectedCityId) {
       this.setData({ status: 'ERROR', message: '请选择所在城市。' });
-      return;
+      return false;
     }
     if (!biography) {
       this.setData({ status: 'ERROR', message: '请填写自由介绍，或先使用 AI 辅助润色。' });
-      return;
+      return false;
     }
 
     const update: ProfileUpdateInput = {
@@ -749,6 +811,7 @@ Page({
     };
     this.setData({ status: 'SAVING', message: '正在保存名片…' });
     const result = await updateMyProfile(update, profile?.version);
+    if (!this.isEditorOperationActive(saveGeneration)) return false;
     if (!result.ok) {
       this.setData({
         status: 'ERROR',
@@ -756,7 +819,7 @@ Page({
           ? '名片已在其他页面更新，请重新加载后再保存。'
           : result.message,
       });
-      return;
+      return false;
     }
 
     const cityIndex = result.data.profile.cityId ? CITY_IDS.indexOf(result.data.profile.cityId) : -1;
@@ -783,12 +846,13 @@ Page({
     });
 
     const refresh = await refreshMyCard(result.data.profile.version);
+    if (!this.isEditorOperationActive(saveGeneration)) return false;
     if (!refresh.ok) {
       this.setData({
         status: 'PROJECTION_PENDING',
         message: '名片资料已保存，但公开展示尚未刷新完成，请稍后重试。',
       });
-      return;
+      return false;
     }
     this.setData({
       status: 'SAVED',
@@ -797,6 +861,55 @@ Page({
         ? '称呼、城市和自由介绍已保存；标签、图片与本地头像仍只在本页预览。'
         : '名片已保存并更新公开展示。',
     });
+    return true;
+  },
+
+  async saveAndOpenShare() {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
+    const saveGeneration = this.saveOperationGeneration;
+    if (!this.isEditorOperationActive(saveGeneration)) return;
+    this.setData({ saveAndShareBusy: true });
+
+    let saved = false;
+    try {
+      saved = await this.saveProfile();
+    } catch (_error) {
+      if (!this.isEditorOperationActive(saveGeneration)) return;
+      this.setData({
+        saveAndShareBusy: false,
+        status: 'ERROR',
+        message: '名片保存失败，请稍后重试。',
+      });
+      showShareToast('名片保存失败，请重试');
+      return;
+    }
+    if (!this.isEditorOperationActive(saveGeneration)) return;
+    if (!saved) {
+      const needsEditing = this.data.status === 'ERROR';
+      this.setData({
+        saveAndShareBusy: false,
+        ...(needsEditing ? { editorMode: 'EDIT' as EditorMode } : {}),
+      });
+      showShareToast(needsEditing ? '请检查必填信息' : '请查看页面提示');
+      return;
+    }
+
+    const navigated = await new Promise<boolean>((resolve) => {
+      wx.redirectTo({
+        url: '/packageCard/pages/share/index',
+        success: () => resolve(true),
+        fail: () => resolve(false),
+      });
+    });
+    if (!this.isEditorOperationActive(saveGeneration)) return;
+    if (!navigated) {
+      this.setData({
+        saveAndShareBusy: false,
+        status: 'ERROR',
+        message: '名片已保存，但暂时无法打开分享页，请重试。',
+      });
+      showShareToast('分享页暂时无法打开');
+    }
   },
 
   async retryProjectionRefresh() {
@@ -806,5 +919,18 @@ Page({
     this.setData(result.ok
       ? { status: 'SAVED', editorMode: 'PREVIEW', message: '公开名片已刷新。' }
       : { status: 'PROJECTION_PENDING', message: result.message });
+  },
+
+  returnToOwnerCard() {
+    const pages = getCurrentPages();
+    const previousRoute = pages.length > 1 ? pages[pages.length - 2]?.route ?? '' : '';
+    if (
+      !this.openedForRegistration
+      && (previousRoute === 'pages/card/index' || previousRoute === 'pages/me/index')
+    ) {
+      void wx.navigateBack();
+      return;
+    }
+    void wx.redirectTo({ url: '/pages/card/index' });
   },
 });

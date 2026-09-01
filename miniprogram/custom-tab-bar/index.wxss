@@ -9,6 +9,7 @@
 }
 
 .custom-tab-bar__safe {
+  height: 0;
   height: env(safe-area-inset-bottom);
 }
 

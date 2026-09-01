@@ -132,8 +132,8 @@ test('ab-art-card renders very long bilingual text and emits select from its bou
     assert.equal(Boolean(card.querySelector('.art-card__image')), false);
     assert.match(card.dom.textContent, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')));
     assert.match(card.dom.textContent, /暂无可公开展示的图片/);
-    assert.match(card.dom.textContent, /SYNTHETIC/);
-    assert.match(card.dom.textContent, /DEMO_ONLY/);
+    assert.match(card.dom.textContent, /合成示例/);
+    assert.match(card.dom.textContent, /非真实作品/);
 
     let selected;
     card.addEventListener('select', (event) => { selected = event.detail; });
@@ -209,7 +209,8 @@ test('ab-content-source renders the missing-source state and emits sourcecopy on
     await nextEventLoop();
     assert.deepEqual(copied, { sourceUrl });
     assert.match(present.dom.textContent, /Redacted Public Source/);
-    assert.match(present.dom.textContent, /DEMO_ONLY/);
+    assert.match(present.dom.textContent, /合成示例/);
+    assert.match(present.dom.textContent, /非真实作品/);
   } finally {
     present.detach();
   }
@@ -301,7 +302,7 @@ test('art-page-state renders weak-network, empty and error branches and only ret
   });
   try {
     assert.match(weak.dom.textContent, /网络响应较慢/);
-    assert.match(weak.dom.textContent, /不会切换到演示数据/);
+    assert.match(weak.dom.textContent, /不会切换到合成示例/);
     assert.equal(weak.querySelector('.page-state__retry'), undefined);
   } finally {
     weak.detach();

@@ -66,6 +66,8 @@ Page({
     heroImageAllowed: false,
     heroImageFailed: false,
     platformStatement: '',
+    recordOriginLabel: '',
+    evidenceScopeLabel: '',
   },
 
   onLoad(query: { readonly contentId?: string }) {
@@ -119,6 +121,8 @@ Page({
       heroImageAllowed: imageAllowed,
       heroImageFailed: false,
       platformStatement: platformStatement(content),
+      recordOriginLabel: content.recordOrigin === 'SYNTHETIC' ? '合成示例' : '公开记录',
+      evidenceScopeLabel: content.evidenceScope === 'DEMO_ONLY' ? '非真实作品' : '公开内容',
     });
   },
 
@@ -158,8 +162,8 @@ Page({
       if (!content || !creator) {
         this.setData({
           state: 'ERROR',
-          stateTitle: '演示内容不存在',
-          stateDescription: '该标识不在脱敏 DEMO_ONLY fixture 中。',
+          stateTitle: '内容不存在',
+          stateDescription: '该内容不在本机预览目录中。',
           retryable: false,
           weakNetwork: false,
         });
@@ -169,7 +173,7 @@ Page({
         content,
         creator,
         listDemoRelatedEvents(contentId).map(toRelatedEventView),
-        '相关活动同为 SYNTHETIC / DEMO_ONLY，不代表真实排期。',
+        '相关活动为活动方向，不代表真实排期。',
       );
       return;
     }
@@ -180,7 +184,7 @@ Page({
       this.setData({
         state: 'ERROR',
         stateTitle: '内容服务尚未连接',
-        stateDescription: '当前运行模式无法读取正式详情；不会使用演示记录替代。',
+        stateDescription: '当前运行模式无法读取正式详情；不会使用合成示例替代。',
         retryable: false,
         weakNetwork: false,
       });

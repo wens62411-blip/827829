@@ -26,40 +26,16 @@ const TAB_LIST: readonly TabItem[] = [
   },
 ] as const;
 
-let introShown = false;
-let safetyTimer: number | null = null;
-
 Component({
   options: {
     styleIsolation: 'apply-shared',
   },
   data: {
     selected: 0,
+    hidden: true,
     loadingVisible: false,
     list: TAB_LIST,
     pendingPath: '',
-  },
-
-  lifetimes: {
-    attached() {
-      // 冷启动入场动画：一次进程只放一次，避免开发者热重载反复弹
-      if (introShown) return;
-      introShown = true;
-      this.setData({ loadingVisible: true });
-      // 真机兜底：lazyCodeLoading 下自定义 tabBar 的嵌套组件初始化时序可能错乱，
-      // loading-city 的 complete 事件收不到，遮罩会一直盖屏转圈。最多 2.5s 强制收起，
-      // 保证任何机型都能进到页面（正常 1.2s 内 complete 已触发，此兜底不生效）。
-      safetyTimer = setTimeout(() => {
-        safetyTimer = null;
-        if (this.data.loadingVisible) this.setData({ loadingVisible: false });
-      }, 2500) as unknown as number;
-    },
-    detached() {
-      if (safetyTimer !== null) {
-        clearTimeout(safetyTimer);
-        safetyTimer = null;
-      }
-    },
   },
 
   methods: {

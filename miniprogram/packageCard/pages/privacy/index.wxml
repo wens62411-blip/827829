@@ -49,5 +49,5 @@
     <text class="privacy-honesty__copy">逐字段设置正式开放前，本页不会伪装成已经保存。当前名片仍以平台确认的公开范围为准。</text>
   </view>
 
-  <navigator class="card-link-button privacy-return" url="/packageCard/pages/edit/index" hover-class="none">返回编辑名片</navigator>
+  <button class="card-link-button privacy-return" bindtap="returnToEditor">返回上一页</button>
 </view>

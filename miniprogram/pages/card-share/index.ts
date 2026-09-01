@@ -66,6 +66,7 @@ Page({
     card: null as PublicCardProjection | null,
     cityLabel: '',
     demoMode: false,
+    localIdentityMode: false,
     demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
     demoPublicLabels: [] as string[],
     cardTheme: 'ivory' as CardTheme,
@@ -80,14 +81,66 @@ Page({
     frozenShareEntry.onLoad.call(this, options);
     const runtime = getRuntimeEvidence();
     const cardTheme = normalizeCardTheme(options.theme);
-    this.setData({ runtimeMode: runtime.runtimeMode, cardTheme, demoMode: false });
+    this.setData({
+      runtimeMode: runtime.runtimeMode,
+      cardTheme,
+      demoMode: false,
+      localIdentityMode: false,
+    });
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+    if (options.local === '1') {
+      if (!isOfflineDemo(runtime)) {
+        this.setData({
+          state: 'ERROR',
+          stateTitle: '本机名片入口不可用',
+          stateDescription: '当前运行环境不接受离线本机名片，请由名片本人创建云端安全分享入口。',
+          allowRetry: false,
+          allowForward: false,
+          card: null,
+          cityLabel: '',
+        });
+        return;
+      }
+      const decoded = decodeOfflineDemoShareSnapshot(options.snapshot);
+      if (!decoded.ok || decoded.snapshot.source !== 'LOCAL') {
+        this.setData({
+          state: 'ERROR',
+          stateTitle: '本机名片已损坏',
+          stateDescription: '这张本机名片的公开快照不完整、类型不符或被修改，请让分享者重新发送。',
+          allowRetry: false,
+          allowForward: false,
+          localIdentityMode: true,
+          card: null,
+          demoFields: [],
+          demoPublicLabels: [],
+          cityLabel: '',
+        });
+        return;
+      }
+      const snapshot = decoded.snapshot;
+      this.demoForwardPath = `/pages/card-share/index?local=1&snapshot=${options.snapshot}`;
+      this.setData({
+        state: 'SUCCESS',
+        stateTitle: 'AB Club 本机名片',
+        stateDescription: '这是从本机转发的公开名片，不含电话或邮箱。',
+        allowRetry: false,
+        allowForward: true,
+        localIdentityMode: true,
+        card: snapshot.card,
+        demoFields: [...snapshot.fields],
+        demoPublicLabels: [...snapshot.publicLabels],
+        cardTheme: snapshot.cardTheme,
+        cityLabel: cityDisplayName(snapshot.card.cityId),
+      });
+      wx.showShareMenu({ menus: ['shareAppMessage'] });
+      return;
+    }
     if (options.demo === '1') {
       if (!isOfflineDemo(runtime)) {
         this.setData({
           state: 'ERROR',
-          stateTitle: '演示入口不可用',
-          stateDescription: '当前运行环境不接受演示名片入口，请由名片本人重新生成安全分享。',
+          stateTitle: '示例入口不可用',
+          stateDescription: '当前运行环境不接受示例名片入口，请由名片本人重新生成安全分享。',
           allowRetry: false,
           allowForward: false,
           card: null,
@@ -98,11 +151,11 @@ Page({
       const decoded = options.snapshot === undefined
         ? { ok: true as const, snapshot: createOfflineDemoShareSnapshot(createDefaultOfflineDemoDraft(), cardTheme) }
         : decodeOfflineDemoShareSnapshot(options.snapshot);
-      if (!decoded.ok) {
+      if (!decoded.ok || decoded.snapshot.source !== 'DEMO') {
         this.setData({
           state: 'ERROR',
-          stateTitle: '体验名片已损坏',
-          stateDescription: '这张体验名片的公开快照不完整或被修改，请让分享者重新发送。',
+          stateTitle: '示例名片已损坏',
+          stateDescription: '这张示例名片的公开快照不完整或被修改，请让分享者重新发送。',
           allowRetry: false,
           allowForward: false,
           demoMode: true,
@@ -120,8 +173,8 @@ Page({
       this.demoForwardPath = forwardPath.ok ? forwardPath.path : '';
       this.setData({
         state: 'SUCCESS',
-        stateTitle: 'AB Club 名片体验',
-        stateDescription: '这张名片由体验版真实转发，人物与资料均为合成演示，不代表真实会员、审核或人脉关系。',
+        stateTitle: 'AB Club 名片预览',
+        stateDescription: '这张名片来自本机预览，人物与资料均为合成示例，不代表真实会员、审核或人脉关系。',
         allowRetry: false,
         allowForward: true,
         demoMode: true,
@@ -258,9 +311,14 @@ Page({
     const themeQuery = this.data.cardTheme === 'ivory'
       ? ''
       : `&theme=${encodeURIComponent(this.data.cardTheme)}`;
-    if (!this.shareUnloaded && this.data.demoMode && card && this.data.state === 'SUCCESS') {
+    if (
+      !this.shareUnloaded
+      && (this.data.demoMode || this.data.localIdentityMode)
+      && card
+      && this.data.state === 'SUCCESS'
+    ) {
       return {
-        title: 'AB Club · 数字名片体验',
+        title: this.data.localIdentityMode ? 'AB Club · 本机数字名片' : 'AB Club · 数字名片预览',
         path: this.demoForwardPath || `/pages/card-share/index?demo=1${themeQuery}`,
       };
     }

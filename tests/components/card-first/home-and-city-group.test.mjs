@@ -56,6 +56,7 @@ function unnegatedPositiveClaims(source) {
 
 test('home keeps card management inside Me while events and city scope remain visible', () => {
   const template = read('miniprogram/pages/discover/index.wxml');
+  const pageSource = read('miniprogram/pages/discover/index.ts');
   const geography = read('miniprogram/shared/constants/geography.ts');
   const actions = interactiveMarkup(template);
   const errors = [];
@@ -67,6 +68,7 @@ test('home keeps card management inside Me while events and city scope remain vi
   if (!eventActions.length) errors.push('首页缺少轻量活动入口');
 
   if (!hasGeographySummary(template)) errors.push('首页未明确展示 7 国 13 城摘要');
+  if (/台北/.test(`${template}\n${pageSource}`)) errors.push('首页城市摘要不应超出冻结的 13 城目录');
   if (constantObjectSize(geography, 'CountryId') !== 7) errors.push('冻结地理常量不是 7 个国家');
   if (constantObjectSize(geography, 'CityId') !== 13) errors.push('冻结地理常量不是 13 座城市');
   if (!/杭州/.test(geography)) errors.push('城市目录缺少杭州');
@@ -100,17 +102,17 @@ test('home has no slogan, public group QR, feed metrics, or direct-chat affordan
   assert.deepEqual(errors, []);
 });
 
-test('Me page exposes the supported city list and one card contact entry', () => {
+test('Me page exposes the supported city list and keeps only the profile edit entry', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const actions = interactiveMarkup(template);
   const errors = [];
 
   if (!/支持的城市清单/.test(template)) errors.push('“我的”页缺少支持的城市清单');
-  if (!actions.some((markup) => /我的名片/.test(markup) && /url="\/pages\/card\/index"/.test(markup))) {
-    errors.push('“我的”页缺少唯一的我的名片入口');
+  if (!actions.some((markup) => /编辑/.test(markup) && /url="\/packageCard\/pages\/edit\/index"/.test(markup))) {
+    errors.push('“我的”页缺少个人资料编辑入口');
   }
-  if (actions.filter((markup) => /url="\/pages\/card\/index"/.test(markup)).length !== 1) {
-    errors.push('“我的”页应只保留一个我的名片入口');
+  if (actions.some((markup) => /url="\/pages\/card\/index"/.test(markup))) {
+    errors.push('“我的”页仍保留重复的我的名片入口');
   }
   if (actions.some((markup) => /申请加入|申请进入|加入城市群|提交加入意向|切换城市/.test(markup))) {
     errors.push('“我的”页不应暴露城市群申请或切换城市动作');

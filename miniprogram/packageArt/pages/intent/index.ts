@@ -53,6 +53,7 @@ Page({
     contentTitle: '',
     categoryLabel: '',
     evidenceScope: '',
+    evidenceScopeLabel: '',
     purposeOptions: PURPOSES,
     purpose: 'VIEWING' as IntentPurpose,
     message: '',
@@ -122,8 +123,8 @@ Page({
       if (!content) {
         this.setData({
           state: 'ERROR',
-          stateTitle: '演示内容不存在',
-          stateDescription: '该标识不在 DEMO_ONLY fixture 中。',
+          stateTitle: '内容不存在',
+          stateDescription: '该内容不在本机预览目录中。',
           retryable: false,
           weakNetwork: false,
         });
@@ -136,6 +137,7 @@ Page({
           ? '珠宝 · 珍珠'
           : categoryLabel(content.category),
         evidenceScope: content.evidenceScope,
+        evidenceScopeLabel: content.evidenceScope === 'DEMO_ONLY' ? '非真实作品' : '公开内容',
         weakNetwork: false,
       });
       return;
@@ -147,7 +149,7 @@ Page({
       this.setData({
         state: 'ERROR',
         stateTitle: '内容服务尚未连接',
-        stateDescription: '当前模式不会提交真实意向，也不会切换到演示成功结果。',
+        stateDescription: '当前模式不会提交真实意向，也不会显示虚假的成功结果。',
         retryable: false,
         weakNetwork: false,
       });
@@ -175,6 +177,7 @@ Page({
         ? '珠宝 · 珍珠'
         : categoryLabel(content.category),
       evidenceScope: content.evidenceScope,
+      evidenceScopeLabel: content.evidenceScope === 'DEMO_ONLY' ? '非真实作品' : '公开内容',
       weakNetwork: false,
     });
   },
@@ -201,7 +204,7 @@ Page({
       this.setData({
         submitting: false,
         intentState: 'NONE',
-        feedback: 'DEMO_ONLY：未提交、未创建任何联系意向；接入正式服务并完成登录后才能发送。',
+        feedback: '本机预览：未提交、未创建任何联系意向；接入正式服务并完成登录后才能发送。',
         feedbackTone: 'error',
       });
       return;

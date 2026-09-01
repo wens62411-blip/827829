@@ -301,7 +301,10 @@
   color: #d1c8bc;
   font-size: 24rpx;
   line-height: 1.68;
+  overflow-wrap: normal;
 }
+
+.me-city-group__city-token { display: inline-block; white-space: nowrap; }
 
 .me-city-group__actions {
   display: flex;

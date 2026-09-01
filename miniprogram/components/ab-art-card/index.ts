@@ -18,12 +18,28 @@ Component({
   data: {
     imageFailed: false,
     showImage: false,
+    recordOriginLabel: '来源待确认',
+    evidenceScopeLabel: '',
   },
   observers: {
     'imageUrl,imageAllowed'(imageUrl: string, imageAllowed: boolean) {
       this.setData({
         imageFailed: false,
         showImage: imageAllowed && imageUrl.trim().length > 0,
+      });
+    },
+    'recordOrigin,evidenceScope'(recordOrigin: string, evidenceScope: string) {
+      this.setData({
+        recordOriginLabel: recordOrigin === 'SYNTHETIC'
+          ? '合成示例'
+          : recordOrigin === 'REAL'
+            ? '公开记录'
+            : '来源待确认',
+        evidenceScopeLabel: evidenceScope === 'DEMO_ONLY'
+          ? '非真实作品'
+          : evidenceScope === 'PUBLIC'
+            ? '公开内容'
+            : '',
       });
     },
   },

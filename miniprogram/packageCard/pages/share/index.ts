@@ -34,14 +34,21 @@ import {
   type OfflineDemoPublicField,
 } from '../../../pages/card/services/offline-demo-draft';
 import {
+  buildLocalIdentitySharePath,
   buildOfflineDemoSharePath,
+  createLocalIdentityShareSnapshot,
   createOfflineDemoShareSnapshot,
 } from '../../../pages/card/services/offline-demo-share-snapshot';
 import {
   drawNativeShareCard,
   NATIVE_SHARE_CARD_HEIGHT,
   NATIVE_SHARE_CARD_WIDTH,
+  resolveNativeShareCardPixelRatio,
 } from '../../../pages/card/services/native-share-card';
+import {
+  readLocalIdentity,
+  type LocalIdentity,
+} from '../../../pages/card/services/local-identity';
 
 type OwnerShareState = '' | 'SUCCESS' | 'REVOKED' | 'ERROR' | 'LOADING';
 type QrState = 'IDLE' | 'LOADING' | 'SUCCESS' | 'ERROR';
@@ -125,7 +132,8 @@ function drawPublicPoster(
   card: PublicCardProjection,
   demoMode: boolean,
 ): void {
-  const pixelRatio = Math.max(1, Math.min(3, wx.getWindowInfo().pixelRatio));
+  const localIdentityReady = card.cardId === 'card_local_device_identity';
+  const pixelRatio = resolveNativeShareCardPixelRatio();
   canvas.width = POSTER_WIDTH * pixelRatio;
   canvas.height = POSTER_HEIGHT * pixelRatio;
   const context = canvas.getContext('2d');
@@ -145,7 +153,7 @@ function drawPublicPoster(
     context.fillStyle = POSTER_PALETTE.gold;
     context.font = '600 16px sans-serif';
     context.textAlign = 'right';
-    context.fillText('体验版', 588, 118);
+    context.fillText('本机预览', 588, 118);
     context.textAlign = 'left';
   }
 
@@ -199,8 +207,10 @@ function drawPublicPoster(
   context.font = '400 19px sans-serif';
   const footerLines = wrapText(
     context,
-    demoMode
-      ? '体验版：人物与资料均为合成体验内容，不代表真实会员。海报不含小程序码。'
+    localIdentityReady
+      ? '本机名片公开字段；海报不含电话、邮箱与小程序码。'
+      : demoMode
+      ? '本机预览：人物与资料均为合成示例，不代表真实会员。海报不含小程序码。'
       : '此海报只包含当前公开名片，不包含任何私密资料。当前版本的海报不含小程序码，请使用微信名片转发入口。',
     536,
     3,
@@ -213,7 +223,7 @@ function drawPublicPoster(
 
 Page({
   activeCard: undefined as PublicCardProjection | undefined,
-  activeDemoDraft: undefined as OfflineDemoDraft | undefined,
+  activeDemoDraft: undefined as OfflineDemoDraft | LocalIdentity | undefined,
   activeShareSecret: undefined as TransientShareSecret | undefined,
   revocableTokenId: undefined as ShareTokenId | undefined,
   posterCanvas: undefined as WechatMiniprogram.Canvas | undefined,
@@ -226,6 +236,7 @@ Page({
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
+    localIdentityReady: false,
     demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
     demoPublicLabels: [] as string[],
     card: null as PublicCardProjection | null,
@@ -267,20 +278,36 @@ Page({
     const cardTheme = readCardThemePreference();
     const runtime = getRuntimeEvidence();
     if (isOfflineDemo(runtime)) {
-      const demoDraft = readOfflineDemoDraft();
-      const demoSnapshot = createOfflineDemoShareSnapshot(demoDraft, cardTheme);
-      this.activeDemoDraft = demoDraft;
-      this.activeCard = demoSnapshot.card;
+      const localIdentity = readLocalIdentity();
+      if (!localIdentity) {
+        this.setData({
+          runtimeMode: runtime.runtimeMode,
+          demoMode: true,
+          localIdentityReady: false,
+          card: null,
+          loadingCard: false,
+          pageError: '请先建立自己的名片，再使用分享功能。',
+          localNotice: '',
+          shareCoverState: 'IDLE',
+          shareCoverMessage: '',
+          shareCoverPath: '',
+        });
+        return;
+      }
+      const offlineSnapshot = createLocalIdentityShareSnapshot(localIdentity, cardTheme);
+      this.activeDemoDraft = localIdentity;
+      this.activeCard = offlineSnapshot.card;
       this.setData({
         runtimeMode: runtime.runtimeMode,
         demoMode: true,
-        card: demoSnapshot.card,
-        demoFields: [...demoSnapshot.fields],
-        demoPublicLabels: [...demoSnapshot.publicLabels],
-        cardTheme: demoSnapshot.cardTheme,
-        cityLabel: cityDisplayName(demoSnapshot.card.cityId),
+        localIdentityReady: true,
+        card: offlineSnapshot.card,
+        demoFields: [...offlineSnapshot.fields],
+        demoPublicLabels: [...offlineSnapshot.publicLabels],
+        cardTheme: offlineSnapshot.cardTheme,
+        cityLabel: cityDisplayName(offlineSnapshot.card.cityId),
         loadingCard: false,
-        localNotice: '体验版：可真实拉起微信转发与生成本地海报；发送的是体验内容，不会创建会员关系或云端分享记录。',
+        localNotice: '本机名片：可拉起微信转发与生成本地海报；对外快照不会包含电话或邮箱，也不会创建云端会员或人脉记录。',
         shareCoverState: 'LOADING',
         shareCoverMessage: '正在生成微信分享卡片…',
         shareCoverPath: '',
@@ -408,7 +435,9 @@ Page({
         return;
       }
       this.nativeShareCanvas = canvas;
-      const draft = this.data.demoMode ? this.activeDemoDraft : undefined;
+      const draft = this.data.demoMode && !this.data.localIdentityReady
+        ? this.activeDemoDraft
+        : undefined;
       drawNativeShareCard(canvas, {
         displayName: card.displayName,
         headline: card.headline,
@@ -481,7 +510,7 @@ Page({
       || this.sharePageUnloaded
     ) return;
     if (this.data.demoMode) {
-      this.setData({ localNotice: '未创建分享：体验版不会生成或保存任何入口。' });
+      this.setData({ localNotice: '未创建分享：本机预览不会生成或保存任何入口。' });
       return;
     }
     const lifecycleGeneration = this.sharePageGeneration;
@@ -879,7 +908,9 @@ Page({
     if (!this.sharePageUnloaded && this.data.demoMode && card) {
       const demoDraft = this.activeDemoDraft;
       const sharePath = demoDraft
-        ? buildOfflineDemoSharePath(demoDraft, this.data.cardTheme)
+        ? this.data.localIdentityReady
+          ? buildLocalIdentitySharePath(demoDraft as LocalIdentity, this.data.cardTheme)
+          : buildOfflineDemoSharePath(demoDraft, this.data.cardTheme)
         : { ok: false as const, code: 'PATH_TOO_LONG' as const, pathLength: 0 };
       if (!sharePath.ok) {
         this.setData({ localNotice: '当前内容超过微信分享路径预算，请返回编辑页精简个人简介。' });
@@ -914,5 +945,13 @@ Page({
         ? { imageUrl: this.data.shareCoverPath }
         : {}),
     };
+  },
+
+  returnToOwnerCard() {
+    if (getCurrentPages().length > 1) {
+      void wx.navigateBack();
+      return;
+    }
+    void wx.redirectTo({ url: '/pages/card/index' });
   },
 });

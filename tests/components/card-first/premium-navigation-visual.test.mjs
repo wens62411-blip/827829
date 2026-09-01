@@ -30,7 +30,9 @@ test('phase-one navigation is Discover, Events and Me with card owned by Me', ()
   const discover = text('miniprogram/pages/discover/index.wxml');
   const me = text('miniprogram/pages/me/index.wxml');
   assert.doesNotMatch(discover, /(?:url|data-route)="\/pages\/card\/index"/);
-  assert.match(me, /url="\/pages\/card\/index"/);
+  assert.doesNotMatch(me, /url="\/pages\/card\/index"/);
+  assert.match(me, /url="\/packageCard\/pages\/edit\/index"/);
+  assert.match(me, /url="\/packageCard\/pages\/share\/index"/);
 });
 
 test('tab artwork is a restrained 81px thin-line set with one typography system', () => {

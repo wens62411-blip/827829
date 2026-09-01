@@ -12,6 +12,10 @@ import {
 } from '../../shared/types/enums';
 import type { PublicEventProjection } from '../../shared/types/projections';
 import { createRequestId } from '../../shared/utils/request-id';
+import {
+  safeGetStorageSync,
+  safeSetStorageSync,
+} from '../../shared/utils/safe-storage';
 import { getEventCloudClient } from '../../components/ab-event-card/cloud-client-loader';
 import {
   DemoEventCategoryId,
@@ -78,14 +82,6 @@ const FRONT_ROW_CITY_IDS: readonly CityId[] = [
   CityId.CN_HANGZHOU,
 ];
 
-/**
- * 台北（中国台湾）属于筹备中的城市，尚未进入冻结的城市字典：
- * 只在筛选器上露出，不提供可切换的活动数据。
- */
-const PENDING_CITY_FILTERS: readonly CityFilterView[] = [
-  { id: 'cn-taipei', label: '台北', nameEn: 'TAIPEI, CHINA · 待开放', selected: false },
-];
-
 function buildCityFilters(selectedId: string): CityFilterView[] {
   const frontRow = CITY_DIRECTORY.filter((city) =>
     FRONT_ROW_CITY_IDS.includes(city.id as CityId),
@@ -93,15 +89,12 @@ function buildCityFilters(selectedId: string): CityFilterView[] {
   const rest = CITY_DIRECTORY.filter(
     (city) => !FRONT_ROW_CITY_IDS.includes(city.id as CityId),
   );
-  return [
-    ...[...frontRow, ...rest].map((city) => ({
-      id: city.id,
-      label: city.name.zh,
-      nameEn: city.name.en,
-      selected: city.id === selectedId,
-    })),
-    ...PENDING_CITY_FILTERS,
-  ];
+  return [...frontRow, ...rest].map((city) => ({
+    id: city.id,
+    label: city.name.zh,
+    nameEn: city.name.en,
+    selected: city.id === selectedId,
+  }));
 }
 
 function buildCategoryFilters(selectedId: ActivityCategoryFilterId): ActivityCategoryView[] {
@@ -218,16 +211,16 @@ Page({
 
   onLoad() {
     // 演示阶段：每次进入活动页都从默认城市上海开始，不沿用上一次的城市缓存。
-    wx.setStorageSync('ab-events-city-id', DEFAULT_CITY.id);
+    safeSetStorageSync('ab-events-city-id', DEFAULT_CITY.id);
     this.applyDemoFilters(DEFAULT_CITY.id, ALL_CATEGORIES);
     void this.refreshEvents();
   },
 
   onShow() {
     const tabBar = typeof this.getTabBar === 'function' ? this.getTabBar() : null;
-    if (tabBar) tabBar.setData({ selected: 1 });
+    if (tabBar) tabBar.setData({ selected: 1, hidden: false });
     if (!this.data.offlineDemo) return;
-    const storedCityId = String(wx.getStorageSync('ab-events-city-id') || '');
+    const storedCityId = safeGetStorageSync('ab-events-city-id', DEFAULT_CITY.id);
     if (storedCityId && storedCityId !== this.data.selectedCityId) {
       const selected = CITY_DIRECTORY.find((city) => city.id === storedCityId);
       if (selected) this.applyDemoFilters(selected.id, this.data.selectedCategoryId);
@@ -242,7 +235,7 @@ Page({
   applyDemoFilters(cityId: string, categoryId: ActivityCategoryFilterId) {
     const city = CITY_DIRECTORY.find((candidate) => candidate.id === cityId);
     if (!city) return;
-    wx.setStorageSync('ab-events-city-id', city.id);
+    safeSetStorageSync('ab-events-city-id', city.id);
     this.setData({
       selectedCityId: city.id,
       selectedCityLabel: city.name.zh,

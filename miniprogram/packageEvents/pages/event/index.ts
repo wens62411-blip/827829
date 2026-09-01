@@ -13,6 +13,7 @@ import type { DemoEventPresentation } from '../../../components/ab-event-card/de
 
 interface EventDetailView {
   readonly displayId: string;
+  readonly displayIdLabel: string;
   readonly title: string;
   readonly summary: string;
   readonly cityName: string;
@@ -61,6 +62,7 @@ function toDemoDetail(event: DemoEventPresentation): EventDetailView {
   const cover = DEMO_COVERS[event.eventId];
   return {
     displayId: event.eventId,
+    displayIdLabel: '活动方向',
     title: event.title,
     summary: event.summary,
     cityName: event.cityName,
@@ -68,7 +70,7 @@ function toDemoDetail(event: DemoEventPresentation): EventDetailView {
     imageSrc: event.imageSrc ?? cover?.src ?? '',
     imageAlt: event.imageAlt ?? cover?.alt ?? '活动方向视觉参考待补充',
     imageCredit: event.imageCredit ?? cover?.credit ?? '图片归属待补充',
-    evidenceLabel: 'DEMO_ONLY',
+    evidenceLabel: '活动方向',
     stateLabel: '方向预览 · 不是实际排期',
     sourceLabel: '本地合成策展文案；图片来源与许可记录在 editorial-events manifest',
     localTimeLabel: '日期与场地待确认',
@@ -105,6 +107,7 @@ function toLiveDetail(event: PublicEventProjection): EventDetailView {
   const realRecord = event.origin === RecordOrigin.REAL;
   return {
     displayId: event.eventId,
+    displayIdLabel: event.eventId,
     title: event.title,
     summary: event.summary,
     cityName: city?.name.zh ?? '城市待确认',
@@ -130,6 +133,7 @@ if (!FIRST_DEMO) throw new Error('Frozen city directory must provide a demo deta
 const EMPTY_DETAIL: EventDetailView = {
   ...toDemoDetail(FIRST_DEMO),
   displayId: '',
+  displayIdLabel: '',
   title: '',
   summary: '',
   evidenceLabel: '',
@@ -163,7 +167,7 @@ Page({
       this.setData({
         stateKind: 'EMPTY',
         stateTitle: '活动方向参数无效',
-        stateDescription: '该 DEMO_ONLY 条目不在本地稳定预览目录中。',
+        stateDescription: '该活动方向不在本机预览目录中。',
         stateDetail: '没有根据任意地址参数创建或替换活动身份。',
       });
       return;
@@ -176,8 +180,8 @@ Page({
       this.setData({
         stateKind: 'OFFLINE',
         stateTitle: '正式活动详情未连接',
-        stateDescription: '当前为 OFFLINE_DEMO，未解析真实活动记录。',
-        stateDetail: '请从活动预览页进入明确标注的 DEMO_ONLY 方向示例。',
+        stateDescription: '当前为本机预览，未连接真实活动记录。',
+        stateDetail: '请从活动页进入已标注的活动方向。',
       });
       return;
     }

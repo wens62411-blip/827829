@@ -87,6 +87,21 @@ test('AB Club crest is present on every registered key card-first page, not only
   ];
   const missing = keyPages.filter((page) => !pageHasCrest(page));
   assert.deepEqual(missing, [], `这些关键页面没有使用统一盾徽：${missing.join(', ')}`);
+
+  const brandManifest = JSON.parse(read('miniprogram/assets/manifests/brand.json'));
+  const crestStyles = [
+    read('miniprogram/pages/discover/index.wxss'),
+    read('miniprogram/pages/events/index.wxss'),
+    read('miniprogram/packageCard/pages/edit/index.wxss'),
+    read('miniprogram/components/ab-profile-card/index.wxss'),
+    read('miniprogram/components/ab-brand-header/index.wxss'),
+  ].join('\n');
+  assert.match(brandManifest.asset.alt, /金色/);
+  assert.doesNotMatch(crestStyles, /(?:crest|brandmark)[^{]*\{[^}]*filter\s*:/is);
+  assert.match(crestStyles, /discover-brandmark__fallback[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
+  assert.match(crestStyles, /events-brand__fallback[\s\S]*?color:\s*var\(--gold\)/);
+  assert.match(crestStyles, /profile-card__crest-fallback[\s\S]*?border:\s*2rpx solid var\(--ab-color-gold\)[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
+  assert.match(crestStyles, /card-editor-header__crest-fallback[\s\S]*?border:\s*2rpx solid var\(--editor-gold\)[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
 });
 
 test('main and card-owned user surfaces contain no green palette', () => {
@@ -193,6 +208,7 @@ test('owner card makes edit and share clear while network stays out of the owner
   assert.match(template, /gallery-urls="\{\{demoGalleryUrls\}\}"/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
   assert.match(template, /标签必须先经过人工审核/);
-  assert.match(template, /体验版/);
+  assert.match(template, /本机预览/);
+  assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览/);
   assert.doesNotMatch(template, /一键分享的安全预览|WECHAT SHARE|安全转发|OPENID|小程序码|海报|token/i);
 });
