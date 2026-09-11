@@ -329,6 +329,29 @@
   .share-native-cover__image {
     border-color: var(--ab-color-dark-border);
   }
+
+  .share-page .card-button,
+  .share-page .card-button--share {
+    border-color: #dec89c;
+    background: #dec89c;
+    color: #211e1a;
+  }
+
+  .share-page .card-button-secondary,
+  .share-page .card-link-button {
+    border-color: #dec89c;
+    background: transparent;
+    color: #fffaf0;
+  }
+
+  .share-page .card-button[disabled],
+  .share-page .card-button-secondary[disabled],
+  .share-page .card-link-button[disabled] {
+    border-color: #655d52;
+    background: #3a352f;
+    color: #d7cec1;
+    opacity: 1;
+  }
 }
 
 @media (max-width: 340px) {

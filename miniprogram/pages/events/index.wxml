@@ -17,7 +17,7 @@
   <view class="events-hero" aria-role="region" aria-label="AB Club 活动">
     <text class="events-kicker">GLOBAL GATHERINGS</text>
     <text class="events-hero__title">在城市与艺术之间，留下一次值得赴约的相遇。</text>
-    <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。先选城市，再从艺术、古董、珠宝与克制的商业对话中浏览活动方向。</text>
+    <text class="events-hero__copy">活动是数字名片连接后的轻量延伸。先选城市，再从艺术、古董、珠宝与精选商业对话中浏览活动方向。</text>
   </view>
 
   <view class="event-filters" aria-role="region" aria-label="城市和活动类型">

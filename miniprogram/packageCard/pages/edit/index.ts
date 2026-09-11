@@ -1,15 +1,22 @@
 import { CITY_DIRECTORY, type CityId } from '../../../shared/constants/geography';
 import type { ProfileUpdateInput } from '../../../shared/contracts';
-import type { MediaAssetId } from '../../../shared/types/primitives';
+import type { MediaAssetId, ShareTokenId, UtcInstant } from '../../../shared/types/primitives';
 import type { ProfilePrivateDto } from '../../../shared/types/projections';
 import {
   bootstrapIdentity,
+  createCardShare,
+  getMyPublicCard,
   getMyProfile,
   getRuntimeEvidence,
   refreshMyCard,
   updateMyProfile,
 } from '../../../pages/card/services/identity-client';
-import { cityDisplayName } from '../../../pages/card/services/card-presenter';
+import {
+  cityDisplayName,
+  isSafeShareBearer,
+  safeShareTitle,
+  shareExpiry,
+} from '../../../pages/card/services/card-presenter';
 import { createEditableIntroduction } from '../../../pages/card/services/introduction-draft';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 import {
@@ -28,6 +35,11 @@ import {
   buildLocalIdentitySharePath,
   buildOfflineDemoSharePath,
 } from '../../../pages/card/services/offline-demo-share-snapshot';
+import {
+  isSafeShareTokenId,
+  rememberShareForRevocation,
+  wasShareRevokedForSession,
+} from '../../../pages/card/services/share-revocation-pointer';
 import {
   LOCAL_IDENTITY_CONTRACT_VERSION,
   hasLocalIdentity,
@@ -56,6 +68,7 @@ const CITY_IDS = CITY_DIRECTORY.map((city) => city.id);
 const LOCAL_DISPLAY_NAME_LIMIT = 24;
 const LOCAL_PROFESSION_LIMIT = 32;
 const LOCAL_BIOGRAPHY_LIMIT = 72;
+const SAFE_CARD_SHARE_COVER = '/assets/brand/ab-club-share-safe-cover.jpg';
 
 const IDENTITY_LABELS = [
   '海归',
@@ -127,6 +140,12 @@ function showShareToast(title: string): void {
   });
 }
 
+function hideNativeShareMenu(): void {
+  if (typeof wx.hideShareMenu === 'function') {
+    wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+  }
+}
+
 function makeTagOptions(values: readonly string[], selectedLabels: readonly string[]) {
   const selected = new Set(selectedLabels);
   return values.map((label) => ({ label, selected: selected.has(label) }));
@@ -182,6 +201,9 @@ Page({
   openedForRegistration: false,
   editorPageUnloaded: true,
   saveOperationGeneration: 0,
+  preparedSharePath: '',
+  preparedShareTitle: 'AB Club',
+  preparedShareTokenId: undefined as ShareTokenId | undefined,
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
@@ -190,6 +212,9 @@ Page({
     profile: null as ProfilePrivateDto | null,
     creatingProfile: false,
     saveAndShareBusy: false,
+    sharePreparing: false,
+    shareReady: false,
+    shareMessage: '完成保存后即可直接分享名片。',
     brandLogoFailed: false,
     status: 'LOADING' as 'LOADING' | 'READY' | 'SAVING' | 'ERROR' | 'SAVED' | 'PROJECTION_PENDING',
     message: '',
@@ -226,6 +251,7 @@ Page({
   },
 
   syncPreview(overrides: Partial<DraftInput>) {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.sharePreparing) return;
     const selectedLabels = uniqueLabels(overrides.selectedLabels ?? this.data.selectedLabels);
     const avatarUrl = overrides.avatarUrl ?? (this.data.localAvatarUsable ? this.data.localAvatarPath : '');
     const draft: DraftInput = {
@@ -246,28 +272,46 @@ Page({
       ...makePreview(draft),
       previewSelectedLabels: [],
       previewPublicLabels: this.data.showTags ? selectedLabels : [],
+      shareReady: false,
+      shareMessage: '内容已修改，请先点击“完成”保存最新名片。',
     });
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
   },
 
   setEditorMode(event: WechatMiniprogram.TouchEvent) {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.sharePreparing) return;
     const mode = String(event.currentTarget.dataset.mode ?? '');
     if (mode !== 'PREVIEW' && mode !== 'EDIT') return;
     this.setData({ editorMode: mode as EditorMode });
   },
 
   selectCardTheme(event: WechatMiniprogram.TouchEvent) {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.sharePreparing) return;
     const theme = String(event.currentTarget.dataset.theme ?? '');
     if (!THEMES.some((item) => item.value === theme)) return;
     this.setData({
       cardTheme: theme as CardTheme,
       themeOptions: makeThemeOptions(theme as CardTheme),
+      shareReady: false,
+      shareMessage: '配色已修改，请点击“完成”保存后再分享。',
     });
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
     writeCardThemePreference(theme as CardTheme);
   },
 
   onLoad(query: Record<string, string | undefined> = {}) {
     this.editorPageUnloaded = false;
     this.saveOperationGeneration += 1;
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
     const cardTheme = readCardThemePreference();
     const runtime = getRuntimeEvidence();
     const demoMode = isOfflineDemo(runtime);
@@ -379,13 +423,40 @@ Page({
     void this.loadProfile();
   },
 
+  onShow() {
+    this.invalidateShareRevokedElsewhere();
+  },
+
   onUnload() {
     this.editorPageUnloaded = true;
     this.saveOperationGeneration += 1;
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
   },
 
   isEditorOperationActive(generation: number): boolean {
     return !this.editorPageUnloaded && this.saveOperationGeneration === generation;
+  },
+
+  invalidateShareRevokedElsewhere(): boolean {
+    const tokenId = this.preparedShareTokenId;
+    if (
+      !this.data.shareReady
+      || !this.preparedSharePath
+      || !tokenId
+      || !wasShareRevokedForSession(tokenId)
+    ) return false;
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
+    this.setData({
+      sharePreparing: false,
+      shareReady: false,
+      shareMessage: '该分享入口已在入口管理中撤销，请重新点击“完成”准备。',
+    });
+    return true;
   },
 
   async loadProfile() {
@@ -556,10 +627,25 @@ Page({
         showTags: enabled,
         previewSelectedLabels: [],
         previewPublicLabels: enabled ? this.data.selectedLabels : [],
+        shareReady: false,
+        shareMessage: '公开标签设置已修改，请点击“完成”保存后再分享。',
       });
+      this.preparedSharePath = '';
+      this.preparedShareTitle = 'AB Club';
+      this.preparedShareTokenId = undefined;
+      hideNativeShareMenu();
     }
     if (moduleName === 'gallery') {
-      this.setData({ showGallery: enabled, previewGalleryImages: enabled ? this.data.galleryImages : [] });
+      this.setData({
+        showGallery: enabled,
+        previewGalleryImages: enabled ? this.data.galleryImages : [],
+        shareReady: false,
+        shareMessage: '展示内容已修改，请点击“完成”保存后再分享。',
+      });
+      this.preparedSharePath = '';
+      this.preparedShareTitle = 'AB Club';
+      this.preparedShareTokenId = undefined;
+      hideNativeShareMenu();
     }
     if (moduleName === 'phone') {
       this.syncPreview({ showPhone: enabled });
@@ -616,7 +702,13 @@ Page({
           galleryImages,
           previewGalleryImages: this.data.showGallery ? galleryImages : [],
           galleryNote: '图片已加入本页预览；当前不会上传或公开。',
+          shareReady: false,
+          shareMessage: '展示内容已修改，请点击“完成”保存后再分享。',
         });
+        this.preparedSharePath = '';
+        this.preparedShareTitle = 'AB Club';
+        this.preparedShareTokenId = undefined;
+        hideNativeShareMenu();
       },
     });
   },
@@ -629,7 +721,13 @@ Page({
       galleryImages,
       previewGalleryImages: this.data.showGallery ? galleryImages : [],
       galleryNote: '',
+      shareReady: false,
+      shareMessage: '展示内容已修改，请点击“完成”保存后再分享。',
     });
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
   },
 
   async generateIntroductionDraft() {
@@ -864,11 +962,116 @@ Page({
     return true;
   },
 
-  async saveAndOpenShare() {
+  async prepareDirectShare(): Promise<boolean> {
+    const shareGeneration = this.saveOperationGeneration;
+    if (!this.isEditorOperationActive(shareGeneration) || this.data.sharePreparing) return false;
+    this.setData({
+      sharePreparing: true,
+      shareReady: false,
+      shareMessage: '正在准备微信分享入口…',
+    });
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
+
+    if (this.data.demoMode || this.data.localIdentityReady) {
+      const localIdentity = hasLocalIdentity() ? readLocalIdentity() : null;
+      const sharePath = localIdentity
+        ? buildLocalIdentitySharePath(localIdentity, this.data.cardTheme)
+        : buildOfflineDemoSharePath(readOfflineDemoDraft(), this.data.cardTheme);
+      if (!this.isEditorOperationActive(shareGeneration)) return false;
+      if (!sharePath.ok) {
+        this.preparedSharePath = '';
+        this.preparedShareTitle = 'AB Club';
+        this.setData({
+          sharePreparing: false,
+          shareReady: false,
+          shareMessage: '当前名片内容超过微信分享路径限制，请精简个人简介后再完成。',
+        });
+        return false;
+      }
+      this.preparedSharePath = sharePath.path;
+      this.preparedShareTitle = safeShareTitle(localIdentity?.displayName ?? this.data.displayName);
+      this.preparedShareTokenId = undefined;
+      this.setData({
+        sharePreparing: false,
+        shareReady: true,
+        shareMessage: '名片已准备好，点击“分享名片”即可打开微信转发面板。',
+      });
+      if (typeof wx.showShareMenu === 'function') {
+        wx.showShareMenu({ menus: ['shareAppMessage'] });
+      }
+      return true;
+    }
+
+    const cardResult = await getMyPublicCard();
+    if (!this.isEditorOperationActive(shareGeneration)) return false;
+    if (!cardResult.ok) {
+      this.preparedSharePath = '';
+      this.preparedShareTitle = 'AB Club';
+      this.setData({
+        sharePreparing: false,
+        shareReady: false,
+        shareMessage: cardResult.message,
+      });
+      return false;
+    }
+    const card = cardResult.data.card;
+    const result = await createCardShare(
+      card.cardId,
+      card.version,
+      shareExpiry(7) as UtcInstant,
+    );
+    if (!this.isEditorOperationActive(shareGeneration)) return false;
+    if (
+      !result.ok
+      || result.data.targetType !== 'CARD'
+      || result.data.targetId !== card.cardId
+      || !isSafeShareBearer(result.data.token)
+      || !isSafeShareTokenId(result.data.shareTokenId)
+    ) {
+      this.preparedSharePath = '';
+      this.preparedShareTitle = 'AB Club';
+      this.setData({
+        sharePreparing: false,
+        shareReady: false,
+        shareMessage: result.ok
+          ? '服务返回的分享入口格式不安全或目标不匹配，请重试。'
+          : result.message,
+      });
+      return false;
+    }
+
+    const revocationRemembered = rememberShareForRevocation(result.data.shareTokenId);
+    this.preparedSharePath = `/pages/card-share/index?token=${encodeURIComponent(result.data.token)}${this.data.cardTheme === 'ivory' ? '' : `&theme=${encodeURIComponent(this.data.cardTheme)}`}`;
+    this.preparedShareTitle = safeShareTitle(card.displayName);
+    this.preparedShareTokenId = result.data.shareTokenId;
+    this.setData({
+      sharePreparing: false,
+      shareReady: true,
+      shareMessage: revocationRemembered
+        ? '安全入口已准备好，点击“分享名片”即可打开微信转发面板。'
+        : '安全入口已准备，但本机未能保存撤销指针；入口仍会按设置自动过期。',
+    });
+    if (typeof wx.showShareMenu === 'function') {
+      wx.showShareMenu({ menus: ['shareAppMessage'] });
+    }
+    return true;
+  },
+
+  async completeEdit() {
     if (this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
     const saveGeneration = this.saveOperationGeneration;
     if (!this.isEditorOperationActive(saveGeneration)) return;
-    this.setData({ saveAndShareBusy: true });
+    this.setData({
+      saveAndShareBusy: true,
+      shareReady: false,
+      shareMessage: '正在保存并准备名片…',
+      editorMode: 'PREVIEW',
+    });
+    this.preparedSharePath = '';
+    this.preparedShareTitle = 'AB Club';
+    this.preparedShareTokenId = undefined;
+    hideNativeShareMenu();
 
     let saved = false;
     try {
@@ -894,22 +1097,62 @@ Page({
       return;
     }
 
-    const navigated = await new Promise<boolean>((resolve) => {
-      wx.redirectTo({
-        url: '/packageCard/pages/share/index',
-        success: () => resolve(true),
-        fail: () => resolve(false),
+    let prepared = false;
+    try {
+      prepared = await this.prepareDirectShare();
+    } catch (_error) {
+      if (!this.isEditorOperationActive(saveGeneration)) return;
+      this.preparedSharePath = '';
+      this.preparedShareTitle = 'AB Club';
+      this.preparedShareTokenId = undefined;
+      this.setData({
+        sharePreparing: false,
+        shareReady: false,
+        shareMessage: '分享入口暂时无法准备，请检查网络后重试。',
       });
-    });
+    }
     if (!this.isEditorOperationActive(saveGeneration)) return;
-    if (!navigated) {
+    if (!prepared) {
       this.setData({
         saveAndShareBusy: false,
-        status: 'ERROR',
-        message: '名片已保存，但暂时无法打开分享页，请重试。',
+        status: 'SAVED',
+        editorMode: 'PREVIEW',
+        message: '名片已保存，但分享入口尚未准备完成，请重试。',
       });
-      showShareToast('分享页暂时无法打开');
+      showShareToast('名片已保存，请重试准备分享');
+      return;
     }
+    this.setData({
+      saveAndShareBusy: false,
+      status: 'SAVED',
+      editorMode: 'PREVIEW',
+      message: '名片已保存，可以直接分享。',
+    });
+  },
+
+  openShareManager() {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.sharePreparing) return;
+    void wx.navigateTo({ url: '/packageCard/pages/share/index' });
+  },
+
+  onShareAppMessage() {
+    this.invalidateShareRevokedElsewhere();
+    if (!this.data.shareReady || !this.preparedSharePath) {
+      showShareToast('请先点击“完成”准备最新名片');
+      return {
+        title: 'AB Club 数字名片',
+        path: '/pages/card-share/index?invalid=1',
+        imageUrl: SAFE_CARD_SHARE_COVER,
+      };
+    }
+    this.setData({
+      shareMessage: '微信转发面板已请求打开；是否真正发送以微信系统结果为准。',
+    });
+    return {
+      title: this.preparedShareTitle,
+      path: this.preparedSharePath,
+      imageUrl: SAFE_CARD_SHARE_COVER,
+    };
   },
 
   async retryProjectionRefresh() {

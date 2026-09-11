@@ -16,6 +16,7 @@ import {
   type OfflineDemoPublicField,
 } from '../../../pages/card/services/offline-demo-draft';
 import {
+  hasLocalIdentity,
   materializeLocalIdentityCard,
   materializeLocalIdentityFields,
   publicLabelsForLocalIdentity,
@@ -47,10 +48,33 @@ function parseOwnerUserId(value: string | undefined): UserId | undefined {
   return normalized as UserId;
 }
 
+const DEFAULT_VISITOR_TITLE = 'AB Club 数字名片';
+type SelfCardState = 'CHECKING' | 'HAS_CARD' | 'NO_CARD' | 'UNKNOWN';
+
+function compactDisplayName(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return Array.from(value.trim()).slice(0, 24).join('');
+}
+
+function shareSafeOfflineFields(fields: readonly OfflineDemoPublicField[]): OfflineDemoPublicField[] {
+  return fields.filter((field) => field.key !== 'phone' && field.key !== 'email');
+}
+
+function visitorTitleForCard(card: PublicCardProjection | null | undefined): string {
+  const displayName = compactDisplayName(card?.displayName);
+  return displayName ? `${displayName} 的数字名片` : DEFAULT_VISITOR_TITLE;
+}
+
+function setNavigationTitle(title: string): void {
+  if (typeof wx.setNavigationBarTitle !== 'function') return;
+  wx.setNavigationBarTitle({ title: Array.from(title).slice(0, 20).join('') });
+}
+
 Page({
   viewedOwnerUserId: undefined as UserId | undefined,
   viewLoadGeneration: 0,
   viewUnloaded: true,
+  selfCardCheckGeneration: 0,
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
@@ -66,11 +90,15 @@ Page({
     viewedOwnerUserId: '',
     cityLabel: '',
     cardTheme: 'ivory' as CardTheme,
+    visitorTitle: DEFAULT_VISITOR_TITLE,
+    localAccountReady: false,
+    selfCardState: 'CHECKING' as SelfCardState,
   },
 
   onLoad(options: Record<string, string | undefined>) {
     this.viewUnloaded = false;
     this.viewLoadGeneration += 1;
+    this.selfCardCheckGeneration += 1;
     const runtime = getCardRuntime();
     const demoMode = isOfflineDemo(runtime);
     const demoVisitorPreview = demoMode && options.preview === 'STRANGER';
@@ -80,7 +108,16 @@ Page({
       demoVisitorPreview,
       invalidOwner: false,
       cardTheme: readCardThemePreference(),
+      visitorTitle: DEFAULT_VISITOR_TITLE,
+      localAccountReady: hasLocalIdentity(),
+      selfCardState: demoMode
+        ? (hasLocalIdentity() ? 'HAS_CARD' : 'NO_CARD')
+        : 'CHECKING',
     });
+    setNavigationTitle(options.ownerUserId !== undefined || demoVisitorPreview
+      ? DEFAULT_VISITOR_TITLE
+      : '我的数字名片');
+    wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     if (options.ownerUserId !== undefined) {
       this.viewedOwnerUserId = parseOwnerUserId(options.ownerUserId);
       if (!this.viewedOwnerUserId) {
@@ -88,6 +125,9 @@ Page({
           invalidOwner: true,
           status: 'ERROR',
           message: '名片查看参数无效，请从可信入口重新打开。',
+          card: null,
+          cityLabel: '',
+          visitorTitle: DEFAULT_VISITOR_TITLE,
         });
       } else {
         this.setData({ viewedOwnerUserId: this.viewedOwnerUserId });
@@ -99,29 +139,19 @@ Page({
   },
 
   onShow() {
+    if (this.viewedOwnerUserId || this.data.demoVisitorPreview) void this.refreshSelfCardState();
     if (!this.data.invalidOwner) void this.loadCard();
   },
 
   onUnload() {
     this.viewUnloaded = true;
     this.viewLoadGeneration += 1;
+    this.selfCardCheckGeneration += 1;
     this.viewedOwnerUserId = undefined;
   },
 
   onPullDownRefresh() {
     void this.loadCard(true);
-  },
-
-  handleDemoExchange() {
-    const localIdentityReady = this.data.localIdentityReady;
-    wx.showModal({
-      title: localIdentityReady ? '人脉功能尚未开放' : '交换功能说明',
-      content: localIdentityReady
-        ? '这张本机名片尚未接入云端人脉申请；本次点击不会提交申请，也不会创建好友关系。'
-        : '这是一张合成示例名片，当前不会创建好友申请或人脉记录。真实名片会在你确认后进入申请流程。',
-      showCancel: false,
-      confirmText: '我知道了',
-    });
   },
 
   async loadCard(fromPullDown: boolean = false) {
@@ -131,6 +161,7 @@ Page({
     }
     const viewedOwnerUserId = this.viewedOwnerUserId;
     const loadGeneration = ++this.viewLoadGeneration;
+    wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const isCurrentLoad = () => (
       !this.viewUnloaded
       && this.viewLoadGeneration === loadGeneration
@@ -141,37 +172,46 @@ Page({
       if (localIdentity) {
         const localCard = materializeLocalIdentityCard(localIdentity);
         const localFields = materializeLocalIdentityFields(localIdentity);
+        const visitorTitle = this.data.demoVisitorPreview
+          ? visitorTitleForCard(localCard)
+          : '我的数字名片';
         this.setData({
           status: 'READY',
           card: localCard,
-          demoFields: this.data.demoVisitorPreview
-            ? localFields.filter((field) => field.key !== 'phone' && field.key !== 'email')
-            : localFields,
+          demoFields: this.data.demoVisitorPreview ? shareSafeOfflineFields(localFields) : localFields,
           demoPublicLabels: publicLabelsForLocalIdentity(localIdentity),
           cityLabel: cityDisplayName(localCard.cityId),
           viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
           localIdentityReady: true,
           message: this.data.demoVisitorPreview
-            ? '本机名片 · 离线访客预览 · 联系方式不对外展示'
-            : '本机名片 · 仅保存在这台设备',
+            ? '分享者公开资料 · 离线访客预览'
+            : '名片仅保存在这台设备',
+          visitorTitle,
         });
+        setNavigationTitle(visitorTitle);
         if (fromPullDown) wx.stopPullDownRefresh();
         return;
       }
       const draft = readOfflineDemoDraft();
       const demoCard = materializeOfflineDemoCard(draft);
+      const demoFields = materializeOfflineDemoFields(draft);
+      const visitorTitle = this.data.demoVisitorPreview
+        ? visitorTitleForCard(demoCard)
+        : '我的数字名片';
       this.setData({
         status: 'READY',
         card: demoCard,
-        demoFields: materializeOfflineDemoFields(draft),
+        demoFields: this.data.demoVisitorPreview ? shareSafeOfflineFields(demoFields) : demoFields,
         demoPublicLabels: publicLabelsForDraft(draft),
         cityLabel: cityDisplayName(demoCard.cityId),
         viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
         localIdentityReady: false,
         message: this.data.demoVisitorPreview
-          ? '本机预览 · 合成示例 · 访客视角'
-          : '本机预览 · 合成示例',
+          ? '合成示例 · 访客视角'
+          : '合成示例',
+        visitorTitle,
       });
+      setNavigationTitle(visitorTitle);
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
     }
@@ -181,14 +221,24 @@ Page({
       const result = await getMyCard();
       if (!isCurrentLoad()) return;
       if (!result.ok) {
-        this.setData({ status: 'ERROR', message: result.message });
+        this.setData({
+          status: 'ERROR',
+          message: result.message,
+          card: null,
+          cityLabel: '',
+          visitorTitle: '我的数字名片',
+        });
+        setNavigationTitle('我的数字名片');
       } else {
+        const card = sanitizePublicCard(result.data.card);
         this.setData({
           status: 'READY',
-          card: sanitizePublicCard(result.data.card),
-          cityLabel: cityDisplayName(result.data.card.cityId),
+          card,
+          cityLabel: cityDisplayName(card.cityId),
           viewerMode: 'SELF',
+          visitorTitle: '我的数字名片',
         });
+        setNavigationTitle('我的数字名片');
       }
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
@@ -201,22 +251,87 @@ Page({
       this.setData({
         status: 'ERROR',
         message: result.code === 'BLOCKED_RELATIONSHIP'
-          ? '根据当前双方关系设置，这张名片不可查看。'
+          ? '根据当前可见范围设置，这张名片不可查看。'
           : result.message,
+        card: null,
+        cityLabel: '',
+        visitorTitle: DEFAULT_VISITOR_TITLE,
       });
+      setNavigationTitle(DEFAULT_VISITOR_TITLE);
     } else if (
       result.data.card.ownerUserId !== viewedOwnerUserId ||
       result.data.relationship.subjectUserId !== viewedOwnerUserId
     ) {
-      this.setData({ status: 'ERROR', message: '服务返回的名片身份不匹配，请重新打开可信入口。' });
+      this.setData({
+        status: 'ERROR',
+        message: '服务返回的名片身份不匹配，请重新打开可信入口。',
+        card: null,
+        cityLabel: '',
+        visitorTitle: DEFAULT_VISITOR_TITLE,
+      });
+      setNavigationTitle(DEFAULT_VISITOR_TITLE);
     } else {
+      const card = sanitizePublicCard(result.data.card, result.data.claims);
+      const visitorTitle = visitorTitleForCard(card);
       this.setData({
         status: 'READY',
-        card: sanitizePublicCard(result.data.card, result.data.claims),
-        cityLabel: cityDisplayName(result.data.card.cityId),
+        card,
+        cityLabel: cityDisplayName(card.cityId),
         viewerMode: viewerModeFromRelationship(result.data.relationship),
+        visitorTitle,
       });
+      setNavigationTitle(visitorTitle);
+      // Legacy owner-id routes remain readable for in-app navigation, but must
+      // not become permanent share links that bypass token expiry/revocation.
     }
     if (fromPullDown) wx.stopPullDownRefresh();
   },
+
+  async refreshSelfCardState() {
+    if (this.data.demoMode) {
+      const localAccountReady = hasLocalIdentity();
+      this.setData({
+        localAccountReady,
+        selfCardState: localAccountReady ? 'HAS_CARD' : 'NO_CARD',
+      });
+      return;
+    }
+    const generation = ++this.selfCardCheckGeneration;
+    this.setData({ selfCardState: 'CHECKING' });
+    try {
+      const { getMyCard } = loadIdentityClient();
+      const result = await getMyCard();
+      if (this.viewUnloaded || generation !== this.selfCardCheckGeneration) return;
+      if (result.ok) {
+        this.setData({ localAccountReady: true, selfCardState: 'HAS_CARD' });
+      } else if (result.code === 'NOT_FOUND') {
+        this.setData({ localAccountReady: false, selfCardState: 'NO_CARD' });
+      } else {
+        this.setData({ localAccountReady: false, selfCardState: 'UNKNOWN' });
+      }
+    } catch (_error) {
+      if (!this.viewUnloaded && generation === this.selfCardCheckGeneration) {
+        this.setData({ localAccountReady: false, selfCardState: 'UNKNOWN' });
+      }
+    }
+  },
+
+  openMyCardEntry() {
+    const offline = this.data.demoMode;
+    const localAccountReady = offline ? hasLocalIdentity() : this.data.selfCardState === 'HAS_CARD';
+    if (offline && localAccountReady !== this.data.localAccountReady) {
+      this.setData({
+        localAccountReady,
+        selfCardState: localAccountReady ? 'HAS_CARD' : 'NO_CARD',
+      });
+    }
+    const url = localAccountReady
+      ? '/pages/card/index'
+      : `/packageCard/pages/edit/index${offline ? '?register=1' : ''}`;
+    wx.navigateTo({
+      url,
+      fail: () => wx.showToast({ title: '暂时无法打开，请稍后再试', icon: 'none' }),
+    });
+  },
+
 });

@@ -23,5 +23,21 @@
     "reviewStatus": "DRAFT",
     "publicationPolicy": "HUMAN_BRAND_RIGHTS_REVIEW_REQUIRED",
     "externalHotlink": false
-  }
+  },
+  "derivatives": [
+    {
+      "assetId": "brand-ab-club-share-safe-cover-600x480-v1",
+      "path": "/assets/brand/ab-club-share-safe-cover.jpg",
+      "derivedFrom": "brand-ab-club-crest-384-v1",
+      "processingType": "LOCAL_5_TO_4_COMPOSITION_ON_IVORY_CANVAS",
+      "containsPersonalData": false,
+      "sha256": "d3e77b5a2eb9236e1011ff23fa1a79784a94a26d440bcfaba58d7eb4043cb102",
+      "width": 600,
+      "height": 480,
+      "bytes": 18923,
+      "reviewStatus": "DRAFT",
+      "publicationPolicy": "HUMAN_BRAND_RIGHTS_REVIEW_REQUIRED",
+      "externalHotlink": false
+    }
+  ]
 }

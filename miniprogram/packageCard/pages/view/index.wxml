@@ -2,14 +2,14 @@
   <view class="visitor-header">
     <view class="visitor-header__copy">
       <text class="card-kicker">VIEW A DIGITAL CARD</text>
-      <text class="card-title">一张名片，一次认识</text>
-      <text class="card-subtitle">先看名片，再决定是否交换。没有强制连接，也不会自动添加好友。</text>
+      <text class="card-title">{{visitorTitle}}</text>
+      <text class="card-subtitle">{{viewerMode === 'SELF' ? '查看、编辑或分享你的数字名片。' : '查看分享者选择公开的资料。'}}</text>
     </view>
     <image class="card-brand-crest visitor-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
 
-  <view wx:if="{{localIdentityReady}}" class="card-demo-ribbon">本机名片 · 非云端账户</view>
-  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">本机预览 · 合成示例 · 非真实会员</view>
+  <view wx:if="{{localIdentityReady}}" class="card-demo-ribbon">{{viewerMode === 'SELF' ? '当前设备资料' : '离线预览 · 用户自填资料'}}</view>
+  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">演示名片 · 合成示例 · 非真实会员</view>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton visitor-loading" aria-label="正在加载名片"></view>
 
@@ -36,12 +36,14 @@
       <navigator class="card-link-button" url="/packageCard/pages/edit/index" hover-class="none">编辑名片</navigator>
       <navigator class="card-link-button card-link-button--strong" url="/packageCard/pages/share/index" hover-class="none">分享名片</navigator>
     </view>
-    <view wx:else slot="actions" class="visitor-exchange">
-      <button wx:if="{{demoMode}}" class="card-link-button card-link-button--strong" bindtap="handleDemoExchange">申请认识 · 交换名片</button>
-      <navigator wx:else class="card-link-button card-link-button--strong" url="/packageSocial/pages/friend/index?ownerUserId={{viewedOwnerUserId}}" hover-class="none">{{viewerMode === 'FRIEND' ? '管理这段连接' : '申请认识 · 交换名片'}}</navigator>
-      <text class="visitor-exchange__note">建立人脉需要对方确认；点击不会自动添加好友。</text>
-    </view>
   </ab-profile-card>
 
-  <text class="visitor-footnote">{{localIdentityReady ? '公开分享不会包含电话或邮箱。' : (demoMode ? '示例只用于查看名片样式，不代表真实账户、好友关系或认证状态。' : '名片内容与可见范围会随双方关系变化重新刷新。')}}</text>
+  <text wx:if="{{card}}" class="visitor-footnote">{{demoMode ? '演示内容只用于查看名片样式，不代表真实账户或认证状态。' : '仅展示名片所有者当前允许查看的资料。'}}</text>
+
+  <view wx:if="{{card && viewerMode !== 'SELF'}}" class="visitor-conversion">
+    <text class="visitor-conversion__kicker">YOUR AB CLUB CARD</text>
+    <text class="visitor-conversion__title">{{selfCardState === 'HAS_CARD' ? '继续管理你的数字名片' : (selfCardState === 'NO_CARD' ? '创建一张属于你的数字名片' : '进入你的数字名片空间')}}</text>
+    <text class="visitor-conversion__copy">{{selfCardState === 'HAS_CARD' ? '返回后仍会保留当前分享者的名片。' : (selfCardState === 'NO_CARD' ? '自主填写内容与公开范围，完成后即可分享。' : '进入后可查看现有名片，或开始创建自己的名片。')}}</text>
+    <button class="visitor-conversion__button" bindtap="openMyCardEntry">{{selfCardState === 'HAS_CARD' ? '查看我的名片' : (selfCardState === 'NO_CARD' ? '创建我的数字名片' : '进入我的名片')}}</button>
+  </view>
 </view>

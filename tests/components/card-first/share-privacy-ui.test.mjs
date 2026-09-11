@@ -7,15 +7,17 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
 
-test('share page presents the card and human-facing sharing choices', () => {
+test('poster and access page presents the card and human-facing management choices', () => {
   const template = read('miniprogram/packageCard/pages/share/index.wxml');
   const config = JSON.parse(read('miniprogram/packageCard/pages/share/index.json'));
 
   assert.match(template, /<ab-profile-card\b[\s\S]*?card="\{\{card\}\}"/);
   assert.match(template, /viewer-mode="STRANGER"/);
   assert.match(template, /fields="\{\{demoMode \? demoFields : \[\]\}\}"/);
-  assert.match(template, /好友接收视角/);
-  assert.match(template, /微信好友|生成名片海报|撤销/);
+  assert.match(template, /名片海报与入口管理/);
+  assert.match(template, /微信转发|生成名片海报|撤销/);
+  assert.match(template, /直接转发请从名片页唤起微信面板/);
+  assert.doesNotMatch(template, /好友|人脉|克制|清除/);
   assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送示例名片到微信/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
   assert.match(template, /打开微信转发面板|可以试用/);
@@ -31,19 +33,21 @@ test('privacy page explains choices in member language, not implementation langu
   assert.doesNotMatch(template, /冻结 DTO|PUBLIC|FRIENDS_ONLY|PRIVATE|OPENID|运行模式/);
 });
 
-test('visitor page keeps the exchange decision clear and quiet', () => {
+test('visitor page is a quiet read-only card with a self-card conversion entry', () => {
   const template = read('miniprogram/packageCard/pages/view/index.wxml');
   const source = read('miniprogram/packageCard/pages/view/index.ts');
   const ownerTemplate = read('miniprogram/pages/card/index.wxml');
 
-  assert.match(template, /先看名片，再决定是否交换/);
-  assert.match(template, /交换名片/);
-  assert.match(template, /需要对方确认/);
+  assert.match(template, /查看分享者选择公开的资料/);
+  assert.match(template, /创建我的数字名片/);
+  assert.match(template, /查看我的名片/);
+  assert.doesNotMatch(template, /申请认识|交换名片|添加好友|好友关系/);
   assert.match(ownerTemplate, /view\/index\?preview=STRANGER/);
   assert.match(source, /demoVisitorPreview[\s\S]*viewerMode:\s*this\.data\.demoVisitorPreview \? 'STRANGER' : 'SELF'/);
   assert.doesNotMatch(source, /import\s*\{[\s\S]*?getRuntimeEvidence[\s\S]*?\}\s*from\s*['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]/);
   assert.match(source, /function loadIdentityClient\(\)[\s\S]*require\(['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]\)/);
   assert.match(source, /if \(this\.data\.demoMode && !viewedOwnerUserId\)[\s\S]*return;[\s\S]*loadIdentityClient\(\)/);
+  assert.match(source, /openMyCardEntry\(\)[\s\S]*wx\.navigateTo/);
   assert.doesNotMatch(template, /服务端投影|服务端核验|运行模式|当前视角/);
 });
 

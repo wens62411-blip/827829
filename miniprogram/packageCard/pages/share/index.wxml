@@ -1,9 +1,9 @@
 <view class="card-page share-page">
   <view class="share-header">
     <view class="share-header__copy">
-      <text class="card-kicker">SHARE YOUR INTRODUCTION</text>
-      <text class="card-title">分享我的名片</text>
-      <text class="card-subtitle">把一张清楚、克制的名片递给对方，是否发送仍由你在微信中确认。</text>
+      <text class="card-kicker">CARD POSTER &amp; ACCESS</text>
+      <text class="card-title">名片海报与入口管理</text>
+      <text class="card-subtitle">此页独立管理名片海报、限时入口与撤销记录；直接转发请从名片页唤起微信面板。</text>
     </view>
     <image class="card-brand-crest share-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
@@ -35,10 +35,10 @@
     <canvas type="2d" id="nativeShareCardCanvas" class="native-share-canvas"></canvas>
   </view>
 
-  <view wx:if="{{card}}" class="share-native-cover" aria-role="region" aria-label="微信分享卡片预览">
-    <text class="share-format-card__eyebrow">WECHAT SHARE CARD</text>
+  <view wx:if="{{card}}" class="share-native-cover" aria-role="region" aria-label="可选的微信转发封面">
+    <text class="share-format-card__eyebrow">OPTIONAL WECHAT COVER</text>
     <view class="share-native-cover__heading">
-      <text class="share-format-card__title">微信分享卡片预览</text>
+      <text class="share-format-card__title">微信转发封面（可选）</text>
       <text class="share-native-cover__ratio">5 : 4</text>
     </view>
     <image wx:if="{{shareCoverState === 'READY'}}" class="share-native-cover__image" src="{{shareCoverPath}}" mode="widthFix" aria-label="包含竖排姓名和公开资料的微信分享卡片" />
@@ -47,7 +47,7 @@
       <text>正在按当前公开权限生成…</text>
     </view>
     <view wx:else class="share-native-cover__empty" aria-live="polite">
-      <text>{{shareCoverMessage || '分享卡片尚未生成。'}}</text>
+      <text>{{shareCoverMessage || '转发封面尚未生成。'}}</text>
       <button wx:if="{{shareCoverState === 'ERROR'}}" class="card-button-secondary share-native-cover__retry" bindtap="retryNativeShareCover">重新生成</button>
     </view>
     <text wx:if="{{shareCoverState === 'READY'}}" class="share-native-cover__note">{{shareCoverMessage}}</text>
@@ -56,11 +56,11 @@
   <view wx:if="{{localNotice}}" class="share-notice" aria-live="polite">{{localNotice}}</view>
 
   <view wx:if="{{demoMode && card}}" class="share-choice-card">
-    <text class="share-choice-card__eyebrow">SHARE PREVIEW</text>
-    <text class="share-choice-card__title">把名片递给微信好友</text>
-    <text class="share-choice-card__copy">{{localIdentityReady ? '上方就是好友接收视角。公开分享不会包含电话或邮箱，发送仍由你在微信中确认。' : '上方就是好友接收视角。发送时会打开微信转发面板；接收方看到的是明确标注的合成示例名片，不会被记录成真实会员或人脉。'}}</text>
+    <text class="share-choice-card__eyebrow">WECHAT FORWARDING</text>
+    <text class="share-choice-card__title">微信转发测试</text>
+    <text class="share-choice-card__copy">{{localIdentityReady ? '上方是可选转发封面。公开转发不会包含电话或邮箱，发送仍由你在微信中确认。' : '上方是可选转发封面。发送时会打开微信转发面板；接收方看到的是明确标注的合成示例名片，不会写入正式账户数据。'}}</text>
     <view class="share-choice-list">
-      <view class="share-choice"><text class="share-choice__index">01</text><view><text class="share-choice__title">微信确认后才发送</text><text class="share-choice__note">页面只负责拉起系统面板，不会替你选择好友或自动发送。</text></view></view>
+      <view class="share-choice"><text class="share-choice__index">01</text><view><text class="share-choice__title">微信确认后才发送</text><text class="share-choice__note">系统面板中由你选择接收方并确认，页面不会自动发送。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">02</text><view><text class="share-choice__title">当前配色随卡片保留</text><text class="share-choice__note">象牙白、墨黑、香槟金与石灰灰会同步到接收页。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">03</text><view><text class="share-choice__title">可生成本地海报</text><text class="share-choice__note">{{localIdentityReady ? '海报只使用公开字段，不包含电话、邮箱或虚构二维码。' : '海报明确标注合成示例，不包含私密资料或虚构二维码。'}}</text></view></view>
     </view>
@@ -70,10 +70,10 @@
 
   <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="share-choice-card share-choice-card--quiet">
     <text class="share-choice-card__title">有一个曾创建的入口</text>
-    <text class="share-choice-card__copy">它不能在本页再次发送，但仍可请求撤销。若只清除本机记录，旧入口可能继续有效到期。</text>
+    <text class="share-choice-card__copy">它不能在本页再次发送，但仍可请求撤销。若只移除本机撤销记录，旧入口可能继续有效到期。</text>
     <view class="card-stack">
       <button class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">撤销最近入口</button>
-      <button class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
+      <button class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">移除本机撤销记录</button>
     </view>
   </view>
 
@@ -91,17 +91,17 @@
   <view wx:if="{{card && !demoMode}}" class="share-actions">
     <button wx:if="{{(!shareState || shareState === 'REVOKED') && !hasRevocableShare}}" class="card-button" bindtap="createShare" loading="{{busyAction === 'CREATE'}}" disabled="{{busyAction !== ''}}">创建 7 天分享入口</button>
     <button wx:if="{{hasRevocableShare && (shareState === 'SUCCESS' || shareState === 'ERROR')}}" class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">{{shareState === 'ERROR' ? '重试撤销' : '撤销当前入口'}}</button>
-    <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
+    <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">移除本机撤销记录</button>
   </view>
 
   <view wx:if="{{!demoMode && shareState === 'SUCCESS'}}" class="share-format-card">
     <text class="share-format-card__eyebrow">WECHAT</text>
-    <text class="share-format-card__title">微信好友与小程序码</text>
+    <text class="share-format-card__title">微信转发与小程序码</text>
     <text class="share-format-card__copy">先由你确认发送对象；历史入口每次打开都会重新核验是否仍然有效。</text>
     <view wx:if="{{qrMessage}}" class="share-inline-state {{qrState === 'ERROR' ? 'share-inline-state--error' : ''}}">{{qrMessage}}</view>
     <view class="card-stack">
       <button class="card-button-secondary" bindtap="createQrScene" loading="{{busyAction === 'QR'}}" disabled="{{busyAction !== '' || qrState === 'SUCCESS'}}">{{qrState === 'ERROR' ? '重试生成小程序码' : qrState === 'SUCCESS' ? '小程序码已准备' : '生成小程序码'}}</button>
-      <button wx:if="{{qrState === 'ERROR'}}" class="card-button card-button--share" open-type="share">分享给微信好友</button>
+      <button wx:if="{{qrState === 'ERROR'}}" class="card-button card-button--share" open-type="share">打开微信转发</button>
     </view>
   </view>
 
@@ -120,5 +120,5 @@
     </view>
   </view>
 
-  <text class="share-footnote">{{localIdentityReady ? '电话和邮箱不会随卡片发送；发送是否完成以微信确认界面为准。' : (demoMode ? '微信转发和本地海报可以试用；发送的是合成示例，不会产生真实会员、审核或人脉记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。')}}</text>
+  <text class="share-footnote">{{localIdentityReady ? '电话和邮箱不会随卡片发送；发送是否完成以微信确认界面为准。' : (demoMode ? '微信转发和本地海报可以试用；发送的是合成示例，不会写入真实会员或审核记录。' : '私密资料不会进入分享名片；发送是否完成，以微信确认界面为准。')}}</text>
 </view>

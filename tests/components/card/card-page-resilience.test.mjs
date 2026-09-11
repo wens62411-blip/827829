@@ -1,10 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { build } from 'esbuild';
+import { readFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
+const read = (relativePath) => readFileSync(resolve(root, relativePath), 'utf8');
 
 async function loadCardPage() {
   let definition;
@@ -50,7 +52,7 @@ function instantiate(definition) {
   };
 }
 
-test('owner card edit and share buttons navigate to their exact secondary pages', async () => {
+test('owner edit and poster management navigate independently while direct share stays native', async () => {
   const navigations = [];
   globalThis.wx = {
     navigateTo(input) { navigations.push(input); },
@@ -65,11 +67,18 @@ test('owner card edit and share buttons navigate to their exact secondary pages'
     const definition = await loadCardPage();
     const page = instantiate(definition);
     page.openEditor.call(page);
-    page.openShare.call(page);
+    page.openShareManager.call(page);
     assert.deepEqual(navigations, [
       { url: '/packageCard/pages/edit/index' },
       { url: '/packageCard/pages/share/index' },
     ]);
+
+    const template = read('miniprogram/pages/card/index.wxml');
+    const directShareButton = template.match(/<button[^>]*card-link-button--strong[^>]*>[\s\S]*?分享名片[\s\S]*?<\/button>/)?.[0];
+    assert.ok(directShareButton, 'owner card needs a direct share control');
+    assert.match(directShareButton, /open-type="share"/);
+    assert.doesNotMatch(directShareButton, /bindtap=|navigateTo|url=/);
+    assert.match(template, /bindtap="openShareManager"[^>]*>名片海报与入口管理/);
   } finally {
     delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
     delete globalThis.Page;
@@ -84,6 +93,7 @@ test('slow share creation stays pending, de-duplicates taps, and cloud failure n
     hideShareMenu(input) { wxCalls.push(['hideShareMenu', input]); },
     showShareMenu(input) { wxCalls.push(['showShareMenu', input]); },
     showToast(input) { wxCalls.push(['showToast', input]); },
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
     setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
     removeStorageSync(key) { storage.delete(key); },
   };
@@ -114,7 +124,6 @@ test('slow share creation stays pending, de-duplicates taps, and cloud failure n
       createdAt: '2026-08-27T08:00:00.000Z',
       updatedAt: '2026-08-27T08:00:00.000Z',
     };
-
     const first = page.prepareWechatShare.call(page);
     await Promise.resolve();
     assert.equal(page.data.sharePreparing, true);
@@ -151,6 +160,7 @@ test('successful response keeps the bearer only in memory and emits a token-only
     hideShareMenu(input) { wxCalls.push(['hideShareMenu', input]); },
     showShareMenu(input) { wxCalls.push(['showShareMenu', input]); },
     showToast(input) { wxCalls.push(['showToast', input]); },
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
     setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
     removeStorageSync(key) { storage.delete(key); },
   };
@@ -190,6 +200,7 @@ test('successful response keeps the bearer only in memory and emits a token-only
       createdAt: '2026-08-27T08:00:00.000Z',
       updatedAt: '2026-08-27T08:00:00.000Z',
     };
+    page.data.cardTheme = 'stone';
     await Promise.all([
       page.prepareWechatShare.call(page),
       page.prepareWechatShare.call(page),
@@ -201,10 +212,168 @@ test('successful response keeps the bearer only in memory and emits a token-only
     assert.match(persisted, /share_synthetic_pointer_001/);
 
     const share = page.onShareAppMessage.call(page);
-    assert.equal(share.path, `/pages/card-share/index?token=${bearer}`);
+    const shareUrl = new URL(share.path, 'https://mini.program.test');
+    assert.equal(shareUrl.pathname, '/pages/card-share/index');
+    assert.deepEqual([...shareUrl.searchParams.keys()], ['token', 'theme']);
+    assert.equal(shareUrl.searchParams.get('token'), bearer);
+    assert.equal(shareUrl.searchParams.get('theme'), 'stone');
     assert.doesNotMatch(share.path, /ownerUserId|profile|permission|openid|phone/i);
     assert.equal(wxCalls.some(([name]) => name === 'showShareMenu'), true);
+    assert.match(page.data.shareHint, /面板已请求打开/);
+    assert.match(page.data.shareHint, /不会伪造.*分享成功/);
     page.onUnload.call(page);
+  } finally {
+    delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('owner card instances keep independent secrets and stop a token revoked in the manager', async () => {
+  const storage = new Map();
+  const wxCalls = [];
+  const cardA = {
+    cardId: 'card_synthetic_instance_A',
+    ownerUserId: 'user_synthetic_instance_A',
+    displayName: '实例 A',
+    visibility: 'PUBLIC',
+    claims: [],
+    origin: 'SYNTHETIC',
+    verificationState: 'USER_DECLARED',
+    version: 1,
+    createdAt: '2026-09-11T08:00:00.000Z',
+    updatedAt: '2026-09-11T08:00:00.000Z',
+  };
+  const cardB = { ...cardA, cardId: 'card_synthetic_instance_B', ownerUserId: 'user_synthetic_instance_B', displayName: '实例 B' };
+  const bearerA = `sc_${'M'.repeat(27)}`;
+  const bearerB = `sc_${'N'.repeat(27)}`;
+  const tokenIdA = 'share_synthetic_instance_A';
+  const tokenIdB = 'share_synthetic_instance_B';
+  globalThis.wx = {
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
+    setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
+    removeStorageSync(key) { storage.delete(key); },
+    hideShareMenu(input) { wxCalls.push(['hideShareMenu', input]); },
+    showShareMenu(input) { wxCalls.push(['showShareMenu', input]); },
+    showToast(input) { wxCalls.push(['showToast', input]); },
+  };
+  globalThis.__AB_CARD_PAGE_TEST_HOOKS__ = {
+    createCardShare: async (cardId) => ({
+      ok: true,
+      data: {
+        shareTokenId: cardId === cardA.cardId ? tokenIdA : tokenIdB,
+        token: cardId === cardA.cardId ? bearerA : bearerB,
+        targetType: 'CARD',
+        targetId: cardId,
+        expiresAt: '2026-09-18T08:00:00.000Z',
+      },
+    }),
+    getMyCard: async () => ({ ok: false, code: 'NOT_FOUND', message: 'not used' }),
+    revokeCardShare: async (shareTokenId) => ({ ok: true, data: { shareTokenId } }),
+  };
+
+  try {
+    const definition = await loadCardPage();
+    const pageA = instantiate(definition);
+    const pageB = instantiate(definition);
+    pageA.data.card = cardA;
+    pageB.data.card = cardB;
+    await Promise.all([pageA.prepareWechatShare.call(pageA), pageB.prepareWechatShare.call(pageB)]);
+
+    assert.equal(pageA.onShareAppMessage.call(pageA).path, `/pages/card-share/index?token=${bearerA}`);
+    assert.equal(pageB.onShareAppMessage.call(pageB).path, `/pages/card-share/index?token=${bearerB}`);
+
+    const registryKey = [...storage.keys()].find((key) => String(key).includes('last_share_revocation_pointer'));
+    assert.ok(registryKey);
+    const registry = structuredClone(storage.get(registryKey));
+    storage.set(registryKey, {
+      ...registry,
+      pointers: registry.pointers.filter((entry) => entry.shareTokenId !== tokenIdA),
+    });
+    assert.equal(
+      pageA.onShareAppMessage.call(pageA).path,
+      `/pages/card-share/index?token=${bearerA}`,
+      'removing only the local pointer must not pretend the server token was revoked',
+    );
+
+    const revoker = instantiate(definition);
+    revoker.data.card = cardA;
+    revoker.data.shareReady = true;
+    revoker.activeShare = { token: bearerA, shareTokenId: tokenIdA };
+    await revoker.revokePreparedShare.call(revoker);
+    pageA.onShow.call(pageA);
+    assert.equal(pageA.data.shareReady, false);
+    assert.match(pageA.data.shareHint, /已在入口管理中撤销/);
+    assert.equal(pageA.onShareAppMessage.call(pageA).path, '/pages/card-share/index?invalid=1');
+    assert.equal(pageB.onShareAppMessage.call(pageB).path, `/pages/card-share/index?token=${bearerB}`);
+    assert.equal(storage.get(registryKey).pointers.some((entry) => entry.shareTokenId === tokenIdB), true);
+  } finally {
+    delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('a share response arriving after owner-card unload cannot install or persist a bearer', async () => {
+  const storage = new Map();
+  let settleCreate;
+  const createPending = new Promise((resolvePromise) => { settleCreate = resolvePromise; });
+  globalThis.wx = {
+    hideShareMenu() {},
+    showShareMenu() {},
+    showToast() {},
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
+    setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
+    removeStorageSync(key) { storage.delete(key); },
+  };
+  globalThis.__AB_CARD_PAGE_TEST_HOOKS__ = {
+    createCardShare: async () => createPending,
+    getMyCard: async () => ({ ok: false, message: 'not used' }),
+    revokeCardShare: async () => ({ ok: false, message: 'not used' }),
+  };
+
+  try {
+    const definition = await loadCardPage();
+    let postUnloadWrites = 0;
+    const page = {
+      ...definition,
+      data: structuredClone(definition.data),
+      setData(patch) {
+        if (this.cardPageUnloaded) postUnloadWrites += 1;
+        Object.assign(this.data, patch);
+      },
+    };
+    page.data.card = {
+      cardId: 'card_synthetic_late_owner_001',
+      ownerUserId: 'user_synthetic_late_owner_001',
+      displayName: '离页竞态测试',
+      visibility: 'PUBLIC',
+      claims: [],
+      origin: 'SYNTHETIC',
+      verificationState: 'USER_DECLARED',
+      version: 1,
+      createdAt: '2026-09-11T08:00:00.000Z',
+      updatedAt: '2026-09-11T08:00:00.000Z',
+    };
+
+    const pending = page.prepareWechatShare.call(page);
+    await Promise.resolve();
+    page.onUnload.call(page);
+    settleCreate({
+      ok: true,
+      data: {
+        shareTokenId: 'share_synthetic_late_owner_001',
+        token: `sc_${'L'.repeat(27)}`,
+        targetType: 'CARD',
+        targetId: 'card_synthetic_late_owner_001',
+        expiresAt: '2026-09-18T08:00:00.000Z',
+      },
+    });
+    await pending;
+
+    assert.equal(postUnloadWrites, 0);
+    assert.equal(storage.size, 0);
+    assert.equal(page.data.shareReady, false);
   } finally {
     delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
     delete globalThis.Page;

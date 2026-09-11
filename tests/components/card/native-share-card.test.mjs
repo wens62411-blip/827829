@@ -77,7 +77,7 @@ test('native share card uses a 5:4 editorial layout with vertical name and divid
   assert.match(source, /content\.email\s*\?/);
 });
 
-test('owner share page previews the native cover and can fall back to sharing without it', () => {
+test('poster and access page keeps the native cover optional and can share without it', () => {
   const page = readFileSync(sharePagePath, 'utf8');
   const template = readFileSync(shareTemplatePath, 'utf8');
 
@@ -86,9 +86,10 @@ test('owner share page previews the native cover and can fall back to sharing wi
   assert.match(page, /email:\s*draft\?\.showEmail\s*\?\s*draft\.email\s*:\s*''/);
   assert.match(page, /imageUrl:\s*this\.data\.shareCoverPath/g);
   assert.match(template, /id="nativeShareCardCanvas"/);
-  assert.match(template, /微信分享卡片预览/);
+  assert.match(template, /名片海报与入口管理/);
+  assert.match(template, /微信转发封面（可选）/);
   assert.doesNotMatch(template, /disabled="\{\{shareCoverState\s*!==\s*'READY'\}\}"/);
   assert.match(template, /disabled="\{\{shareCoverState\s*===\s*'LOADING'\}\}"/);
   assert.match(template, /allow-forward="\{\{shareState === 'SUCCESS' && shareCoverState !== 'LOADING'\}\}"/);
-  assert.match(template, /WECHAT SHARE CARD/);
+  assert.match(template, /OPTIONAL WECHAT COVER/);
 });

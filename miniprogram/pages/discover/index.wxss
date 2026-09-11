@@ -145,6 +145,25 @@
 
 .discover-primary-action__arrow { flex: 0 0 auto; font-size: 34rpx; }
 
+.discover-brand-share {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 540rpx;
+  min-height: 88rpx;
+  margin: 16rpx 0 0;
+  padding: 18rpx 24rpx;
+  border: 2rpx solid var(--discover-accent);
+  border-radius: 6rpx;
+  background: transparent;
+  color: var(--discover-ink);
+  font-size: 25rpx;
+  font-weight: 650;
+  letter-spacing: .06em;
+  line-height: 1.3;
+}
+
+.discover-brand-share::after { border: 0; }
+
 .discover-hero__rule { width: 100%; max-width: 540rpx; height: 2rpx; margin-top: 36rpx; background: var(--discover-line); }
 
 .discover-runtime__label { display: block; color: var(--discover-muted); font-size: 20rpx; line-height: 1.5; }

@@ -1,5 +1,5 @@
 {
-  "navigationBarTitleText": "查看名片",
+  "navigationBarTitleText": "数字名片",
   "enablePullDownRefresh": true,
   "backgroundTextStyle": "dark",
   "usingComponents": {

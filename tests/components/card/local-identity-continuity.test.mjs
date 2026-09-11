@@ -117,8 +117,9 @@ test('local contact controls describe the privacy behavior that sharing actually
   const template = read('miniprogram/packageCard/pages/edit/index.wxml');
 
   assert.match(template, /localIdentityReady \|\| registerMode/);
-  assert.match(template, /只控制当前设备上的本机名片预览/);
-  assert.match(template, /不会进入微信分享卡片、接收页或海报/);
+  assert.match(template, /电话和邮箱只在当前设备预览/);
+  assert.match(template, /离线演示分享不会把联系方式写进链接/);
+  assert.match(template, /云端公开联系方式需在服务端字段权限接入后开放/);
   assert.match(template, /分享时自动移除/);
 });
 
@@ -160,13 +161,14 @@ test('local registration requires an explicit city instead of silently choosing 
   assert.doesNotMatch(localSaveBranch, /cityId:\s*\(cityId \?\? CITY_DIRECTORY\[0\]\.id\)/);
 });
 
-test('cold-start card receiver distinguishes local input from synthetic demo evidence', () => {
+test('cold-start card receiver presents the shared person without local-device ownership copy', () => {
   const receiver = read('miniprogram/pages/card-share/index.ts');
   const template = read('miniprogram/pages/card-share/index.wxml');
 
   assert.match(receiver, /options\.local === '1'/);
   assert.match(receiver, /snapshot\.source !== 'LOCAL'/);
-  assert.match(receiver, /从本机转发的公开名片/);
+  assert.match(receiver, /visitorTitleForCard\(snapshot\.card\)/);
   assert.match(template, /localIdentityMode/);
-  assert.match(template, /本机名片 · 非云端账户/);
+  assert.match(template, /分享者公开资料/);
+  assert.doesNotMatch(`${receiver}\n${template}`, /本机名片/);
 });

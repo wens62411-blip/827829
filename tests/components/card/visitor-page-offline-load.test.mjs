@@ -38,3 +38,47 @@ test('visitor OFFLINE_DEMO registers without eagerly loading the live identity c
   assert.ok(demoGuard >= 0, 'visitor page must retain the explicit offline demo guard');
   assert.ok(liveClientLoad > demoGuard, 'live identity client must load only after the offline demo guard');
 });
+
+test('visitor surfaces stay read-only and keep the shared person while opening the local card CTA', () => {
+  const source = read('miniprogram/packageCard/pages/view/index.ts');
+  const template = read('miniprogram/packageCard/pages/view/index.wxml');
+  const shareSource = read('miniprogram/pages/card-share/index.ts');
+  const shareTemplate = read('miniprogram/pages/card-share/index.wxml');
+  const combinedTemplates = `${template}\n${shareTemplate}`;
+
+  assert.doesNotMatch(
+    combinedTemplates,
+    /申请认识|交换名片|添加好友|建立好友关系|好友关系|本机名片|克制|清除/,
+  );
+  assert.doesNotMatch(template, /packageSocial\/pages\/friend/);
+  assert.match(combinedTemplates, /创建我的数字名片/);
+  assert.match(combinedTemplates, /查看我的名片/);
+
+  for (const candidate of [source, shareSource]) {
+    const start = candidate.indexOf('openMyCardEntry()');
+    const end = candidate.indexOf('\n  },', start);
+    const body = candidate.slice(start, end);
+    assert.match(body, /wx\.navigateTo\(/, '打开自己的名片应保留访客页返回栈');
+    assert.doesNotMatch(body, /switchTab|redirectTo|reLaunch/);
+    assert.doesNotMatch(body, /this\.data\.card\s*=|card:\s*this\.data\.card|viewedOwnerUserId\s*=/);
+  }
+
+  assert.doesNotMatch(source, /visitorForwardPath|ownerUserId=\$\{encodeURIComponent/);
+  assert.doesNotMatch(template, /open-type="share"/);
+  assert.match(source, /Legacy owner-id routes remain readable/);
+  assert.match(shareSource, /title:\s*safeShareTitle\(card\.displayName\)/);
+  assert.match(shareSource, /path:\s*`\/pages\/card-share\/index\?\$\{query\}\$\{themeQuery\}`/);
+  assert.match(shareSource, /SAFE_VISITOR_SHARE_COVER\s*=\s*['"]\/assets\/brand\/ab-club-share-safe-cover\.jpg['"]/);
+  assert.equal((shareSource.match(/imageUrl:\s*SAFE_VISITOR_SHARE_COVER/g) ?? []).length, 3);
+  assert.doesNotMatch(`${source}\n${shareSource}`, /(?:phone|email)[^\n]*encodeURIComponent|encodeURIComponent\([^)]*(?:phone|email)/i);
+});
+
+test('visitor failures clear the prior card instead of falling back to another person', () => {
+  const source = read('miniprogram/packageCard/pages/view/index.ts');
+  const shareSource = read('miniprogram/pages/card-share/index.ts');
+
+  assert.match(source, /if \(!result\.ok\) \{[\s\S]*?card:\s*null[\s\S]*?visitorTitle:\s*DEFAULT_VISITOR_TITLE/);
+  assert.match(source, /result\.data\.card\.ownerUserId !== viewedOwnerUserId[\s\S]*?card:\s*null/);
+  assert.match(shareSource, /if \(!result\.ok\) \{[\s\S]*?card:\s*null[\s\S]*?visitorTitle:\s*DEFAULT_VISITOR_TITLE/);
+  assert.match(shareSource, /catch \(_error\) \{[\s\S]*?card:\s*null[\s\S]*?visitorTitle:\s*DEFAULT_VISITOR_TITLE/);
+});

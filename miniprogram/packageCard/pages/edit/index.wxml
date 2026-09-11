@@ -11,16 +11,17 @@
     </view>
   </view>
 
-  <view class="card-editor-tabs" aria-role="group" aria-label="名片预览、编辑与分享操作">
-    <button class="card-editor-tab {{editorMode === 'PREVIEW' ? 'card-editor-tab--active' : ''}}" data-mode="PREVIEW" bindtap="setEditorMode" aria-pressed="{{editorMode === 'PREVIEW'}}">名片预览</button>
-    <button class="card-editor-tab card-editor-tab--bordered {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-pressed="{{editorMode === 'EDIT'}}">编辑内容</button>
+  <view class="card-editor-tabs" aria-role="group" aria-label="名片预览、编辑与完成操作">
+    <button class="card-editor-tab {{editorMode === 'PREVIEW' ? 'card-editor-tab--active' : ''}}" data-mode="PREVIEW" bindtap="setEditorMode" disabled="{{status === 'SAVING' || saveAndShareBusy || sharePreparing}}" aria-pressed="{{editorMode === 'PREVIEW'}}">名片预览</button>
+    <button class="card-editor-tab card-editor-tab--bordered {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" disabled="{{status === 'SAVING' || saveAndShareBusy || sharePreparing}}" aria-pressed="{{editorMode === 'EDIT'}}">编辑内容</button>
     <button
-      class="card-editor-tab card-editor-tab--bordered card-editor-tab--share"
-      bindtap="saveAndOpenShare"
+      class="card-editor-tab card-editor-tab--bordered card-editor-tab--complete"
+      bindtap="completeEdit"
+      loading="{{saveAndShareBusy}}"
       disabled="{{status === 'LOADING' || status === 'SAVING' || saveAndShareBusy || !(profile || creatingProfile || localIdentityReady || registerMode)}}"
-      aria-label="{{status === 'LOADING' ? '名片正在加载' : (saveAndShareBusy ? '正在保存并准备分享我的名片' : '保存当前编辑并分享我的名片')}}"
+      aria-label="{{status === 'LOADING' ? '名片正在加载' : (saveAndShareBusy ? '正在保存并准备名片' : '完成编辑并查看最新名片')}}"
       aria-busy="{{saveAndShareBusy}}"
-    >{{status === 'LOADING' ? '名片加载中…' : (saveAndShareBusy ? '准备分享…' : '分享我的名片')}}</button>
+    >{{status === 'LOADING' ? '名片加载中…' : (saveAndShareBusy ? '正在完成…' : '完成')}}</button>
   </view>
 
   <view wx:if="{{registerMode}}" class="card-editor-evidence">本机名片 · 保存后只保存在这台设备</view>
@@ -54,9 +55,17 @@
         show-default-actions="{{false}}"
       />
       <view class="card-editor-preview__actions">
-        <button class="card-button" data-mode="EDIT" bindtap="setEditorMode">编辑这张名片</button>
-        <button class="card-link-button" bindtap="returnToOwnerCard">返回我的名片</button>
+        <button
+          class="card-button card-editor-share-button"
+          open-type="share"
+          disabled="{{!shareReady || sharePreparing || saveAndShareBusy}}"
+          aria-label="{{shareReady ? '将这张名片分享给微信好友' : '请先点击完成准备最新名片'}}"
+        >{{sharePreparing ? '正在准备…' : '分享名片'}}</button>
+        <button class="card-button-secondary" data-mode="EDIT" bindtap="setEditorMode" disabled="{{saveAndShareBusy || sharePreparing}}">继续编辑</button>
+        <button class="card-button-secondary" bindtap="openShareManager" disabled="{{saveAndShareBusy || sharePreparing}}">名片海报与入口</button>
+        <button class="card-link-button" bindtap="returnToOwnerCard" disabled="{{saveAndShareBusy || sharePreparing}}">返回我的名片</button>
       </view>
+      <text class="card-editor-preview__share-note" aria-live="polite">{{shareMessage}}</text>
       <text class="card-editor-preview__note">这里只预览已经打开“对外展示”的标签；关闭后，访客和分享名片都会隐藏。</text>
     </view>
 
@@ -128,7 +137,7 @@
           <view><text class="card-editor-section__eyebrow">CONTACT</text><text class="card-editor-section__title">联系方式</text></view>
           <text class="card-editor-section__hint">选填 · 独立公开</text>
         </view>
-        <text class="card-editor-contact-intro">{{(localIdentityReady || registerMode) ? '开关只控制当前设备上的本机名片预览；电话和邮箱不会进入微信分享卡片、接收页或海报。' : '电话与邮箱分别控制。只有填写有效内容并打开对应开关，才会出现在访客名片、微信分享卡片和接收页。'}}</text>
+        <text class="card-editor-contact-intro">电话和邮箱只在当前设备预览；离线演示分享不会把联系方式写进链接。云端公开联系方式需在服务端字段权限接入后开放。</text>
         <view class="card-editor-contact-grid">
           <view class="card-editor-contact-card">
             <view class="card-field card-editor-contact-field">
@@ -219,9 +228,9 @@
       </view>
 
       <view class="card-editor-savebar">
-        <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">{{localIdentityReady ? '保存名片' : (registerMode ? '创建我的名片' : (demoMode ? '完成本页预览' : (creatingProfile ? '创建我的名片' : '保存名片')))}}</button>
-        <button class="card-button-secondary" bindtap="saveAndOpenShare" loading="{{saveAndShareBusy}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">分享我的名片</button>
+        <button class="card-button" bindtap="completeEdit" loading="{{status === 'SAVING' || saveAndShareBusy}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">{{localIdentityReady ? '完成并预览' : (registerMode ? '创建并预览名片' : (demoMode ? '完成并预览' : (creatingProfile ? '创建并预览名片' : '完成并预览')))}}</button>
         <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode" disabled="{{status === 'SAVING' || saveAndShareBusy}}">查看实时效果</button>
+        <button class="card-link-button" bindtap="openShareManager" disabled="{{status === 'SAVING' || saveAndShareBusy}}">名片海报与入口管理</button>
         <text class="card-editor-savebar__note">标签与图片仅用于本机预览，不会被冒充为人工认证。</text>
       </view>
     </view>

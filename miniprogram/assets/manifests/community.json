@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "1.0.0",
+  "generatedAt": "2026-09-11T14:34:28.3260849+08:00",
+  "evidenceStatus": "LICENSE_METADATA_RECORDED_HUMAN_REVIEW_PENDING",
+  "runtimePolicy": "LOCAL_FILE_ONLY_NO_HOTLINK",
+  "asset": {
+    "assetId": "community-european-salon-hero-1440-v1",
+    "path": "/assets/community/european-salon-hero.jpg",
+    "sourcePage": "https://commons.wikimedia.org/wiki/File:Tremezzo_Villa_Carlotta_(interior)_(25).jpg",
+    "author": "Pierre André Leclercq",
+    "license": "CC BY-SA 4.0",
+    "licenseUrl": "https://creativecommons.org/licenses/by-sa/4.0/",
+    "sourceSha256": "f989752d3e485bd81215db62bd70f9593fc25ca0a49ac926e5e46575647f21bd",
+    "sourceDimensions": [3840, 2880],
+    "originalDimensions": [4896, 3672],
+    "sourceVariant": "Wikimedia 3840px derivative downloaded from the source page",
+    "crop": {
+      "x": 420,
+      "y": 500,
+      "width": 3420,
+      "height": 1425,
+      "focus": "window, framed painting, period seating and inlaid table"
+    },
+    "processing": {
+      "resize": "HIGH_QUALITY_BICUBIC",
+      "runtimeFormat": "JPEG",
+      "runtimeDimensions": [1440, 600],
+      "jpegQuality": 76,
+      "bytes": 90898
+    },
+    "sha256": "f99f12e4f291db123aeb41339b4f88c8cc3cd2de0a4f7fa1a9704cce1d85906e",
+    "alt": "意大利卡洛塔别墅古典艺术沙龙室内",
+    "rightsState": "CLAIMED",
+    "reviewStatus": "DRAFT",
+    "publicationPolicy": "HUMAN_RIGHTS_REVIEW_REQUIRED",
+    "attributionRequired": true,
+    "modificationNotice": "Cropped to the salon focal region, resized to 1440x600, and JPEG-compressed for the mini program.",
+    "externalHotlink": false
+  }
+}

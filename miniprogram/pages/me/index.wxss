@@ -200,7 +200,7 @@
 
 .me-city-group__art {
   position: relative;
-  height: 236rpx;
+  height: 276rpx;
   overflow: hidden;
   background: #2d2823;
 }
@@ -214,6 +214,10 @@
   left: 0;
   width: 100%;
   height: 100%;
+}
+
+.me-city-group__image {
+  object-position: center center;
 }
 
 .me-city-group__shade {
@@ -265,7 +269,8 @@
 .me-city-group__kicker,
 .me-city-group__evidence,
 .me-city-group__title,
-.me-city-group__copy,
+.me-city-group__contact-label,
+.me-city-group__wechat,
 .me-city-group__boundary {
   display: block;
   overflow-wrap: anywhere;
@@ -296,15 +301,34 @@
   line-height: 1.3;
 }
 
-.me-city-group__copy {
-  margin-top: 14rpx;
-  color: #d1c8bc;
-  font-size: 24rpx;
-  line-height: 1.68;
-  overflow-wrap: normal;
+.me-city-group__contact {
+  box-sizing: border-box;
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20rpx;
+  margin-top: 24rpx;
+  padding: 20rpx 0;
+  border-top: 2rpx solid #4b443b;
+  border-bottom: 2rpx solid #4b443b;
 }
 
-.me-city-group__city-token { display: inline-block; white-space: nowrap; }
+.me-city-group__contact-label {
+  color: #bdb3a7;
+  font-size: 21rpx;
+  line-height: 1.45;
+}
+
+.me-city-group__wechat {
+  color: #fffaf0;
+  font-family: Georgia, "Songti SC", serif;
+  font-size: 25rpx;
+  font-weight: 600;
+  letter-spacing: .02em;
+  line-height: 1.45;
+  text-align: right;
+}
 
 .me-city-group__actions {
   display: flex;
@@ -328,6 +352,7 @@
   line-height: 1.35;
   text-align: center;
   overflow-wrap: anywhere;
+  transition: background var(--ab-motion-quick) ease, color var(--ab-motion-quick) ease, opacity var(--ab-motion-quick) ease;
 }
 
 .me-city-group__action::after {
@@ -335,10 +360,10 @@
 }
 
 .me-city-group__action--primary {
-  flex: 1.35;
+  flex: 1;
   border: 2rpx solid var(--ab-color-gold-soft);
-  background: transparent;
-  color: var(--ab-color-gold-soft);
+  background: var(--ab-color-gold-soft);
+  color: #211e1a;
 }
 
 .me-city-group__action--secondary {
@@ -348,6 +373,10 @@
   color: var(--ab-color-paper);
 }
 
+.me-city-group__action--pressed {
+  opacity: .74;
+}
+
 .me-city-group__boundary {
   margin-top: 22rpx;
   padding-top: 20rpx;
@@ -355,6 +384,15 @@
   color: #aaa094;
   font-size: 20rpx;
   line-height: 1.6;
+}
+
+.me-city-group__credit {
+  display: block;
+  margin-top: 14rpx;
+  color: #8f867a;
+  font-size: 17rpx;
+  line-height: 1.55;
+  overflow-wrap: anywhere;
 }
 
 .me-section-heading {
@@ -484,6 +522,11 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .me-pressed,
+  .me-city-group__action {
+    transition: none;
+  }
+
   .me-pressed {
     opacity: 1;
   }
@@ -517,6 +560,16 @@
   .me-city-group__actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .me-city-group__contact {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 8rpx;
+  }
+
+  .me-city-group__wechat {
+    text-align: left;
   }
 
   .me-city-group__evidence,

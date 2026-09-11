@@ -222,8 +222,10 @@ function compactPayload(draftValue: unknown, theme: CardTheme): CompactSnapshotP
     h: draft.profession,
     b: draft.biography,
     c: draft.cityId,
-    p: draft.showPhone ? draft.phone : '',
-    e: draft.showEmail ? draft.email : '',
+    // A demo query snapshot is reversible transport, not private storage.
+    // Contacts require the server-filtered token flow and never enter the URL.
+    p: '',
+    e: '',
     l: publicLabelsForDraft(draft),
     t: normalizeCardTheme(theme),
   };
@@ -251,10 +253,10 @@ function draftFromPayload(payload: CompactSnapshotPayload): OfflineDemoDraft {
     profession: payload.h,
     biography: payload.b,
     cityId: payload.c as CityId,
-    phone: payload.p,
-    email: payload.e,
-    showPhone: Boolean(payload.p),
-    showEmail: Boolean(payload.e),
+    phone: '',
+    email: '',
+    showPhone: false,
+    showEmail: false,
     selectedLabels: payload.l,
     showTags: payload.l.length > 0,
   });

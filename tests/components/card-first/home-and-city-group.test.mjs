@@ -28,7 +28,7 @@ function hasGeographySummary(source) {
 }
 
 function cityGroupWindow(source) {
-  const anchor = source.search(/所在城市群|当前城市群|我的城市群|支持的城市清单/);
+  const anchor = source.search(/所在城市群|当前城市群|我的城市群|支持的城市清单|加入各地巡演群/);
   if (anchor < 0) return '';
   return source.slice(Math.max(0, anchor - 600), Math.min(source.length, anchor + 3600));
 }
@@ -102,12 +102,15 @@ test('home has no slogan, public group QR, feed metrics, or direct-chat affordan
   assert.deepEqual(errors, []);
 });
 
-test('Me page exposes the supported city list and keeps only the profile edit entry', () => {
+test('Me page exposes the community contact CTA and keeps only the profile edit entry', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const actions = interactiveMarkup(template);
   const errors = [];
 
-  if (!/支持的城市清单/.test(template)) errors.push('“我的”页缺少支持的城市清单');
+  if (!/加入各地巡演群，请添加负责人微信。/.test(template)) errors.push('“我的”页缺少巡演群负责人引导');
+  if (!actions.some((markup) => /复制负责人微信号/.test(markup) && /bindtap="copyCommunityWechat"/.test(markup))) {
+    errors.push('“我的”页缺少负责人微信号复制动作');
+  }
   if (!actions.some((markup) => /编辑/.test(markup) && /url="\/packageCard\/pages\/edit\/index"/.test(markup))) {
     errors.push('“我的”页缺少个人资料编辑入口');
   }
@@ -135,13 +138,13 @@ test('city-group UI stays OFFLINE_DEMO or operations-pending while frozen contra
   const template = read('miniprogram/pages/me/index.wxml');
   const pageSource = read('miniprogram/pages/me/index.ts');
   const groupSurface = cityGroupWindow(template);
-  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入|逐步开放/;
+  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入|逐步开放|以微信内实际操作为准/;
   const errors = [];
 
   if (!groupSurface) {
     errors.push('无法定位“我的”页城市群区块，因而无法验证能力边界');
   } else if (!boundary.test(groupSurface) && !referencedBoundaryCopy(groupSurface, pageSource)) {
-    errors.push('城市群区块没有“逐步开放”或 OFFLINE_DEMO/未接入边界说明');
+    errors.push('城市群区块没有说明复制后仍需在微信内完成后续操作');
   }
 
   const positiveClaims = unnegatedPositiveClaims(`${groupSurface}\n${pageSource}`);

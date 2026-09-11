@@ -78,12 +78,18 @@ async function loadOwnerSharePage() {
             export const isSafeShareTokenId = (value) => typeof value === 'string'
               && value.length >= 3 && value.length <= 128 && /^[A-Za-z0-9._:-]+$/.test(value);
             export const readShareRevocationPointer = () => hooks().revocationPointer;
+            export const markShareRevokedForSession = (tokenId) => {
+              hooks().revokedTokenIds ??= new Set();
+              hooks().revokedTokenIds.add(tokenId);
+            };
+            export const wasShareRevokedForSession = (tokenId) => hooks().revokedTokenIds?.has(tokenId) ?? false;
             export const rememberShareForRevocation = (tokenId) => {
               hooks().revocationPointer = tokenId;
               hooks().remembered.push(tokenId);
               return true;
             };
-            export const forgetShareRevocationPointer = () => {
+            export const forgetShareRevocationPointer = (tokenId) => {
+              if (hooks().revocationPointer !== tokenId) return;
               hooks().revocationPointer = undefined;
               hooks().forgotten += 1;
             };
@@ -221,6 +227,7 @@ test('two owner share pages keep cards, bearer secrets and revocation state isol
     assert.equal(pageB.data.shareState, 'SUCCESS');
     assert.equal(globalThis.__AB_OWNER_SHARE_TEST_HOOKS__.revocationPointer, 'share_owner_B');
     assert.equal(globalThis.__AB_OWNER_SHARE_TEST_HOOKS__.forgotten, 0);
+    assert.deepEqual([...globalThis.__AB_OWNER_SHARE_TEST_HOOKS__.revokedTokenIds], ['share_owner_A']);
     assert.equal(pageB.onShareAppMessage.call(pageB).path, `/pages/card-share/index?token=${tokenB}`);
   } finally {
     delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
@@ -300,7 +307,7 @@ test('a create response arriving after unload cannot install or persist its bear
     assert.deepEqual(globalThis.__AB_OWNER_SHARE_TEST_HOOKS__.remembered, []);
     assert.notEqual(page.data.shareState, 'SUCCESS');
     assert.equal(calls.filter(([name]) => name === 'showShareMenu').length, 0);
-    assert.equal(page.onShareAppMessage.call(page).path, '/pages/card/index');
+    assert.equal(page.onShareAppMessage.call(page).path, '/pages/card-share/index?invalid=1');
   } finally {
     delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
     delete globalThis.Page;
@@ -384,7 +391,7 @@ test('first-time offline users must establish their own card before sharing', as
     assert.equal(cloudReads, 0, 'first-time offline sharing must not read from cloud');
 
     const fallbackShare = page.onShareAppMessage.call(page);
-    assert.equal(fallbackShare.path, '/pages/card/index');
+    assert.equal(fallbackShare.path, '/pages/card-share/index?invalid=1');
     assert.doesNotMatch(JSON.stringify(fallbackShare), /林知遥|demo@|\+41/);
   } finally {
     delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;

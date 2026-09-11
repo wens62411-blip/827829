@@ -239,6 +239,15 @@
   opacity: 0.76;
 }
 
+.card-button[disabled],
+.card-button-secondary[disabled],
+.card-link-button[disabled] {
+  border-color: #b9b0a2;
+  background: #e7e0d5;
+  color: #655f57;
+  opacity: 1;
+}
+
 .card-inline-actions {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -335,6 +344,20 @@
   border-left-color: var(--card-page-gold);
   background: #efe6d6;
   color: #5a4325;
+}
+
+.card-owner-share-feedback {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  margin-top: 22rpx;
+  padding: 22rpx 24rpx;
+  border: 1rpx solid rgba(166, 124, 63, 0.24);
+  border-radius: 22rpx;
+  background: rgba(255, 252, 246, 0.94);
+  color: #5d554b;
+  font-size: 24rpx;
+  line-height: 1.65;
 }
 
 .card-demo-ribbon {
@@ -768,6 +791,23 @@
     color: var(--card-page-ink);
   }
 
+  .card-button,
+  .card-button--share,
+  .card-link-button--strong {
+    border-color: #dec89c;
+    background: #dec89c;
+    color: #211e1a;
+  }
+
+  .card-button[disabled],
+  .card-button-secondary[disabled],
+  .card-link-button[disabled] {
+    border-color: #5f584f;
+    background: #3a3630;
+    color: #bdb4a7;
+    opacity: 1;
+  }
+
   .card-contract-lock {
     border-color: var(--card-page-line);
     background: #2d2924;
@@ -787,6 +827,12 @@
   .card-status--success {
     background: #4b402e;
     color: #f0dfbe;
+  }
+
+  .card-owner-share-feedback {
+    border-color: rgba(220, 190, 132, 0.4);
+    background: #211e1a;
+    color: #f4ead8;
   }
 
   .card-demo-ribbon { background:#332e27; color:var(--card-page-ink); }

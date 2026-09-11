@@ -72,6 +72,7 @@ test('only a real discover cold start can consume the entry film once', async ()
     for (const path of ['', 'pages/discover/index', '/pages/discover/index?from=share']) {
       const app = createApp(definition);
       app.onLaunch.call(app, { path });
+      app.onShow.call(app, { path });
       assert.equal(app.consumeEntryFilmLaunch.call(app), true, path || 'default path');
       assert.equal(app.consumeEntryFilmLaunch.call(app), false, 'the same launch cannot replay');
     }
@@ -84,12 +85,53 @@ test('only a real discover cold start can consume the entry film once', async ()
     ]) {
       const app = createApp(definition);
       app.onLaunch.call(app, { path });
+      app.onShow.call(app, { path });
       assert.equal(app.consumeEntryFilmLaunch.call(app), false, `${path} must bypass the intro`);
       assert.equal(app.consumeEntryFilmLaunch.call(app), false, 'later visits to discover must stay bypassed');
     }
 
     assert.ok(storageWrites.length > 0);
     assert.ok(storageWrites.every(({ key }) => key === 'ab_club_runtime_evidence'), 'intro state must remain memory-only');
+  } finally {
+    delete globalThis.App;
+    delete globalThis.wx;
+  }
+});
+
+test('explicit brand shares arm one cold or warm entry while foreground restores and card shares never do', async () => {
+  const storageWrites = [];
+  try {
+    const definition = await loadAppDefinition(storageWrites);
+    const coldBrand = createApp(definition);
+    const coldOptions = {
+      path: 'pages/discover/index',
+      query: { entry: 'brand', entry_id: 'cold-brand' },
+      scene: 1007,
+    };
+    coldBrand.onLaunch.call(coldBrand, coldOptions);
+    coldBrand.onShow.call(coldBrand, coldOptions);
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), true);
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), false);
+
+    coldBrand.onShow.call(coldBrand, coldOptions);
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), false, 'ordinary restore must not replay the same entry');
+
+    coldBrand.onShow.call(coldBrand, {
+      ...coldOptions,
+      query: { entry: 'brand', entry_id: 'warm-brand' },
+    });
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), true, 'a distinct warm brand entry may play once');
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), false);
+
+    coldBrand.onShow.call(coldBrand, { path: 'pages/discover/index' });
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), false, 'ordinary discover foreground must stay silent');
+
+    coldBrand.onShow.call(coldBrand, {
+      path: 'pages/card-share/index?entry=brand&entry_id=must-not-arm',
+      query: { entry: 'brand', entry_id: 'must-not-arm' },
+      scene: 1007,
+    });
+    assert.equal(coldBrand.consumeEntryFilmLaunch.call(coldBrand), false, 'card share must never trigger the brand film');
   } finally {
     delete globalThis.App;
     delete globalThis.wx;
@@ -116,6 +158,52 @@ test('one page-module claim covers the cold first frame but cannot replay after 
     assert.equal(rebuiltPage.data.showEntryFilm, false, 'a same-process page rebuild must not replay the film');
     assert.equal(consumeCalls, 1, 'page rebuilds use the module claim instead of consuming App state again');
   } finally {
+    delete globalThis.Page;
+    delete globalThis.getApp;
+    delete globalThis.wx;
+  }
+});
+
+test('an existing Discover page consumes a newly armed warm brand entry once', async () => {
+  let pending = false;
+  let consumeCalls = 0;
+  try {
+    const definition = await loadDiscoverDefinition(() => {
+      consumeCalls += 1;
+      if (!pending) return false;
+      pending = false;
+      return true;
+    });
+    const page = createPage(definition);
+    definition.onLoad.call(page);
+    assert.equal(page.data.showEntryFilm, false);
+
+    pending = true;
+    definition.onShow.call(page);
+    assert.equal(page.data.showEntryFilm, true, 'the warm entry is covered by the existing film');
+
+    definition.handleEntryFilmComplete.call(page);
+    assert.equal(page.data.showEntryFilm, false);
+    definition.onShow.call(page);
+    assert.equal(page.data.showEntryFilm, false, 'later page shows cannot replay without a new App entry');
+    assert.equal(consumeCalls, 3, 'module load plus two page shows are the only gate checks');
+  } finally {
+    delete globalThis.Page;
+    delete globalThis.getApp;
+    delete globalThis.wx;
+  }
+});
+
+test('sharing AB Club emits an explicit, instance-scoped brand entry path', async () => {
+  const realNow = Date.now;
+  try {
+    Date.now = () => 1_725_000_000_000;
+    const definition = await loadDiscoverDefinition(() => false);
+    const share = definition.onShareAppMessage();
+    assert.equal(share.title, 'AB Club · 全球华人文化与连接');
+    assert.equal(share.path, `/pages/discover/index?entry=brand&entry_id=${Date.now().toString(36)}`);
+  } finally {
+    Date.now = realNow;
     delete globalThis.Page;
     delete globalThis.getApp;
     delete globalThis.wx;

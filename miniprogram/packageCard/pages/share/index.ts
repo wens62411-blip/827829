@@ -17,6 +17,7 @@ import {
 import {
   forgetShareRevocationPointer,
   isSafeShareTokenId,
+  markShareRevokedForSession,
   readShareRevocationPointer,
   rememberShareForRevocation,
 } from '../../../pages/card/services/share-revocation-pointer';
@@ -286,7 +287,7 @@ Page({
           localIdentityReady: false,
           card: null,
           loadingCard: false,
-          pageError: '请先建立自己的名片，再使用分享功能。',
+          pageError: '请先建立自己的名片，再使用海报与入口管理。',
           localNotice: '',
           shareCoverState: 'IDLE',
           shareCoverMessage: '',
@@ -307,7 +308,7 @@ Page({
         cardTheme: offlineSnapshot.cardTheme,
         cityLabel: cityDisplayName(offlineSnapshot.card.cityId),
         loadingCard: false,
-        localNotice: '本机名片：可拉起微信转发与生成本地海报；对外快照不会包含电话或邮箱，也不会创建云端会员或人脉记录。',
+        localNotice: '当前设备名片：可单独管理微信转发封面与本地海报；对外快照不会包含电话或邮箱，也不会创建云端会员或审核记录。',
         shareCoverState: 'LOADING',
         shareCoverMessage: '正在生成微信分享卡片…',
         shareCoverPath: '',
@@ -475,7 +476,7 @@ Page({
       this.setData({
         shareCoverState: 'READY',
         shareCoverPath: tempFilePath,
-        shareCoverMessage: '这就是微信好友在分享入口看到的卡片封面；隐藏的电话、邮箱和标签不会写入图片。',
+        shareCoverMessage: '这是可选的微信转发封面；隐藏的电话、邮箱和标签不会写入图片。',
       });
       if (this.data.demoMode || this.data.shareState === 'SUCCESS') {
         wx.showShareMenu({ menus: ['shareAppMessage'] });
@@ -660,6 +661,12 @@ Page({
     this.setData({ busyAction: 'REVOKE' });
     try {
       const result = await revokeCardShare(tokenId, card.version);
+      const wasCurrentPointer = readShareRevocationPointer() === tokenId;
+      const revokeConfirmed = result.ok && result.data.shareTokenId === tokenId;
+      if (revokeConfirmed) {
+        markShareRevokedForSession(tokenId);
+        forgetShareRevocationPointer(tokenId);
+      }
       if (!this.isCurrentAction(lifecycleGeneration, actionGeneration)) return;
       if (this.activeCard !== card || this.revocableTokenId !== tokenId) {
         this.setData({
@@ -670,7 +677,7 @@ Page({
         });
         return;
       }
-      if (!result.ok || result.data.shareTokenId !== tokenId) {
+      if (!revokeConfirmed) {
         this.setData({
           busyAction: '',
           shareState: 'ERROR',
@@ -680,19 +687,19 @@ Page({
         return;
       }
       this.activeShareSecret = undefined;
-      this.revocableTokenId = undefined;
-      if (readShareRevocationPointer() === tokenId) forgetShareRevocationPointer();
+      const nextTokenId = wasCurrentPointer ? readShareRevocationPointer() : undefined;
+      this.revocableTokenId = nextTokenId;
       wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
       this.setData({
         busyAction: '',
-        shareState: 'REVOKED',
-        shareTitle: '分享已撤销',
-        shareDescription: '分享已经撤销；旧入口与历史小程序码再次打开时将不再有效。',
+        shareState: nextTokenId ? '' : 'REVOKED',
+        shareTitle: nextTokenId ? '' : '分享已撤销',
+        shareDescription: nextTokenId ? '' : '分享已经撤销；旧入口与历史小程序码再次打开时将不再有效。',
         hasActiveShare: false,
-        hasRevocableShare: false,
+        hasRevocableShare: Boolean(nextTokenId),
         qrState: 'IDLE',
         qrMessage: '',
-        localNotice: '',
+        localNotice: nextTokenId ? '当前入口已撤销；还有较早创建的入口可继续撤销。' : '',
       });
     } catch (_error) {
       if (!this.isCurrentAction(lifecycleGeneration, actionGeneration)) return;
@@ -718,9 +725,9 @@ Page({
     if (!tokenId || this.activeShareSecret || this.data.busyAction || this.sharePageUnloaded) return;
     const lifecycleGeneration = this.sharePageGeneration;
     wx.showModal({
-      title: '仅清除本机记录？',
+      title: '移除本机撤销记录？',
       content: '这不会真正撤销已创建的入口。若撤销一直失败，旧入口可能继续有效直到过期。',
-      confirmText: '清除记录',
+      confirmText: '移除记录',
       confirmColor: POSTER_PALETTE.ink,
       success: (result) => {
         if (
@@ -730,14 +737,17 @@ Page({
           || this.activeShareSecret
           || this.data.busyAction
         ) return;
-        if (readShareRevocationPointer() === tokenId) forgetShareRevocationPointer();
-        this.revocableTokenId = undefined;
+        forgetShareRevocationPointer(tokenId);
+        const nextTokenId = readShareRevocationPointer();
+        this.revocableTokenId = nextTokenId;
         this.setData({
           shareState: '',
           shareTitle: '',
           shareDescription: '',
-          hasRevocableShare: false,
-          localNotice: '仅清除了本机记录，并不代表入口已经撤销。旧入口可能继续有效直到过期。',
+          hasRevocableShare: Boolean(nextTokenId),
+          localNotice: nextTokenId
+            ? '只移除了这条本机记录；还有较早入口可继续处理。被移除记录对应的入口可能继续有效直到过期。'
+            : '只移除了本机撤销记录，并不代表入口已经撤销。旧入口可能继续有效直到过期。',
         });
       },
     });
@@ -915,7 +925,7 @@ Page({
       if (!sharePath.ok) {
         this.setData({ localNotice: '当前内容超过微信分享路径预算，请返回编辑页精简个人简介。' });
         wx.showToast({ title: '请先精简名片内容', icon: 'none' });
-        return { title: 'AB Club', path: '/pages/discover/index' };
+        return { title: 'AB Club 数字名片', path: '/pages/card-share/index?invalid=1' };
       }
       this.setData({ localNotice: '已请求打开微信转发面板；只有你在微信界面确认后才会真正发送。' });
       return {
@@ -933,7 +943,7 @@ Page({
       || this.data.shareState !== 'SUCCESS'
     ) {
       wx.showToast({ title: '请先创建安全分享入口', icon: 'none' });
-      return { title: 'AB Club', path: '/pages/card/index' };
+      return { title: 'AB Club 数字名片', path: '/pages/card-share/index?invalid=1' };
     }
     this.setData({
       shareDescription: '已请求打开微信转发面板；是否真正转发以微信系统结果为准。',

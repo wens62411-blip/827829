@@ -22,34 +22,39 @@
     <view wx:if="{{profile && profile.phoneMasked}}" class="me-private-note" aria-role="note">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开名片。</view>
   </block>
 
-  <view class="me-city-group" aria-role="region" aria-label="AB Club 支持的城市清单">
+  <view class="me-city-group" aria-role="region" aria-label="加入各地巡演群">
     <view wx:if="{{cityImageSrc && !cityImageFailed}}" class="me-city-group__art">
       <image
         class="me-city-group__image"
         src="{{cityImageSrc}}"
         mode="aspectFill"
         lazy-load="{{true}}"
-        alt="{{cityName}}城市群城市景观"
+        alt="意大利卡洛塔别墅古典艺术沙龙室内"
         binderror="handleCityImageError"
       />
       <view class="me-city-group__shade"></view>
-        <text class="me-city-group__city">CURRENT CITY · {{cityName || 'HANGZHOU'}}</text>
+        <text class="me-city-group__city">AB CLUB · CITY COMMUNITY</text>
     </view>
     <view wx:else class="me-city-group__art me-city-group__art--fallback">
       <image class="me-city-group__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
-      <text class="me-city-group__city">SUPPORTED CITIES · AB CLUB</text>
+      <text class="me-city-group__city">AB CLUB · CITY COMMUNITY</text>
     </view>
 
     <view class="me-city-group__body">
       <view class="me-city-group__masthead">
-        <text class="me-city-group__kicker">SUPPORTED CITIES</text>
-        <text class="me-city-group__evidence">13 城目录 · 逐步开放</text>
+        <text class="me-city-group__kicker">CITY COMMUNITY</text>
+        <text class="me-city-group__evidence">WECHAT GROUPS</text>
       </view>
-      <text class="me-city-group__title">{{cityGroupTitle}}</text>
-      <view class="me-city-group__copy" aria-label="{{supportedCities}}">
-        <text wx:for="{{supportedCityNames}}" wx:key="*this" class="me-city-group__city-token">{{item}}{{index === supportedCityNames.length - 1 ? '' : '、'}}</text>
+      <text class="me-city-group__title">加入各地巡演群，请添加负责人微信。</text>
+      <view class="me-city-group__contact" aria-label="负责人微信号 {{communityWechatId}}">
+        <text class="me-city-group__contact-label">负责人微信</text>
+        <text class="me-city-group__wechat" user-select="{{true}}">微信号：{{communityWechatId}}</text>
       </view>
-      <text class="me-city-group__boundary" aria-live="polite">节点开放状态以后续公告为准。</text>
+      <view class="me-city-group__actions">
+        <button class="me-city-group__action me-city-group__action--primary" bindtap="copyCommunityWechat" hover-class="me-city-group__action--pressed" aria-label="复制负责人微信号 {{communityWechatId}}">复制负责人微信号</button>
+      </view>
+      <text class="me-city-group__boundary" aria-live="polite">复制后请前往微信搜索该账号；是否添加及入群以微信内实际操作为准。</text>
+      <text wx:if="{{cityImageSrc && !cityImageFailed}}" class="me-city-group__credit">图片：Pierre André Leclercq（裁切与压缩）· CC BY-SA 4.0 · Wikimedia Commons</text>
     </view>
   </view>
 

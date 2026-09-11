@@ -128,6 +128,13 @@ Page({
   },
 
   onShow() {
+    const showEntryFilm = this.data.showEntryFilm || consumeColdStartEntryFilm();
+    if (showEntryFilm !== this.data.showEntryFilm) {
+      this.setData({ showEntryFilm }, () => {
+        updateTabBarPresentation(this, 0, true);
+      });
+      return;
+    }
     updateTabBarPresentation(this, 0, this.data.showEntryFilm);
   },
 
@@ -184,9 +191,10 @@ Page({
   },
 
   onShareAppMessage() {
+    const entryId = Date.now().toString(36);
     return {
       title: 'AB Club · 全球华人文化与连接',
-      path: '/pages/discover/index',
+      path: `/pages/discover/index?entry=brand&entry_id=${entryId}`,
     };
   },
 });

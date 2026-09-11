@@ -29,20 +29,18 @@ function loadIdentityClient(): IdentityClientModule {
 
 interface CityGroupView {
   readonly cityName: string;
-  readonly cityGroupTitle: string;
   readonly cityImageSrc: string;
   readonly hasProfileCity: boolean;
 }
 
+const COMMUNITY_IMAGE_SRC = '/assets/community/european-salon-hero.jpg';
+const COMMUNITY_WECHAT_ID = 'ABclub1';
+
 const EMPTY_CITY_GROUP: CityGroupView = {
   cityName: '',
-  cityGroupTitle: 'AB Club 支持的城市清单',
-  cityImageSrc: '',
+  cityImageSrc: COMMUNITY_IMAGE_SRC,
   hasProfileCity: false,
 };
-
-const supportedCities = CITY_DIRECTORY.map((city) => city.name.zh).join('、');
-const supportedCityNames = CITY_DIRECTORY.map((city) => city.name.zh);
 
 function displayInitial(displayName: string): string {
   return Array.from(displayName.trim())[0] ?? 'AB';
@@ -63,8 +61,7 @@ function resolveCityGroup(profile: ProfilePrivateDto | null): CityGroupView {
 
   return {
     cityName: city.name.zh,
-    cityGroupTitle: 'AB Club 支持的城市清单',
-    cityImageSrc: `/assets/cities/${city.id}.jpg`,
+    cityImageSrc: COMMUNITY_IMAGE_SRC,
     hasProfileCity: true,
   };
 }
@@ -78,12 +75,10 @@ Page({
     localIdentityReady: false,
     profileInitial: 'AB',
     cityName: '',
-    cityGroupTitle: EMPTY_CITY_GROUP.cityGroupTitle,
-    cityImageSrc: '',
+    cityImageSrc: EMPTY_CITY_GROUP.cityImageSrc,
     cityImageFailed: false,
     hasProfileCity: false,
-    supportedCities,
-    supportedCityNames,
+    communityWechatId: COMMUNITY_WECHAT_ID,
     status: 'IDLE' as 'IDLE' | 'LOADING' | 'READY' | 'ERROR',
     message: '',
   },
@@ -170,6 +165,24 @@ Page({
 
   handleCityImageError() {
     this.setData({ cityImageFailed: true });
+  },
+
+  copyCommunityWechat() {
+    wx.setClipboardData({
+      data: COMMUNITY_WECHAT_ID,
+      success: () => {
+        wx.showToast({
+          title: '微信号已复制，请前往微信添加负责人。',
+          icon: 'none',
+        });
+      },
+      fail: () => {
+        wx.showToast({
+          title: '复制失败，请手动复制 ABclub1。',
+          icon: 'none',
+        });
+      },
+    });
   },
 
 });

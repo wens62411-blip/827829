@@ -97,6 +97,12 @@ test('AB Club crest is present on every registered key card-first page, not only
     read('miniprogram/components/ab-brand-header/index.wxss'),
   ].join('\n');
   assert.match(brandManifest.asset.alt, /金色/);
+  const safeCover = brandManifest.derivatives.find((asset) => asset.assetId === 'brand-ab-club-share-safe-cover-600x480-v1');
+  assert.ok(safeCover);
+  const safeCoverBytes = readFileSync(resolve(repoRoot, `miniprogram${safeCover.path}`));
+  assert.equal(createHash('sha256').update(safeCoverBytes).digest('hex'), safeCover.sha256);
+  assert.deepEqual(jpegDimensions(safeCoverBytes), { width: 600, height: 480 });
+  assert.equal(safeCover.containsPersonalData, false);
   assert.doesNotMatch(crestStyles, /(?:crest|brandmark)[^{]*\{[^}]*filter\s*:/is);
   assert.match(crestStyles, /discover-brandmark__fallback[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
   assert.match(crestStyles, /events-brand__fallback[\s\S]*?color:\s*var\(--gold\)/);
@@ -193,7 +199,7 @@ test('profile card follows the confirmed LinkedIn-like hierarchy and four restra
   assert.doesNotMatch(styles, /--[\w-]*green\b|var\(--[\w-]*green\b/i);
 });
 
-test('owner card makes edit and share clear while network stays out of the owner action block', () => {
+test('owner card makes edit and native direct share clear while poster management stays secondary', () => {
   const template = read('miniprogram/pages/card/index.wxml');
   const primaryEditIndex = template.indexOf('编辑名片');
   const shareIndex = template.indexOf('分享名片');
@@ -203,12 +209,62 @@ test('owner card makes edit and share clear while network stays out of the owner
   assert.ok(primaryEditIndex >= 0 && shareIndex > primaryEditIndex, '名片第一动作区需要按编辑、分享排列');
   assert.ok(editIndex > shareIndex && privacyIndex > shareIndex, '编辑与隐私应位于核心交换/分享动作之后');
   assert.doesNotMatch(template, /交换名片|\/pages\/network\/index/);
-  assert.match(template, /card-link-button card-link-button--strong[^>]*bindtap="openShare"/);
+  const shareButton = template.match(/<button[^>]*card-link-button--strong[^>]*>[\s\S]*?分享名片[\s\S]*?<\/button>/)?.[0];
+  assert.ok(shareButton);
+  assert.match(shareButton, /open-type="share"/);
+  assert.doesNotMatch(shareButton, /bindtap=|url=/);
+  assert.match(template, /bindtap="openShareManager"[^>]*>名片海报与入口管理/);
   assert.match(template, /selected-labels="\{\{demoMode \? demoSelectedLabels : \[\]\}\}"/);
   assert.match(template, /gallery-urls="\{\{demoGalleryUrls\}\}"/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
   assert.match(template, /标签必须先经过人工审核/);
-  assert.match(template, /本机预览/);
+  assert.match(template, /当前为合成示例/);
   assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览/);
-  assert.doesNotMatch(template, /一键分享的安全预览|WECHAT SHARE|安全转发|OPENID|小程序码|海报|token/i);
+  assert.doesNotMatch(template, /一键分享的安全预览|WECHAT SHARE|安全转发|OPENID|小程序码|token/i);
+});
+
+test('brand sharing and card sharing use isolated destinations and truthful panel language', () => {
+  const discoverTemplate = read('miniprogram/pages/discover/index.wxml');
+  const discoverSource = read('miniprogram/pages/discover/index.ts');
+  const cardSource = read('miniprogram/pages/card/index.ts');
+  const editorTemplate = read('miniprogram/packageCard/pages/edit/index.wxml');
+  const editorSource = read('miniprogram/packageCard/pages/edit/index.ts');
+  const shareManagerSource = read('miniprogram/packageCard/pages/share/index.ts');
+
+  assert.match(discoverTemplate, /class="discover-brand-share"[^>]*open-type="share"[^>]*>分享 AB Club<\/button>/);
+  assert.match(discoverSource, /path:\s*`\/pages\/discover\/index\?entry=brand&entry_id=\$\{entryId\}`/);
+  assert.doesNotMatch(discoverSource.slice(discoverSource.indexOf('onShareAppMessage()')), /pages\/card-share/);
+
+  const editorShareButton = editorTemplate.match(/<button[^>]*card-editor-share-button[^>]*>[\s\S]*?<\/button>/)?.[0];
+  assert.ok(editorShareButton);
+  assert.match(editorShareButton, /open-type="share"/);
+  assert.match(editorShareButton, /分享名片/);
+  assert.doesNotMatch(editorShareButton, /bindtap=|url=/);
+  assert.match(editorSource, /preparedSharePath\s*=\s*`\/pages\/card-share\/index\?token=\$\{encodeURIComponent\(result\.data\.token\)\}[\s\S]*?theme=/);
+  assert.match(cardSource, /const share = this\.activeShare;[\s\S]*?path:\s*`\/pages\/card-share\/index\?token=\$\{encodeURIComponent\(share\.token\)\}[\s\S]*?theme=/);
+  assert.match(cardSource, /SAFE_CARD_SHARE_COVER\s*=\s*['"]\/assets\/brand\/ab-club-share-safe-cover\.jpg['"]/);
+  assert.match(editorSource, /SAFE_CARD_SHARE_COVER\s*=\s*['"]\/assets\/brand\/ab-club-share-safe-cover\.jpg['"]/);
+  assert.equal((cardSource.slice(cardSource.indexOf('onShareAppMessage()')).match(/imageUrl:\s*SAFE_CARD_SHARE_COVER/g) ?? []).length, 5);
+  assert.equal((editorSource.slice(editorSource.indexOf('onShareAppMessage()')).match(/imageUrl:\s*SAFE_CARD_SHARE_COVER/g) ?? []).length, 2);
+  const shareManagerHandler = shareManagerSource.slice(shareManagerSource.indexOf('onShareAppMessage()'));
+  assert.match(shareManagerHandler, /path:\s*['"]\/pages\/card-share\/index\?invalid=1['"]/);
+  assert.doesNotMatch(shareManagerHandler, /path:\s*['"]\/pages\/(?:discover|card)\/index['"]/);
+  assert.match([cardSource, editorSource].join('\n'), /面板已请求打开/);
+  for (const source of [cardSource, editorSource]) {
+    const statusMessages = [...source.matchAll(/(?:shareHint|shareMessage):\s*'([^']+)'/g)].map((match) => match[1]);
+    const falseSuccess = statusMessages.filter((message) => (
+      /已成功发送|发送成功|分享成功/.test(message) && !/不会伪造/.test(message)
+    ));
+    assert.deepEqual(falseSuccess, [], '打开系统面板不得被描述为已经发送成功');
+  }
+});
+
+test('ink-theme edit and share controls keep explicit high-contrast color pairs', () => {
+  const editorStyles = read('miniprogram/packageCard/pages/edit/index.wxss');
+  const cardStyles = read('miniprogram/pages/card/styles/card-theme.wxss');
+
+  assert.match(editorStyles, /\.card-editor-page--ink \.card-editor-tab--active,[\s\S]*?\.card-editor-page--ink \.card-editor-tab--complete\s*\{[^}]*background:\s*#39342e;[^}]*color:\s*#fffaf0;/);
+  assert.match(editorStyles, /\.card-editor-page--ink \.card-editor-share-button,[\s\S]*?\.card-editor-page--ink \.card-button\s*\{[^}]*background:\s*#dec89c;[^}]*color:\s*#211e1a;/);
+  assert.match(editorStyles, /\.card-editor-page--ink \.card-button-secondary,[\s\S]*?\.card-editor-page--ink \.card-link-button\s*\{[^}]*border-color:\s*#dec89c;[^}]*background:\s*transparent;[^}]*color:\s*#fffaf0;/);
+  assert.match(cardStyles, /@media \(prefers-color-scheme:\s*dark\)[\s\S]*?\.card-link-button--strong\s*\{[^}]*background:\s*#dec89c;[^}]*color:\s*#211e1a;/);
 });

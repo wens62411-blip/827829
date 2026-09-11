@@ -2,7 +2,7 @@ import { CITY_DIRECTORY, CityId } from '../../shared/constants/geography';
 
 const CONCEPTS = [
   ['城市雅集', '商业创作者与收藏爱好者围绕一件城市主题作品展开小桌交流。'],
-  ['艺藏夜谈', '从艺术、古董与珠宝的观看方式出发，设计一场克制而深入的跨界对话。'],
+  ['艺藏夜谈', '从艺术、古董与珠宝的观看方式出发，设计一场从容而深入的跨界对话。'],
   ['世界餐桌', '以当地文化为线索连接跨城成员，呈现小规模餐叙与观点交换的体验结构。'],
   ['建筑漫游', '从一处城市地标出发，串联建筑、设计与商业灵感的策展式步行路线。'],
   ['收藏入门课', '以公开知识框架讨论来源、品相与审美，不提供鉴真结论或交易撮合。'],
@@ -61,8 +61,8 @@ export interface ActivityDemoEventPresentation extends DemoEventPresentation {
 const ACTIVITY_CATEGORY_DEFINITIONS = [
   [DemoEventCategoryId.ART, '艺术', ['当代艺术与城市夜谈', '工作室开放日', '建筑与公共艺术漫游'], '从作品、空间与城市文化出发，连接创作者与关注者。', ['/assets/editorial-events/gallery-salon.jpg', '美术馆展厅视觉参考', 'Tourbillon · CC BY-SA 3.0']],
   [DemoEventCategoryId.ANTIQUES, '古董', ['器物、年代与收藏叙事', '东西方工艺阅读会', '城市博物馆观察路线'], '讨论器物历史、工艺与收藏伦理，不提供鉴定或交易。', ['/assets/editorial-events/private-table.jpg', '小型桌谈视觉参考', 'Shixart1985 · CC BY 2.0']],
-  [DemoEventCategoryId.JEWELRY, '珠宝', ['珠宝设计与当代收藏', '宝石色彩与佩戴美学', '独立设计地图导览'], '以设计、材料与佩戴方式为线索，呈现克制的观看与交流。', ['/assets/editorial-events/jewelry-study.jpg', '珠宝展柜视觉参考', 'Hannolans · CC BY 4.0']],
-  [DemoEventCategoryId.BUSINESS, '商业交流', ['跨境品牌与文化合作小桌', '新精英的长期主义对话', '城市创意产业走访'], '围绕跨城市经验、品牌与文化合作交换观点，不构成撮合。', ['/assets/editorial-events/private-table.jpg', '克制餐叙视觉参考', 'Shixart1985 · CC BY 2.0']],
+  [DemoEventCategoryId.JEWELRY, '珠宝', ['珠宝设计与当代收藏', '宝石色彩与佩戴美学', '独立设计地图导览'], '以设计、材料与佩戴方式为线索，呈现专注的观看与交流。', ['/assets/editorial-events/jewelry-study.jpg', '珠宝展柜视觉参考', 'Hannolans · CC BY 4.0']],
+  [DemoEventCategoryId.BUSINESS, '商业交流', ['跨境品牌与文化合作小桌', '新精英的长期主义对话', '城市创意产业走访'], '围绕跨城市经验、品牌与文化合作交换观点，不构成撮合。', ['/assets/editorial-events/private-table.jpg', '雅致餐叙视觉参考', 'Shixart1985 · CC BY 2.0']],
 ] as const;
 const ACTIVITY_SECTIONS = [
   [DemoEventSectionId.FEATURED, '本月精选', 0],

@@ -28,3 +28,114 @@
   display: block;
   margin-top: 30rpx;
 }
+
+.share-entry-actions {
+  margin-top: 24rpx;
+}
+
+.share-entry-forward,
+.share-entry-conversion__button {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 92rpx;
+  margin: 0;
+  padding: 20rpx 28rpx;
+  border-radius: 18rpx;
+  font-size: 29rpx;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.share-entry-forward {
+  border: 2rpx solid var(--card-page-champagne);
+  background: transparent;
+  color: var(--card-page-champagne);
+}
+
+.share-entry-forward::after,
+.share-entry-conversion__button::after {
+  border: 0;
+}
+
+.share-entry-conversion {
+  box-sizing: border-box;
+  margin-top: 34rpx;
+  padding: 34rpx 30rpx 30rpx;
+  border: 2rpx solid var(--card-page-line);
+  border-radius: 24rpx;
+  background: var(--card-page-paper);
+}
+
+.share-entry-conversion__kicker {
+  display: block;
+  color: var(--card-page-champagne);
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+}
+
+.share-entry-conversion__title {
+  display: block;
+  margin-top: 14rpx;
+  color: var(--card-page-ink);
+  font-family: Georgia, "Songti SC", "STSong", serif;
+  font-size: 34rpx;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.share-entry-conversion__copy {
+  display: block;
+  margin-top: 12rpx;
+  color: var(--card-page-muted);
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.share-entry-conversion__button {
+  margin-top: 26rpx;
+  border: 2rpx solid var(--card-page-champagne);
+  background: var(--card-page-champagne);
+  color: #fffdf8;
+}
+
+@media (prefers-color-scheme: dark) {
+  .share-entry-forward {
+    border-color: #dec89c;
+    color: #f2e5cc;
+  }
+
+  .share-entry-conversion {
+    border-color: var(--card-page-line);
+    background: var(--card-page-paper);
+  }
+
+  .share-entry-conversion__title {
+    color: var(--card-page-ink);
+  }
+
+  .share-entry-conversion__copy {
+    color: var(--card-page-muted);
+  }
+
+  .share-entry-conversion__button {
+    border-color: #dec89c;
+    background: #dec89c;
+    color: #211e1a;
+  }
+}
+
+@media (max-width: 340px) {
+  .share-entry-header {
+    align-items: center;
+  }
+
+  .share-entry-header__crest {
+    width: 82rpx;
+    height: 82rpx;
+    flex-basis: 82rpx;
+  }
+}

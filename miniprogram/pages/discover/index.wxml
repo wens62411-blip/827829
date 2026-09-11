@@ -32,6 +32,7 @@
       <text class="discover-primary-action__label">生成我的 AI 赛博名片</text>
       <text class="discover-primary-action__arrow" aria-hidden="true">→</text>
     </button>
+    <button class="discover-brand-share" open-type="share" hover-class="discover-press" aria-label="将 AB Club 小程序分享给微信好友">分享 AB Club</button>
     <view class="discover-hero__rule" aria-hidden="true"></view>
     <text
       class="discover-runtime__label discover-runtime__label--hero"

@@ -33,12 +33,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
-.visitor-exchange {
-  display: grid;
-  gap: 16rpx;
-}
-
-.visitor-exchange__note,
 .visitor-footnote {
   display: block;
   overflow-wrap: anywhere;
@@ -47,24 +41,112 @@
   line-height: 1.6;
 }
 
-.visitor-exchange__note {
-  text-align: center;
-}
-
 .visitor-footnote {
   margin-top: 28rpx;
   padding-top: 22rpx;
   border-top: 2rpx solid var(--ab-color-border);
 }
 
+.visitor-conversion {
+  box-sizing: border-box;
+  margin-top: 34rpx;
+  padding: 34rpx 30rpx 30rpx;
+  border: 2rpx solid var(--card-page-line);
+  border-radius: 24rpx;
+  background: var(--card-page-paper);
+}
+
+.visitor-conversion__kicker {
+  display: block;
+  color: var(--card-page-champagne);
+  font-size: 20rpx;
+  font-weight: 700;
+  letter-spacing: 4rpx;
+}
+
+.visitor-conversion__title {
+  display: block;
+  margin-top: 14rpx;
+  color: var(--card-page-ink);
+  font-family: Georgia, "Songti SC", "STSong", serif;
+  font-size: 34rpx;
+  font-weight: 650;
+  line-height: 1.4;
+}
+
+.visitor-conversion__copy {
+  display: block;
+  margin-top: 12rpx;
+  color: var(--card-page-muted);
+  font-size: 24rpx;
+  line-height: 1.7;
+}
+
+.visitor-conversion__button,
+.visitor-conversion__forward {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 92rpx;
+  margin: 26rpx 0 0;
+  padding: 20rpx 28rpx;
+  border-radius: 18rpx;
+  font-size: 29rpx;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.visitor-conversion__button {
+  border: 2rpx solid var(--card-page-champagne);
+  background: var(--card-page-champagne);
+  color: #fffdf8;
+}
+
+.visitor-conversion__forward {
+  margin-top: 16rpx;
+  border: 2rpx solid var(--card-page-champagne);
+  background: transparent;
+  color: var(--card-page-champagne);
+}
+
+.visitor-conversion__button::after,
+.visitor-conversion__forward::after {
+  border: 0;
+}
+
 @media (prefers-color-scheme: dark) {
-  .visitor-exchange__note,
   .visitor-footnote {
     color: var(--ab-color-dark-muted);
   }
 
   .visitor-footnote {
     border-color: var(--ab-color-dark-border);
+  }
+
+  .visitor-conversion {
+    border-color: var(--card-page-line);
+    background: var(--card-page-paper);
+  }
+
+  .visitor-conversion__title {
+    color: var(--card-page-ink);
+  }
+
+  .visitor-conversion__copy {
+    color: var(--card-page-muted);
+  }
+
+  .visitor-conversion__button {
+    border-color: #dec89c;
+    background: #dec89c;
+    color: #211e1a;
+  }
+
+  .visitor-conversion__forward {
+    border-color: #dec89c;
+    color: #f2e5cc;
   }
 }
 
