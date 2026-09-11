@@ -16,8 +16,8 @@
     <button class="card-editor-tab card-editor-tab--bordered {{editorMode === 'EDIT' ? 'card-editor-tab--active' : ''}}" data-mode="EDIT" bindtap="setEditorMode" aria-pressed="{{editorMode === 'EDIT'}}">编辑内容</button>
     <button
       class="card-editor-tab card-editor-tab--bordered card-editor-tab--share"
-      bindtap="saveAndOpenShare"
-      disabled="{{status === 'LOADING' || status === 'SAVING' || saveAndShareBusy || !(profile || creatingProfile || localIdentityReady || registerMode)}}"
+      open-type="share"
+      disabled="{{!shareDraftValid || status === 'LOADING' || status === 'SAVING' || saveAndShareBusy || generatingIntroduction || !(profile || creatingProfile || localIdentityReady || registerMode)}}"
       aria-label="{{status === 'LOADING' ? '名片正在加载' : (saveAndShareBusy ? '正在保存并准备分享我的名片' : '保存当前编辑并分享我的名片')}}"
       aria-busy="{{saveAndShareBusy}}"
     >{{status === 'LOADING' ? '名片加载中…' : (saveAndShareBusy ? '准备分享…' : '分享我的名片')}}</button>
@@ -55,7 +55,8 @@
       />
       <view class="card-editor-preview__actions">
         <button class="card-button" data-mode="EDIT" bindtap="setEditorMode">编辑这张名片</button>
-        <button class="card-link-button" bindtap="returnToOwnerCard">返回我的名片</button>
+        <button class="card-button-secondary" open-type="share" loading="{{saveAndShareBusy}}" disabled="{{!shareDraftValid || status === 'SAVING' || saveAndShareBusy || generatingIntroduction}}">分享名片</button>
+        <button class="card-link-button card-inline-action--wide" bindtap="returnToOwnerCard">返回我的名片</button>
       </view>
       <text class="card-editor-preview__note">这里只预览已经打开“对外展示”的标签；关闭后，访客和分享名片都会隐藏。</text>
     </view>
@@ -220,10 +221,11 @@
 
       <view class="card-editor-savebar">
         <button class="card-button" bindtap="saveProfile" loading="{{status === 'SAVING'}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">{{localIdentityReady ? '保存名片' : (registerMode ? '创建我的名片' : (demoMode ? '完成本页预览' : (creatingProfile ? '创建我的名片' : '保存名片')))}}</button>
-        <button class="card-button-secondary" bindtap="saveAndOpenShare" loading="{{saveAndShareBusy}}" disabled="{{status === 'SAVING' || saveAndShareBusy}}">分享我的名片</button>
+        <button class="card-button-secondary" open-type="share" loading="{{saveAndShareBusy}}" disabled="{{!shareDraftValid || status === 'SAVING' || saveAndShareBusy || generatingIntroduction}}">分享我的名片</button>
         <button class="card-button-secondary" data-mode="PREVIEW" bindtap="setEditorMode" disabled="{{status === 'SAVING' || saveAndShareBusy}}">查看实时效果</button>
         <text class="card-editor-savebar__note">标签与图片仅用于本机预览，不会被冒充为人工认证。</text>
       </view>
     </view>
   </block>
+  <canvas type="2d" id="nativeCardShareCover" class="card-editor-share-canvas" aria-hidden="true"></canvas>
 </view>

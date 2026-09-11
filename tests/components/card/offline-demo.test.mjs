@@ -45,7 +45,7 @@ test('offline card surfaces label state, editable preview, and explicitly labell
   const sharePage = read('miniprogram/packageCard/pages/share/index.wxml');
 
   for (const source of [cardPage, sharePage]) {
-    assert.match(source, /本机预览/);
+    assert.match(source, /本机预览|此设备保存的名片|当前为合成示例/);
     assert.doesNotMatch(source, /体验版|DEMO_ONLY|仅供预览/);
   }
   assert.doesNotMatch(mePage, /体验版|DEMO_ONLY|示例内容/);

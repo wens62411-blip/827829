@@ -4,6 +4,9 @@
   padding-top: 34rpx;
 }
 
+.personal-share-canvas-stage { position: fixed; left: -2400rpx; top: -2400rpx; width: 600px; height: 480px; pointer-events: none; }
+.personal-share-canvas { width: 600px; height: 480px; }
+
 .visitor-header {
   display: flex;
   align-items: flex-start;

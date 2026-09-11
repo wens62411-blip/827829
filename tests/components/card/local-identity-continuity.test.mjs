@@ -160,13 +160,14 @@ test('local registration requires an explicit city instead of silently choosing 
   assert.doesNotMatch(localSaveBranch, /cityId:\s*\(cityId \?\? CITY_DIRECTORY\[0\]\.id\)/);
 });
 
-test('cold-start card receiver distinguishes local input from synthetic demo evidence', () => {
+test('cold-start card receiver presents the sender without local-device ownership copy', () => {
   const receiver = read('miniprogram/pages/card-share/index.ts');
   const template = read('miniprogram/pages/card-share/index.wxml');
 
   assert.match(receiver, /options\.local === '1'/);
   assert.match(receiver, /snapshot\.source !== 'LOCAL'/);
-  assert.match(receiver, /从本机转发的公开名片/);
+  assert.match(receiver, /visitorTitleForCard\(snapshot\.card\)/);
   assert.match(template, /localIdentityMode/);
-  assert.match(template, /本机名片 · 非云端账户/);
+  assert.match(template, /分享者公开资料/);
+  assert.doesNotMatch(`${receiver}\n${template}`, /本机名片/);
 });

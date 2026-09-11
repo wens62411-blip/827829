@@ -20,7 +20,7 @@
 <text class="case__material-notice">{{detail.materialNotice}}</text>
 </view>
 <view class="case__lease" aria-role="note">
-详情仅在内存中保留 {{expiresInSeconds}} 秒；离开页面会立即清除。
+详情仅在内存中保留 {{expiresInSeconds}} 秒；离开页面会立即移除。
 </view>
 <view class="case__ai" aria-role="note">
 AI 检查只能辅助阅读，不会自动触发批准，也不能代替人的明确操作。

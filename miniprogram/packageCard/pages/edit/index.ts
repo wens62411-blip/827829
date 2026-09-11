@@ -1,15 +1,17 @@
 import { CITY_DIRECTORY, type CityId } from '../../../shared/constants/geography';
 import type { ProfileUpdateInput } from '../../../shared/contracts';
-import type { MediaAssetId } from '../../../shared/types/primitives';
+import type { MediaAssetId, UtcInstant } from '../../../shared/types/primitives';
 import type { ProfilePrivateDto } from '../../../shared/types/projections';
 import {
   bootstrapIdentity,
+  createCardShare,
+  getMyPublicCard,
   getMyProfile,
   getRuntimeEvidence,
   refreshMyCard,
   updateMyProfile,
 } from '../../../pages/card/services/identity-client';
-import { cityDisplayName } from '../../../pages/card/services/card-presenter';
+import { cityDisplayName, isSafeShareBearer, safeShareTitle, shareExpiry } from '../../../pages/card/services/card-presenter';
 import { createEditableIntroduction } from '../../../pages/card/services/introduction-draft';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 import {
@@ -27,7 +29,11 @@ import {
 import {
   buildLocalIdentitySharePath,
   buildOfflineDemoSharePath,
+  createLocalIdentityShareSnapshot,
+  createOfflineDemoShareSnapshot,
 } from '../../../pages/card/services/offline-demo-share-snapshot';
+import { prepareNativeShareCardCover } from '../../../pages/card/services/native-share-card';
+import { isSafeShareTokenId, rememberShareForRevocation, wasShareRevokedForSession } from '../../../pages/card/services/share-revocation-pointer';
 import {
   LOCAL_IDENTITY_CONTRACT_VERSION,
   hasLocalIdentity,
@@ -56,6 +62,9 @@ const CITY_IDS = CITY_DIRECTORY.map((city) => city.id);
 const LOCAL_DISPLAY_NAME_LIMIT = 24;
 const LOCAL_PROFESSION_LIMIT = 32;
 const LOCAL_BIOGRAPHY_LIMIT = 72;
+const BRAND_SHARE_COVER = '/assets/brand/ab-club-brand-share.jpg';
+const UNAVAILABLE_SHARE = { title: 'AB Club 数字名片', path: '/pages/card-share/index?invalid=1', imageUrl: BRAND_SHARE_COVER };
+type NativeShareResult = { title: string; path: string; imageUrl: string };
 
 const IDENTITY_LABELS = [
   '海归',
@@ -182,6 +191,7 @@ Page({
   openedForRegistration: false,
   editorPageUnloaded: true,
   saveOperationGeneration: 0,
+  pendingNativeShare: undefined as Promise<NativeShareResult> | undefined,
   data: {
     runtimeMode: 'OFFLINE_DEMO',
     demoMode: false,
@@ -190,6 +200,7 @@ Page({
     profile: null as ProfilePrivateDto | null,
     creatingProfile: false,
     saveAndShareBusy: false,
+    shareDraftValid: false,
     brandLogoFailed: false,
     status: 'LOADING' as 'LOADING' | 'READY' | 'SAVING' | 'ERROR' | 'SAVED' | 'PROJECTION_PENDING',
     message: '',
@@ -226,6 +237,7 @@ Page({
   },
 
   syncPreview(overrides: Partial<DraftInput>) {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
     const selectedLabels = uniqueLabels(overrides.selectedLabels ?? this.data.selectedLabels);
     const avatarUrl = overrides.avatarUrl ?? (this.data.localAvatarUsable ? this.data.localAvatarPath : '');
     const draft: DraftInput = {
@@ -247,6 +259,50 @@ Page({
       previewSelectedLabels: [],
       previewPublicLabels: this.data.showTags ? selectedLabels : [],
     });
+    this.refreshNativeShareAvailability();
+  },
+
+  refreshNativeShareAvailability() {
+    const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
+    const phone = normalizeDraftPhone(this.data.phone);
+    const email = normalizeDraftEmail(this.data.email);
+    let valid = Boolean(this.data.displayName.trim() && cityId)
+      && (!this.data.phone.trim() || Boolean(phone))
+      && (!this.data.email.trim() || Boolean(email));
+    if (valid && (this.data.localIdentityReady || this.data.registerMode)) {
+      valid = Array.from(this.data.biography.trim()).length <= LOCAL_BIOGRAPHY_LIMIT
+        && buildLocalIdentitySharePath({
+          contractVersion: LOCAL_IDENTITY_CONTRACT_VERSION,
+          displayName: compactDraftText(this.data.displayName, LOCAL_DISPLAY_NAME_LIMIT),
+          profession: compactDraftText(this.data.profession, LOCAL_PROFESSION_LIMIT),
+          biography: this.data.biography.trim(),
+          cityId: cityId as CityId,
+          selectedLabels: this.data.selectedLabels,
+          showTags: this.data.showTags,
+          phone, email,
+          showPhone: this.data.showPhone,
+          showEmail: this.data.showEmail,
+          registeredAt: readLocalIdentity()?.registeredAt ?? new Date().toISOString(),
+        }, this.data.cardTheme).ok;
+    } else if (valid && this.data.demoMode) {
+      valid = buildOfflineDemoSharePath({
+        ...readOfflineDemoDraft(),
+        displayName: this.data.displayName,
+        profession: this.data.profession,
+        biography: this.data.biography,
+        cityId,
+        selectedLabels: this.data.selectedLabels,
+        showTags: this.data.showTags,
+        phone, email,
+        showPhone: this.data.showPhone,
+        showEmail: this.data.showEmail,
+      }, this.data.cardTheme).ok;
+    } else if (valid) {
+      valid = Boolean(this.data.biography.trim()) && this.data.biography.length <= 240;
+    }
+    this.setData({ shareDraftValid: valid });
+    if (valid && typeof wx.showShareMenu === 'function') wx.showShareMenu({ menus: ['shareAppMessage'] });
+    if (!valid && typeof wx.hideShareMenu === 'function') wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
   },
 
   setEditorMode(event: WechatMiniprogram.TouchEvent) {
@@ -256,6 +312,7 @@ Page({
   },
 
   selectCardTheme(event: WechatMiniprogram.TouchEvent) {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
     const theme = String(event.currentTarget.dataset.theme ?? '');
     if (!THEMES.some((item) => item.value === theme)) return;
     this.setData({
@@ -263,11 +320,14 @@ Page({
       themeOptions: makeThemeOptions(theme as CardTheme),
     });
     writeCardThemePreference(theme as CardTheme);
+    this.refreshNativeShareAvailability();
   },
 
   onLoad(query: Record<string, string | undefined> = {}) {
     this.editorPageUnloaded = false;
     this.saveOperationGeneration += 1;
+    this.pendingNativeShare = undefined;
+    if (typeof wx.hideShareMenu === 'function') wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const cardTheme = readCardThemePreference();
     const runtime = getRuntimeEvidence();
     const demoMode = isOfflineDemo(runtime);
@@ -325,6 +385,7 @@ Page({
         ...makePreview(myDraft),
         message: localReady ? '' : '第一次建立名片：填写后将保存在这台设备。',
       });
+      this.refreshNativeShareAvailability();
       return;
     }
     if (demoMode) {
@@ -368,6 +429,7 @@ Page({
         ...makePreview(demoDraft),
         message: '本机预览：当前为合成示例，可保存到这台设备，不会写入云端。',
       });
+      this.refreshNativeShareAvailability();
       return;
     }
     this.setData({
@@ -382,6 +444,7 @@ Page({
   onUnload() {
     this.editorPageUnloaded = true;
     this.saveOperationGeneration += 1;
+    this.pendingNativeShare = undefined;
   },
 
   isEditorOperationActive(generation: number): boolean {
@@ -477,6 +540,7 @@ Page({
       localAvatarPath: '',
       localAvatarUsable: false,
     });
+    this.refreshNativeShareAvailability();
   },
 
   onDisplayNameInput(event: WechatMiniprogram.Input) {
@@ -549,6 +613,7 @@ Page({
   },
 
   onModuleToggle(event: WechatMiniprogram.CustomEvent<{ value: boolean }>) {
+    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
     const moduleName = String(event.currentTarget.dataset.module ?? '');
     const enabled = Boolean(event.detail.value);
     if (moduleName === 'tags') {
@@ -569,6 +634,7 @@ Page({
       this.syncPreview({ showEmail: enabled });
       this.setData({ contactMessage: '' });
     }
+    this.refreshNativeShareAvailability();
   },
 
   onCityChange(event: WechatMiniprogram.CustomEvent<{ value: string }>) {
@@ -633,7 +699,8 @@ Page({
   },
 
   async generateIntroductionDraft() {
-    if (this.data.generatingIntroduction) return;
+    if (this.data.generatingIntroduction || this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
+    const generation = this.saveOperationGeneration;
     const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
     this.setData({ generatingIntroduction: true, introductionNote: '正在准备可编辑草稿…' });
     const draft = await createEditableIntroduction({
@@ -643,6 +710,7 @@ Page({
       profession: this.data.profession,
       interests: this.data.selectedLabels.join('、'),
     });
+    if (!this.isEditorOperationActive(generation)) return;
     const biography = compactDraftText(
       draft.text,
       this.data.localIdentityReady || this.data.registerMode
@@ -864,52 +932,93 @@ Page({
     return true;
   },
 
-  async saveAndOpenShare() {
-    if (this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
+  async saveAndOpenShare(deadline = Date.now() + 2500): Promise<NativeShareResult> {
+    if (this.data.status === 'LOADING' || this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.generatingIntroduction) return UNAVAILABLE_SHARE;
     const saveGeneration = this.saveOperationGeneration;
-    if (!this.isEditorOperationActive(saveGeneration)) return;
+    if (!this.isEditorOperationActive(saveGeneration)) return UNAVAILABLE_SHARE;
     this.setData({ saveAndShareBusy: true });
-
-    let saved = false;
+    const active = () => this.isEditorOperationActive(saveGeneration) && Date.now() < deadline;
     try {
-      saved = await this.saveProfile();
-    } catch (_error) {
-      if (!this.isEditorOperationActive(saveGeneration)) return;
-      this.setData({
-        saveAndShareBusy: false,
-        status: 'ERROR',
-        message: '名片保存失败，请稍后重试。',
-      });
-      showShareToast('名片保存失败，请重试');
-      return;
-    }
-    if (!this.isEditorOperationActive(saveGeneration)) return;
-    if (!saved) {
-      const needsEditing = this.data.status === 'ERROR';
-      this.setData({
-        saveAndShareBusy: false,
-        ...(needsEditing ? { editorMode: 'EDIT' as EditorMode } : {}),
-      });
-      showShareToast(needsEditing ? '请检查必填信息' : '请查看页面提示');
-      return;
-    }
+      const saved = await this.saveProfile();
+      if (!active()) return UNAVAILABLE_SHARE;
+      if (!saved) {
+        const needsEditing = this.data.status === 'ERROR';
+        this.setData({ ...(needsEditing ? { editorMode: 'EDIT' as EditorMode } : {}) });
+        showShareToast(needsEditing ? '请检查必填信息' : '请查看页面提示');
+        return UNAVAILABLE_SHARE;
+      }
 
-    const navigated = await new Promise<boolean>((resolve) => {
-      wx.redirectTo({
-        url: '/packageCard/pages/share/index',
-        success: () => resolve(true),
-        fail: () => resolve(false),
-      });
-    });
-    if (!this.isEditorOperationActive(saveGeneration)) return;
-    if (!navigated) {
-      this.setData({
-        saveAndShareBusy: false,
-        status: 'ERROR',
-        message: '名片已保存，但暂时无法打开分享页，请重试。',
-      });
-      showShareToast('分享页暂时无法打开');
+      if (this.data.demoMode || this.data.localIdentityReady) {
+        const localIdentity = this.data.localIdentityReady ? readLocalIdentity() : null;
+        if (this.data.localIdentityReady && !localIdentity) throw new Error('Saved identity missing');
+        const draft = localIdentity ? null : readOfflineDemoDraft();
+        const path = localIdentity
+          ? buildLocalIdentitySharePath(localIdentity, this.data.cardTheme)
+          : buildOfflineDemoSharePath(draft!, this.data.cardTheme);
+        if (!path.ok) throw new Error('Share path too long');
+        const snapshot = localIdentity
+          ? createLocalIdentityShareSnapshot(localIdentity, this.data.cardTheme)
+          : createOfflineDemoShareSnapshot(draft!, this.data.cardTheme);
+        const imageUrl = await prepareNativeShareCardCover(this, {
+          displayName: snapshot.card.displayName,
+          headline: snapshot.card.headline,
+          biography: snapshot.card.biography,
+          labels: snapshot.publicLabels,
+          phone: snapshot.fields.find((field) => field.key === 'phone')?.value,
+          email: snapshot.fields.find((field) => field.key === 'email')?.value,
+          demoMode: snapshot.source === 'DEMO',
+        });
+        if (!active()) return UNAVAILABLE_SHARE;
+        return { title: safeShareTitle(), path: path.path, imageUrl: imageUrl || BRAND_SHARE_COVER };
+      }
+
+      const cardResult = await getMyPublicCard();
+      if (!active()) return UNAVAILABLE_SHARE;
+      if (!cardResult.ok) throw new Error('Public card unavailable');
+      const card = cardResult.data.card;
+      const share = await createCardShare(card.cardId, card.version, shareExpiry(7) as UtcInstant);
+      if (!active()) return UNAVAILABLE_SHARE;
+      if (!share.ok || share.data.targetType !== 'CARD' || share.data.targetId !== card.cardId
+        || !isSafeShareBearer(share.data.token) || !isSafeShareTokenId(share.data.shareTokenId)
+        || wasShareRevokedForSession(share.data.shareTokenId)) throw new Error('Invalid share');
+      rememberShareForRevocation(share.data.shareTokenId);
+      return {
+        title: safeShareTitle(),
+        path: `/pages/card-share/index?token=${encodeURIComponent(share.data.token)}&theme=${this.data.cardTheme}`,
+        imageUrl: BRAND_SHARE_COVER,
+      };
+    } catch (_error) {
+      if (active()) {
+        this.setData({ status: 'ERROR', message: '暂时无法准备名片分享，请检查保存信息后重试。' });
+        showShareToast('分享暂时不可用，请重试');
+      }
+      return UNAVAILABLE_SHARE;
+    } finally {
+      if (this.isEditorOperationActive(saveGeneration)) this.setData({ saveAndShareBusy: false });
     }
+  },
+
+  onShareAppMessage() {
+    if (!this.pendingNativeShare) {
+      const generation = this.saveOperationGeneration;
+      let timeout: ReturnType<typeof setTimeout> | undefined;
+      const timedOut = new Promise<NativeShareResult>((resolve) => {
+        timeout = setTimeout(() => {
+          if (this.isEditorOperationActive(generation)) {
+            this.saveOperationGeneration += 1;
+            this.pendingNativeShare = undefined;
+            this.setData({ saveAndShareBusy: false, status: 'ERROR', message: '分享准备时间较长，请稍后重试。' });
+            showShareToast('分享准备超时，请重试');
+          }
+          resolve(UNAVAILABLE_SHARE);
+        }, 2500);
+      });
+      this.pendingNativeShare = Promise.race([this.saveAndOpenShare(), timedOut]).finally(() => {
+        if (timeout !== undefined) clearTimeout(timeout);
+        if (this.isEditorOperationActive(generation)) this.pendingNativeShare = undefined;
+      });
+    }
+    return { ...UNAVAILABLE_SHARE, promise: this.pendingNativeShare };
   },
 
   async retryProjectionRefresh() {

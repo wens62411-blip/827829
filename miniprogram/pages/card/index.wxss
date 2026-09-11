@@ -1,1 +1,6 @@
 @import "./styles/card-theme.wxss";
+
+.personal-share-canvas-stage { position: fixed; left: -2400rpx; top: -2400rpx; width: 600px; height: 480px; pointer-events: none; }
+.personal-share-canvas { width: 600px; height: 480px; }
+.card-owner-share-feedback { display: grid; gap: 16rpx; margin-top: 18rpx; font-size: 22rpx; line-height: 1.6; color: var(--ab-color-muted); }
+@media (prefers-color-scheme: dark) { .card-owner-share-feedback { color: var(--ab-color-dark-muted); } }

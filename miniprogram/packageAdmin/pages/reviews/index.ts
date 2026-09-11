@@ -381,7 +381,7 @@ if (controller.detailTimer !== undefined) clearTimeout(controller.detailTimer);
 controller.detailTimer = setTimeout(() => {
 if (controllers.get(this) !== controller) return;
 this.clearDetail();
-this.setData({ detailNotice: '案件详情已在 120 秒后自动清除。' });
+this.setData({ detailNotice: '案件详情已在 120 秒后自动移除。' });
 }, 120000);
 },
 clearDetail() {

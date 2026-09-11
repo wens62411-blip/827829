@@ -2,8 +2,8 @@
   <view class="share-header">
     <view class="share-header__copy">
       <text class="card-kicker">SHARE YOUR INTRODUCTION</text>
-      <text class="card-title">分享我的名片</text>
-      <text class="card-subtitle">把一张清楚、克制的名片递给对方，是否发送仍由你在微信中确认。</text>
+      <text class="card-title">名片海报与入口管理</text>
+      <text class="card-subtitle">在这里查看转发封面、保存名片海报或管理分享入口。</text>
     </view>
     <image class="card-brand-crest share-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
@@ -58,22 +58,22 @@
   <view wx:if="{{demoMode && card}}" class="share-choice-card">
     <text class="share-choice-card__eyebrow">SHARE PREVIEW</text>
     <text class="share-choice-card__title">把名片递给微信好友</text>
-    <text class="share-choice-card__copy">{{localIdentityReady ? '上方就是好友接收视角。公开分享不会包含电话或邮箱，发送仍由你在微信中确认。' : '上方就是好友接收视角。发送时会打开微信转发面板；接收方看到的是明确标注的合成示例名片，不会被记录成真实会员或人脉。'}}</text>
+    <text class="share-choice-card__copy">{{localIdentityReady ? '封面只使用当前公开字段。公开分享不会包含电话或邮箱，发送仍由你在微信中确认。' : '封面只使用当前公开字段。发送时会打开微信转发面板；接收方看到的是明确标注的合成示例名片，不会被记录成真实会员或人脉。'}}</text>
     <view class="share-choice-list">
       <view class="share-choice"><text class="share-choice__index">01</text><view><text class="share-choice__title">微信确认后才发送</text><text class="share-choice__note">页面只负责拉起系统面板，不会替你选择好友或自动发送。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">02</text><view><text class="share-choice__title">当前配色随卡片保留</text><text class="share-choice__note">象牙白、墨黑、香槟金与石灰灰会同步到接收页。</text></view></view>
       <view class="share-choice"><text class="share-choice__index">03</text><view><text class="share-choice__title">可生成本地海报</text><text class="share-choice__note">{{localIdentityReady ? '海报只使用公开字段，不包含电话、邮箱或虚构二维码。' : '海报明确标注合成示例，不包含私密资料或虚构二维码。'}}</text></view></view>
     </view>
-    <button class="card-button share-wechat-button" open-type="share" disabled="{{shareCoverState === 'LOADING'}}"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>{{shareCoverState === 'LOADING' ? '正在准备分享卡片' : (localIdentityReady ? '发送本机名片到微信' : '发送示例名片到微信')}}</text></button>
+    <button class="card-button share-wechat-button" open-type="share" disabled="{{shareCoverState === 'LOADING'}}"><image src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>{{shareCoverState === 'LOADING' ? '正在准备分享卡片' : (localIdentityReady ? '分享名片' : '发送示例名片到微信')}}</text></button>
     <button class="card-link-button share-return" bindtap="returnToOwnerCard">返回我的名片</button>
   </view>
 
   <view wx:if="{{!demoMode && card && hasRevocableShare && !hasActiveShare && !shareState}}" class="share-choice-card share-choice-card--quiet">
     <text class="share-choice-card__title">有一个曾创建的入口</text>
-    <text class="share-choice-card__copy">它不能在本页再次发送，但仍可请求撤销。若只清除本机记录，旧入口可能继续有效到期。</text>
+    <text class="share-choice-card__copy">它不能在本页再次发送，但仍可请求撤销。若只移除本机记录，旧入口可能继续有效到期。</text>
     <view class="card-stack">
       <button class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">撤销最近入口</button>
-      <button class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
+      <button class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅移除本机记录</button>
     </view>
   </view>
 
@@ -91,7 +91,7 @@
   <view wx:if="{{card && !demoMode}}" class="share-actions">
     <button wx:if="{{(!shareState || shareState === 'REVOKED') && !hasRevocableShare}}" class="card-button" bindtap="createShare" loading="{{busyAction === 'CREATE'}}" disabled="{{busyAction !== ''}}">创建 7 天分享入口</button>
     <button wx:if="{{hasRevocableShare && (shareState === 'SUCCESS' || shareState === 'ERROR')}}" class="card-button-secondary" bindtap="revokeShare" loading="{{busyAction === 'REVOKE'}}" disabled="{{busyAction !== ''}}">{{shareState === 'ERROR' ? '重试撤销' : '撤销当前入口'}}</button>
-    <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅清除本机记录</button>
+    <button wx:if="{{hasRevocableShare && shareState === 'ERROR' && !hasActiveShare}}" class="card-button-secondary" bindtap="clearLocalRevocationPointer" disabled="{{busyAction !== ''}}">仅移除本机记录</button>
   </view>
 
   <view wx:if="{{!demoMode && shareState === 'SUCCESS'}}" class="share-format-card">

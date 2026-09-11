@@ -33,16 +33,6 @@ function cityGroupWindow(source) {
   return source.slice(Math.max(0, anchor - 600), Math.min(source.length, anchor + 3600));
 }
 
-function referencedBoundaryCopy(templateWindow, pageSource) {
-  const bindings = [...templateWindow.matchAll(/\{\{\s*([A-Za-z_$][\w$]*)/g)].map((match) => match[1]);
-  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入|逐步开放/;
-  return bindings.some((binding) => {
-    const assignmentPattern = binding + "\\s*:\\s*(['\"`])([\\s\\S]*?)\\1";
-    const assignment = pageSource.match(new RegExp(assignmentPattern));
-    return assignment ? boundary.test(assignment[2]) : false;
-  });
-}
-
 function unnegatedPositiveClaims(source) {
   const positive = /申请已提交|已提交申请|提交成功|申请成功|加入成功|已加入(?:[^。；\n<]{0,16})?(?:城市群|城市节点|群组)|(?:城市群|城市节点|群组)[^。；\n<]{0,12}(?:LIVE|已上线|运营中)/gi;
   const negation = /未|不代表|不会|并非|没有|不可|不能|非真实|请勿理解为/;
@@ -121,7 +111,7 @@ test('Me page exposes the supported city list and keeps only the profile edit en
   assert.deepEqual(errors, []);
 });
 
-test('city-group UI stays OFFLINE_DEMO or operations-pending while frozen contracts have no join action', () => {
+test('city-group UI directs users to the confirmed operator without claiming an in-app join result', () => {
   const actionDirectory = resolve(repoRoot, 'docs/contracts/actions');
   const frozenActions = readdirSync(actionDirectory)
     .filter((name) => name.endsWith('.json'))
@@ -135,13 +125,17 @@ test('city-group UI stays OFFLINE_DEMO or operations-pending while frozen contra
   const template = read('miniprogram/pages/me/index.wxml');
   const pageSource = read('miniprogram/pages/me/index.ts');
   const groupSurface = cityGroupWindow(template);
-  const boundary = /待运营确认|运营确认后|OFFLINE[_ ]DEMO|离线示例|仅(?:记录|保留)(?:加入)?意向|仅作意向|不会(?:真实)?提交|不代表(?:已经|已)|尚未接入|未接入|逐步开放/;
   const errors = [];
 
   if (!groupSurface) {
     errors.push('无法定位“我的”页城市群区块，因而无法验证能力边界');
-  } else if (!boundary.test(groupSurface) && !referencedBoundaryCopy(groupSurface, pageSource)) {
-    errors.push('城市群区块没有“逐步开放”或 OFFLINE_DEMO/未接入边界说明');
+  } else {
+    if (!/以上城市均设有微信群，入群请添加负责人微信/.test(groupSurface)) {
+      errors.push('城市群区块未说明通过负责人加入用户已确认存在的微信群');
+    }
+    if (!/bindtap="copyCommunityWechat"/.test(groupSurface) || !/communityWechatId:\s*'ABclub1'/.test(pageSource)) {
+      errors.push('城市群区块缺少可复制的负责人微信号 ABclub1');
+    }
   }
 
   const positiveClaims = unnegatedPositiveClaims(`${groupSurface}\n${pageSource}`);

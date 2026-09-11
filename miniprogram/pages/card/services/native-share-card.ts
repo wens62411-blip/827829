@@ -24,6 +24,60 @@ export interface NativeShareCardContent {
   readonly demoMode: boolean;
 }
 
+/** Export the existing personal share design from a page's hidden 2D canvas. */
+export async function prepareNativeShareCardCover(
+  page: WechatMiniprogram.Page.TrivialInstance | WechatMiniprogram.Component.TrivialInstance,
+  input: NativeShareCardInput,
+  selector: string = '#nativeCardShareCover',
+): Promise<string | undefined> {
+  let active = true;
+  let deadline: ReturnType<typeof setTimeout> | undefined;
+  try {
+    return await Promise.race([
+      renderNativeShareCardCover(page, input, selector, () => active),
+      new Promise<undefined>((resolve) => {
+        deadline = setTimeout(() => { active = false; resolve(undefined); }, 1500);
+      }),
+    ]);
+  } finally {
+    active = false;
+    if (deadline !== undefined) clearTimeout(deadline);
+  }
+}
+
+async function renderNativeShareCardCover(
+  page: WechatMiniprogram.Page.TrivialInstance | WechatMiniprogram.Component.TrivialInstance,
+  input: NativeShareCardInput,
+  selector: string,
+  isCurrent: () => boolean,
+): Promise<string | undefined> {
+  if (typeof wx.createSelectorQuery !== 'function' || typeof wx.canvasToTempFilePath !== 'function') return undefined;
+  try {
+    if (typeof wx.nextTick === 'function') await new Promise<void>((resolve) => wx.nextTick(resolve));
+    if (!isCurrent()) return undefined;
+    const canvas = await new Promise<WechatMiniprogram.Canvas | undefined>((resolve) => {
+      wx.createSelectorQuery().in(page).select(selector)
+        .node((result) => resolve(result?.node as WechatMiniprogram.Canvas | undefined)).exec();
+    });
+    if (!canvas || !isCurrent()) return undefined;
+    drawNativeShareCard(canvas, input);
+    return await new Promise<string | undefined>((resolve) => {
+      wx.canvasToTempFilePath({
+        canvas,
+        width: NATIVE_SHARE_CARD_WIDTH,
+        height: NATIVE_SHARE_CARD_HEIGHT,
+        destWidth: NATIVE_SHARE_CARD_WIDTH * 2,
+        destHeight: NATIVE_SHARE_CARD_HEIGHT * 2,
+        fileType: 'png',
+        success: (result) => resolve(result.tempFilePath),
+        fail: () => resolve(undefined),
+      }, page);
+    });
+  } catch (_error) {
+    return undefined;
+  }
+}
+
 type CanvasContext = WechatMiniprogram.CanvasRenderingContext.CanvasRenderingContext2D;
 
 interface WindowMetricsApi {
@@ -210,7 +264,7 @@ export function drawNativeShareCard(
 
   context.fillStyle = '#211E1A';
   context.font = '600 25px serif';
-  const headline = content.headline || '一张清楚而有分寸的自我介绍';
+  const headline = content.headline || '让个人风格，成为第一印象';
   const headlineLines = wrapText(context, headline, 410, 2);
   headlineLines.forEach((line, index) => {
     context.fillText(line, 148, 137 + index * 31);

@@ -37,7 +37,7 @@ interface CityGroupView {
 const EMPTY_CITY_GROUP: CityGroupView = {
   cityName: '',
   cityGroupTitle: 'AB Club 支持的城市清单',
-  cityImageSrc: '',
+  cityImageSrc: '/assets/community/european-classical-terrace.jpg',
   hasProfileCity: false,
 };
 
@@ -64,7 +64,7 @@ function resolveCityGroup(profile: ProfilePrivateDto | null): CityGroupView {
   return {
     cityName: city.name.zh,
     cityGroupTitle: 'AB Club 支持的城市清单',
-    cityImageSrc: `/assets/cities/${city.id}.jpg`,
+    cityImageSrc: EMPTY_CITY_GROUP.cityImageSrc,
     hasProfileCity: true,
   };
 }
@@ -79,7 +79,9 @@ Page({
     profileInitial: 'AB',
     cityName: '',
     cityGroupTitle: EMPTY_CITY_GROUP.cityGroupTitle,
-    cityImageSrc: '',
+    cityImageSrc: EMPTY_CITY_GROUP.cityImageSrc,
+    communityWechatId: 'ABclub1',
+    copyingCommunityWechat: false,
     cityImageFailed: false,
     hasProfileCity: false,
     supportedCities,
@@ -170,6 +172,22 @@ Page({
 
   handleCityImageError() {
     this.setData({ cityImageFailed: true });
+  },
+
+  copyCommunityWechat() {
+    if (this.data.copyingCommunityWechat) return;
+    this.setData({ copyingCommunityWechat: true });
+    try {
+      wx.setClipboardData({
+        data: this.data.communityWechatId,
+        success: () => wx.showToast({ title: '微信号已复制', icon: 'success' }),
+        fail: () => wx.showToast({ title: '复制未完成，请长按微信号复制', icon: 'none' }),
+        complete: () => this.setData({ copyingCommunityWechat: false }),
+      });
+    } catch (_error) {
+      this.setData({ copyingCommunityWechat: false });
+      wx.showToast({ title: '请长按微信号复制', icon: 'none' });
+    }
   },
 
 });

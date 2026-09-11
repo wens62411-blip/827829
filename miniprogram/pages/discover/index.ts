@@ -128,6 +128,7 @@ Page({
   },
 
   onShow() {
+    if (consumeColdStartEntryFilm()) this.setData({ showEntryFilm: true });
     updateTabBarPresentation(this, 0, this.data.showEntryFilm);
   },
 
@@ -185,8 +186,9 @@ Page({
 
   onShareAppMessage() {
     return {
-      title: 'AB Club · 全球华人文化与连接',
-      path: '/pages/discover/index',
+      title: 'AB Club · 你的名片，连接世界',
+      path: `/pages/discover/index?entry=brand&entry_id=${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      imageUrl: '/assets/brand/ab-club-brand-share.jpg',
     };
   },
 });

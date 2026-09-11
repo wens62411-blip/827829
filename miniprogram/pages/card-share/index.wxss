@@ -28,3 +28,18 @@
   display: block;
   margin-top: 30rpx;
 }
+
+.personal-share-canvas-stage { position: fixed; left: -2400rpx; top: -2400rpx; width: 600px; height: 480px; pointer-events: none; }
+.personal-share-canvas { width: 600px; height: 480px; }
+.share-entry-actions { margin-top: 24rpx; }
+.share-entry-forward, .share-entry-conversion__button { padding: 24rpx; border: 1rpx solid #bca77d; border-radius: 12rpx; background: #211e1a; color: #f4efe6; font-size: 28rpx; line-height: 1.45; }
+.share-entry-conversion { display: grid; gap: 16rpx; margin-top: 34rpx; padding: 30rpx; border: 1rpx solid var(--ab-color-border); border-radius: 20rpx; background: var(--ab-color-surface); }
+.share-entry-conversion__kicker { color: #8a6a36; font-size: 20rpx; letter-spacing: 3rpx; }
+.share-entry-conversion__title { color: var(--ab-color-ink); font-size: 32rpx; line-height: 1.5; }
+.share-entry-conversion__copy { color: var(--ab-color-muted); font-size: 24rpx; line-height: 1.6; }
+@media (prefers-color-scheme: dark) {
+  .share-entry-conversion { background: #24211d; border-color: #665c4d; }
+  .share-entry-conversion__title { color: #f4efe6; }
+  .share-entry-conversion__kicker, .share-entry-conversion__copy { color: #d7c9b0; }
+  .share-entry-forward, .share-entry-conversion__button { background: #e7d4af; color: #211e1a; border-color: #e7d4af; }
+}

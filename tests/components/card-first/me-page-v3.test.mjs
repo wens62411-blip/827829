@@ -26,16 +26,18 @@ test('Me page uses a direct profile hierarchy instead of a second full header', 
   assert.doesNotMatch(template, /资料与名片/);
 });
 
-test('Me city group reuses shipped city photography and keeps operations-pending truth', () => {
+test('Me city group keeps the formal city directory and adds the operator contact below it', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const source = read('miniprogram/pages/me/index.ts');
   const styles = read('miniprogram/pages/me/index.wxss');
 
   assert.match(template, /src="\{\{cityImageSrc\}\}"/);
   assert.match(template, /binderror="handleCityImageError"/);
-  assert.match(source, /cityImageSrc:\s*`\/assets\/cities\/\$\{city\.id\}\.jpg`/);
-  assert.match(template, /逐步开放/);
-  assert.match(template, /节点开放状态以后续公告为准/);
+  assert.match(source, /cityImageSrc:\s*'\/assets\/community\/european-classical-terrace\.jpg'/);
+  assert.match(template, /13 城 · 微信群/);
+  assert.match(template, /以上城市均设有微信群，入群请添加负责人微信/);
+  assert.ok(template.indexOf('以上城市均设有微信群') > template.indexOf('wx:for="{{supportedCityNames}}"'));
+  assert.match(template, /bindtap="copyCommunityWechat"/);
   assert.doesNotMatch(template, /示例城市|城市目录为本地演示/);
   assert.doesNotMatch(template, /申请成功|加入成功|城市群[^<\n]{0,20}\bLIVE\b/);
   assert.match(source, /supportedCityNames\s*=\s*CITY_DIRECTORY\.map/);
@@ -82,7 +84,7 @@ test('Me page keeps accessible touch targets, dark mode, and reduced-motion trea
 
   assert.match(styles, /\.me-profile__edit\s*\{[\s\S]*?min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
   assert.match(styles, /\.me-link-row\s*\{[\s\S]*?min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
-  assert.match(styles, /\.me-city-group__action\s*\{[\s\S]*?min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
+  assert.match(styles, /\.me-city-group__copy-button\s*\{[^}]*min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
   assert.match(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });

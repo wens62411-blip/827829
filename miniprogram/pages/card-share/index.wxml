@@ -1,13 +1,19 @@
 <view class="card-page share-entry-page">
+  <view class="personal-share-canvas-stage" aria-hidden="true"><canvas type="2d" id="nativeCardShareCover" class="personal-share-canvas"></canvas></view>
   <view class="share-entry-header">
-    <view><text class="card-kicker">SHARED DIGITAL INTRODUCTION</text><text class="card-title">AB Club 数字名片</text><text class="card-subtitle">一张清楚、克制的自我介绍。是否继续认识，由你决定。</text></view>
+    <view>
+      <text class="card-kicker">SHARED DIGITAL INTRODUCTION</text>
+      <text class="card-title">{{visitorTitle}}</text>
+      <text class="card-subtitle">查看分享者选择公开的资料。</text>
+    </view>
     <image class="share-entry-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
 
-  <view wx:if="{{localIdentityMode}}" class="card-demo-ribbon">本机名片 · 非云端账户</view>
-  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">本机预览 · 合成示例 · 非真实会员资料</view>
+  <view wx:if="{{localIdentityMode}}" class="card-demo-ribbon">离线分享 · 分享者公开资料 · 用户自填</view>
+  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">演示名片 · 合成示例 · 非真实会员资料</view>
 
   <ab-share-state
+    wx:if="{{state !== 'SUCCESS'}}"
     state="{{state}}"
     title="{{stateTitle}}"
     description="{{stateDescription}}"
@@ -29,9 +35,16 @@
     show-default-actions="{{false}}"
   />
 
-  <view class="card-status">{{localIdentityMode ? '是否进一步建立联系由双方决定；本页不会自动添加好友。' : (demoMode ? '合成示例名片不建立账户、好友关系或认证；转发只传递这张已标注的卡片。' : '每次回到本页或下拉刷新都会重新解析入口。好友删除或认证撤销后，旧页面不会继续沿用先前可见内容。')}}</view>
+  <view wx:if="{{state === 'SUCCESS' && card}}" class="share-entry-actions">
+    <button class="share-entry-forward" open-type="share">转发这张名片</button>
+  </view>
 
-  <view class="card-stack">
-    <navigator class="card-link-button" open-type="switchTab" url="/pages/discover/index" hover-class="none">返回 AB Club</navigator>
+  <view wx:if="{{state === 'SUCCESS' && card}}" class="card-status">仅展示分享者选择公开的资料；页面刷新时会重新检查当前可见内容。</view>
+
+  <view class="share-entry-conversion">
+    <text class="share-entry-conversion__kicker">YOUR AB CLUB CARD</text>
+    <text class="share-entry-conversion__title">{{selfCardState === 'HAS_CARD' ? '继续管理你的数字名片' : (selfCardState === 'NO_CARD' ? '创建一张属于你的数字名片' : '进入你的数字名片空间')}}</text>
+    <text class="share-entry-conversion__copy">{{selfCardState === 'HAS_CARD' ? '返回后仍可继续查看当前分享者的名片。' : (selfCardState === 'NO_CARD' ? '自主填写内容与公开范围，完成后即可分享。' : '进入后可查看现有名片，或开始创建自己的名片。')}}</text>
+    <button class="share-entry-conversion__button" bindtap="openMyCardEntry">{{selfCardState === 'HAS_CARD' ? '查看我的名片' : (selfCardState === 'NO_CARD' ? '创建我的数字名片' : '进入我的名片')}}</button>
   </view>
 </view>

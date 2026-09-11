@@ -42,6 +42,8 @@ async function loadOfflineEditorPage() {
             export const getRuntimeEvidence = () => ({ runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false });
             export const bootstrapIdentity = async () => { throw new Error('offline'); };
             export const getMyProfile = async () => { throw new Error('offline'); };
+            export const getMyPublicCard = async () => { throw new Error('offline'); };
+            export const createCardShare = async () => { throw new Error('offline'); };
             export const refreshMyCard = async () => { throw new Error('offline'); };
             export const updateMyProfile = async () => { throw new Error('offline'); };
           `,
@@ -293,11 +295,16 @@ test('editor saves the latest card before sharing, ignores double taps, and stay
     page.onLoad.call(page, { register: '1' });
     page.setData({ displayName: '审核测试名片', cityIndex: 4, biography: '用于验证保存后直接分享。' });
 
-    const first = page.saveAndOpenShare.call(page);
-    const duplicate = page.saveAndOpenShare.call(page);
-    await Promise.all([first, duplicate]);
+    const first = page.onShareAppMessage.call(page);
+    const duplicate = page.onShareAppMessage.call(page);
+    assert.equal(first.promise, duplicate.promise, 'double taps reuse one save and preparation');
+    const result = await first.promise;
     assert.equal(page.data.status, 'SAVED');
-    assert.deepEqual(redirects, ['/packageCard/pages/share/index']);
+    assert.deepEqual(redirects, [], 'native sharing never visits the poster page');
+    assert.match(result.path, /^\/pages\/card-share\/index\?local=1&snapshot=/);
+    const snapshot = await loadBundledTypeScript('miniprogram/pages/card/services/offline-demo-share-snapshot.ts');
+    const encoded = result.path.match(/[?&]snapshot=([^&]+)/)?.[1];
+    assert.equal(snapshot.decodeOfflineDemoShareSnapshot(encoded).snapshot.card.displayName, '审核测试名片');
     assert.ok([...storage.values()].some((value) => value?.contractVersion === 1 && value?.displayName));
 
     const invalidPage = {
@@ -307,18 +314,16 @@ test('editor saves the latest card before sharing, ignores double taps, and stay
     };
     invalidPage.onLoad.call(invalidPage, { register: '1' });
     invalidPage.setData({ displayName: '', editorMode: 'PREVIEW', saveAndShareBusy: false });
-    await invalidPage.saveAndOpenShare.call(invalidPage);
+    const failedShare = await invalidPage.onShareAppMessage.call(invalidPage).promise;
     assert.equal(invalidPage.data.status, 'ERROR');
     assert.equal(invalidPage.data.editorMode, 'EDIT', 'validation failure should reveal the editable fields');
     assert.equal(invalidPage.data.saveAndShareBusy, false);
-    assert.equal(redirects.length, 1, 'invalid edits must not enter the share page');
+    assert.equal(redirects.length, 0, 'invalid edits must not enter the share page');
+    assert.equal(failedShare.path, '/pages/card-share/index?invalid=1', 'invalid edits never share previous local data');
     assert.equal(toasts.at(-1)?.title, '请检查必填信息');
     assert.equal(toasts.at(-1)?.icon, 'none');
 
-    globalThis.wx.redirectTo = (options) => {
-      redirects.push(options.url);
-      options.fail?.({ errMsg: 'redirectTo:fail test' });
-    };
+    globalThis.wx.setStorageSync = () => { throw new Error('full storage'); };
     const navigationFailurePage = {
       ...definition,
       data: structuredClone(definition.data),
@@ -326,16 +331,16 @@ test('editor saves the latest card before sharing, ignores double taps, and stay
     };
     navigationFailurePage.onLoad.call(navigationFailurePage, {});
     navigationFailurePage.setData({
-      displayName: '跳转失败测试名片',
+      displayName: '存储失败测试名片',
       cityIndex: 4,
-      biography: '用于验证分享页打不开时也有明确反馈。',
+      biography: '用于验证存储失败时不会分享旧内容。',
     });
-    await navigationFailurePage.saveAndOpenShare.call(navigationFailurePage);
+    const storageFailure = await navigationFailurePage.onShareAppMessage.call(navigationFailurePage).promise;
     assert.equal(navigationFailurePage.data.status, 'ERROR');
     assert.equal(navigationFailurePage.data.saveAndShareBusy, false);
-    assert.equal(navigationFailurePage.data.message, '名片已保存，但暂时无法打开分享页，请重试。');
-    assert.equal(toasts.at(-1)?.title, '分享页暂时无法打开');
-    assert.equal(redirects.length, 2, 'navigation failures should make one attempted redirect and then stop');
+    assert.equal(navigationFailurePage.data.message, '本机名片保存失败，请检查存储空间后重试。');
+    assert.equal(storageFailure.path, '/pages/card-share/index?invalid=1');
+    assert.equal(redirects.length, 0);
   } finally {
     delete globalThis.Page;
     delete globalThis.wx;
@@ -351,19 +356,19 @@ test('preview, edit, and share stay in one centered white-gold action row while 
   const actionRow = template.slice(tabsPosition, template.indexOf('card-editor-evidence'));
   const savebar = template.slice(template.indexOf('<view class="card-editor-savebar">'));
   const savePosition = savebar.indexOf('bindtap="saveProfile"');
-  const sharePosition = savebar.indexOf('bindtap="saveAndOpenShare"');
+  const sharePosition = savebar.indexOf('open-type="share"');
   const previewPosition = savebar.indexOf('bindtap="setEditorMode"', sharePosition);
 
   assert.ok(toolbarPosition >= 0 && toolbarPosition < tabsPosition);
   assert.doesNotMatch(template.slice(toolbarPosition, tabsPosition), /bindtap="saveAndOpenShare"|card-editor-share-primary/);
   assert.equal((actionRow.match(/<button\b/g) ?? []).length, 3, '顶部操作区应是等宽三栏');
-  assert.match(actionRow, /名片预览[\s\S]*编辑内容[\s\S]*bindtap="saveAndOpenShare"[\s\S]*正在保存并准备分享我的名片[\s\S]*分享我的名片/);
+  assert.match(actionRow, /名片预览[\s\S]*编辑内容[\s\S]*open-type="share"[\s\S]*正在保存并准备分享我的名片[\s\S]*分享我的名片/);
   assert.match(template, /card-editor-tabs[\s\S]*card-editor-action-feedback[\s\S]*wx:if="\{\{status === 'LOADING'\}\}"/);
   assert.equal((template.match(/class="card-status/g) ?? []).length, 1, '状态提示应只在顶部操作区渲染一次');
   assert.match(source, /showShareToast\(needsEditing \? '请检查必填信息' : '请查看页面提示'\)/);
   assert.ok(savePosition >= 0 && savePosition < sharePosition && sharePosition < previewPosition);
-  assert.match(savebar, /bindtap="saveAndOpenShare"[^>]*loading="\{\{saveAndShareBusy\}\}"[^>]*disabled="\{\{status === 'SAVING' \|\| saveAndShareBusy\}\}"[^>]*>分享我的名片<\/button>/);
-  assert.ok((template.match(/bindtap="saveAndOpenShare"/g) ?? []).length >= 2);
+  assert.match(savebar, /open-type="share"[^>]*loading="\{\{saveAndShareBusy\}\}"[^>]*disabled="\{\{!shareDraftValid \|\| status === 'SAVING' \|\| saveAndShareBusy \|\| generatingIntroduction\}\}"[^>]*>分享我的名片<\/button>/);
+  assert.equal((template.match(/open-type="share"/g) ?? []).length, 3, 'toolbar, completed preview and savebar share directly');
   assert.match(styles, /\.card-editor-tabs\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\);[^}]*background:\s*#fffaf0;/);
   assert.match(styles, /\.card-editor-tab\s*\{[^}]*display:\s*flex;[^}]*align-items:\s*center;[^}]*justify-content:\s*center;[^}]*text-align:\s*center;[^}]*white-space:\s*nowrap;/);
   assert.match(styles, /\.card-editor-tab--active\s*\{[^}]*background:\s*#f3ead8;[^}]*color:\s*var\(--editor-gold-ink\);[^}]*var\(--editor-gold-strong\)/);
@@ -371,7 +376,8 @@ test('preview, edit, and share stay in one centered white-gold action row while 
   assert.doesNotMatch(styles, /\.card-editor-tab--active\s*\{[^}]*var\(--editor-ink\)/);
   assert.match(source, /async saveProfile\(\): Promise<boolean>/);
   assert.match(source, /saved = await this\.saveProfile\(\)/);
-  assert.match(source, /url: '\/packageCard\/pages\/share\/index'/);
+  assert.doesNotMatch(source, /url: '\/packageCard\/pages\/share\/index'/);
+  assert.match(source, /onShareAppMessage\(\)/);
   assert.ok((source.match(/if \(!this\.isEditorOperationActive\(saveGeneration\)\) return false;/g) ?? []).length >= 2);
   assert.match(source, /onUnload\(\)[\s\S]*editorPageUnloaded = true;[\s\S]*saveOperationGeneration \+= 1;/);
 });
@@ -401,13 +407,84 @@ test('leaving the editor during save-and-share prevents late navigation and post
     page.onLoad.call(page, { register: '1' });
     page.setData({ displayName: '离页测试名片', cityIndex: 4, biography: '验证离页后不跳转。' });
 
-    const pending = page.saveAndOpenShare.call(page);
+    const pending = page.onShareAppMessage.call(page).promise;
     page.onUnload.call(page);
-    await pending;
+    const result = await pending;
 
     assert.deepEqual(redirects, []);
     assert.equal(postUnloadWrites, 0);
+    assert.equal(result.path, '/pages/card-share/index?invalid=1');
   } finally {
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('native share availability follows current validation and blocks edits while preparing', async () => {
+  const storage = new Map();
+  globalThis.wx = {
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
+    setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
+  };
+  try {
+    const definition = await loadOfflineEditorPage();
+    const page = {
+      ...definition,
+      data: structuredClone(definition.data),
+      setData(patch) { Object.assign(this.data, patch); },
+    };
+    page.onLoad.call(page, { register: '1' });
+    assert.equal(page.data.shareDraftValid, false);
+    page.onDisplayNameInput.call(page, { detail: { value: '当前填写者' } });
+    assert.equal(page.data.shareDraftValid, false, 'an explicit city is required before native sharing');
+    page.onCityChange.call(page, { detail: { value: '4' } });
+    assert.equal(page.data.shareDraftValid, true);
+    page.onPhoneInput.call(page, { detail: { value: 'invalid' } });
+    assert.equal(page.data.shareDraftValid, false, 'invalid contact input never opens a known-bad share');
+    page.onPhoneInput.call(page, { detail: { value: '' } });
+    assert.equal(page.data.shareDraftValid, true);
+
+    const sharing = page.onShareAppMessage.call(page).promise;
+    page.onDisplayNameInput.call(page, { detail: { value: '准备时不能覆盖' } });
+    page.onModuleToggle.call(page, { detail: { value: false }, currentTarget: { dataset: { module: 'tags' } } });
+    assert.equal(page.data.displayName, '当前填写者');
+    assert.equal(page.data.showTags, true);
+    const result = await sharing;
+    assert.match(result.path, /local=1&snapshot=/);
+    assert.equal(page.data.saveAndShareBusy, false);
+  } finally {
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('native share timeout releases controls and discards late save completion', async (t) => {
+  globalThis.wx = { getStorageSync() { return undefined; }, setStorageSync() {}, showToast() {} };
+  try {
+    const definition = await loadOfflineEditorPage();
+    const page = {
+      ...definition,
+      data: structuredClone(definition.data),
+      setData(patch) { Object.assign(this.data, patch); },
+    };
+    page.onLoad.call(page, { register: '1' });
+    let completeSave;
+    page.saveProfile = () => new Promise((resolve) => { completeSave = resolve; });
+    t.mock.timers.enable({ apis: ['setTimeout'] });
+    const pending = page.onShareAppMessage.call(page).promise;
+    assert.equal(page.data.saveAndShareBusy, true);
+    t.mock.timers.tick(2500);
+    const result = await pending;
+    assert.equal(result.path, '/pages/card-share/index?invalid=1');
+    assert.equal(page.data.saveAndShareBusy, false);
+    assert.equal(page.data.status, 'ERROR');
+    assert.equal(page.pendingNativeShare, undefined);
+    completeSave(true);
+    await Promise.resolve();
+    await Promise.resolve();
+    assert.equal(page.data.status, 'ERROR', 'late completion must not revive a timed-out share');
+  } finally {
+    t.mock.timers.reset();
     delete globalThis.Page;
     delete globalThis.wx;
   }

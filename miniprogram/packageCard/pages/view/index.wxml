@@ -1,9 +1,10 @@
 <view class="card-page visitor-page">
+  <view class="personal-share-canvas-stage" aria-hidden="true"><canvas type="2d" id="nativeCardShareCover" class="personal-share-canvas"></canvas></view>
   <view class="visitor-header">
     <view class="visitor-header__copy">
       <text class="card-kicker">VIEW A DIGITAL CARD</text>
-      <text class="card-title">一张名片，一次认识</text>
-      <text class="card-subtitle">先看名片，再决定是否交换。没有强制连接，也不会自动添加好友。</text>
+      <text class="card-title">{{visitorTitle}}</text>
+      <text class="card-subtitle">{{viewerMode === 'SELF' && !viewedOwnerUserId ? '整理个人资料，分享你的数字名片。' : '查看分享者选择公开的资料。'}}</text>
     </view>
     <image class="card-brand-crest visitor-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
   </view>
@@ -34,14 +35,15 @@
   >
     <view wx:if="{{viewerMode === 'SELF'}}" slot="actions" class="card-inline-actions visitor-actions">
       <navigator class="card-link-button" url="/packageCard/pages/edit/index" hover-class="none">编辑名片</navigator>
-      <navigator class="card-link-button card-link-button--strong" url="/packageCard/pages/share/index" hover-class="none">分享名片</navigator>
+      <button class="card-link-button card-link-button--strong" open-type="share" disabled="{{!ownerShareReady || ownerSharePreparing}}">{{ownerSharePreparing ? '正在准备…' : '分享名片'}}</button>
     </view>
     <view wx:else slot="actions" class="visitor-exchange">
-      <button wx:if="{{demoMode}}" class="card-link-button card-link-button--strong" bindtap="handleDemoExchange">申请认识 · 交换名片</button>
-      <navigator wx:else class="card-link-button card-link-button--strong" url="/packageSocial/pages/friend/index?ownerUserId={{viewedOwnerUserId}}" hover-class="none">{{viewerMode === 'FRIEND' ? '管理这段连接' : '申请认识 · 交换名片'}}</navigator>
-      <text class="visitor-exchange__note">建立人脉需要对方确认；点击不会自动添加好友。</text>
+      <text class="visitor-exchange__note">一张属于你的名片，自主填写内容与公开范围。</text>
+      <button class="card-link-button card-link-button--strong" bindtap="openMyCardEntry">{{selfCardState === 'HAS_CARD' ? '查看我的数字名片' : '创建我的数字名片'}}</button>
     </view>
   </ab-profile-card>
 
-  <text class="visitor-footnote">{{localIdentityReady ? '公开分享不会包含电话或邮箱。' : (demoMode ? '示例只用于查看名片样式，不代表真实账户、好友关系或认证状态。' : '名片内容与可见范围会随双方关系变化重新刷新。')}}</text>
+  <view wx:if="{{viewerMode === 'SELF' && ownerShareMessage}}" class="visitor-footnote"><text>{{ownerShareMessage}}</text><button class="card-button-secondary" bindtap="prepareOwnerShare">重新准备分享</button></view>
+  <navigator wx:if="{{viewerMode === 'SELF'}}" class="card-secondary-tool" url="/packageCard/pages/share/index" hover-class="none">名片海报与入口管理 <text>›</text></navigator>
+  <text class="visitor-footnote">{{localIdentityReady ? '公开分享不会包含电话或邮箱。' : (demoMode ? '示例只用于查看名片样式，不代表真实账户或认证状态。' : '仅展示当前可见范围内的名片资料。')}}</text>
 </view>

@@ -753,6 +753,28 @@
   text-align: center;
 }
 
+.card-editor-share-canvas {
+  position: fixed;
+  left: -2000px;
+  top: 0;
+  width: 600px;
+  height: 480px;
+  pointer-events: none;
+}
+
+/* The editor keeps its approved ivory workspace even when the device is dark. */
+.card-editor-page .card-button-secondary,
+.card-editor-page .card-link-button {
+  color: #725126;
+}
+
+.card-editor-page .card-button,
+.card-editor-page .card-link-button--strong {
+  border-color: #d7bf8d;
+  background: #d7bf8d;
+  color: #211e1a;
+}
+
 @media (max-width: 430px) {
   .card-editor-contact-grid {
     grid-template-columns: minmax(0, 1fr);

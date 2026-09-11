@@ -1,6 +1,7 @@
 import type { PublicCardProjection } from '../../shared/types/projections';
 import { createShareEntryPage } from '../../shared/utils/placeholder-page';
 import {
+  getMyCard,
   getRuntimeEvidence,
   resolveCardShare,
   type IdentityClientFailure,
@@ -12,6 +13,7 @@ import {
   sanitizePublicCard,
 } from '../card/services/card-presenter';
 import { OFFLINE_DEMO_FIELDS, isOfflineDemo } from '../card/services/offline-demo';
+import { hasLocalIdentity } from '../card/services/local-identity';
 import { normalizeCardTheme, type CardTheme } from '../card/services/card-theme-preference';
 import {
   createDefaultOfflineDemoDraft,
@@ -22,11 +24,34 @@ import {
   createOfflineDemoShareSnapshot,
   decodeOfflineDemoShareSnapshot,
 } from '../card/services/offline-demo-share-snapshot';
+import { prepareNativeShareCardCover } from '../card/services/native-share-card';
 
 type ShareReference = { readonly token: string } | { readonly scene: string };
 type ShareState = 'SUCCESS' | 'EXPIRED' | 'REVOKED' | 'ERROR' | 'LOADING';
+type SelfCardState = 'CHECKING' | 'HAS_CARD' | 'NO_CARD' | 'UNKNOWN';
 
 const frozenShareEntry = createShareEntryPage('名片分享入口', 'CARD');
+const DEFAULT_VISITOR_TITLE = 'AB Club 数字名片';
+const SAFE_VISITOR_SHARE_COVER = '/assets/brand/ab-club-brand-share.jpg';
+
+function compactDisplayName(value: unknown): string {
+  if (typeof value !== 'string') return '';
+  return Array.from(value.trim()).slice(0, 24).join('');
+}
+
+function visitorTitleForCard(card: PublicCardProjection | null | undefined): string {
+  const displayName = compactDisplayName(card?.displayName);
+  return displayName ? `${displayName} 的数字名片` : DEFAULT_VISITOR_TITLE;
+}
+
+function setNavigationTitle(title: string): void {
+  if (typeof wx.setNavigationBarTitle !== 'function') return;
+  wx.setNavigationBarTitle({ title: Array.from(title).slice(0, 20).join('') });
+}
+
+function localAccountIsReady(): boolean {
+  return hasLocalIdentity();
+}
 
 function stateForFailure(failure: IdentityClientFailure): {
   readonly state: ShareState;
@@ -54,13 +79,16 @@ Page({
   shareResolveGeneration: 0,
   shareResolving: false,
   shareUnloaded: false,
+  selfCardCheckGeneration: 0,
   demoForwardPath: '',
+  shareCoverPath: '',
+  shareCoverGeneration: 0,
   data: {
     ...frozenShareEntry.data,
     runtimeMode: 'OFFLINE_DEMO',
     state: 'LOADING' as ShareState,
     stateTitle: '正在核验分享入口',
-    stateDescription: '服务端会重新检查过期、撤销、拉黑、好友关系和认证有效性。',
+    stateDescription: '正在检查入口状态与当前可见范围。',
     allowRetry: true,
     allowForward: false,
     card: null as PublicCardProjection | null,
@@ -70,6 +98,9 @@ Page({
     demoFields: [...OFFLINE_DEMO_FIELDS] as OfflineDemoPublicField[],
     demoPublicLabels: [] as string[],
     cardTheme: 'ivory' as CardTheme,
+    visitorTitle: DEFAULT_VISITOR_TITLE,
+    localAccountReady: false,
+    selfCardState: 'CHECKING' as SelfCardState,
   },
 
   onLoad(options: Record<string, string | undefined>) {
@@ -77,7 +108,10 @@ Page({
     this.shareReference = undefined;
     this.shareResolveGeneration += 1;
     this.shareResolving = false;
+    this.selfCardCheckGeneration += 1;
     this.demoForwardPath = '';
+    this.shareCoverPath = '';
+    this.shareCoverGeneration += 1;
     frozenShareEntry.onLoad.call(this, options);
     const runtime = getRuntimeEvidence();
     const cardTheme = normalizeCardTheme(options.theme);
@@ -86,14 +120,26 @@ Page({
       cardTheme,
       demoMode: false,
       localIdentityMode: false,
+      demoFields: [],
+      demoPublicLabels: [],
+      visitorTitle: DEFAULT_VISITOR_TITLE,
+      localAccountReady: localAccountIsReady(),
+      selfCardState: isOfflineDemo(runtime)
+        ? (localAccountIsReady() ? 'HAS_CARD' : 'NO_CARD')
+        : 'CHECKING',
     });
+    setNavigationTitle(DEFAULT_VISITOR_TITLE);
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
+    if ([options.local === '1', options.demo === '1', Boolean(options.token), Boolean(options.scene)].filter(Boolean).length > 1) {
+      this.setData({ state: 'ERROR', stateTitle: '入口不可用', stateDescription: '分享入口参数冲突，请让分享者重新发送。', allowRetry: false, allowForward: false, card: null, cityLabel: '' });
+      return;
+    }
     if (options.local === '1') {
       if (!isOfflineDemo(runtime)) {
         this.setData({
           state: 'ERROR',
-          stateTitle: '本机名片入口不可用',
-          stateDescription: '当前运行环境不接受离线本机名片，请由名片本人创建云端安全分享入口。',
+          stateTitle: '离线名片入口不可用',
+          stateDescription: '当前运行环境不接受该离线入口，请让分享者重新发送。',
           allowRetry: false,
           allowForward: false,
           card: null,
@@ -105,8 +151,8 @@ Page({
       if (!decoded.ok || decoded.snapshot.source !== 'LOCAL') {
         this.setData({
           state: 'ERROR',
-          stateTitle: '本机名片已损坏',
-          stateDescription: '这张本机名片的公开快照不完整、类型不符或被修改，请让分享者重新发送。',
+          stateTitle: '名片内容无法读取',
+          stateDescription: '这张名片的公开快照不完整、类型不符或被修改，请让分享者重新发送。',
           allowRetry: false,
           allowForward: false,
           localIdentityMode: true,
@@ -118,11 +164,12 @@ Page({
         return;
       }
       const snapshot = decoded.snapshot;
+      const visitorTitle = visitorTitleForCard(snapshot.card);
       this.demoForwardPath = `/pages/card-share/index?local=1&snapshot=${options.snapshot}`;
       this.setData({
         state: 'SUCCESS',
-        stateTitle: 'AB Club 本机名片',
-        stateDescription: '这是从本机转发的公开名片，不含电话或邮箱。',
+        stateTitle: visitorTitle,
+        stateDescription: '以下资料由分享者填写并选择公开，尚未经过平台认证。',
         allowRetry: false,
         allowForward: true,
         localIdentityMode: true,
@@ -131,7 +178,10 @@ Page({
         demoPublicLabels: [...snapshot.publicLabels],
         cardTheme: snapshot.cardTheme,
         cityLabel: cityDisplayName(snapshot.card.cityId),
+        visitorTitle,
       });
+      setNavigationTitle(visitorTitle);
+      void this.prepareVisitorShareCover();
       wx.showShareMenu({ menus: ['shareAppMessage'] });
       return;
     }
@@ -167,14 +217,15 @@ Page({
         return;
       }
       const snapshot = decoded.snapshot;
+      const visitorTitle = visitorTitleForCard(snapshot.card);
       const forwardPath = options.snapshot === undefined
         ? buildOfflineDemoSharePath(createDefaultOfflineDemoDraft(), snapshot.cardTheme)
         : { ok: true as const, path: `/pages/card-share/index?demo=1&snapshot=${options.snapshot}` };
       this.demoForwardPath = forwardPath.ok ? forwardPath.path : '';
       this.setData({
         state: 'SUCCESS',
-        stateTitle: 'AB Club 名片预览',
-        stateDescription: '这张名片来自本机预览，人物与资料均为合成示例，不代表真实会员、审核或人脉关系。',
+        stateTitle: visitorTitle,
+        stateDescription: '这张名片来自本机预览，人物与资料均为合成示例，不代表真实会员或审核状态。',
         allowRetry: false,
         allowForward: true,
         demoMode: true,
@@ -183,7 +234,10 @@ Page({
         demoPublicLabels: [...snapshot.publicLabels],
         cardTheme: snapshot.cardTheme,
         cityLabel: cityDisplayName(snapshot.card.cityId),
+        visitorTitle,
       });
+      setNavigationTitle(visitorTitle);
+      void this.prepareVisitorShareCover();
       wx.showShareMenu({ menus: ['shareAppMessage'] });
       return;
     }
@@ -204,7 +258,7 @@ Page({
     this.setData({
       state: 'LOADING',
       stateTitle: '正在核验分享入口',
-      stateDescription: '服务端会重新检查过期、撤销、拉黑、好友关系和认证有效性。',
+      stateDescription: '正在检查入口状态与当前可见范围。',
       allowRetry: true,
       allowForward: false,
       card: null,
@@ -213,6 +267,7 @@ Page({
   },
 
   onShow() {
+    void this.refreshSelfCardState();
     if (this.shareReference) void this.resolveShare();
   },
 
@@ -220,7 +275,10 @@ Page({
     this.shareUnloaded = true;
     this.shareReference = undefined;
     this.demoForwardPath = '';
+    this.shareCoverPath = '';
+    this.shareCoverGeneration += 1;
     this.shareResolveGeneration += 1;
+    this.selfCardCheckGeneration += 1;
     this.shareResolving = false;
   },
 
@@ -235,6 +293,9 @@ Page({
       return;
     }
     this.shareResolving = true;
+    this.shareCoverPath = '';
+    this.shareCoverGeneration += 1;
+    wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     const generation = ++this.shareResolveGeneration;
     const requestIsCurrent = () => (
       !this.shareUnloaded
@@ -247,18 +308,27 @@ Page({
       stateTitle: '正在重新核验',
       stateDescription: '每次返回页面都会重新检查权限，不沿用旧页面结果。',
       card: null,
+      cityLabel: '',
+      visitorTitle: DEFAULT_VISITOR_TITLE,
       allowForward: false,
     });
+    setNavigationTitle(DEFAULT_VISITOR_TITLE);
     try {
       const result = await resolveCardShare(reference);
       if (!requestIsCurrent()) return;
       if (!result.ok) {
         const failureState = stateForFailure(result);
         this.setData({
-          ...failureState,
+          state: failureState.state,
+          stateTitle: failureState.title,
+          stateDescription: failureState.description,
           allowRetry: result.retryable || result.code === 'TOKEN_INVALID',
           allowForward: false,
+          card: null,
+          cityLabel: '',
+          visitorTitle: DEFAULT_VISITOR_TITLE,
         });
+        setNavigationTitle(DEFAULT_VISITOR_TITLE);
         return;
       }
       if (
@@ -271,18 +341,27 @@ Page({
           stateDescription: '这个入口不是数字名片，请返回正确页面重新打开。',
           allowRetry: false,
           allowForward: false,
+          card: null,
+          cityLabel: '',
+          visitorTitle: DEFAULT_VISITOR_TITLE,
         });
+        setNavigationTitle(DEFAULT_VISITOR_TITLE);
         return;
       }
+      const card = sanitizePublicCard(result.data.resolution.card);
+      const visitorTitle = visitorTitleForCard(card);
       this.setData({
         state: 'SUCCESS',
-        stateTitle: '分享入口有效',
-        stateDescription: '以下内容是服务端按当前查看关系实时生成的最小公开投影。',
+        stateTitle: visitorTitle,
+        stateDescription: '以下是分享者选择向你展示的名片资料。',
         allowRetry: true,
         allowForward: true,
-        card: sanitizePublicCard(result.data.resolution.card),
-        cityLabel: cityDisplayName(result.data.resolution.card.cityId),
+        card,
+        cityLabel: cityDisplayName(card.cityId),
+        visitorTitle,
       });
+      setNavigationTitle(visitorTitle);
+      void this.prepareVisitorShareCover();
       wx.showShareMenu({ menus: ['shareAppMessage'] });
     } catch (_error) {
       if (!requestIsCurrent()) return;
@@ -292,7 +371,11 @@ Page({
         stateDescription: '分享入口核验未完成，未展示任何未经核验的名片内容。请稍后重试。',
         allowRetry: true,
         allowForward: false,
+        card: null,
+        cityLabel: '',
+        visitorTitle: DEFAULT_VISITOR_TITLE,
       });
+      setNavigationTitle(DEFAULT_VISITOR_TITLE);
     } finally {
       if (this.shareResolveGeneration === generation) {
         this.shareResolving = false;
@@ -303,6 +386,70 @@ Page({
 
   handleRetry() {
     void this.resolveShare();
+  },
+
+  async prepareVisitorShareCover() {
+    const card = this.data.card;
+    if (!card || this.data.state !== 'SUCCESS') return;
+    const generation = ++this.shareCoverGeneration;
+    const image = await prepareNativeShareCardCover(this, {
+      displayName: card.displayName,
+      headline: card.headline,
+      biography: card.biography,
+      labels: (this.data.demoMode || this.data.localIdentityMode) ? this.data.demoPublicLabels : card.claims.map((claim) => claim.labelText.zh),
+      phone: (this.data.demoMode || this.data.localIdentityMode) ? this.data.demoFields.find((field) => field.key === 'phone')?.value : '',
+      email: (this.data.demoMode || this.data.localIdentityMode) ? this.data.demoFields.find((field) => field.key === 'email')?.value : '',
+      demoMode: this.data.demoMode,
+    });
+    if (!this.shareUnloaded && generation === this.shareCoverGeneration && this.data.card === card) this.shareCoverPath = image || '';
+  },
+
+  async refreshSelfCardState() {
+    if (this.data.runtimeMode === 'OFFLINE_DEMO') {
+      const localAccountReady = localAccountIsReady();
+      this.setData({
+        localAccountReady,
+        selfCardState: localAccountReady ? 'HAS_CARD' : 'NO_CARD',
+      });
+      return;
+    }
+    const generation = ++this.selfCardCheckGeneration;
+    this.setData({ selfCardState: 'CHECKING' });
+    try {
+      const result = await getMyCard();
+      if (this.shareUnloaded || generation !== this.selfCardCheckGeneration) return;
+      if (result.ok) {
+        this.setData({ localAccountReady: true, selfCardState: 'HAS_CARD' });
+        return;
+      }
+      if (result.code === 'NOT_FOUND') {
+        this.setData({ localAccountReady: false, selfCardState: 'NO_CARD' });
+        return;
+      }
+      this.setData({ localAccountReady: false, selfCardState: 'UNKNOWN' });
+    } catch (_error) {
+      if (!this.shareUnloaded && generation === this.selfCardCheckGeneration) {
+        this.setData({ localAccountReady: false, selfCardState: 'UNKNOWN' });
+      }
+    }
+  },
+
+  openMyCardEntry() {
+    const offline = this.data.runtimeMode === 'OFFLINE_DEMO';
+    const localAccountReady = offline ? localAccountIsReady() : this.data.selfCardState === 'HAS_CARD';
+    if (offline && localAccountReady !== this.data.localAccountReady) {
+      this.setData({
+        localAccountReady,
+        selfCardState: localAccountReady ? 'HAS_CARD' : 'NO_CARD',
+      });
+    }
+    const url = localAccountReady
+      ? '/pages/card/index'
+      : `/packageCard/pages/edit/index${offline ? '?register=1' : ''}`;
+    wx.navigateTo({
+      url,
+      fail: () => wx.showToast({ title: '暂时无法打开，请稍后再试', icon: 'none' }),
+    });
   },
 
   onShareAppMessage() {
@@ -318,13 +465,18 @@ Page({
       && this.data.state === 'SUCCESS'
     ) {
       return {
-        title: this.data.localIdentityMode ? 'AB Club · 本机数字名片' : 'AB Club · 数字名片预览',
+        title: safeShareTitle(card.displayName),
         path: this.demoForwardPath || `/pages/card-share/index?demo=1${themeQuery}`,
+        imageUrl: this.shareCoverPath || SAFE_VISITOR_SHARE_COVER,
       };
     }
     if (this.shareUnloaded || !reference || !card || this.data.state !== 'SUCCESS') {
       wx.showToast({ title: '当前入口不可转发', icon: 'none' });
-      return { title: 'AB Club', path: '/pages/discover/index' };
+      return {
+        title: 'AB Club 数字名片',
+        path: '/pages/card-share/index?invalid=1',
+        imageUrl: SAFE_VISITOR_SHARE_COVER,
+      };
     }
     const query = 'token' in reference
       ? `token=${encodeURIComponent(reference.token)}`
@@ -332,6 +484,7 @@ Page({
     return {
       title: safeShareTitle(card.displayName),
       path: `/pages/card-share/index?${query}${themeQuery}`,
+      imageUrl: this.shareCoverPath || SAFE_VISITOR_SHARE_COVER,
     };
   },
 });

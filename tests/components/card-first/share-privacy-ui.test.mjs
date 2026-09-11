@@ -14,7 +14,7 @@ test('share page presents the card and human-facing sharing choices', () => {
   assert.match(template, /<ab-profile-card\b[\s\S]*?card="\{\{card\}\}"/);
   assert.match(template, /viewer-mode="STRANGER"/);
   assert.match(template, /fields="\{\{demoMode \? demoFields : \[\]\}\}"/);
-  assert.match(template, /好友接收视角/);
+  assert.match(template, /封面只使用当前公开字段/);
   assert.match(template, /微信好友|生成名片海报|撤销/);
   assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送示例名片到微信/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
@@ -31,14 +31,15 @@ test('privacy page explains choices in member language, not implementation langu
   assert.doesNotMatch(template, /冻结 DTO|PUBLIC|FRIENDS_ONLY|PRIVATE|OPENID|运行模式/);
 });
 
-test('visitor page keeps the exchange decision clear and quiet', () => {
+test('visitor page identifies the sender and offers a separate create-own-card entry', () => {
   const template = read('miniprogram/packageCard/pages/view/index.wxml');
   const source = read('miniprogram/packageCard/pages/view/index.ts');
   const ownerTemplate = read('miniprogram/pages/card/index.wxml');
 
-  assert.match(template, /先看名片，再决定是否交换/);
-  assert.match(template, /交换名片/);
-  assert.match(template, /需要对方确认/);
+  assert.match(template, /查看分享者选择公开的资料/);
+  assert.match(template, /创建我的数字名片/);
+  assert.match(template, /bindtap="openMyCardEntry"/);
+  assert.doesNotMatch(template, /交换名片|需要对方确认|添加好友|建立好友/);
   assert.match(ownerTemplate, /view\/index\?preview=STRANGER/);
   assert.match(source, /demoVisitorPreview[\s\S]*viewerMode:\s*this\.data\.demoVisitorPreview \? 'STRANGER' : 'SELF'/);
   assert.doesNotMatch(source, /import\s*\{[\s\S]*?getRuntimeEvidence[\s\S]*?\}\s*from\s*['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]/);

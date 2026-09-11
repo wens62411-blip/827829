@@ -1,8 +1,9 @@
 <view class="card-page">
+  <view class="personal-share-canvas-stage" aria-hidden="true"><canvas type="2d" id="nativeCardShareCover" class="personal-share-canvas"></canvas></view>
   <view class="card-hero-row">
     <view><text class="card-kicker">AB CLUB · DIGITAL CARD</text><text class="card-title">我的数字名片</text></view>
   </view>
-  <text class="card-subtitle">一张克制、私密可控的自我介绍。先填写，再交换；公开认证完全可选。</text>
+  <text class="card-subtitle">一张简洁、私密可控的数字名片。先完成资料，再把公开内容分享给对方。</text>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载名片"></view>
 
@@ -28,18 +29,24 @@
   >
     <view slot="actions" class="card-inline-actions card-first-actions">
       <button class="card-link-button" bindtap="openEditor"><image class="card-link-button__icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑名片</text></button>
-      <button class="card-link-button card-link-button--strong" bindtap="openShare"><image class="card-link-button__icon" src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>分享名片</text></button>
+      <button class="card-link-button card-link-button--strong" open-type="share" disabled="{{!shareReady || sharePreparing || shareRevoking}}"><image class="card-link-button__icon" src="/assets/icons/ui-share-light.png" mode="aspectFit" aria-hidden="true" /><text>{{sharePreparing ? '正在准备…' : '分享名片'}}</text></button>
     </view>
   </ab-profile-card>
+
+  <view wx:if="{{card && shareHint}}" class="card-owner-share-feedback" aria-live="polite">
+    <text>{{shareHint}}</text>
+    <button wx:if="{{!shareReady && !sharePreparing && !shareRevoking}}" class="card-button-secondary" bindtap="prepareWechatShare">重新准备分享</button>
+  </view>
 
   <view wx:if="{{card}}" class="card-secondary-tools" aria-label="名片管理">
     <navigator class="card-secondary-tool" url="/packageCard/pages/edit/index" hover-class="none">编辑资料 <text>›</text></navigator>
     <navigator class="card-secondary-tool" url="/packageCard/pages/privacy/index" hover-class="none">查看隐私范围 <text>›</text></navigator>
+    <button class="card-secondary-tool" bindtap="openShareManager">名片海报与入口管理 <text>›</text></button>
     <navigator wx:if="{{demoMode}}" class="card-secondary-tool" url="/packageCard/pages/view/index?preview=STRANGER" hover-class="none">预览访客视角 <text>›</text></navigator>
   </view>
 
   <view wx:if="{{card}}" class="card-truth-note" aria-role="note">
-    <text>{{localIdentityReady ? '本机名片 · 当前展示你填写的内容，并只保存在这台设备。' : (demoMode ? '本机预览 · 当前为合成示例，不代表真实会员；分享页可试用当前公开字段的发送效果。' : '名片按当前可见范围显示；分享操作在独立页面完成。')}}</text>
+    <text>{{localIdentityReady ? '此设备保存的名片 · 当前展示你填写并选择公开的内容。' : (demoMode ? '当前为合成示例，不代表真实会员；可体验公开字段的转发效果。' : '名片按当前可见范围显示；点击分享会直接打开微信转发面板。')}}</text>
     <text>认证完全可选；标签必须先经过人工审核，才会公开显示。</text>
   </view>
 </view>

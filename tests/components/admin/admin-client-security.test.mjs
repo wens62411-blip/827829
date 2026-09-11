@@ -138,7 +138,7 @@ test('case details expire after 120 seconds and all sensitive page state clears 
   }
   const caseTemplate = read('miniprogram', 'components', 'ab-admin-case', 'index.wxml');
   assert.match(caseTemplate, /expiresInSeconds/);
-  assert.match(caseTemplate, /离开页面会立即清除/);
+  assert.match(caseTemplate, /离开页面会立即移除/);
 });
 
 test('switching cases destroys every unsubmitted decision draft before rebinding the selected secret', () => {

@@ -60,7 +60,7 @@ test('phase-one navigation opens on Discover and exposes only activity and Me be
   assert.deepEqual(errors, []);
 });
 
-test('phase-one card journey exposes create, display, live preview, share, and add-friend', () => {
+test('phase-one card journey exposes create, display, live preview, native share, and visitor conversion', () => {
   const routes = new Set(registeredRoutes());
   const requiredRoutes = [
     'pages/card/index',
@@ -87,13 +87,12 @@ test('phase-one card journey exposes create, display, live preview, share, and a
   const publicCard = read('miniprogram/packageCard/pages/view/index.wxml');
   assert.match(`${ownerCard}\n${publicCard}`, /分享名片|安全分享|分享与撤销/, '名片展示必须有直接分享入口');
 
-  const profileCard = read('miniprogram/components/ab-profile-card/index.wxml');
-  const strangerSurface = `${publicCard}\n${profileCard}`;
-  assert.match(
-    strangerSurface,
-    /申请认识|添加好友|加为好友|ab-friend-request|friend-request/i,
-    '查看他人名片时必须能发起 AB Club 好友申请',
-  );
+  const sharedCard = read('miniprogram/pages/card-share/index.wxml');
+  for (const template of [publicCard, sharedCard]) {
+    assert.match(template, /创建我的数字名片/);
+    assert.doesNotMatch(template, /申请认识|添加好友|加为好友|friend\/index/);
+  }
+  assert.match(ownerCard, /<button\b[^>]*open-type="share"/);
 });
 
 test('identity bootstrap is deferred until the user deliberately enters card creation', () => {
@@ -126,7 +125,8 @@ test('network overview is no longer linked from Discover and other surfaces keep
   for (const [name, template] of Object.entries({ ownerCard, me, visitor })) {
     assert.doesNotMatch(template, /url="\/pages\/network\/index"/, `${name} 不应再暴露人脉总页入口`);
   }
-  assert.match(visitor, /\/packageSocial\/pages\/friend\/index\?ownerUserId=/);
+  assert.doesNotMatch(visitor, /\/packageSocial\/pages\/friend\/index\?ownerUserId=/);
+  assert.match(visitor, /bindtap="openMyCardEntry"/);
 });
 
 test('profile review is optional and does not occupy the core card flow', () => {

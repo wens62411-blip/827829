@@ -29,11 +29,11 @@
         src="{{cityImageSrc}}"
         mode="aspectFill"
         lazy-load="{{true}}"
-        alt="{{cityName}}城市群城市景观"
+        alt="欧洲古典湖畔别墅拱廊与艺术沙龙，品牌氛围配图"
         binderror="handleCityImageError"
       />
       <view class="me-city-group__shade"></view>
-        <text class="me-city-group__city">CURRENT CITY · {{cityName || 'HANGZHOU'}}</text>
+        <text class="me-city-group__city">AB CLUB · GLOBAL COMMUNITY</text>
     </view>
     <view wx:else class="me-city-group__art me-city-group__art--fallback">
       <image class="me-city-group__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
@@ -43,13 +43,19 @@
     <view class="me-city-group__body">
       <view class="me-city-group__masthead">
         <text class="me-city-group__kicker">SUPPORTED CITIES</text>
-        <text class="me-city-group__evidence">13 城目录 · 逐步开放</text>
+        <text class="me-city-group__evidence">13 城 · 微信群</text>
       </view>
       <text class="me-city-group__title">{{cityGroupTitle}}</text>
       <view class="me-city-group__copy" aria-label="{{supportedCities}}">
         <text wx:for="{{supportedCityNames}}" wx:key="*this" class="me-city-group__city-token">{{item}}{{index === supportedCityNames.length - 1 ? '' : '、'}}</text>
       </view>
-      <text class="me-city-group__boundary" aria-live="polite">节点开放状态以后续公告为准。</text>
+      <view class="me-city-group__boundary">
+        <text>以上城市均设有微信群，入群请添加负责人微信：</text>
+        <view class="me-city-group__contact">
+          <text class="me-city-group__wechat" user-select="{{true}}">{{communityWechatId}}</text>
+          <button class="me-city-group__copy-button" bindtap="copyCommunityWechat" disabled="{{copyingCommunityWechat}}" hover-class="me-pressed" aria-label="复制负责人微信号 ABclub1">复制微信号</button>
+        </view>
+      </view>
     </view>
   </view>
 

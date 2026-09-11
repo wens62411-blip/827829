@@ -19,7 +19,7 @@ test('Discover is an explicit offline editorial demo rather than a placeholder',
   assert.match(template, /当前不开放报名/);
   assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览|仅做数据示例/);
   assert.doesNotMatch(template, /隐私边界，先说清楚|无需认证即可/);
-  assert.match(source, /title:\s*'AB Club · 全球华人文化与连接'/);
+  assert.match(source, /title:\s*'AB Club · 你的名片，连接世界'/);
 });
 
 test('Discover keeps event entry restrained and numbered quick links removed', () => {

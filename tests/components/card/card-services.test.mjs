@@ -148,7 +148,7 @@ test('editable introduction uses AI only for valid output and deterministically 
   assert.equal(timedOut.fallbackReason, 'TIMEOUT');
 });
 
-test('revocation persistence stores only the non-secret shareTokenId pointer', async () => {
+test('revocation persistence keeps a bounded non-secret token-id registry without overwriting older entries', async () => {
   const storage = new Map();
   globalThis.wx = {
     setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
@@ -157,12 +157,23 @@ test('revocation persistence stores only the non-secret shareTokenId pointer', a
   };
   const pointer = await loadBundledTypeScript('miniprogram/pages/card/services/share-revocation-pointer.ts');
   const shareTokenId = 'share_synthetic_pointer_123';
+  const olderShareTokenId = 'share_synthetic_pointer_older';
+  assert.equal(pointer.rememberShareForRevocation(olderShareTokenId), true);
   assert.equal(pointer.rememberShareForRevocation(shareTokenId), true);
   const serialized = JSON.stringify([...storage.values()]);
   assert.equal(serialized.includes('sc_AAAAAAAAAAAAAAAAAAAAAAAAAAA'), false);
-  assert.deepEqual(Object.keys([...storage.values()][0]).sort(), ['contractVersion', 'savedAt', 'shareTokenId']);
+  assert.deepEqual(Object.keys([...storage.values()][0]).sort(), ['contractVersion', 'pointers']);
+  assert.equal([...storage.values()][0].contractVersion, '2.0.0');
+  assert.equal([...storage.values()][0].pointers.length, 2);
   assert.equal(pointer.readShareRevocationPointer(), shareTokenId);
-  pointer.forgetShareRevocationPointer();
+  assert.equal(pointer.wasShareRevokedForSession(shareTokenId), false);
+  pointer.forgetShareRevocationPointer(shareTokenId);
+  assert.equal(pointer.wasShareRevokedForSession(shareTokenId), false, 'removing a local pointer is not a confirmed revoke');
+  assert.equal(pointer.readShareRevocationPointer(), olderShareTokenId);
+  pointer.markShareRevokedForSession(shareTokenId);
+  assert.equal(pointer.wasShareRevokedForSession(shareTokenId), true);
+  assert.equal(pointer.wasShareRevokedForSession(olderShareTokenId), false);
+  pointer.forgetShareRevocationPointer(olderShareTokenId);
   assert.equal(storage.size, 0);
   delete globalThis.wx;
 });

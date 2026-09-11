@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0.0",
+  "sourceType": "AI_GENERATED_ORIGINAL",
+  "runtimePolicy": "LOCAL_FILE_ONLY_NO_HOTLINK",
+  "createdAt": "2026-09-11",
+  "reviewStatus": "DRAFT",
+  "assets": [
+    {
+      "path": "/assets/community/european-classical-terrace.jpg",
+      "usage": "My page city panel only; decorative architectural setting, not a named venue or location claim",
+      "width": 1200,
+      "height": 500,
+      "bytes": 90733,
+      "sha256": "b819624fa2aa1115f02e8705135eb44d43d74f2618d7558ff5ad8f9493c7a94e"
+    },
+    {
+      "path": "/assets/brand/ab-club-brand-share.jpg",
+      "usage": "Brand share thumbnail; no personal data; 5:4 aspect ratio",
+      "width": 600,
+      "height": 480,
+      "bytes": 32531,
+      "sha256": "623b126ec5e82a7b47950a2698a257350bb9cb953363656f32cd619171c4a384"
+    }
+  ],
+  "existingPageImagesModified": false,
+  "generationEvidence": "docs/formal-baseline-refinement-images.md"
+}

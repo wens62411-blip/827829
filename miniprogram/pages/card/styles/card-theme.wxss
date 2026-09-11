@@ -768,6 +768,14 @@
     color: var(--card-page-ink);
   }
 
+  .card-button,
+  .card-button--share,
+  .card-link-button--strong {
+    border-color: #d7bf8d;
+    background: #d7bf8d;
+    color: #211e1a;
+  }
+
   .card-contract-lock {
     border-color: var(--card-page-line);
     background: #2d2924;
