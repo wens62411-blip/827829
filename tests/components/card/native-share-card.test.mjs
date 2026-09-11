@@ -72,12 +72,12 @@ test('native share card uses a 5:4 editorial layout with vertical name and divid
   assert.match(source, /NATIVE_SHARE_CARD_HEIGHT\s*=\s*480/);
   assert.match(source, /drawVerticalName/);
   assert.match(source, /moveTo\(112\.5,\s*102\)[\s\S]*lineTo\(112\.5,\s*399\)/);
-  assert.match(source, /PRIVATE BY CHOICE · SHARED WITH INTENT/);
+  assert.doesNotMatch(source, /PRIVATE BY CHOICE|SHARED WITH INTENT|让个人风格，成为第一印象|愿在新的城市里/);
   assert.match(source, /content\.phone\s*\?/);
   assert.match(source, /content\.email\s*\?/);
 });
 
-test('owner share page previews the native cover and can fall back to sharing without it', () => {
+test('owner poster page keeps native sharing available without customer-facing forwarding tests', () => {
   const page = readFileSync(sharePagePath, 'utf8');
   const template = readFileSync(shareTemplatePath, 'utf8');
 
@@ -86,9 +86,65 @@ test('owner share page previews the native cover and can fall back to sharing wi
   assert.match(page, /email:\s*draft\?\.showEmail\s*\?\s*draft\.email\s*:\s*''/);
   assert.match(page, /imageUrl:\s*this\.data\.shareCoverPath/g);
   assert.match(template, /id="nativeShareCardCanvas"/);
-  assert.match(template, /微信分享卡片预览/);
+  assert.match(template, /名片海报/);
   assert.doesNotMatch(template, /disabled="\{\{shareCoverState\s*!==\s*'READY'\}\}"/);
-  assert.match(template, /disabled="\{\{shareCoverState\s*===\s*'LOADING'\}\}"/);
-  assert.match(template, /allow-forward="\{\{shareState === 'SUCCESS' && shareCoverState !== 'LOADING'\}\}"/);
-  assert.match(template, /WECHAT SHARE CARD/);
+  assert.doesNotMatch(template, /微信分享卡片预览|转发测试|WECHAT SHARE CARD/);
+});
+
+function luminance(hex) {
+  const rgb = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255)
+    .map(v => v <= 0.04045 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+  return rgb[0] * 0.2126 + rgb[1] * 0.7152 + rgb[2] * 0.0722;
+}
+
+test('personal covers follow the explicit card theme and keep readable text in every palette', async () => {
+  const { normalizeNativeShareCard, resolveNativeShareCardPalette } = await loadService();
+  assert.equal(normalizeNativeShareCard({ theme: 'unknown' }).theme, 'ivory');
+  const seen = new Set();
+  for (const theme of ['ivory', 'ink', 'champagne', 'stone']) {
+    const normalized = normalizeNativeShareCard({ theme });
+    assert.equal(normalized.theme, theme);
+    const palette = resolveNativeShareCardPalette(theme);
+    seen.add(palette.paper.join(','));
+    for (const textColor of [palette.ink, palette.muted, palette.accent]) {
+      for (const background of palette.paper) {
+        const a = luminance(textColor), b = luminance(background);
+        assert.ok((Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05) >= 4.5, `${theme}: ${textColor} on ${background}`);
+      }
+    }
+  }
+  assert.equal(seen.size, 4);
+});
+
+test('cover renderer uses the selected palette without invented profile text or hidden contacts', async () => {
+  const { drawNativeShareCard, resolveNativeShareCardPalette } = await loadService();
+  const originalWx = globalThis.wx;
+  globalThis.wx = { getWindowInfo: () => ({ pixelRatio: 2 }) };
+  try {
+    for (const theme of ['ivory', 'ink', 'champagne', 'stone']) {
+      const texts = [], stops = [];
+      const context = {
+        scale() {}, save() {}, restore() {}, fillRect() {}, strokeRect() {},
+        beginPath() {}, moveTo() {}, lineTo() {}, stroke() {},
+        createLinearGradient: () => ({ addColorStop: (_, color) => stops.push(color) }),
+        measureText: value => ({ width: Array.from(value).length * 16 }),
+        fillText(value) { texts.push({ value, color: this.fillStyle }); },
+      };
+      const canvas = { getContext: () => context };
+      const content = drawNativeShareCard(canvas, { displayName: '林雅', theme });
+      assert.equal(content.theme, theme);
+      assert.deepEqual(stops, [...resolveNativeShareCardPalette(theme).paper]);
+      assert.ok(texts.some(t => t.value === '林' && t.color === resolveNativeShareCardPalette(theme).ink));
+      assert.doesNotMatch(texts.map(t => t.value).join(' '), /TEL|MAIL|ABOUT|CONTACT|让个人风格|愿在新的城市|PRIVATE BY CHOICE/);
+      assert.equal(canvas.width, 1200);
+      assert.equal(canvas.height, 960);
+    }
+  } finally { globalThis.wx = originalWx; }
+});
+
+test('all native cover entry points pass the same card theme as their receiving route', () => {
+  for (const page of ['pages/card', 'pages/card-share', 'packageCard/pages/view', 'packageCard/pages/edit', 'packageCard/pages/share']) {
+    const source = readFileSync(resolve(repoRoot, `miniprogram/${page}/index.ts`), 'utf8');
+    assert.match(source, /(?:prepareNativeShareCardCover\(this|drawNativeShareCard\(canvas), \{[\s\S]*?\btheme(?:\s*:\s*this\.data\.cardTheme)?\s*,/, page);
+  }
 });

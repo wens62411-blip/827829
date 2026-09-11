@@ -394,6 +394,7 @@ Page({
         labels = card.claims.map((claim) => claim.labelText.zh);
       }
       const imageUrl = await prepareNativeShareCardCover(this, {
+        theme: this.data.cardTheme,
         displayName: card.displayName, headline: card.headline, biography: card.biography, labels,
         phone: fields.find((field) => field.key === 'phone')?.value,
         email: fields.find((field) => field.key === 'email')?.value,

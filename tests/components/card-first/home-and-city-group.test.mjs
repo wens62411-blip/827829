@@ -92,7 +92,7 @@ test('home has no slogan, public group QR, feed metrics, or direct-chat affordan
   assert.deepEqual(errors, []);
 });
 
-test('Me page exposes the supported city list and keeps only the profile edit entry', () => {
+test('Me page exposes the supported city list and keeps card actions in its profile panel', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const actions = interactiveMarkup(template);
   const errors = [];
@@ -101,8 +101,8 @@ test('Me page exposes the supported city list and keeps only the profile edit en
   if (!actions.some((markup) => /编辑/.test(markup) && /url="\/packageCard\/pages\/edit\/index"/.test(markup))) {
     errors.push('“我的”页缺少个人资料编辑入口');
   }
-  if (actions.some((markup) => /url="\/pages\/card\/index"/.test(markup))) {
-    errors.push('“我的”页仍保留重复的我的名片入口');
+  if (actions.some((markup) => /(?:privacy|tag-status)\/index|分享入口与撤销|管理限时名片入口/.test(markup))) {
+    errors.push('“我的”页仍暴露已移除的管理入口');
   }
   if (actions.some((markup) => /申请加入|申请进入|加入城市群|提交加入意向|切换城市/.test(markup))) {
     errors.push('“我的”页不应暴露城市群申请或切换城市动作');

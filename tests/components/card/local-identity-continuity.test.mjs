@@ -117,17 +117,16 @@ test('local contact controls describe the privacy behavior that sharing actually
   const template = read('miniprogram/packageCard/pages/edit/index.wxml');
 
   assert.match(template, /localIdentityReady \|\| registerMode/);
-  assert.match(template, /只控制当前设备上的本机名片预览/);
-  assert.match(template, /不会进入微信分享卡片、接收页或海报/);
-  assert.match(template, /分享时自动移除/);
+  assert.match(template, /本机保存/);
+  assert.match(template, /本机显示电话\s*[（(]不参与分享[）)]/);
+  assert.match(template, /本机显示邮箱\s*[（(]不参与分享[）)]/);
 });
 
 test('local registration hides image controls that cannot persist across page exits', () => {
   const template = read('miniprogram/packageCard/pages/edit/index.wxml');
 
   assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}"[^>]*open-type="chooseAvatar"/);
-  assert.match(template, /图片头像将在云端账户接入后开放/);
-  assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}" class="card-editor-section"[\s\S]*?GALLERY/);
+  assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}" class="card-editor-section"[\s\S]*?展示图片/);
   assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}" class="card-editor-switch-row"[\s\S]*?显示图片/);
 });
 

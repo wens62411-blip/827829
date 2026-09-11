@@ -71,18 +71,18 @@
     }
   },
   "window": {
-    "navigationBarBackgroundColor": "#F4EFE6",
-    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "navigationBarTextStyle": "@navigationBarTextStyle",
     "navigationBarTitleText": "AB Club",
-    "backgroundColor": "#F4EFE6",
-    "backgroundTextStyle": "dark"
+    "backgroundColor": "@backgroundColor",
+    "backgroundTextStyle": "@backgroundTextStyle"
   },
   "tabBar": {
     "custom": true,
-    "color": "#756F66",
-    "selectedColor": "#98723A",
-    "backgroundColor": "#FFFDF8",
-    "borderStyle": "white",
+    "color": "@tabBarColor",
+    "selectedColor": "@tabBarSelectedColor",
+    "backgroundColor": "@tabBarBackgroundColor",
+    "borderStyle": "@tabBarBorderStyle",
     "list": [
       {
         "pagePath": "pages/discover/index",
@@ -113,5 +113,7 @@
     "loading-city": "/components/loading-city/index"
   },
   "style": "v2",
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "sitemapLocation": "sitemap.json"
 }

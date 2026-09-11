@@ -17,9 +17,9 @@
       <text wx:else class="profile-card__crest-fallback">AB</text>
       <view class="profile-card__edition">
         <text class="profile-card__edition-title">AB Club</text>
-        <text class="profile-card__edition-meta">GLOBAL CHINESE COMMUNITY</text>
+        <text wx:if="{{!concisePreview}}" class="profile-card__edition-meta">GLOBAL CHINESE COMMUNITY</text>
       </view>
-      <text class="profile-card__viewer">{{viewerLabel}}</text>
+      <text wx:if="{{!concisePreview}}" class="profile-card__viewer">{{viewerLabel}}</text>
     </view>
 
     <view class="profile-card__cover" aria-hidden="true">
@@ -43,7 +43,7 @@
       </view>
 
       <view class="profile-card__identity">
-        <text class="profile-card__eyebrow">DIGITAL INTRODUCTION</text>
+        <text wx:if="{{!concisePreview}}" class="profile-card__eyebrow">DIGITAL INTRODUCTION</text>
         <text class="profile-card__name" user-select="{{true}}">{{safeCard.displayName}}</text>
         <text wx:if="{{safeCard.headline}}" class="profile-card__headline">{{safeCard.headline}}</text>
         <view wx:if="{{cityLabel || safeCard.cityId}}" class="profile-card__city-line">
@@ -68,10 +68,10 @@
 
     <view wx:if="{{safePublicLabels.length}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="公开个人标签，未经人工认证">
       <view class="profile-card__section-heading">
-        <text>人物标签</text>
+        <text>{{concisePreview ? '自定义标签' : '人物标签'}}</text>
         <text class="profile-card__section-count">{{safePublicLabels.length}} 项</text>
       </view>
-      <text class="profile-card__section-note">本人自定义 · 未经人工认证</text>
+      <text wx:if="{{!concisePreview}}" class="profile-card__section-note">本人自定义 · 未经人工认证</text>
       <view class="profile-card__tag-list">
         <text wx:for="{{safePublicLabels}}" wx:key="*this" class="profile-card__self-tag">{{item}}</text>
       </view>
@@ -90,21 +90,21 @@
       </view>
     </view>
 
-    <view wx:if="{{isSelf}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="本人自选标签，未经人工认证">
+    <view wx:if="{{isSelf && (!concisePreview || safeSelectedLabels.length)}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="本人自选标签，未经人工认证">
       <view class="profile-card__section-heading">
-        <text>我的标签</text>
+        <text>{{concisePreview ? '自选标签 · 未发布' : '我的标签'}}</text>
         <text class="profile-card__section-count">{{safeSelectedLabels.length}} 项</text>
       </view>
-      <text class="profile-card__section-note">自选内容 · 未认证 · 当前未保存到公开名片</text>
+      <text wx:if="{{!concisePreview}}" class="profile-card__section-note">自选内容 · 未认证 · 当前未保存到公开名片</text>
       <view wx:if="{{safeSelectedLabels.length}}" class="profile-card__tag-list">
         <text wx:for="{{safeSelectedLabels}}" wx:key="*this" class="profile-card__self-tag">{{item}}</text>
       </view>
       <text wx:else class="profile-card__empty-note">尚未添加自选标签。</text>
     </view>
 
-    <view wx:if="{{isSelf}}" class="profile-card__section profile-card__gallery-section" aria-role="group" aria-label="本人图片预览">
+    <view wx:if="{{isSelf && (!concisePreview || safeGallery.length)}}" class="profile-card__section profile-card__gallery-section" aria-role="group" aria-label="本人图片预览">
       <view class="profile-card__section-heading">
-        <text>图片</text>
+        <text>{{concisePreview ? '图片 · 本机预览' : '图片'}}</text>
         <text class="profile-card__section-count">{{safeGallery.length}} 张</text>
       </view>
       <view wx:if="{{safeGallery.length}}" class="profile-card__gallery">

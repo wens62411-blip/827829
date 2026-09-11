@@ -39,6 +39,13 @@
   margin-top: 22rpx;
 }
 
+.card-editor-storage-label {
+  display: block;
+  margin-top: 10rpx;
+  color: var(--editor-muted);
+  font-size: 22rpx;
+}
+
 .card-editor-header__crest,
 .card-editor-header__crest-fallback {
   display: block;
@@ -97,7 +104,6 @@
 .card-editor-tab::after,
 .card-theme-option::after,
 .card-editor-upload::after,
-.card-editor-ai::after,
 .card-editor-gallery-upload::after,
 .card-editor-gallery__remove::after,
 .card-editor-selected-tag__remove::after,
@@ -130,16 +136,6 @@
   box-shadow: 0 10rpx 24rpx rgba(69, 49, 20, .06);
 }
 
-.card-editor-evidence {
-  margin-top: 18rpx;
-  padding: 12rpx 16rpx;
-  border-left: 4rpx solid var(--editor-gold);
-  background: #f3eee5;
-  color: var(--editor-muted);
-  font-size: 21rpx;
-  letter-spacing: .06em;
-}
-
 .card-editor-preview,
 .card-editor-workspace {
   margin-top: 26rpx;
@@ -158,15 +154,6 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16rpx;
   margin-top: 20rpx;
-}
-
-.card-editor-preview__note {
-  display: block;
-  margin-top: 16rpx;
-  color: var(--editor-muted);
-  font-size: 23rpx;
-  line-height: 1.55;
-  text-align: center;
 }
 
 .card-editor-section {
@@ -195,17 +182,9 @@
   margin-bottom: 22rpx;
 }
 
-.card-editor-section__eyebrow,
 .card-editor-section__title,
 .card-editor-section__hint {
   display: block;
-}
-
-.card-editor-section__eyebrow {
-  color: var(--ab-color-champagne-deep);
-  font-size: 20rpx;
-  font-weight: 700;
-  letter-spacing: .15em;
 }
 
 .card-editor-section__title {
@@ -469,14 +448,6 @@
   flex: 1;
 }
 
-.card-editor-avatar-note {
-  min-width: 0;
-  flex: 1;
-  color: var(--ab-color-muted);
-  font-size: 21rpx;
-  line-height: 1.5;
-}
-
 .card-editor-free-copy {
   min-height: 260rpx;
   border-radius: 18rpx;
@@ -486,24 +457,12 @@
 .card-editor-copy-tools {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 20rpx;
+  justify-content: flex-end;
   margin-top: 12rpx;
 }
 
 .card-editor-copy-tools .card-counter {
   margin-top: 0;
-}
-
-.card-editor-ai {
-  min-height: var(--ab-touch-target);
-  margin: 0;
-  padding: 0 18rpx;
-  border: 0;
-  background: transparent;
-  color: var(--editor-gold);
-  font-size: 24rpx;
-  line-height: var(--ab-touch-target);
 }
 
 .card-editor-inline-note {
@@ -512,15 +471,6 @@
   color: var(--editor-muted);
   font-size: 23rpx;
   line-height: 1.55;
-}
-
-.card-editor-contact-intro {
-  display: block;
-  margin: -4rpx 0 20rpx;
-  color: var(--editor-muted);
-  font-size: 23rpx;
-  line-height: 1.65;
-  overflow-wrap: anywhere;
 }
 
 .card-editor-contact-grid {
@@ -555,7 +505,7 @@
   border-top: 2rpx solid var(--editor-soft);
 }
 
-.card-editor-contact-visibility > view {
+.card-editor-contact-visibility > text {
   min-width: 0;
   flex: 1;
 }
@@ -564,8 +514,7 @@
   flex: 0 0 auto;
 }
 
-.card-editor-contact-visibility__title,
-.card-editor-contact-visibility__note {
+.card-editor-contact-visibility__title {
   display: block;
   overflow-wrap: anywhere;
 }
@@ -574,13 +523,6 @@
   color: var(--editor-ink);
   font-size: 24rpx;
   font-weight: 600;
-  line-height: 1.45;
-}
-
-.card-editor-contact-visibility__note {
-  margin-top: 5rpx;
-  color: var(--editor-muted);
-  font-size: 20rpx;
   line-height: 1.45;
 }
 
@@ -720,7 +662,7 @@
   font-size: 27rpx;
 }
 
-.card-editor-switch-row > view {
+.card-editor-switch-row > text {
   min-width: 0;
   flex: 1;
 }
@@ -729,28 +671,11 @@
   flex: 0 0 auto;
 }
 
-.card-editor-switch-note {
-  display: block;
-  max-width: 500rpx;
-  margin-top: 6rpx;
-  color: var(--editor-muted);
-  font-size: 21rpx;
-  line-height: 1.45;
-}
-
 .card-editor-savebar {
   display: grid;
   gap: 16rpx;
   margin-top: 24rpx;
   padding: 24rpx 0 12rpx;
-}
-
-.card-editor-savebar__note {
-  display: block;
-  color: var(--editor-muted);
-  font-size: 22rpx;
-  line-height: 1.55;
-  text-align: center;
 }
 
 .card-editor-share-canvas {
@@ -775,6 +700,47 @@
   color: #211e1a;
 }
 
+/* Keep feedback and native form controls on the editor's ivory palette. */
+.card-editor-page .card-status,
+.card-editor-page .card-status--success,
+.card-editor-page .card-status--error {
+  border-left-color: var(--editor-gold-strong);
+  background: var(--editor-surface);
+  color: var(--editor-ink);
+}
+
+.card-editor-page .card-input,
+.card-editor-page .card-textarea,
+.card-editor-page .card-picker {
+  border-color: var(--editor-line);
+  background: var(--editor-surface);
+  color: var(--editor-ink);
+}
+
+.card-editor-page .card-editor-free-copy {
+  background: #fbf8f1;
+}
+
+.card-editor-page .input-placeholder,
+.card-editor-page .textarea-placeholder {
+  color: var(--editor-muted);
+  opacity: 1;
+}
+
+.card-editor-page .card-interest-chip--selected {
+  border-color: var(--editor-gold-strong);
+  background: #f3ead8;
+  color: var(--editor-gold-ink);
+}
+
+.card-editor-page .card-editor-upload,
+.card-editor-page .card-editor-gallery-upload,
+.card-editor-page .card-editor-custom-tag__add,
+.card-editor-page .card-editor-selected-tag__remove,
+.card-editor-page .card-editor-avatar--fallback {
+  color: var(--editor-gold-ink);
+}
+
 @media (max-width: 430px) {
   .card-editor-contact-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -784,8 +750,7 @@
     padding: 24rpx 26rpx;
   }
 
-  .card-editor-contact-visibility__title,
-  .card-editor-contact-visibility__note {
+  .card-editor-contact-visibility__title {
     overflow-wrap: normal;
   }
 }

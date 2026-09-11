@@ -24,12 +24,12 @@
     </button>
   </view>
 
-  <view class="discover-hero" aria-role="region" aria-label="AB Club AI 赛博名片入口">
-    <text class="discover-hero__eyebrow">AB CLUB · AI CYBER CARD</text>
+  <view class="discover-hero" aria-role="region" aria-label="AB Club 数字名片入口">
+    <text class="discover-hero__eyebrow">AB CLUB · DIGITAL CARD</text>
     <text class="discover-hero__title">先让对方记住你。</text>
-    <text class="discover-hero__copy">AI 赛博名片 · 把身份，做成一件值得被收藏的数字作品</text>
-    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="生成我的 AI 赛博名片">
-      <text class="discover-primary-action__label">生成我的 AI 赛博名片</text>
+    <text class="discover-hero__copy">把身份，做成一件值得被收藏的数字作品</text>
+    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="创建我的数字名片">
+      <text class="discover-primary-action__label">创建我的数字名片</text>
       <text class="discover-primary-action__arrow" aria-hidden="true">→</text>
     </button>
     <view class="discover-hero__rule" aria-hidden="true"></view>

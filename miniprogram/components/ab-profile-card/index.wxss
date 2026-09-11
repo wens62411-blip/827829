@@ -51,7 +51,7 @@
   --card-ink: #211e1a;
   --card-muted: #5e5952;
   --card-line: #b2aa9f;
-  --card-accent: #755929;
+  --card-accent: #705424;
   --card-accent-soft: #c5b28e;
   --card-cover-a: #9f998f;
   --card-cover-b: #e0dcd4;
@@ -82,17 +82,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 2rpx solid var(--ab-color-gold);
+  border: 2rpx solid var(--card-accent);
   border-radius: 50%;
-  color: var(--ab-color-champagne-deep);
+  color: var(--card-accent);
   font-family: Georgia, "Songti SC", serif;
   font-size: 22rpx;
   font-weight: 700;
-}
-
-.profile-card--theme-ink .profile-card__crest-fallback {
-  border-color: var(--ab-color-gold-soft);
-  color: var(--ab-color-gold-soft);
 }
 
 .profile-card__edition {
@@ -466,6 +461,7 @@
   margin: 8rpx 0 0;
   padding: 0 8rpx;
   border: 0;
+  background: transparent;
   color: var(--card-accent);
   font-size: 24rpx;
   line-height: var(--ab-touch-target);

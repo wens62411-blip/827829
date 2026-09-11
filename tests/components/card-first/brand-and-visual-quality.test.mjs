@@ -100,7 +100,7 @@ test('AB Club crest is present on every registered key card-first page, not only
   assert.doesNotMatch(crestStyles, /(?:crest|brandmark)[^{]*\{[^}]*filter\s*:/is);
   assert.match(crestStyles, /discover-brandmark__fallback[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
   assert.match(crestStyles, /events-brand__fallback[\s\S]*?color:\s*var\(--gold\)/);
-  assert.match(crestStyles, /profile-card__crest-fallback[\s\S]*?border:\s*2rpx solid var\(--ab-color-gold\)[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
+  assert.match(crestStyles, /profile-card__crest-fallback[\s\S]*?border:\s*2rpx solid var\(--card-accent\)[\s\S]*?color:\s*var\(--card-accent\)/);
   assert.match(crestStyles, /card-editor-header__crest-fallback[\s\S]*?border:\s*2rpx solid var\(--editor-gold\)[\s\S]*?color:\s*var\(--ab-color-champagne-deep\)/);
 });
 
@@ -197,21 +197,20 @@ test('owner card makes edit and share clear while network stays out of the owner
   const template = read('miniprogram/pages/card/index.wxml');
   const primaryEditIndex = template.indexOf('编辑名片');
   const shareIndex = template.indexOf('分享名片');
-  const editIndex = template.indexOf('编辑资料');
-  const privacyIndex = template.indexOf('查看隐私范围');
+  const posterIndex = template.indexOf('>名片海报');
 
   assert.ok(primaryEditIndex >= 0 && shareIndex > primaryEditIndex, '名片第一动作区需要按编辑、分享排列');
-  assert.ok(editIndex > shareIndex && privacyIndex > shareIndex, '编辑与隐私应位于核心交换/分享动作之后');
+  assert.ok(posterIndex > shareIndex, '独立海报功能应位于核心编辑/分享之后');
+  assert.doesNotMatch(template, /编辑资料|查看隐私范围|预览访客视角|privacy\/index|preview=STRANGER/);
   assert.doesNotMatch(template, /交换名片|\/pages\/network\/index/);
   assert.match(template, /card-link-button card-link-button--strong[^>]*open-type="share"/);
   assert.doesNotMatch(template, /bindtap="openShare"/);
   assert.match(template, /selected-labels="\{\{demoMode \? demoSelectedLabels : \[\]\}\}"/);
   assert.match(template, /gallery-urls="\{\{demoGalleryUrls\}\}"/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
-  assert.match(template, /标签必须先经过人工审核/);
-  assert.match(template, /此设备保存的名片|当前为合成示例/);
+  assert.match(template, /名片已保存在此设备|演示名片 · 合成示例/);
   assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览/);
   assert.doesNotMatch(template, /一键分享的安全预览|WECHAT SHARE|安全转发|OPENID|小程序码|token/i);
-  assert.match(template, /bindtap="openShareManager">名片海报与入口管理/);
+  assert.match(template, /bindtap="openShareManager">名片海报/);
   assert.doesNotMatch(template.slice(template.indexOf('slot="actions"'), template.indexOf('</ab-profile-card>')), /海报|openShareManager/);
 });

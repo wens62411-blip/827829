@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { build } from 'esbuild';
 import { resolve } from 'node:path';
 import { runInNewContext } from 'node:vm';
+import { readFileSync } from 'node:fs';
 
 const root = resolve(import.meta.dirname, '../../..');
 const asset = '/assets/community/european-classical-terrace.jpg';
@@ -124,4 +125,27 @@ test('synchronous clipboard errors also restore the contact button', () => {
   assert.equal(toasts.at(-1).icon, 'none');
   assert.match(toasts.at(-1).title, /长按微信号复制/);
   assert.ok(toasts.every((toast) => !/已复制|成功|已加入|已提交/.test(toast.title)));
+});
+
+test('the frosted contact button retains high contrast without blur support in light and dark mode', () => {
+  const styles = readFileSync(resolve(root, 'miniprogram/pages/me/index.wxss'), 'utf8');
+  const rules = [...styles.matchAll(/\.me-city-group__copy-button\s*\{([^}]+)\}/g)].map((match) => match[1]);
+  const colorRules = rules.filter((rule) => /background-color:/.test(rule));
+  assert.equal(colorRules.length, 2, 'light and dark backgrounds should be explicit');
+  const luminance = (rgb) => rgb.map((value) => value / 255).map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4).reduce((sum, value, index) => sum + value * [0.2126, 0.7152, 0.0722][index], 0);
+  for (const rule of colorRules) {
+    const background = rule.match(/background-color:\s*rgba\(([^)]+)\)/)?.[1].split(',').map(Number);
+    const textHex = rule.match(/(?:^|;)\s*color:\s*#([0-9a-f]{6})/i)?.[1];
+    assert.ok(background?.length === 4 && textHex);
+    const foreground = [0, 2, 4].map((offset) => Number.parseInt(textHex.slice(offset, offset + 2), 16));
+    for (const underlying of [0, 255]) {
+      const composite = background.slice(0, 3).map((value) => value * background[3] + underlying * (1 - background[3]));
+      const contrast = (luminance(composite) + 0.05) / (luminance(foreground) + 0.05);
+      assert.ok(contrast >= 4.5, `fallback contrast ${contrast.toFixed(2)} must remain readable`);
+    }
+  }
+  assert.match(rules[0], /border:\s*1rpx solid/);
+  assert.match(rules[0], /box-shadow:\s*inset/);
+  assert.match(rules[0], /backdrop-filter:\s*blur\(16px\)/);
+  assert.match(styles, /prefers-reduced-motion: reduce[\s\S]*?\.me-city-group__copy-button[\s\S]*?transition: none/);
 });

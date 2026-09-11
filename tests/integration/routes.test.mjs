@@ -13,6 +13,13 @@ const registeredRoutePaths = new Set([
 ]);
 const tabRoutePaths = new Set(app.tabBar.list.map((item) => `/${item.pagePath}`));
 
+function navigatorTargetUrls(rawUrl) {
+  if (!rawUrl.trim().startsWith('{{')) return [rawUrl];
+  const conditional = rawUrl.match(/^\{\{\s*[A-Za-z_$][\w$]*\s*\?\s*'([^']+)'\s*:\s*'([^']+)'\s*\}\}$/);
+  assert.ok(conditional, `动态导航必须提供可静态验证的两个字面量路径：${rawUrl}`);
+  return [conditional[1], conditional[2]];
+}
+
 const visibleRouteSurfaces = [
   'pages/discover/index',
   'pages/events/index',
@@ -145,16 +152,28 @@ test('visible navigators resolve to registered routes and use switchTab only for
       const attributes = match[1];
       const rawUrl = attributes.match(/\burl="([^"]+)"/)?.[1];
       if (!rawUrl) continue;
-      const path = rawUrl.split('?')[0];
       const usesSwitchTab = /\bopen-type="switchTab"/.test(attributes);
-      assert.ok(registeredRoutePaths.has(path), `${route} 指向未注册页面 ${path}`);
-      assert.equal(
-        usesSwitchTab,
-        tabRoutePaths.has(path),
-        `${route} → ${path} 的页面类型与 ${usesSwitchTab ? 'switchTab' : 'navigateTo'} 不匹配`,
-      );
+      for (const targetUrl of navigatorTargetUrls(rawUrl)) {
+        const path = targetUrl.split('?')[0];
+        assert.ok(registeredRoutePaths.has(path), `${route} 指向未注册页面 ${path}`);
+        assert.equal(
+          usesSwitchTab,
+          tabRoutePaths.has(path),
+          `${route} → ${path} 的页面类型与 ${usesSwitchTab ? 'switchTab' : 'navigateTo'} 不匹配`,
+        );
+      }
     }
   }
+});
+
+test('conditional navigator inspection includes both branches and rejects unresolved route expressions', () => {
+  assert.deepEqual(navigatorTargetUrls("{{profile ? '/pages/card/index' : '/packageCard/pages/edit/index?register=1'}}"), [
+    '/pages/card/index', '/packageCard/pages/edit/index?register=1',
+  ]);
+  const invalidBranch = navigatorTargetUrls("{{profile ? '/pages/card/index' : '/unregistered/index'}}");
+  assert.equal(invalidBranch.every((url) => registeredRoutePaths.has(url.split('?')[0])), false);
+  assert.throws(() => navigatorTargetUrls('{{computedRoute}}'), /可静态验证/);
+  assert.throws(() => navigatorTargetUrls("{{profile ? '/pages/card/index' : computedRoute}}"), /可静态验证/);
 });
 
 test('every visible tap binding has a page or component method', () => {

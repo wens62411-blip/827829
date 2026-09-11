@@ -207,8 +207,8 @@ test('profile custom theme, labels and gallery stay owner-only and never imitate
   }
   assert.match(source, /viewerMode !== 'SELF'/);
   assert.match(source, /wxfile:\\\/\\\/\|http:\\\/\\\/tmp\\\//);
-  assert.match(template, /wx:if="\{\{isSelf\}\}" class="profile-card__section profile-card__selected-labels"/);
-  assert.match(template, /wx:if="\{\{isSelf\}\}" class="profile-card__section profile-card__gallery-section"/);
+  assert.match(template, /wx:if="\{\{isSelf && \(!concisePreview \|\| safeSelectedLabels\.length\)\}\}" class="profile-card__section profile-card__selected-labels"/);
+  assert.match(template, /wx:if="\{\{isSelf && \(!concisePreview \|\| safeGallery\.length\)\}\}" class="profile-card__section profile-card__gallery-section"/);
   assert.match(template, /自选内容 · 未认证 · 当前未保存到公开名片/);
   assert.match(template, /class="profile-card__self-tag"/);
   assert.doesNotMatch(template, /<ab-verified-tag[^>]*safeSelectedLabels/s);

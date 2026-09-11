@@ -233,3 +233,18 @@
 @media (prefers-reduced-motion: reduce) {
   .discover-press { opacity: 1; }
 }
+
+@media (prefers-color-scheme: dark) {
+  .discover-page {
+    --discover-paper: #24211d;
+    --discover-ink: #fffaf0;
+    --discover-muted: #bdb4a7;
+    --discover-line: #4b443b;
+    --discover-accent: #dec89c;
+    background: #161412;
+  }
+  .discover-primary-action { background: #dec89c; color: #211e1a; }
+  .discover-brandmark__fallback { color: #dec89c; }
+  .discover-city-media__fallback,
+  .discover-event-feature__fallback { background: #24211d; color: #bdb4a7; }
+}

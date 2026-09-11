@@ -45,21 +45,20 @@ test('offline card surfaces label state, editable preview, and explicitly labell
   const sharePage = read('miniprogram/packageCard/pages/share/index.wxml');
 
   for (const source of [cardPage, sharePage]) {
-    assert.match(source, /本机预览|此设备保存的名片|当前为合成示例/);
+    assert.match(source, /演示名片 · 合成示例/);
     assert.doesNotMatch(source, /体验版|DEMO_ONLY|仅供预览/);
   }
   assert.doesNotMatch(mePage, /体验版|DEMO_ONLY|示例内容/);
-  assert.match(mePage, /尚未建立云端账户/);
+  assert.match(mePage, /保存后仅保存在本机/);
   assert.match(meSource, /materializeLocalIdentityProfile/);
   assert.doesNotMatch(meSource, /OFFLINE_DEMO_PROFILE|readOfflineDemoDraft/);
-  assert.match(cardPage, /标签必须先经过人工审核/);
-  assert.match(mePage, /公开标签状态/);
+  assert.doesNotMatch(cardPage, /查看隐私范围|公开标签状态|preview=STRANGER/);
   assert.match(editSource, /已保存到本机预览草稿[\s\S]*?未写入云端/);
   assert.match(shareSource, /未创建分享：[\s\S]*?本机预览/);
-  assert.match(shareSource, /本机预览[\s\S]*?合成示例[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/);
-  assert.match(sharePage, /<button\b[^>]*open-type="share"[^>]*>/);
-  assert.match(sharePage, /微信转发和本地海报可以试用/);
-  assert.match(sharePage, /不会产生真实会员、审核或人脉记录/);
+  assert.match(shareSource, /合成示例[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode, this\.data\.cardTheme\)/);
+  assert.match(cardPage, /<button\b[^>]*open-type="share"[^>]*>/);
+  assert.match(sharePage, /bindtap="generatePoster"/);
+  assert.match(sharePage, /bindtap="savePosterToAlbum"/);
   assert.doesNotMatch(sharePage, /demoMode[^\n]*分享成功/);
   for (const source of [cardSource, meSource]) {
     assert.doesNotMatch(source, /^import\s+\{[^\n]*\}\s+from\s+['"][^'"]*identity-client['"]/m);

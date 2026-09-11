@@ -266,6 +266,7 @@ Component({
     theme: { type: String, value: 'ivory' },
     maxVisibleClaims: { type: Number, value: 4 },
     showDefaultActions: { type: Boolean, value: true },
+    concisePreview: { type: Boolean, value: false },
   },
   data: {
     safeCard: EMPTY_CARD,

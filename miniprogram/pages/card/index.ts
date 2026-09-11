@@ -245,6 +245,7 @@ Page({
     }
     if (!card) return;
     const cover = await prepareNativeShareCardCover(this, {
+      theme,
       displayName: card.displayName,
       headline: card.headline,
       biography: card.biography,
@@ -270,7 +271,7 @@ Page({
       shareRevoking: false,
       shareReady: false,
       shareRevokePending: false,
-      shareHint: '该分享入口已在入口管理中撤销，请重新准备后再分享。',
+      shareHint: '已停止分享，请重新准备后再发送。',
     });
     return true;
   },
@@ -289,7 +290,7 @@ Page({
       && this.data.cardTheme === theme;
     if (this.activeShare) {
       const share = this.activeShare;
-      this.setData({ sharePreparing: true, shareReady: false });
+      this.setData({ sharePreparing: true, shareReady: false, shareHint: '' });
       await this.preparePersonalShareCover();
       if (isCurrentShare() && this.activeShare === share && !this.invalidateShareRevokedElsewhere()) this.setData({ shareReady: true, sharePreparing: false });
       return;
@@ -306,7 +307,7 @@ Page({
         sharePreparing: false,
         shareReady: sharePath.ok,
         shareHint: sharePath.ok
-          ? '名片已准备好，点击“分享名片”将直接打开微信转发面板。'
+          ? ''
           : '当前名片内容超过微信分享路径限制，请返回编辑页精简后重试。',
       });
       if (sharePath.ok && typeof wx.showShareMenu === 'function') {
@@ -314,7 +315,7 @@ Page({
       }
       return;
     }
-    this.setData({ sharePreparing: true, shareReady: false, shareHint: '正在创建一次安全分享入口…' });
+    this.setData({ sharePreparing: true, shareReady: false, shareHint: '正在准备分享…' });
     const { createCardShare } = loadIdentityClient();
     const result = await createCardShare(
       card.cardId,
@@ -337,7 +338,7 @@ Page({
       this.setData({
         sharePreparing: false,
         shareReady: false,
-        shareHint: result.ok ? '服务返回的分享入口格式不安全或目标不匹配，请重试。' : result.message,
+        shareHint: result.ok ? '名片分享暂时不可用，请重试。' : result.message,
       });
       return;
     }
@@ -353,8 +354,8 @@ Page({
       shareReady: true,
       shareRevokePending: false,
       shareHint: revocationRemembered
-        ? '安全入口已准备。点击下方按钮打开微信转发面板；是否送达以微信界面为准。'
-        : '安全入口已准备，但本机未能保存撤销指针。请在离开本页前撤销，或等待入口自动过期。',
+        ? ''
+        : '分享已准备，但此设备未能保存停止分享记录；链接将在 7 天后失效。',
     });
     if (typeof wx.showShareMenu === 'function') {
       wx.showShareMenu({ menus: ['shareAppMessage'] });
@@ -391,8 +392,8 @@ Page({
         shareRevoking: false,
         shareRevokePending: true,
         shareHint: result.ok
-          ? '服务返回的撤销目标不匹配。为避免误转发，入口已暂停使用；请重试。'
-          : '撤销结果尚未确认。为避免误转发，入口已在本页暂停使用；请重试撤销。',
+          ? '停止分享尚未完成，请重试。'
+          : '停止分享尚未完成，原链接可能仍然有效，请重试。',
       });
       return;
     }
@@ -429,7 +430,6 @@ Page({
           imageUrl: SAFE_CARD_SHARE_COVER,
         };
       }
-      this.setData({ shareHint: '微信转发面板已请求打开；是否真正发送以微信系统界面为准。' });
       return {
         title: safeShareTitle(card.displayName),
         path: sharePath.path,
@@ -445,7 +445,6 @@ Page({
         imageUrl: SAFE_CARD_SHARE_COVER,
       };
     }
-    this.setData({ shareHint: '微信转发面板已请求打开；本页不会伪造“分享成功”。' });
     return {
       title: safeShareTitle(card.displayName),
       path: `/pages/card-share/index?token=${encodeURIComponent(share.token)}${this.data.cardTheme === 'ivory' ? '' : `&theme=${encodeURIComponent(this.data.cardTheme)}`}`,

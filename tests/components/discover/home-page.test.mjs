@@ -88,12 +88,14 @@ test('Discover uses the transparent AB Club crest and its frozen local manifest'
   assert.equal(manifest.asset.reviewStatus, 'DRAFT');
 });
 
-test('Discover controls meet touch targets and keep the approved light canvas', () => {
+test('Discover controls meet touch targets and adapt the brand canvas to system theme', () => {
   const styles = readPage('index.wxss');
 
   assert.match(styles, /\.discover-global-chip\s*\{[\s\S]*?min-height:\s*88rpx/);
   assert.match(styles, /\.discover-text-link\s*\{[\s\S]*?min-height:\s*88rpx/);
-  assert.doesNotMatch(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/, '首页品牌画布不应跟随系统强制反色');
+  assert.match(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/, '深色主题应协调页面与导航，而非只反转部分文字');
+  assert.match(styles, /--discover-ink:\s*#fffaf0/);
+  assert.match(styles, /--discover-paper:\s*#24211d/);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });
 

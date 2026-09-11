@@ -143,6 +143,7 @@
   .city-filter--selected, .category-filter--selected { border-color: var(--gold-soft); background: #eee6da; color: #171512; }
   .city-filter--selected text:first-child { color: #171512; }
   .city-filter--selected text:last-child, .category-filter--selected .category-filter__description { color: #514a41; }
+  .category-filter--selected .category-filter__en { color: #6d501f; }
 }
 @media (prefers-reduced-motion: reduce) {
   .events-hero, .event-filters, .events-section, .city-filter, .category-filter { animation: none; transition: none; }

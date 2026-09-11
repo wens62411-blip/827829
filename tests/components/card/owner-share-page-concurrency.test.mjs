@@ -115,23 +115,24 @@ function instantiate(definition) {
 }
 
 function createCanvas(label) {
+  const operations = [];
   const context = {
-    scale() {},
-    fillRect() {},
-    fillText() {},
+    scale(...args) { operations.push({ operation: 'scale', args }); },
+    fillRect(...args) { operations.push({ operation: 'fillRect', color: this.fillStyle, args }); },
+    fillText(...args) { operations.push({ operation: 'fillText', color: this.fillStyle, font: this.font, args }); },
     beginPath() {},
-    arc() {},
-    fill() {},
-    moveTo() {},
-    lineTo() {},
-    stroke() {},
+    arc(...args) { operations.push({ operation: 'arc', args }); },
+    fill() { operations.push({ operation: 'fill', color: this.fillStyle }); },
+    moveTo(...args) { operations.push({ operation: 'moveTo', args }); },
+    lineTo(...args) { operations.push({ operation: 'lineTo', args }); },
+    stroke() { operations.push({ operation: 'stroke', color: this.strokeStyle }); },
     strokeRect() {},
     save() {},
     restore() {},
     createLinearGradient() { return { addColorStop() {} }; },
     measureText(text) { return { width: String(text).length * 10 }; },
   };
-  return { label, width: 0, height: 0, getContext: () => context };
+  return { label, operations, width: 0, height: 0, getContext: () => context };
 }
 
 function installWx(cardTheme, localIdentity) {
@@ -351,6 +352,74 @@ test('one page unloading cannot clear another page canvas or block its album sav
 
     assert.deepEqual(savedPaths, ['tmp://A.png']);
     assert.equal(pageA.data.posterMessage, '微信已确认图片保存到相册。');
+  } finally {
+    delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('saved posters follow all four card themes without changing layout, public data or album export', async () => {
+  const { savedPaths } = installWx();
+  const paletteBuild = await build({
+    entryPoints: [resolve(root, 'miniprogram/pages/card/services/native-share-card.ts')],
+    bundle: true, platform: 'node', format: 'esm', target: 'es2020', write: false, logLevel: 'silent',
+  });
+  const { resolveNativeShareCardPalette } = await import(
+    `data:text/javascript;base64,${Buffer.from(paletteBuild.outputFiles[0].text).toString('base64')}`
+  );
+  const publicResult = cardResult('poster');
+  // These extra fields are not in the public projection and must never enter the poster.
+  publicResult.data.card.phone = '+86 138 0013 8000';
+  publicResult.data.card.email = 'private@example.com';
+  let cloudReads = 0;
+  globalThis.__AB_OWNER_SHARE_TEST_HOOKS__ = {
+    getMyPublicCard: async () => { cloudReads += 1; return publicResult; },
+  };
+  const exports = [];
+  wx.canvasToTempFilePath = (input) => {
+    exports.push([input.width, input.height, input.destWidth, input.destHeight, input.fileType]);
+    input.success({ tempFilePath: `tmp://${input.canvas.label}.png` });
+  };
+
+  try {
+    const definition = await loadOwnerSharePage();
+    const themes = ['ivory', 'ink', 'champagne', 'stone'];
+    const backgrounds = [];
+    let baselineGeometry;
+    for (const theme of themes) {
+      const page = instantiate(definition);
+      const canvas = createCanvas(`poster-${theme}`);
+      page.canvasForTest = canvas;
+      page.sharePageUnloaded = false;
+      page.activeCard = publicResult.data.card;
+      page.setData({ loadingCard: false, demoMode: false, cardTheme: theme });
+      await page.generatePoster.call(page);
+
+      assert.equal(page.data.posterReady, true, `${theme} poster is ready`);
+      assert.deepEqual([canvas.width, canvas.height], [640, 880]);
+      const palette = resolveNativeShareCardPalette(theme);
+      const background = canvas.operations.find(({ operation }) => operation === 'fillRect');
+      assert.equal(background.color, palette.paper[0], `${theme} paper uses the shared palette`);
+      backgrounds.push(background.color);
+      const name = canvas.operations.find(({ operation, args }) => operation === 'fillText' && args[0] === publicResult.data.card.displayName);
+      const headline = canvas.operations.find(({ operation, args }) => operation === 'fillText' && args[0] === publicResult.data.card.headline);
+      const brand = canvas.operations.find(({ operation, args }) => operation === 'fillText' && args[0] === 'AB CLUB · DIGITAL CARD');
+      assert.equal(name.color, palette.ink, `${theme} name remains readable`);
+      assert.equal(headline.color, palette.muted);
+      assert.equal(brand.color, palette.accent);
+      assert.equal(canvas.operations.find(({ operation }) => operation === 'stroke').color, palette.line);
+      const geometry = canvas.operations.map(({ color, ...operation }) => operation);
+      baselineGeometry ??= geometry;
+      assert.deepEqual(geometry, baselineGeometry, `${theme} preserves text, typography and geometry`);
+      assert.doesNotMatch(JSON.stringify(canvas.operations), /138 0013 8000|private@example\.com/);
+      assert.doesNotMatch(JSON.stringify(page.data.card), /138 0013 8000|private@example\.com/);
+      await page.savePosterToAlbum.call(page);
+    }
+    assert.equal(new Set(backgrounds).size, 4, 'themes must not silently produce the same light poster');
+    assert.equal(cloudReads, 4, 'each live export still refreshes the current public projection');
+    assert.deepEqual(savedPaths, themes.map((theme) => `tmp://poster-${theme}.png`));
+    assert.deepEqual(exports, themes.map(() => [640, 880, 1280, 1760, 'png']));
   } finally {
     delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
     delete globalThis.Page;

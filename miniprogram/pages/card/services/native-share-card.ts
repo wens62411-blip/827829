@@ -1,3 +1,5 @@
+import { normalizeCardTheme, type CardTheme } from './card-theme-preference';
+
 export const NATIVE_SHARE_CARD_WIDTH = 600;
 export const NATIVE_SHARE_CARD_HEIGHT = 480;
 
@@ -12,6 +14,7 @@ export interface NativeShareCardInput {
   readonly phone?: unknown;
   readonly email?: unknown;
   readonly demoMode?: unknown;
+  readonly theme?: unknown;
 }
 
 export interface NativeShareCardContent {
@@ -22,6 +25,26 @@ export interface NativeShareCardContent {
   readonly phone: string;
   readonly email: string;
   readonly demoMode: boolean;
+  readonly theme: CardTheme;
+}
+
+interface NativeSharePalette {
+  readonly paper: readonly [string, string, string];
+  readonly ink: string;
+  readonly muted: string;
+  readonly accent: string;
+  readonly line: string;
+}
+
+const SHARE_PALETTES: Readonly<Record<CardTheme, NativeSharePalette>> = {
+  ivory: { paper: ['#FBF8F1', '#F7F1E7', '#EEE3D1'], ink: '#211E1A', muted: '#514B44', accent: '#80602D', line: '#C5AD7C' },
+  ink: { paper: ['#29251F', '#211E1A', '#1C1A17'], ink: '#FFFAF0', muted: '#C8C0B4', accent: '#E5D4B2', line: '#AA8448' },
+  champagne: { paper: ['#F5EAD5', '#EFE2C7', '#E4D1AA'], ink: '#211E1A', muted: '#5C554B', accent: '#6D501F', line: '#B49B65' },
+  stone: { paper: ['#E0DCD4', '#D8D3CA', '#C8C1B5'], ink: '#211E1A', muted: '#514C45', accent: '#65491F', line: '#A39170' },
+};
+
+export function resolveNativeShareCardPalette(theme: unknown): NativeSharePalette {
+  return SHARE_PALETTES[normalizeCardTheme(theme)];
 }
 
 /** Export the existing personal share design from a page's hidden 2D canvas. */
@@ -146,6 +169,7 @@ export function normalizeNativeShareCard(input: NativeShareCardInput): NativeSha
     phone: normalizePhone(input.phone),
     email: normalizeEmail(input.email),
     demoMode: input.demoMode === true,
+    theme: normalizeCardTheme(input.theme),
   };
 }
 
@@ -178,13 +202,13 @@ function wrapText(
   return result;
 }
 
-function drawVerticalName(context: CanvasContext, name: string): void {
+function drawVerticalName(context: CanvasContext, name: string, ink: string): void {
   const raw = Array.from(name);
   const characters = raw.length > 6 ? [...raw.slice(0, 5), '…'] : raw;
   const spacing = characters.length <= 4 ? 47 : 42;
   const startY = 126;
   context.save();
-  context.fillStyle = '#211E1A';
+  context.fillStyle = ink;
   context.font = '600 32px serif';
   context.textAlign = 'center';
   characters.forEach((character, index) => {
@@ -193,7 +217,7 @@ function drawVerticalName(context: CanvasContext, name: string): void {
   context.restore();
 }
 
-function drawLabelRows(context: CanvasContext, labels: readonly string[], startY: number): number {
+function drawLabelRows(context: CanvasContext, labels: readonly string[], startY: number, palette: NativeSharePalette): number {
   if (labels.length === 0) return startY;
   let x = 148;
   let y = startY;
@@ -204,10 +228,10 @@ function drawLabelRows(context: CanvasContext, labels: readonly string[], startY
       x = 148;
       y += 38;
     }
-    context.strokeStyle = '#CDB98F';
+    context.strokeStyle = palette.line;
     context.lineWidth = 1;
     context.strokeRect(x, y - 21, width, 29);
-    context.fillStyle = '#6D5732';
+    context.fillStyle = palette.accent;
     context.fillText(label, x + 12, y);
     x += width + 10;
   }
@@ -219,6 +243,7 @@ export function drawNativeShareCard(
   input: NativeShareCardInput,
 ): NativeShareCardContent {
   const content = normalizeNativeShareCard(input);
+  const palette = resolveNativeShareCardPalette(content.theme);
   const pixelRatio = resolveNativeShareCardPixelRatio();
   canvas.width = NATIVE_SHARE_CARD_WIDTH * pixelRatio;
   canvas.height = NATIVE_SHARE_CARD_HEIGHT * pixelRatio;
@@ -226,59 +251,50 @@ export function drawNativeShareCard(
   context.scale(pixelRatio, pixelRatio);
 
   const paper = context.createLinearGradient(0, 0, NATIVE_SHARE_CARD_WIDTH, NATIVE_SHARE_CARD_HEIGHT);
-  paper.addColorStop(0, '#FBF8F1');
-  paper.addColorStop(0.58, '#F7F1E7');
-  paper.addColorStop(1, '#EEE3D1');
+  paper.addColorStop(0, palette.paper[0]);
+  paper.addColorStop(0.58, palette.paper[1]);
+  paper.addColorStop(1, palette.paper[2]);
   context.fillStyle = paper;
   context.fillRect(0, 0, NATIVE_SHARE_CARD_WIDTH, NATIVE_SHARE_CARD_HEIGHT);
 
-  context.strokeStyle = '#C5AD7C';
+  context.strokeStyle = palette.line;
   context.lineWidth = 1;
   context.strokeRect(18.5, 18.5, 563, 443);
 
-  context.fillStyle = '#9A773C';
+  context.fillStyle = palette.accent;
   context.font = '600 14px serif';
   context.fillText('AB CLUB', 34, 48);
-  context.fillStyle = '#7C746A';
+  context.fillStyle = palette.muted;
   context.font = '400 10px sans-serif';
   context.fillText('GLOBAL CHINESE COMMUNITY', 34, 65);
   if (content.demoMode) {
     context.textAlign = 'right';
-    context.fillStyle = '#9A773C';
+    context.fillStyle = palette.accent;
     context.font = '500 10px sans-serif';
-    context.fillText('本机预览', 564, 49);
+    context.fillText('演示名片', 564, 49);
     context.textAlign = 'left';
   }
 
-  drawVerticalName(context, content.displayName);
-  context.strokeStyle = '#9A773C';
+  drawVerticalName(context, content.displayName, palette.ink);
+  context.strokeStyle = palette.accent;
   context.lineWidth = 1;
   context.beginPath();
   context.moveTo(112.5, 102);
   context.lineTo(112.5, 399);
   context.stroke();
 
-  context.fillStyle = '#9A773C';
-  context.font = '600 11px sans-serif';
-  context.fillText('DIGITAL INTRODUCTION', 148, 105);
-
-  context.fillStyle = '#211E1A';
+  context.fillStyle = palette.ink;
   context.font = '600 25px serif';
-  const headline = content.headline || '让个人风格，成为第一印象';
-  const headlineLines = wrapText(context, headline, 410, 2);
+  const headlineLines = wrapText(context, content.headline, 410, 2);
   headlineLines.forEach((line, index) => {
     context.fillText(line, 148, 137 + index * 31);
   });
 
   const labelStartY = headlineLines.length > 1 ? 205 : 181;
-  const nextSectionY = drawLabelRows(context, content.labels, labelStartY);
-  context.fillStyle = '#9A773C';
-  context.font = '600 11px sans-serif';
-  context.fillText('ABOUT', 148, nextSectionY);
-  context.fillStyle = '#514B44';
+  const nextSectionY = drawLabelRows(context, content.labels, labelStartY, palette);
+  context.fillStyle = palette.muted;
   context.font = '400 16px sans-serif';
-  const biography = content.biography || '愿在新的城市里，认识认真做事、尊重边界的人。';
-  wrapText(context, biography, 410, 4).forEach((line, index) => {
+  wrapText(context, content.biography, 410, 4).forEach((line, index) => {
     context.fillText(line, 148, nextSectionY + 29 + index * 25);
   });
 
@@ -287,18 +303,12 @@ export function drawNativeShareCard(
     content.email ? `MAIL  ${content.email}` : '',
   ].filter(Boolean);
   if (contactLines.length > 0) {
-    context.fillStyle = '#9A773C';
-    context.font = '600 11px sans-serif';
-    context.fillText('CONTACT', 148, 402);
-    context.fillStyle = '#514B44';
+    context.fillStyle = palette.muted;
     context.font = '400 13px sans-serif';
-    contactLines.slice(0, 2).forEach((line, index) => context.fillText(line, 219, 402 + index * 20));
+    contactLines.slice(0, 2).forEach((line, index) => context.fillText(line, 148, 402 + index * 20));
   }
 
-  context.fillStyle = '#9A773C';
+  context.fillStyle = palette.line;
   context.fillRect(34, 436, 532, 1);
-  context.fillStyle = '#7C746A';
-  context.font = '400 10px sans-serif';
-  context.fillText('PRIVATE BY CHOICE · SHARED WITH INTENT', 34, 452);
   return content;
 }

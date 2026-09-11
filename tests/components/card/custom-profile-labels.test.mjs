@@ -183,7 +183,7 @@ test('offline editor adds, removes, previews, and saves custom labels without a 
 
     await page.saveProfile.call(page);
     assert.equal(page.data.status, 'SAVED');
-    assert.match(page.data.message, /本机预览/);
+    assert.match(page.data.message, /本机保存|本机预览/);
     const persisted = [...storage.values()].find((value) => value?.contractVersion === 1);
     assert.ok(persisted);
     assert.deepEqual(persisted.selectedLabels, page.data.selectedLabels);
@@ -353,7 +353,7 @@ test('preview, edit, and share stay in one centered white-gold action row while 
   const source = read('miniprogram/packageCard/pages/edit/index.ts');
   const toolbarPosition = template.indexOf('card-editor-header__toolbar');
   const tabsPosition = template.indexOf('card-editor-tabs');
-  const actionRow = template.slice(tabsPosition, template.indexOf('card-editor-evidence'));
+  const actionRow = template.slice(tabsPosition, template.indexOf('</view>', tabsPosition));
   const savebar = template.slice(template.indexOf('<view class="card-editor-savebar">'));
   const savePosition = savebar.indexOf('bindtap="saveProfile"');
   const sharePosition = savebar.indexOf('open-type="share"');
@@ -367,7 +367,7 @@ test('preview, edit, and share stay in one centered white-gold action row while 
   assert.equal((template.match(/class="card-status/g) ?? []).length, 1, '状态提示应只在顶部操作区渲染一次');
   assert.match(source, /showShareToast\(needsEditing \? '请检查必填信息' : '请查看页面提示'\)/);
   assert.ok(savePosition >= 0 && savePosition < sharePosition && sharePosition < previewPosition);
-  assert.match(savebar, /open-type="share"[^>]*loading="\{\{saveAndShareBusy\}\}"[^>]*disabled="\{\{!shareDraftValid \|\| status === 'SAVING' \|\| saveAndShareBusy \|\| generatingIntroduction\}\}"[^>]*>分享我的名片<\/button>/);
+  assert.match(savebar, /open-type="share"[^>]*loading="\{\{saveAndShareBusy\}\}"[^>]*disabled="\{\{!shareDraftValid \|\| status === 'SAVING' \|\| saveAndShareBusy\}\}"[^>]*>分享我的名片<\/button>/);
   assert.equal((template.match(/open-type="share"/g) ?? []).length, 3, 'toolbar, completed preview and savebar share directly');
   assert.match(styles, /\.card-editor-tabs\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\);[^}]*background:\s*#fffaf0;/);
   assert.match(styles, /\.card-editor-tab\s*\{[^}]*display:\s*flex;[^}]*align-items:\s*center;[^}]*justify-content:\s*center;[^}]*text-align:\s*center;[^}]*white-space:\s*nowrap;/);
@@ -485,6 +485,52 @@ test('native share timeout releases controls and discards late save completion',
     assert.equal(page.data.status, 'ERROR', 'late completion must not revive a timed-out share');
   } finally {
     t.mock.timers.reset();
+    delete globalThis.Page;
+    delete globalThis.wx;
+  }
+});
+
+test('editor without AI still validates identity, saves user input, and shares the saved card directly', async () => {
+  const storage = new Map();
+  const navigations = [];
+  globalThis.wx = {
+    getStorageSync(key) { return structuredClone(storage.get(key)); },
+    setStorageSync(key, value) { storage.set(key, structuredClone(value)); },
+    redirectTo(options) { navigations.push(options.url); },
+    navigateTo(options) { navigations.push(options.url); },
+    showToast() {},
+  };
+  try {
+    const definition = await loadOfflineEditorPage();
+    assert.equal(definition.generateIntroductionDraft, undefined);
+    assert.equal(Object.hasOwn(definition.data, 'generatingIntroduction'), false);
+    assert.equal(Object.hasOwn(definition.data, 'introductionNote'), false);
+    const page = {
+      ...definition,
+      data: structuredClone(definition.data),
+      setData(patch) { Object.assign(this.data, patch); },
+    };
+    page.onLoad.call(page, { register: '1' });
+    assert.equal(await page.saveProfile.call(page), false, 'missing display name must not save');
+    page.onDisplayNameInput.call(page, { detail: { value: '独立填写者' } });
+    assert.equal(await page.saveProfile.call(page), false, 'missing city must not save');
+    assert.equal(storage.size, 0);
+    page.onCityChange.call(page, { detail: { value: '4' } });
+    page.onBiographyInput.call(page, { detail: { value: '完全由本人填写的简短介绍。' } });
+    assert.equal(page.data.shareDraftValid, true);
+    assert.equal(await page.saveProfile.call(page), true);
+    assert.equal(page.data.editorMode, 'PREVIEW');
+    assert.equal(page.data.status, 'SAVED');
+    const shared = await page.onShareAppMessage.call(page).promise;
+    const snapshot = await loadBundledTypeScript('miniprogram/pages/card/services/offline-demo-share-snapshot.ts');
+    const encoded = shared.path.match(/[?&]snapshot=([^&]+)/)?.[1];
+    const decoded = snapshot.decodeOfflineDemoShareSnapshot(encoded);
+    assert.equal(decoded.ok, true);
+    assert.equal(decoded.snapshot.card.displayName, '独立填写者');
+    assert.equal(decoded.snapshot.card.biography, '完全由本人填写的简短介绍。');
+    assert.equal(decoded.snapshot.card.cityId, 'cn-hangzhou');
+    assert.deepEqual(navigations, [], 'completed preview shares without any poster or editor navigation');
+  } finally {
     delete globalThis.Page;
     delete globalThis.wx;
   }

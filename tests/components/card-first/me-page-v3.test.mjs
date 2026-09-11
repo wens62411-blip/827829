@@ -15,9 +15,8 @@ test('Me page uses a direct profile hierarchy instead of a second full header', 
   assert.doesNotMatch(template, /<ab-profile-card\b/);
   assert.doesNotMatch(template, /PRIVATE DESK|我的名片中心/);
 
-  for (const label of ['支持的城市清单', '公开标签状态']) {
-    assert.match(template, new RegExp(label), `“我的”页缺少层级入口：${label}`);
-  }
+  assert.match(template, /支持的城市清单/);
+  assert.doesNotMatch(template, /公开标签状态|隐私与分享范围|分享入口与撤销|待开通|接入后开放|CARD SETTINGS|资料与设置/);
   assert.match(template, /class="me-profile__edit"[^>]*url="\/packageCard\/pages\/edit\/index"/);
   assert.doesNotMatch(template, /class="me-link-row"[^>]*url="\/pages\/card\/index"/);
   assert.doesNotMatch(template, /联系我 · 预览、编辑与分享|ui-card\.png/);
@@ -64,17 +63,16 @@ test('Me removes repeated demo copy while retaining a concise local-only boundar
   assert.match(template, /仅保存在本机|尚未建立云端账户/);
 });
 
-test('Me keeps the top profile panel for first-time creation and removes the duplicate My Card row', () => {
+test('Me keeps the top profile panel for first-time creation and omits developer settings', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const profileIndex = template.indexOf('class="me-profile"');
   const registerIndex = template.indexOf('url="/packageCard/pages/edit/index?register=1"');
   const cityIndex = template.indexOf('class="me-city-group"');
-  const settingsIndex = template.indexOf('class="me-section-heading"');
 
   assert.ok(profileIndex >= 0);
   assert.ok(registerIndex > profileIndex);
   assert.ok(registerIndex < cityIndex);
-  assert.ok(registerIndex < settingsIndex);
+  assert.doesNotMatch(template, /class="me-section-heading"|class="me-evidence-footer"|class="me-private-note"/);
   assert.doesNotMatch(template, /class="me-register-cta"/);
   assert.doesNotMatch(template, /class="me-link-row"[^>]*url="\/pages\/card\/index"/);
 });
@@ -83,8 +81,18 @@ test('Me page keeps accessible touch targets, dark mode, and reduced-motion trea
   const styles = read('miniprogram/pages/me/index.wxss');
 
   assert.match(styles, /\.me-profile__edit\s*\{[\s\S]*?min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
-  assert.match(styles, /\.me-link-row\s*\{[\s\S]*?min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
   assert.match(styles, /\.me-city-group__copy-button\s*\{[^}]*min-height:\s*(?:8[8-9]|9\d|[1-9]\d{2,})rpx/);
   assert.match(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
+});
+
+test('Me profile avatar and identity open the owner card while editing remains a separate action', () => {
+  const template = read('miniprogram/pages/me/index.wxml');
+  for (const className of ['me-profile__avatar', 'me-profile__identity']) {
+    const navigator = [...template.matchAll(/<navigator\b[^>]*>/g)].find(([tag]) => tag.includes(`class="${className}"`))?.[0];
+    assert.ok(navigator, `${className} must be tappable`);
+    assert.match(navigator, /url="\{\{profile \? '\/pages\/card\/index' : '\/packageCard\/pages\/edit\/index\?register=1'\}\}"/);
+  }
+  assert.match(template, /class="me-profile__edit" url="\/packageCard\/pages\/edit\/index"/);
+  assert.doesNotMatch(template, /url="\/packageCard\/pages\/(?:privacy|share)\/index"|url="\/packageSocial\//);
 });

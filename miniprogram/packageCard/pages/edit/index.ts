@@ -12,7 +12,6 @@ import {
   updateMyProfile,
 } from '../../../pages/card/services/identity-client';
 import { cityDisplayName, isSafeShareBearer, safeShareTitle, shareExpiry } from '../../../pages/card/services/card-presenter';
-import { createEditableIntroduction } from '../../../pages/card/services/introduction-draft';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 import {
   readCardThemePreference,
@@ -232,8 +231,6 @@ Page({
     localAvatarPath: '',
     localAvatarUsable: false,
     avatarDraftPending: false,
-    generatingIntroduction: false,
-    introductionNote: '',
   },
 
   syncPreview(overrides: Partial<DraftInput>) {
@@ -681,7 +678,7 @@ Page({
         this.setData({
           galleryImages,
           previewGalleryImages: this.data.showGallery ? galleryImages : [],
-          galleryNote: '图片已加入本页预览；当前不会上传或公开。',
+          galleryNote: '',
         });
       },
     });
@@ -695,35 +692,6 @@ Page({
       galleryImages,
       previewGalleryImages: this.data.showGallery ? galleryImages : [],
       galleryNote: '',
-    });
-  },
-
-  async generateIntroductionDraft() {
-    if (this.data.generatingIntroduction || this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
-    const generation = this.saveOperationGeneration;
-    const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
-    this.setData({ generatingIntroduction: true, introductionNote: '正在准备可编辑草稿…' });
-    const draft = await createEditableIntroduction({
-      displayName: this.data.displayName,
-      cityName: cityDisplayName(cityId),
-      education: '',
-      profession: this.data.profession,
-      interests: this.data.selectedLabels.join('、'),
-    });
-    if (!this.isEditorOperationActive(generation)) return;
-    const biography = compactDraftText(
-      draft.text,
-      this.data.localIdentityReady || this.data.registerMode
-        ? LOCAL_BIOGRAPHY_LIMIT
-        : 240,
-    );
-    this.syncPreview({ biography });
-    this.setData({
-      generatingIntroduction: false,
-      biographyLength: biography.length,
-      introductionNote: draft.source === 'AI'
-        ? '已生成可编辑草稿，请在保存前确认内容。'
-        : '已根据你填写的身份和标签整理出可编辑草稿。',
     });
   },
 
@@ -791,7 +759,7 @@ Page({
         phone,
         email,
         contactMessage: '',
-        message: '已保存到本机名片，仅保存在这台设备。',
+        message: '已保存到本机。',
       });
       return true;
     }
@@ -865,7 +833,7 @@ Page({
       return false;
     }
     if (!biography) {
-      this.setData({ status: 'ERROR', message: '请填写自由介绍，或先使用 AI 辅助润色。' });
+      this.setData({ status: 'ERROR', message: '请填写个人简介。' });
       return false;
     }
 
@@ -933,7 +901,7 @@ Page({
   },
 
   async saveAndOpenShare(deadline = Date.now() + 2500): Promise<NativeShareResult> {
-    if (this.data.status === 'LOADING' || this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.generatingIntroduction) return UNAVAILABLE_SHARE;
+    if (this.data.status === 'LOADING' || this.data.status === 'SAVING' || this.data.saveAndShareBusy) return UNAVAILABLE_SHARE;
     const saveGeneration = this.saveOperationGeneration;
     if (!this.isEditorOperationActive(saveGeneration)) return UNAVAILABLE_SHARE;
     this.setData({ saveAndShareBusy: true });
@@ -960,6 +928,7 @@ Page({
           ? createLocalIdentityShareSnapshot(localIdentity, this.data.cardTheme)
           : createOfflineDemoShareSnapshot(draft!, this.data.cardTheme);
         const imageUrl = await prepareNativeShareCardCover(this, {
+          theme: this.data.cardTheme,
           displayName: snapshot.card.displayName,
           headline: snapshot.card.headline,
           biography: snapshot.card.biography,

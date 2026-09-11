@@ -1,5 +1,8 @@
 {
   "navigationBarTitleText": "编辑名片",
+  "navigationBarBackgroundColor": "#F4EFE6",
+  "navigationBarTextStyle": "black",
+  "backgroundColor": "#F4EFE6",
   "enablePullDownRefresh": false,
   "backgroundTextStyle": "dark",
   "usingComponents": {

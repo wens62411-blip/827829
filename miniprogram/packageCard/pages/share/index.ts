@@ -44,6 +44,7 @@ import {
   drawNativeShareCard,
   NATIVE_SHARE_CARD_HEIGHT,
   NATIVE_SHARE_CARD_WIDTH,
+  resolveNativeShareCardPalette,
   resolveNativeShareCardPixelRatio,
 } from '../../../pages/card/services/native-share-card';
 import {
@@ -132,7 +133,18 @@ function drawPublicPoster(
   canvas: WechatMiniprogram.Canvas,
   card: PublicCardProjection,
   demoMode: boolean,
+  cardTheme: CardTheme,
 ): void {
+  const themePalette = resolveNativeShareCardPalette(cardTheme);
+  const palette = {
+    ivory: themePalette.paper[0],
+    ink: themePalette.ink,
+    champagne: themePalette.accent,
+    gold: themePalette.accent,
+    stone: themePalette.muted,
+    line: themePalette.line,
+    soft: themePalette.paper[2],
+  };
   const localIdentityReady = card.cardId === 'card_local_device_identity';
   const pixelRatio = resolveNativeShareCardPixelRatio();
   canvas.width = POSTER_WIDTH * pixelRatio;
@@ -140,84 +152,84 @@ function drawPublicPoster(
   const context = canvas.getContext('2d');
   context.scale(pixelRatio, pixelRatio);
 
-  context.fillStyle = POSTER_PALETTE.ivory;
+  context.fillStyle = palette.ivory;
   context.fillRect(0, 0, POSTER_WIDTH, POSTER_HEIGHT);
-  context.fillStyle = POSTER_PALETTE.ink;
+  context.fillStyle = palette.ink;
   context.fillRect(0, 0, POSTER_WIDTH, 18);
-  context.fillStyle = POSTER_PALETTE.gold;
+  context.fillStyle = palette.gold;
   context.fillRect(52, 70, 72, 6);
 
-  context.fillStyle = POSTER_PALETTE.champagne;
+  context.fillStyle = palette.champagne;
   context.font = '600 22px sans-serif';
   context.fillText('AB CLUB · DIGITAL CARD', 52, 120);
-  if (demoMode) {
-    context.fillStyle = POSTER_PALETTE.gold;
+  if (demoMode && !localIdentityReady) {
+    context.fillStyle = palette.gold;
     context.font = '600 16px sans-serif';
     context.textAlign = 'right';
-    context.fillText('本机预览', 588, 118);
+    context.fillText('合成示例', 588, 118);
     context.textAlign = 'left';
   }
 
   context.beginPath();
   context.arc(102, 220, 50, 0, Math.PI * 2);
-  context.fillStyle = POSTER_PALETTE.soft;
+  context.fillStyle = palette.soft;
   context.fill();
-  context.fillStyle = POSTER_PALETTE.ink;
+  context.fillStyle = palette.ink;
   context.font = '600 30px sans-serif';
   context.textAlign = 'center';
   context.fillText(card.displayName.trim().slice(0, 1) || 'A', 102, 231);
   context.textAlign = 'left';
 
-  context.fillStyle = POSTER_PALETTE.ink;
+  context.fillStyle = palette.ink;
   context.font = '600 42px sans-serif';
   const nameLines = wrapText(context, card.displayName, 410, 2);
   nameLines.forEach((line, index) => context.fillText(line, 180, 205 + index * 50));
 
   if (card.headline) {
-    context.fillStyle = POSTER_PALETTE.stone;
+    context.fillStyle = palette.stone;
     context.font = '400 23px sans-serif';
     const headlineLines = wrapText(context, card.headline, 410, 2);
     headlineLines.forEach((line, index) => context.fillText(line, 180, 292 + index * 34));
   }
 
-  context.strokeStyle = POSTER_PALETTE.line;
+  context.strokeStyle = palette.line;
   context.lineWidth = 1;
   context.beginPath();
   context.moveTo(52, 360);
   context.lineTo(588, 360);
   context.stroke();
 
-  context.fillStyle = POSTER_PALETTE.ink;
+  context.fillStyle = palette.ink;
   context.font = '400 25px sans-serif';
   const biographyLines = wrapText(context, card.biography ?? '愿在同城相识，分享真实、有价值的连接。', 536, 5);
   biographyLines.forEach((line, index) => context.fillText(line, 52, 420 + index * 40));
 
   const claims = card.claims.slice(0, 3);
   if (claims.length > 0) {
-    context.fillStyle = POSTER_PALETTE.ink;
+    context.fillStyle = palette.ink;
     context.font = '600 20px sans-serif';
     context.fillText('人工审核有效标签', 52, 650);
     context.font = '400 20px sans-serif';
-    context.fillStyle = POSTER_PALETTE.gold;
+    context.fillStyle = palette.gold;
     context.fillText(claims.map((claim) => claim.labelText.zh).join(' · ').slice(0, 46), 52, 686);
   }
 
-  context.fillStyle = POSTER_PALETTE.champagne;
+  context.fillStyle = palette.champagne;
   context.fillRect(52, 730, 536, 1);
-  context.fillStyle = POSTER_PALETTE.stone;
+  context.fillStyle = palette.stone;
   context.font = '400 19px sans-serif';
   const footerLines = wrapText(
     context,
     localIdentityReady
-      ? '本机名片公开字段；海报不含电话、邮箱与小程序码。'
+      ? 'AB Club · 数字名片'
       : demoMode
-      ? '本机预览：人物与资料均为合成示例，不代表真实会员。海报不含小程序码。'
-      : '此海报只包含当前公开名片，不包含任何私密资料。当前版本的海报不含小程序码，请使用微信名片转发入口。',
+      ? '演示名片 · 合成示例'
+      : 'AB Club · 数字名片',
     536,
     3,
   );
   footerLines.forEach((line, index) => context.fillText(line, 52, 770 + index * 28));
-  context.fillStyle = POSTER_PALETTE.ink;
+  context.fillStyle = palette.ink;
   context.font = '600 20px sans-serif';
   context.fillText('AB Club', 52, 858);
 }
@@ -287,7 +299,7 @@ Page({
           localIdentityReady: false,
           card: null,
           loadingCard: false,
-          pageError: '请先建立自己的名片，再使用海报与入口管理。',
+          pageError: '请先建立自己的名片。',
           localNotice: '',
           shareCoverState: 'IDLE',
           shareCoverMessage: '',
@@ -440,6 +452,7 @@ Page({
         ? this.activeDemoDraft
         : undefined;
       drawNativeShareCard(canvas, {
+        theme: this.data.cardTheme,
         displayName: card.displayName,
         headline: card.headline,
         biography: card.biography,
@@ -707,7 +720,7 @@ Page({
         busyAction: '',
         shareState: 'ERROR',
         shareTitle: '撤销尚未确认',
-        shareDescription: '撤销尚未确认，旧入口可能仍然有效，本页不会显示撤销成功。',
+        shareDescription: '暂时无法停止分享，原链接可能仍然有效，请重试。',
       });
     }
   },
@@ -805,7 +818,7 @@ Page({
         return;
       }
       this.posterCanvas = canvas;
-      drawPublicPoster(canvas, posterCard, this.data.demoMode);
+      drawPublicPoster(canvas, posterCard, this.data.demoMode, this.data.cardTheme);
       const tempFilePath = await new Promise<string | undefined>((resolve) => {
         wx.canvasToTempFilePath({
           canvas,
@@ -828,7 +841,7 @@ Page({
         busyAction: '',
         posterReady: true,
         posterPath: tempFilePath,
-        posterMessage: '海报已在本地生成，尚未保存到相册。它只包含公开名片，并明确标注“不含小程序码”。',
+        posterMessage: '海报已生成，可保存到相册。',
       });
     } catch (_error) {
       if (!this.isCurrentAction(lifecycleGeneration, actionGeneration)) return;
@@ -836,7 +849,7 @@ Page({
       this.setData({
         busyAction: '',
         posterReady: false,
-        posterMessage: '海报生成未完成，未产生可保存图片。请稍后重试。',
+        posterMessage: '海报生成失败，请稍后重试。',
       });
     }
   },
@@ -885,7 +898,7 @@ Page({
       albumDenied: !saved,
       posterMessage: saved
         ? '微信已确认图片保存到相册。'
-        : '保存到相册失败，未伪造成功。请检查空间和权限后重试。',
+        : '保存失败，请检查相册权限和存储空间后重试。',
     });
   },
 

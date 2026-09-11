@@ -41,18 +41,17 @@ test('Discover reflows constrained content instead of relying on offsets', () =>
   assert.match(narrow, /\.discover-city-group\s*\{[\s\S]*?grid-template-columns:\s*92rpx minmax\(0, 1fr\);/);
 });
 
-test('Me keeps profile, settings and city actions usable at 320–340px', () => {
+test('Me keeps the profile and community contact usable at 320–340px', () => {
   const styles = read('miniprogram/pages/me/index.wxss');
   const narrow = narrowRules(styles);
 
   assert.doesNotMatch(styles, /(?:left|right):\s*-\d/);
   assert.match(styles, /\.me-profile\s*\{[\s\S]*?width:\s*100%;[\s\S]*?min-width:\s*0;/);
-  assert.match(styles, /\.me-link-row\s*\{[\s\S]*?width:\s*100%;[\s\S]*?min-width:\s*0;/);
-  assert.match(styles, /\.me-city-group__actions\s*\{[\s\S]*?width:\s*100%;/);
-  assert.match(styles, /\.me-city-group__action\s*\{[\s\S]*?min-width:\s*0;[\s\S]*?overflow-wrap:\s*anywhere;/);
+  assert.match(styles, /\.me-city-group__contact\s*\{[\s\S]*?display:\s*flex;[\s\S]*?gap:\s*20rpx;/);
+  assert.match(styles, /\.me-city-group__copy-button\s*\{[\s\S]*?min-height:\s*88rpx;/);
 
   assert.match(narrow, /\.me-profile\s*\{[\s\S]*?grid-template-columns:\s*76rpx minmax\(0, 1fr\);/);
   assert.match(narrow, /\.me-profile__edit\s*\{[\s\S]*?grid-column:\s*1 \/ -1;[\s\S]*?width:\s*100%;/);
   assert.match(narrow, /\.me-city-group__masthead,[\s\S]*?\.me-city-group__actions\s*\{[\s\S]*?flex-direction:\s*column;/);
-  assert.match(narrow, /\.me-city-group__action\s*\{[\s\S]*?width:\s*100%;/);
+  assert.match(narrow, /\.me-city-group__contact\s*\{[\s\S]*?flex-wrap:\s*wrap;/);
 });

@@ -32,7 +32,8 @@ test('phase-one navigation is Discover, Events and Me with card owned by Me', ()
   assert.doesNotMatch(discover, /(?:url|data-route)="\/pages\/card\/index"/);
   assert.doesNotMatch(me, /url="\/pages\/card\/index"/);
   assert.match(me, /url="\/packageCard\/pages\/edit\/index"/);
-  assert.match(me, /url="\/packageCard\/pages\/share\/index"/);
+  assert.match(me, /class="me-profile__identity" url="\{\{profile \? '\/pages\/card\/index'/);
+  assert.doesNotMatch(me, /url="\/packageCard\/pages\/(?:share|privacy)\/index"/);
 });
 
 test('tab artwork is a restrained 81px thin-line set with one typography system', () => {

@@ -7,18 +7,20 @@ import { fileURLToPath } from 'node:url';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '../../..');
 const read = (path) => readFileSync(resolve(root, path), 'utf8');
 
-test('share page presents the card and human-facing sharing choices', () => {
+test('poster page offers image saving and conditional stop-sharing without developer tools', () => {
   const template = read('miniprogram/packageCard/pages/share/index.wxml');
   const config = JSON.parse(read('miniprogram/packageCard/pages/share/index.json'));
 
   assert.match(template, /<ab-profile-card\b[\s\S]*?card="\{\{card\}\}"/);
   assert.match(template, /viewer-mode="STRANGER"/);
   assert.match(template, /fields="\{\{demoMode \? demoFields : \[\]\}\}"/);
-  assert.match(template, /封面只使用当前公开字段/);
-  assert.match(template, /微信好友|生成名片海报|撤销/);
-  assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送示例名片到微信/);
+  assert.match(template, /bindtap="generatePoster"/);
+  assert.match(template, /bindtap="savePosterToAlbum"/);
+  assert.match(template, /!demoMode && card && hasRevocableShare/);
+  assert.match(template, /bindtap="revokeShare"[^>]*>[\s\S]*?停止分享/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
-  assert.match(template, /打开微信转发面板|可以试用/);
+  assert.equal(config.navigationBarTitleText, '名片海报');
+  assert.doesNotMatch(template, /微信分享卡片预览|发送示例名片|createQrScene|clearLocalRevocationPointer|创建 7 天分享入口/);
   assert.equal(config.usingComponents?.['ab-profile-card'], '/components/ab-profile-card/index');
   assert.doesNotMatch(template, /OPENID|profile ID|PUBLIC PROJECTION|小程序码 scene|Canvas 2D|高熵 token/);
 });
@@ -40,7 +42,7 @@ test('visitor page identifies the sender and offers a separate create-own-card e
   assert.match(template, /创建我的数字名片/);
   assert.match(template, /bindtap="openMyCardEntry"/);
   assert.doesNotMatch(template, /交换名片|需要对方确认|添加好友|建立好友/);
-  assert.match(ownerTemplate, /view\/index\?preview=STRANGER/);
+  assert.doesNotMatch(ownerTemplate, /view\/index\?preview=STRANGER/);
   assert.match(source, /demoVisitorPreview[\s\S]*viewerMode:\s*this\.data\.demoVisitorPreview \? 'STRANGER' : 'SELF'/);
   assert.doesNotMatch(source, /import\s*\{[\s\S]*?getRuntimeEvidence[\s\S]*?\}\s*from\s*['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]/);
   assert.match(source, /function loadIdentityClient\(\)[\s\S]*require\(['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]\)/);

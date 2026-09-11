@@ -23,7 +23,7 @@ test('card editor follows the approved one-template high-control concept', () =>
   const source = read('miniprogram/packageCard/pages/edit/index.ts');
   const styles = read('miniprogram/packageCard/pages/edit/index.wxss');
 
-  assert.match(template, /自由填写内容/, '编辑器应以自由文字为核心，而不是固定简历字段表');
+  assert.match(template, /个人简介/, '编辑器应保留自由简介，而不是固定简历字段表');
   assert.doesNotMatch(template, />教育背景</, '教育背景不应继续作为固定必填式分区');
   assert.match(template, /卡片配色/);
   for (const theme of ['象牙白', '墨黑', '香槟金', '石灰灰']) {
@@ -39,11 +39,25 @@ test('card editor follows the approved one-template high-control concept', () =>
 
   assert.match(template, /bindtap="toggleProfileTag"/);
   assert.match(template, /bindtap="chooseGalleryImages"/);
-  assert.match(template, /标签与图片.*仅.*预览/, '不能把尚未持久化的标签和图片冒充已保存');
   assert.equal((template.match(/aria-pressed="\{\{editorMode === '(?:PREVIEW|EDIT)'\}\}"/g) ?? []).length, 2, '两个编辑视图都应暴露真实按下态');
   assert.doesNotMatch(template, /aria-role="tab"|aria-selected=/, '混合分享动作的按钮组不应伪装成纯 tablist');
   assert.match(styles, /\.card-editor-tab[\s\S]*min-height:\s*104rpx/);
-  assert.match(styles, /\.card-editor-ai[\s\S]*min-height:\s*var\(--ab-touch-target\)/);
+});
+
+test('editor removes AI assistance and repeated explanatory copy while retaining concise state and controls', () => {
+  const template = read('miniprogram/packageCard/pages/edit/index.wxml');
+  const source = read('miniprogram/packageCard/pages/edit/index.ts');
+  const styles = read('miniprogram/packageCard/pages/edit/index.wxss');
+  assert.doesNotMatch(`${template}\n${source}`, /AI\s*辅助润色|generateIntroductionDraft|generatingIntroduction|introductionNote|createEditableIntroduction|services\/introduction-draft/);
+  assert.doesNotMatch(`${template}\n${styles}`, /card-editor-ai(?:\b|::)/);
+  assert.doesNotMatch(template, /card-editor-evidence|card-editor-preview__note|card-editor-savebar__note|card-editor-section__eyebrow|ONE TEMPLATE|HIGH CONTROL|四套同源主题|首屏只保留必要信息|平台不限制表达方式|生活、作品或项目/);
+  assert.match(template, /最多\s*5\s*个\s*·\s*每个\s*10\s*字/, '标签数量和长度属于必要填写限制');
+  assert.match(template, /本机预览\s*·\s*最多\s*4\s*张/, '图库预览与数量限制继续准确显示');
+  assert.match(template, /本机保存/);
+  assert.match(template, /bindinput="onDisplayNameInput"/);
+  assert.match(template, /bindchange="onCityChange"/);
+  assert.match(template, /bindtap="saveProfile"/);
+  assert.equal((template.match(/open-type="share"/g) ?? []).length, 3);
 });
 
 test('card editor theme control matches the approved live-preview geometry', () => {
