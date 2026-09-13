@@ -371,7 +371,7 @@ test('execution evidence stays frozen while visual tokens use the approved phase
     'PASS', 'FAIL', 'UNVERIFIED', 'NOT_APPLICABLE',
   ]);
   const tokens = read('miniprogram', 'shared', 'design-tokens', 'tokens.wxss').toUpperCase();
-  ['#F4EFE6', '#211E1A', '#8A6A36', '#FFFDF8', '#161412'].forEach((color) =>
+  ['#F7F4ED', '#211E1A', '#8A6A36', '#FFFDF8', '#302D29'].forEach((color) =>
     assert.match(tokens, new RegExp(color)));
   assert.doesNotMatch(tokens, /--AB-COLOR-(?:GREEN|WINE|BURGUNDY)\b|#(?:173C32|102821|1D463B|7B3038|6B2637|70464A)/);
   assert.match(tokens, /MIN-HEIGHT: 88RPX/);

@@ -224,7 +224,7 @@ test('explicit demo share opens only in offline demo, keeps theme, and never res
     assert.equal(page.data.demoMode, true);
     assert.equal(page.data.state, 'SUCCESS');
     assert.equal(page.data.cardTheme, 'champagne');
-    assert.match(page.data.stateDescription, /合成示例/);
+    assert.equal(page.data.stateDescription, '');
     const displayedCard = page.data.card;
     const forward = page.onShareAppMessage.call(page);
     assert.equal(forward.title, 'AB Club 数字名片');
@@ -260,7 +260,7 @@ test('demo query is rejected outside offline demo', async () => {
     assert.equal(page.data.demoMode, false);
     assert.equal(page.data.state, 'ERROR');
     assert.equal(page.data.allowForward, false);
-    assert.match(page.data.stateDescription, /不接受示例名片入口/);
+    assert.match(page.data.stateDescription, /请让分享者重新发送名片/);
     assert.equal(wxCalls.filter(([name]) => name === 'showShareMenu').length, 0);
   } finally {
     delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;
@@ -311,7 +311,7 @@ test('a demo snapshot cold start restores only its explicit public labels and fa
     assert.equal(tampered.data.card, null);
     assert.deepEqual(tampered.data.demoPublicLabels, []);
     assert.equal(tampered.data.allowForward, false);
-    assert.match(tampered.data.stateDescription, /不完整或被修改/);
+    assert.match(tampered.data.stateDescription, /名片内容无法读取/);
     assert.ok(wxCalls.filter(([name]) => name === 'showShareMenu').length >= 1);
   } finally {
     delete globalThis.__AB_CARD_SHARE_PAGE_TEST_HOOKS__;
@@ -484,7 +484,7 @@ test('conflicting local and bearer entries fail closed without consulting local 
     page.onLoad.call(page, { local: '1', token: `sc_${'Q'.repeat(27)}`, snapshot: 'bad' });
     page.onShow.call(page);
     assert.equal(page.data.state, 'ERROR');
-    assert.match(page.data.stateDescription, /参数冲突/);
+    assert.match(page.data.stateDescription, /名片无法打开/);
     assert.equal(page.data.card, null);
     assert.equal(calls, 0);
   } finally {

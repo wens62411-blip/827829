@@ -24,25 +24,20 @@
     </button>
   </view>
 
-  <view class="discover-hero" aria-role="region" aria-label="AB Club AI 赛博名片入口">
-    <text class="discover-hero__eyebrow">AB CLUB · AI CYBER CARD</text>
+  <view class="discover-hero" aria-role="region" aria-label="AB Club 数字名片入口">
+    <text class="discover-hero__eyebrow">AB CLUB · DIGITAL CARD</text>
     <text class="discover-hero__title">先让对方记住你。</text>
-    <text class="discover-hero__copy">AI 赛博名片 · 把身份，做成一件值得被收藏的数字作品</text>
-    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="生成我的 AI 赛博名片">
-      <text class="discover-primary-action__label">生成我的 AI 赛博名片</text>
+    <text class="discover-hero__copy">把身份，做成一件值得被收藏的数字作品。</text>
+    <button class="discover-primary-action" bindtap="openMyCard" loading="{{openingCard}}" disabled="{{openingCard}}" hover-class="discover-press" aria-label="创建我的数字名片">
+      <text class="discover-primary-action__label">创建我的数字名片</text>
       <text class="discover-primary-action__arrow" aria-hidden="true">→</text>
     </button>
     <view class="discover-hero__rule" aria-hidden="true"></view>
-    <text
-      class="discover-runtime__label discover-runtime__label--hero"
-      aria-label="当前内容为本机预览"
-    >本机预览</text>
   </view>
 
-  <view class="discover-section discover-gathering" aria-role="region" aria-label="全球城市艺术活动预览">
+  <view class="discover-section discover-gathering" aria-role="region" aria-label="全球城市艺术活动">
     <view class="discover-section__head">
       <view><text class="discover-section__eyebrow">CURATED GATHERING</text><text class="discover-heading">一场值得赴约的相遇</text></view>
-      <text class="discover-section__status">内容预览</text>
     </view>
     <navigator class="discover-event-feature" url="/packageEvents/pages/event/index?demoEventId={{primaryEvent.eventId}}" hover-class="discover-press">
       <view class="discover-event-feature__media">
@@ -56,8 +51,8 @@
           binderror="handleImageError"
         />
         <view wx:else class="discover-event-feature__fallback" aria-role="img" aria-label="{{primaryEvent.coverAlt}}">
-          <text>AB CLUB · EVENT PREVIEW</text>
-          <text>本地活动视觉暂不可用 · 不使用外链替代</text>
+          <text>AB CLUB · GATHERINGS</text>
+          <text>图片暂不可用</text>
         </view>
         <text class="discover-event-feature__notice">{{primaryEvent.cityName}} · {{primaryEvent.cardMeta}}</text>
       </view>
@@ -67,7 +62,7 @@
         <text
           class="discover-event-feature__boundary"
           aria-label="当前活动不开放报名"
-        >当前不开放报名 · 信息以后续公告为准</text>
+        >报名尚未开放</text>
       </view>
     </navigator>
     <navigator class="discover-text-link" open-type="switchTab" url="/pages/events/index" hover-class="discover-press">浏览全部城市活动 <text>→</text></navigator>
@@ -88,9 +83,9 @@
         data-image-key="city"
         binderror="handleImageError"
       />
-      <view wx:else class="discover-city-media__fallback" aria-role="img" aria-label="{{cityFeature.alt}}">本地城市视觉暂不可用</view>
+      <view wx:else class="discover-city-media__fallback" aria-role="img" aria-label="{{cityFeature.alt}}">图片暂不可用</view>
       <view class="discover-city-media__shade"></view>
-      <text class="discover-city-media__label">ZÜRICH · CITY DIRECTORY PREVIEW</text>
+      <text class="discover-city-media__label">ZÜRICH · SWITZERLAND</text>
     </view>
     <view class="discover-city-groups">
       <view wx:for="{{cityGroups}}" wx:key="region" class="discover-city-group">
@@ -98,7 +93,6 @@
         <text class="discover-city-group__cities">{{item.cities}}</text>
       </view>
     </view>
-    <text class="discover-rights">城市图片使用本地高清资源；正式发布前仍需完成人工版权复核。</text>
   </view>
 
   <view class="discover-footer" aria-hidden="true"><text>AB CLUB · GLOBAL CHINESE BUSINESS CARD</text></view>

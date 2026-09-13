@@ -12,7 +12,7 @@
   --editor-ink: #211e1a;
   --editor-muted: #6f695f;
   --editor-line: #d8d1c4;
-  --editor-gold: var(--ab-color-gold);
+  --editor-gold: #88693e;
   --editor-gold-ink: #725126;
   --editor-gold-strong: #80602f;
   box-sizing: border-box;
@@ -42,9 +42,9 @@
 .card-editor-header__crest,
 .card-editor-header__crest-fallback {
   display: block;
-  width: 88rpx;
-  height: 88rpx;
-  flex: 0 0 88rpx;
+  width: 62rpx;
+  height: 62rpx;
+  flex: 0 0 62rpx;
 }
 
 .card-editor-header__crest-fallback {
@@ -97,7 +97,6 @@
 .card-editor-tab::after,
 .card-theme-option::after,
 .card-editor-upload::after,
-.card-editor-ai::after,
 .card-editor-gallery-upload::after,
 .card-editor-gallery__remove::after,
 .card-editor-selected-tag__remove::after,
@@ -127,6 +126,7 @@
   margin-top: 16rpx;
   border-left-color: var(--editor-gold-strong);
   background: rgba(255, 253, 248, .94);
+  color: var(--editor-ink);
   box-shadow: 0 10rpx 24rpx rgba(69, 49, 20, .06);
 }
 
@@ -495,17 +495,6 @@
   margin-top: 0;
 }
 
-.card-editor-ai {
-  min-height: var(--ab-touch-target);
-  margin: 0;
-  padding: 0 18rpx;
-  border: 0;
-  background: transparent;
-  color: var(--editor-gold);
-  font-size: 24rpx;
-  line-height: var(--ab-touch-target);
-}
-
 .card-editor-inline-note {
   display: block;
   margin-top: 10rpx;
@@ -762,17 +751,52 @@
   pointer-events: none;
 }
 
-/* The editor keeps its approved ivory workspace even when the device is dark. */
 .card-editor-page .card-button-secondary,
 .card-editor-page .card-link-button {
-  color: #725126;
+  color: var(--editor-gold-ink);
+  background: transparent;
+  border-color: rgba(151, 121, 77, .36);
 }
 
 .card-editor-page .card-button,
 .card-editor-page .card-link-button--strong {
-  border-color: #d7bf8d;
-  background: #d7bf8d;
-  color: #211e1a;
+  border-color: rgba(151, 121, 77, .46);
+  background: rgba(214, 190, 147, .16);
+  color: var(--editor-ink);
+}
+
+.card-editor-page .card-input,
+.card-editor-page .card-textarea,
+.card-editor-page .card-picker { color: var(--editor-ink); border-color: var(--editor-line); background: var(--editor-surface); }
+.card-editor-page .card-field__label { color: var(--editor-ink); }
+.card-editor-page .card-field__hint,
+.card-editor-page .card-counter { color: var(--editor-muted); }
+.card-editor-page .card-interest-chip { color: var(--editor-muted); background: transparent; border-color: var(--editor-line); }
+.card-editor-page .card-interest-chip--selected { color: var(--editor-gold-ink); background: rgba(185, 153, 99, .13); border-color: var(--editor-gold); }
+
+@media (prefers-color-scheme: dark) {
+  .card-editor-page {
+    --editor-surface: #393630;
+    --editor-soft: #444037;
+    --editor-ink: #f3ede2;
+    --editor-muted: #c6bcad;
+    --editor-line: #665e51;
+    --editor-gold: #d4bd93;
+    --editor-gold-ink: #e2cfaa;
+    --editor-gold-strong: #bea273;
+    background: #302d28;
+    color: var(--editor-ink);
+  }
+  .card-editor-page .card-title { color: var(--editor-ink); }
+  .card-editor-tabs, .card-editor-tab--share { background: #393630; border-color: #77674e; color: #dcc7a1; }
+  .card-editor-tab { color: #cec2af; }
+  .card-editor-tab--active { background: #4b4337; color: #f0e0c0; }
+  .card-editor-tab--bordered { border-left-color: rgba(214, 191, 150, .25); }
+  .card-editor-action-feedback { background: #403a30; color: var(--editor-ink); }
+  .card-editor-page .card-status--error, .card-editor-inline-note--error { color: #f0b9a8; }
+  .card-editor-free-copy, .card-editor-contact-card, .card-editor-selected-tag { background: #3d3932; }
+  .card-editor-page .card-button-secondary, .card-editor-page .card-link-button,
+  .card-editor-page .card-button, .card-editor-page .card-link-button--strong { border-color: rgba(211, 188, 145, .38); }
 }
 
 @media (max-width: 430px) {

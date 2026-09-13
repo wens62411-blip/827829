@@ -1,0 +1,74 @@
+<view class="calendar-page ab-safe-bottom">
+  <view class="calendar-shell">
+    <view class="calendar-header">
+      <view class="calendar-header__topline">
+        <text>AB CLUB</text>
+        <text>ART WORLD / {{year}}</text>
+      </view>
+      <text class="calendar-year">{{year}}</text>
+      <text class="calendar-title">GLOBAL ART CALENDAR</text>
+      <text class="calendar-title__zh">全球艺术日历</text>
+      <text class="calendar-intro">一整年的艺术世界，在城市之间依次展开。</text>
+    </view>
+
+    <scroll-view class="calendar-month-rail" scroll-x="true" enable-flex="true" show-scrollbar="false" aria-label="按月份浏览全球艺术日历">
+      <view class="calendar-month-rail__inner">
+        <button
+          wx:for="{{monthNav}}"
+          wx:key="code"
+          class="calendar-month-tab {{activeMonthAnchor === item.anchor ? 'calendar-month-tab--active' : ''}}"
+          data-anchor="{{item.anchor}}"
+          bindtap="jumpToMonth"
+          aria-label="跳转到 {{item.name}}"
+          aria-pressed="{{activeMonthAnchor === item.anchor}}"
+        >{{item.code}}</button>
+      </view>
+    </scroll-view>
+
+    <scroll-view class="calendar-timeline" scroll-y="true" scroll-into-view="{{activeMonthAnchor}}" enhanced="true" show-scrollbar="false" aria-label="{{year}} 全球艺术时间轴">
+      <view wx:for="{{months}}" wx:key="code" id="{{item.anchor}}" class="calendar-month">
+        <view class="calendar-month__heading">
+          <text class="calendar-month__code">{{item.code}}</text>
+          <text class="calendar-month__name">{{item.name}}</text>
+          <view class="calendar-month__rule" aria-hidden="true"></view>
+        </view>
+
+        <view wx:if="{{item.events.length}}" class="calendar-event-list">
+          <button
+            wx:for="{{item.events}}"
+            wx:for-item="calendarEvent"
+            wx:key="id"
+            class="calendar-event {{calendarEvent.featured ? 'calendar-event--featured' : ''}}"
+            data-event-id="{{calendarEvent.id}}"
+            bindtap="openCalendarEvent"
+            hover-class="calendar-event--pressed"
+            aria-label="{{calendarEvent.titleEn}} {{calendarEvent.titleZh}}，{{calendarEvent.date}}"
+          >
+            <view class="calendar-event__rail" aria-hidden="true">
+              <text class="calendar-event__dot"></text>
+            </view>
+            <view class="calendar-event__body">
+              <view class="calendar-event__city"><text>{{calendarEvent.cityEn}}</text><text>{{calendarEvent.cityZh}}</text></view>
+              <text class="calendar-event__title-en">{{calendarEvent.titleEn}}</text>
+              <text class="calendar-event__title-zh">{{calendarEvent.titleZh}}</text>
+              <text class="calendar-event__date">{{calendarEvent.date}}</text>
+              <text class="calendar-event__venue">{{calendarEvent.venue}}</text>
+              <text class="calendar-event__summary">{{calendarEvent.summary}}</text>
+            </view>
+            <text class="calendar-event__arrow" aria-hidden="true">＋</text>
+          </button>
+        </view>
+
+        <view wx:else class="calendar-month__empty">
+          <text>本期未收录已确认节点</text>
+          <text>NO CONFIRMED ENTRIES</text>
+        </view>
+      </view>
+
+      <view class="calendar-timeline__footer" aria-hidden="true">
+        <text>AB CLUB / GLOBAL CHINESE CLUB</text>
+        <text>CALENDAR EDITION · {{year}}</text>
+      </view>
+    </scroll-view>
+  </view>
+</view>

@@ -24,7 +24,7 @@ loading: false,
 busy: false,
 loaded: false,
 eligibilityLabel: '未检查',
-eligibilityDetail: '服务端会检查活动状态、时间和已批准准入标签。',
+eligibilityDetail: '',
 enrollmentStateLabel: '尚无兴趣登记',
 enrollmentVersion: 0,
 eventVersion: 0,
@@ -37,8 +37,8 @@ registerIdempotencyKey: '',
 cancelIdempotencyKey: '',
 stateKind: 'EMPTY',
 stateTitle: '兴趣登记尚未载入',
-stateDescription: '请从经人工复核且可公开的活动详情进入。',
-stateDetail: '客户端不能提交城市、人数、资格标签或 organizer 角色；服务端从可信记录重新校验。',
+stateDescription: '请从活动详情进入。',
+stateDetail: '',
 },
 onLoad(query: Record<string, string | undefined>) {
 if (!query.eventId) return;
@@ -49,8 +49,8 @@ async loadEnrollment(eventId: EventId) {
 if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
 this.setData({
 stateKind: 'OFFLINE',
-stateTitle: '正式兴趣登记未连接',
-stateDescription: '本机预览不会模拟登记、满员、支付或成功状态。',
+stateTitle: '兴趣登记暂未开放',
+stateDescription: '',
 });
 return;
 }
@@ -99,7 +99,7 @@ loading: false,
 loaded: true,
 eligibilityLabel: eligibility.eligible ? '符合当前准入条件' : '不符合当前准入条件',
 eligibilityDetail: eligibility.eligible
-? '资格由服务端根据已批准标签计算；客户端没有提交资格标签。'
+? ''
 : eligibility.failureReason ?? '资格原因未公开',
 enrollmentStateLabel: enrollment?.state ?? '尚无兴趣登记',
 enrollmentVersion: enrollment?.version ?? 0,
@@ -143,13 +143,13 @@ enrollmentVersion: enrollment.version,
 canRegisterInterest: false,
 canCancelInterest: CANCELLABLE_ENROLLMENTS.includes(enrollment.state),
 paymentStateLabel: enrollment.paymentState,
-operationMessage: '兴趣登记已由服务端确认；重复请求会复用同一幂等键。',
+operationMessage: '兴趣已登记。',
 registerIdempotencyKey: '',
 });
 } catch {
 this.setData({
 busy: false,
-operationMessage: '请求结果未知；再次提交会复用同一幂等键，由服务端避免重复登记。',
+operationMessage: '暂未收到提交结果，请重试。',
 });
 }
 },
@@ -180,13 +180,13 @@ enrollmentStateLabel: enrollment.state,
 enrollmentVersion: enrollment.version,
 canRegisterInterest: false,
 canCancelInterest: false,
-operationMessage: '取消状态已由服务端确认。',
+operationMessage: '已取消登记。',
 cancelIdempotencyKey: '',
 });
 } catch {
 this.setData({
 busy: false,
-operationMessage: '取消结果未知；再次提交会复用同一幂等键。',
+operationMessage: '暂未收到取消结果，请重试。',
 });
 }
 },
@@ -198,7 +198,7 @@ loaded: false,
 stateKind: 'ERROR',
 stateTitle: '兴趣登记不可用',
 stateDescription: message,
-stateDetail: '没有客户端直写、模拟成功或支付成功回退。',
+stateDetail: '',
 });
 },
 });

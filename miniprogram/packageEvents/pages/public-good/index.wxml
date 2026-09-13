@@ -1,0 +1,52 @@
+<view class="good-page">
+  <view class="good-shell">
+    <view class="good-header">
+      <text class="good-eyebrow">AB CLUB · PUBLIC GOOD</text>
+      <text class="good-title">让善意，成为日常</text>
+      <view class="good-header__line"><text>100 件公益小事</text><text class="good-header__edition">A LITTLE GOOD, EVERY DAY</text></view>
+    </view>
+
+    <view class="good-draw {{drawing ? 'good-draw--opening' : ''}} {{current ? 'good-draw--has-result' : ''}}">
+      <view class="good-gift" aria-hidden="true">
+        <view class="good-gift__halo"></view>
+        <view class="good-gift__lid"><view class="good-gift__ribbon"></view></view>
+        <view class="good-gift__body"><text>AB</text><view class="good-gift__seam"></view></view>
+        <view class="good-gift__spark good-gift__spark--one"></view>
+        <view class="good-gift__spark good-gift__spark--two"></view>
+      </view>
+      <view wx:if="{{current}}" class="good-result" aria-live="polite">
+        <text class="good-result__category">{{current.categoryName}}</text>
+        <text class="good-result__text">{{current.text}}</text>
+        <text wx:if="{{currentCompleted}}" class="good-result__completed">已完成 ✓</text>
+      </view>
+      <view wx:else class="good-draw__invitation"><text>从一件小事开始</text></view>
+      <view class="good-actions">
+        <button wx:if="{{!current}}" class="good-button good-button--primary good-button--full" bindtap="drawAction" disabled="{{drawing}}" hover-class="good-button--pressed">{{drawing ? '正在开启…' : '抽取一件公益小事'}}</button>
+        <block wx:else>
+          <button class="good-button good-button--secondary" bindtap="drawAction" disabled="{{drawing}}" hover-class="good-button--pressed">{{drawing ? '正在开启…' : '换一件'}}</button>
+          <button class="good-button good-button--primary" bindtap="completeAction" disabled="{{drawing || currentCompleted}}" hover-class="good-button--pressed">{{currentCompleted ? '已完成 ✓' : '做完了'}}</button>
+        </block>
+      </view>
+    </view>
+
+    <view class="good-progress" aria-live="polite">
+      <view class="good-progress__label"><text>累计功德</text><text class="good-progress__caption">已完成 {{completedCount}} / {{totalCount}} 件</text></view>
+      <view class="good-progress__value"><text class="good-progress__number {{celebrating ? 'good-progress__number--celebrate' : ''}}">{{completedCount}}</text><text wx:if="{{celebrating}}" class="good-progress__plus">功德 +1</text></view>
+    </view>
+    <view wx:if="{{completedCount === totalCount}}" class="good-all-complete">100 件小事，汇成一份长久的善意。</view>
+    <view wx:if="{{saveFailed}}" class="good-storage-message" role="alert"><text>本次记录暂未保存，退出后可能丢失。</text><button bindtap="retrySave" class="good-storage-retry">重试保存</button></view>
+    <view wx:elif="{{repaired}}" class="good-storage-message"><text>部分记录未能读取，已保留可恢复的完成记录。</text></view>
+
+    <view class="good-library">
+      <view class="good-section-heading"><text class="good-eyebrow">THE COLLECTION</text><text class="good-section-title">100 种善意</text></view>
+      <view class="good-categories">
+        <button wx:for="{{categories}}" wx:key="id" class="good-category {{selectedCategoryId === item.id ? 'good-category--selected' : ''}}" data-id="{{item.id}}" bindtap="selectCategory" hover-class="good-category--pressed" aria-label="{{item.name}}，10 件公益小事" aria-pressed="{{selectedCategoryId === item.id}}"><text class="good-category__number">{{item.number}}</text><text>{{item.name}}</text></button>
+      </view>
+      <view class="good-list-heading"><text>{{selectedCategoryName}}</text><text>{{categoryCompleted}} / 10</text></view>
+      <view class="good-list">
+        <button wx:for="{{categoryActions}}" wx:key="id" class="good-list-item {{item.selected ? 'good-list-item--selected' : ''}}" data-id="{{item.id}}" bindtap="selectAction" disabled="{{drawing}}" hover-class="good-list-item--pressed" aria-label="{{item.text}}{{item.completed ? '，已完成' : '，选择这件事'}}"><text class="good-list-item__number">{{item.number}}</text><text class="good-list-item__text">{{item.text}}</text><text class="good-list-item__status {{item.completed ? 'good-list-item__status--done' : ''}}">{{item.completed ? '✓' : '+'}}</text></button>
+      </view>
+    </view>
+    <view class="good-footer"><text>AB CLUB</text><text>PUBLIC GOOD</text></view>
+  </view>
+</view>

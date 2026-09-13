@@ -52,3 +52,10 @@
 .custom-tab-bar__item--active .custom-tab-bar__text {
   color: #98723A;
 }
+
+@media (prefers-color-scheme: dark) {
+  .custom-tab-bar { background: #35312c; border-top-color: #61584b; }
+  .custom-tab-bar__text { color: #d0c8bc; }
+  .custom-tab-bar__item--active .custom-tab-bar__text { color: #ead6ae; }
+  .custom-tab-bar__icon { filter: brightness(1.65); }
+}

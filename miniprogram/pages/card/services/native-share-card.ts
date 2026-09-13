@@ -1,3 +1,5 @@
+import { normalizeCardTheme } from './card-theme-preference';
+
 export const NATIVE_SHARE_CARD_WIDTH = 600;
 export const NATIVE_SHARE_CARD_HEIGHT = 480;
 
@@ -12,6 +14,7 @@ export interface NativeShareCardInput {
   readonly phone?: unknown;
   readonly email?: unknown;
   readonly demoMode?: unknown;
+  readonly theme?: unknown;
 }
 
 export interface NativeShareCardContent {
@@ -79,6 +82,59 @@ async function renderNativeShareCardCover(
 }
 
 type CanvasContext = WechatMiniprogram.CanvasRenderingContext.CanvasRenderingContext2D;
+
+export interface NativeShareCardPalette {
+  readonly paper: readonly [string, string, string];
+  readonly ink: string;
+  readonly muted: string;
+  readonly accent: string;
+  readonly line: string;
+}
+
+export function resolveNativeShareCardPalette(theme: unknown): NativeShareCardPalette {
+  switch (normalizeCardTheme(theme)) {
+    case 'ink': return { paper: ['#494138', '#3D3730', '#39342E'], ink: '#FFF8EB', muted: '#DBD0BE', accent: '#E2CAA0', line: '#9B8766' };
+    case 'champagne': return { paper: ['#FAF4E7', '#F4EAD6', '#EDE0C5'], ink: '#332C23', muted: '#625747', accent: '#73542D', line: '#BFA67C' };
+    case 'stone': return { paper: ['#F2EFE9', '#EAE5DD', '#E0D9CD'], ink: '#34312B', muted: '#635E54', accent: '#68593E', line: '#B9AC96' };
+    default: return { paper: ['#FFFDF7', '#F8F4EB', '#EEE6D6'], ink: '#332D25', muted: '#6B6153', accent: '#7B5C30', line: '#C5AF86' };
+  }
+}
+
+/** Fine double rules and symmetrical corners; no decorative text competes with the person. */
+export function drawClassicalShareFrame(
+  context: CanvasContext, width: number, height: number, palette: NativeShareCardPalette,
+): void {
+  context.save();
+  context.strokeStyle = palette.line;
+  context.lineWidth = 0.8;
+  context.strokeRect(18.5, 18.5, width - 37, height - 37);
+  context.lineWidth = 0.4;
+  context.strokeRect(24.5, 24.5, width - 49, height - 49);
+  for (const [x, y, dx, dy] of [[32, 32, 1, 1], [width - 32, 32, -1, 1], [32, height - 32, 1, -1], [width - 32, height - 32, -1, -1]] as const) {
+    context.beginPath();
+    context.moveTo(x, y + dy * 19);
+    context.lineTo(x, y);
+    context.lineTo(x + dx * 35, y);
+    context.moveTo(x + dx * 5, y + dy * 24);
+    context.lineTo(x + dx * 5, y + dy * 5);
+    context.lineTo(x + dx * 40, y + dy * 5);
+    context.stroke();
+  }
+  const center = width / 2;
+  const y = height - 40;
+  context.beginPath();
+  context.moveTo(center - 70, y);
+  context.lineTo(center - 12, y);
+  context.moveTo(center + 12, y);
+  context.lineTo(center + 70, y);
+  context.moveTo(center, y - 4);
+  context.lineTo(center + 5, y);
+  context.lineTo(center, y + 4);
+  context.lineTo(center - 5, y);
+  context.closePath();
+  context.stroke();
+  context.restore();
+}
 
 interface WindowMetricsApi {
   readonly getWindowInfo?: () => { readonly pixelRatio?: number };
@@ -178,14 +234,13 @@ function wrapText(
   return result;
 }
 
-function drawVerticalName(context: CanvasContext, name: string): void {
-  const raw = Array.from(name);
-  const characters = raw.length > 6 ? [...raw.slice(0, 5), '…'] : raw;
-  const spacing = characters.length <= 4 ? 47 : 42;
+function drawVerticalName(context: CanvasContext, name: string, palette: NativeShareCardPalette): void {
+  const characters = Array.from(name).filter((character) => character !== ' ');
+  const spacing = Math.min(47, 277 / Math.max(1, characters.length - 1));
   const startY = 126;
   context.save();
-  context.fillStyle = '#211E1A';
-  context.font = '600 32px serif';
+  context.fillStyle = palette.ink;
+  context.font = `500 ${Math.min(32, spacing - 2)}px serif`;
   context.textAlign = 'center';
   characters.forEach((character, index) => {
     context.fillText(character, 65, startY + index * spacing);
@@ -193,21 +248,21 @@ function drawVerticalName(context: CanvasContext, name: string): void {
   context.restore();
 }
 
-function drawLabelRows(context: CanvasContext, labels: readonly string[], startY: number): number {
+function drawLabelRows(context: CanvasContext, labels: readonly string[], startY: number, palette: NativeShareCardPalette): number {
   if (labels.length === 0) return startY;
   let x = 148;
   let y = startY;
   context.font = '500 15px sans-serif';
   for (const label of labels) {
-    const width = Math.min(132, Math.ceil(context.measureText(label).width) + 24);
-    if (x + width > 566) {
+    const width = Math.ceil(context.measureText(label).width) + 24;
+    if (x + width > 555) {
       x = 148;
       y += 38;
     }
-    context.strokeStyle = '#CDB98F';
-    context.lineWidth = 1;
+    context.strokeStyle = palette.line;
+    context.lineWidth = 0.5;
     context.strokeRect(x, y - 21, width, 29);
-    context.fillStyle = '#6D5732';
+    context.fillStyle = palette.accent;
     context.fillText(label, x + 12, y);
     x += width + 10;
   }
@@ -219,6 +274,7 @@ export function drawNativeShareCard(
   input: NativeShareCardInput,
 ): NativeShareCardContent {
   const content = normalizeNativeShareCard(input);
+  const palette = resolveNativeShareCardPalette(input.theme);
   const pixelRatio = resolveNativeShareCardPixelRatio();
   canvas.width = NATIVE_SHARE_CARD_WIDTH * pixelRatio;
   canvas.height = NATIVE_SHARE_CARD_HEIGHT * pixelRatio;
@@ -226,79 +282,60 @@ export function drawNativeShareCard(
   context.scale(pixelRatio, pixelRatio);
 
   const paper = context.createLinearGradient(0, 0, NATIVE_SHARE_CARD_WIDTH, NATIVE_SHARE_CARD_HEIGHT);
-  paper.addColorStop(0, '#FBF8F1');
-  paper.addColorStop(0.58, '#F7F1E7');
-  paper.addColorStop(1, '#EEE3D1');
+  paper.addColorStop(0, palette.paper[0]);
+  paper.addColorStop(0.58, palette.paper[1]);
+  paper.addColorStop(1, palette.paper[2]);
   context.fillStyle = paper;
   context.fillRect(0, 0, NATIVE_SHARE_CARD_WIDTH, NATIVE_SHARE_CARD_HEIGHT);
 
-  context.strokeStyle = '#C5AD7C';
-  context.lineWidth = 1;
-  context.strokeRect(18.5, 18.5, 563, 443);
+  drawClassicalShareFrame(context, NATIVE_SHARE_CARD_WIDTH, NATIVE_SHARE_CARD_HEIGHT, palette);
+  context.fillStyle = palette.accent;
+  context.font = '500 13px serif';
+  context.fillText('AB CLUB', 43, 62);
 
-  context.fillStyle = '#9A773C';
-  context.font = '600 14px serif';
-  context.fillText('AB CLUB', 34, 48);
-  context.fillStyle = '#7C746A';
-  context.font = '400 10px sans-serif';
-  context.fillText('GLOBAL CHINESE COMMUNITY', 34, 65);
-  if (content.demoMode) {
-    context.textAlign = 'right';
-    context.fillStyle = '#9A773C';
-    context.font = '500 10px sans-serif';
-    context.fillText('本机预览', 564, 49);
-    context.textAlign = 'left';
-  }
-
-  drawVerticalName(context, content.displayName);
-  context.strokeStyle = '#9A773C';
-  context.lineWidth = 1;
+  drawVerticalName(context, content.displayName, palette);
+  context.strokeStyle = palette.line;
+  context.lineWidth = 0.7;
   context.beginPath();
   context.moveTo(112.5, 102);
   context.lineTo(112.5, 399);
   context.stroke();
 
-  context.fillStyle = '#9A773C';
-  context.font = '600 11px sans-serif';
-  context.fillText('DIGITAL INTRODUCTION', 148, 105);
-
-  context.fillStyle = '#211E1A';
-  context.font = '600 25px serif';
-  const headline = content.headline || '让个人风格，成为第一印象';
-  const headlineLines = wrapText(context, headline, 410, 2);
+  context.fillStyle = palette.ink;
+  context.font = '500 25px serif';
+  const headlineLines = wrapText(context, content.headline, 400, 2);
   headlineLines.forEach((line, index) => {
-    context.fillText(line, 148, 137 + index * 31);
+    context.fillText(line, 148, 124 + index * 31);
   });
 
-  const labelStartY = headlineLines.length > 1 ? 205 : 181;
-  const nextSectionY = drawLabelRows(context, content.labels, labelStartY);
-  context.fillStyle = '#9A773C';
-  context.font = '600 11px sans-serif';
-  context.fillText('ABOUT', 148, nextSectionY);
-  context.fillStyle = '#514B44';
+  const labelStartY = headlineLines.length > 1 ? 204 : headlineLines.length === 1 ? 173 : 124;
+  const nextSectionY = drawLabelRows(context, content.labels, labelStartY, palette);
+  const hasContacts = Boolean(content.phone || content.email);
+  const biographyLimit = hasContacts ? 349 : 406;
+  const biographyLines = Math.max(0, Math.floor((biographyLimit - nextSectionY) / 25) + 1);
+  context.fillStyle = palette.muted;
   context.font = '400 16px sans-serif';
-  const biography = content.biography || '愿在新的城市里，认识认真做事、尊重边界的人。';
-  wrapText(context, biography, 410, 4).forEach((line, index) => {
-    context.fillText(line, 148, nextSectionY + 29 + index * 25);
+  if (biographyLines > 0) wrapText(context, content.biography, 400, Math.min(4, biographyLines)).forEach((line, index) => {
+    context.fillText(line, 148, nextSectionY + index * 25);
   });
 
   const contactLines = [
-    content.phone ? `TEL  ${content.phone}` : '',
-    content.email ? `MAIL  ${content.email}` : '',
+    content.phone,
+    content.email,
   ].filter(Boolean);
   if (contactLines.length > 0) {
-    context.fillStyle = '#9A773C';
-    context.font = '600 11px sans-serif';
-    context.fillText('CONTACT', 148, 402);
-    context.fillStyle = '#514B44';
+    context.strokeStyle = palette.line;
+    context.lineWidth = 0.5;
+    context.beginPath();
+    context.moveTo(148, 367);
+    context.lineTo(214, 367);
+    context.stroke();
+    context.fillStyle = palette.muted;
     context.font = '400 13px sans-serif';
-    contactLines.slice(0, 2).forEach((line, index) => context.fillText(line, 219, 402 + index * 20));
+    contactLines.slice(0, 2).forEach((line, index) => {
+      const visible = wrapText(context, line, 400, 1)[0] ?? '';
+      context.fillText(visible, 148, 391 + index * 20);
+    });
   }
-
-  context.fillStyle = '#9A773C';
-  context.fillRect(34, 436, 532, 1);
-  context.fillStyle = '#7C746A';
-  context.font = '400 10px sans-serif';
-  context.fillText('PRIVATE BY CHOICE · SHARED WITH INTENT', 34, 452);
   return content;
 }

@@ -14,9 +14,7 @@ test('Discover is an explicit offline editorial demo rather than a placeholder',
 
   assert.doesNotMatch(source, /createPlaceholderPage/);
   assert.match(source, /RuntimeMode\.OFFLINE_DEMO/);
-  assert.match(template, /本机预览/);
-  assert.match(template, /内容预览/);
-  assert.match(template, /当前不开放报名/);
+  assert.match(template, /报名尚未开放/);
   assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览|仅做数据示例/);
   assert.doesNotMatch(template, /隐私边界，先说清楚|无需认证即可/);
   assert.match(source, /title:\s*'AB Club · 你的名片，连接世界'/);
@@ -63,8 +61,7 @@ test('Discover images fail closed to local accessible placeholders', () => {
   assert.equal(imageTags.length, guardedContentImages.length, '发现页的内容图片都应有失败闭环，文字入口不依赖装饰图标');
   assert.match(source, /handleImageError\(event:/);
   for (const key of ['brand', 'event', 'city']) assert.match(source, new RegExp(`imageKey === '${key}'`));
-  assert.match(template, /本地活动视觉暂不可用 · 不使用外链替代/);
-  assert.match(template, /本地城市视觉暂不可用/);
+  assert.match(template, /图片暂不可用/);
   assert.doesNotMatch(`${source}\n${template}`, /https?:\/\//);
 });
 
@@ -88,12 +85,12 @@ test('Discover uses the transparent AB Club crest and its frozen local manifest'
   assert.equal(manifest.asset.reviewStatus, 'DRAFT');
 });
 
-test('Discover controls meet touch targets and keep the approved light canvas', () => {
+test('Discover controls meet touch targets with system appearance support', () => {
   const styles = readPage('index.wxss');
 
   assert.match(styles, /\.discover-global-chip\s*\{[\s\S]*?min-height:\s*88rpx/);
   assert.match(styles, /\.discover-text-link\s*\{[\s\S]*?min-height:\s*88rpx/);
-  assert.doesNotMatch(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/, '首页品牌画布不应跟随系统强制反色');
+  assert.match(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/);
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
 });
 
@@ -108,7 +105,6 @@ test('Discover names every launch city and uses shipped city/editorial photograp
   for (const city of ['北京', '上海', '广州', '深圳', '杭州', '苏黎世', '米兰', '巴黎', '新加坡', '墨尔本', '悉尼', '多伦多', '温哥华']) {
     assert.match(source, new RegExp(city));
   }
-  assert.match(template, /正式发布前仍需完成人工版权复核/);
   assert.equal(cityManifest.assets.some((asset) => asset.cityId === 'ch-zurich'), true);
   assert.equal(editorialManifest.assets.some((asset) => asset.id === 'jewelry-study'), true);
   assert.equal(cityManifest.processingProfile.runtimeWidth, 1152);

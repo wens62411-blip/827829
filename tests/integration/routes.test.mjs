@@ -26,6 +26,9 @@ const visibleRouteSurfaces = [
   'packageCard/pages/share/index',
   'packageEvents/pages/city/index',
   'packageEvents/pages/event/index',
+  'packageEvents/pages/calendar/index',
+  'packageEvents/pages/public-good/index',
+  'packageEvents/pages/pearls/index',
   'packageSocial/pages/friend/index',
   'packageSocial/pages/requests/index',
   'packageSocial/pages/tag-apply/index',
@@ -96,11 +99,11 @@ test('subpackage routes match the frozen route table', () => {
   assert.deepEqual(routeCounts, {
     packageCard: 4,
     packageSocial: 4,
-    packageEvents: 3,
+    packageEvents: 6,
     packageArt: 3,
     packageAdmin: 5,
   });
-  assert.equal(app.pages.length + app.subpackages.reduce((sum, item) => sum + item.pages.length, 0), 26);
+  assert.equal(app.pages.length + app.subpackages.reduce((sum, item) => sum + item.pages.length, 0), 29);
 });
 
 test('every registered route has TypeScript, JSON, WXML and WXSS files', () => {
@@ -172,13 +175,13 @@ test('every visible tap binding has a page or component method', () => {
   }
 });
 
-test('activity card forwards the clicked event identity into the registered detail route', () => {
-  const componentSource = readFileSync(new URL('components/ab-event-card/index.ts', miniRoot), 'utf8');
+test('activity index forwards the global art calendar entry into the registered second-level route', () => {
   const eventsSource = readFileSync(new URL('pages/events/index.ts', miniRoot), 'utf8');
-  assert.match(componentSource, /triggerEvent\('open',\s*\{\s*eventId:\s*this\.properties\.eventId\s*\}\)/);
-  assert.match(eventsSource, /const eventId = event\.detail\.eventId/);
-  assert.match(eventsSource, /eventId\.startsWith\('demo:'\)[\s\S]*?demoEventId=/);
-  assert.match(eventsSource, /wx\.navigateTo\(\{ url: `\/packageEvents\/pages\/event\/index\?\$\{query\}` \}\)/);
+  const eventsTemplate = readFileSync(new URL('pages/events/index.wxml', miniRoot), 'utf8');
+  assert.match(eventsSource, /portalId === 'calendar'/);
+  assert.match(eventsSource, /wx\.navigateTo\(\{ url: '\/packageEvents\/pages\/calendar\/index' \}\)/);
+  assert.match(eventsTemplate, /data-portal-id="\{\{item\.id\}\}"/);
+  assert.match(eventsSource, /titleEn: 'GLOBAL ART CALENDAR'/);
 });
 
 test('project permits only an authorized experience upload and has no second frontend framework', () => {

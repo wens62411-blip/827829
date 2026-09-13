@@ -1,0 +1,96 @@
+.good-page {
+  --good-canvas: #f5f1e9;
+  --good-paper: #fffcf6;
+  --good-ink: #302c26;
+  --good-muted: #716756;
+  --good-gold: #88652f;
+  --good-line: #dcd1bd;
+  --good-soft: #eee5d4;
+  box-sizing: border-box;
+  min-height: 100vh;
+  background: var(--good-canvas);
+  color: var(--good-ink);
+}
+.good-shell { box-sizing: border-box; max-width: 1000rpx; margin: 0 auto; padding: 48rpx 36rpx calc(48rpx + env(safe-area-inset-bottom)); }
+.good-header { margin-bottom: 36rpx; }
+.good-eyebrow { display: block; color: var(--good-gold); font: 24rpx/1.5 Georgia, serif; letter-spacing: .15em; }
+.good-title { display: block; margin-top: 20rpx; font: 500 49rpx/1.45 "Songti SC", "STSong", SimSun, serif; letter-spacing: .03em; }
+.good-header__line { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12rpx; margin-top: 20rpx; color: var(--good-muted); font-size: 28rpx; line-height: 1.6; }
+.good-header__edition { font: 20rpx/1.6 Georgia, serif; letter-spacing: .09em; }
+.good-draw { position: relative; overflow: hidden; padding: 30rpx 30rpx 32rpx; border: 1rpx solid var(--good-line); border-radius: 28rpx; background: radial-gradient(ellipse at 48% 0%, rgba(221, 201, 158, .17), transparent 68%), var(--good-paper); box-shadow: 0 12rpx 35rpx rgba(74, 54, 21, .035); }
+.good-gift { position: relative; width: 198rpx; height: 176rpx; margin: 26rpx auto 22rpx; }
+.good-gift__halo { position: absolute; top: -14rpx; left: -18rpx; width: 232rpx; height: 188rpx; border: 1rpx solid rgba(174, 145, 91, .17); border-radius: 50%; transform: rotate(-19deg); }
+.good-gift__body { position: absolute; top: 49rpx; left: 39rpx; display: flex; align-items: center; justify-content: center; width: 120rpx; height: 105rpx; border: 1rpx solid #bb9e65; border-radius: 3rpx 3rpx 10rpx 10rpx; background: linear-gradient(125deg, #fbf2db, #dac69d); color: #795a2e; box-shadow: 10rpx 13rpx 22rpx rgba(64, 49, 22, .10); font: 33rpx Georgia, serif; letter-spacing: .04em; }
+.good-gift__seam { position: absolute; top: 0; bottom: 0; right: 14rpx; width: 1rpx; background: rgba(129, 97, 45, .32); }
+.good-gift__lid { position: absolute; top: 33rpx; left: 32rpx; z-index: 2; width: 134rpx; height: 25rpx; border: 1rpx solid #b5975e; border-radius: 5rpx; background: linear-gradient(110deg, #fbf0d4, #ddcaa3); transition: transform .32s ease; }
+.good-gift__ribbon { position: absolute; bottom: 27rpx; left: 54rpx; width: 26rpx; height: 24rpx; border: 1rpx solid #b5975e; border-radius: 80% 20% 60% 40%; transform: rotate(-25deg); }
+.good-gift__spark { position: absolute; width: 5rpx; height: 5rpx; background: var(--good-gold); transform: rotate(45deg); }
+.good-gift__spark--one { top: 28rpx; right: 4rpx; }
+.good-gift__spark--two { bottom: 40rpx; left: 3rpx; width: 4rpx; height: 4rpx; }
+.good-draw--opening .good-gift__lid { transform: translateY(-24rpx) rotate(-8deg); }
+.good-draw--has-result .good-gift { transform: scale(.8); margin-top: 6rpx; margin-bottom: 0; height: 156rpx; }
+.good-draw__invitation { padding: 2rpx 0 30rpx; text-align: center; color: var(--good-muted); font: 32rpx/1.5 "Songti SC", "STSong", SimSun, serif; }
+.good-result { min-height: 142rpx; padding: 0 0 30rpx; text-align: center; }
+.good-result__category { display: block; color: var(--good-gold); font-size: 28rpx; line-height: 1.5; letter-spacing: .08em; }
+.good-result__text { display: block; margin-top: 15rpx; font: 500 38rpx/1.6 "Songti SC", "STSong", SimSun, serif; overflow-wrap: break-word; }
+.good-result__completed { display: block; margin-top: 12rpx; color: var(--good-gold); font-size: 28rpx; line-height: 1.5; }
+.good-actions { display: flex; gap: 16rpx; }
+.good-button { display: flex; flex: 1; align-items: center; justify-content: center; min-height: 88rpx; margin: 0; padding: 14rpx 16rpx; border: 1rpx solid var(--good-line); border-radius: 14rpx; font-size: 29rpx; font-weight: 500; line-height: 1.5; }
+.good-button::after, .good-category::after, .good-list-item::after, .good-storage-retry::after { border: 0; }
+.good-button--primary { background: var(--good-soft); color: var(--good-ink); border-color: var(--good-line); }
+.good-button--secondary { color: var(--good-gold); background: transparent; }
+.good-button--pressed { opacity: .75; }
+.good-button[disabled], .good-list-item[disabled] { color: var(--good-muted); opacity: .7; }
+.good-button--primary[disabled] { background: var(--good-soft); }
+.good-progress { display: flex; align-items: center; justify-content: space-between; gap: 24rpx; min-height: 142rpx; margin: 12rpx 0 0; padding: 0 5rpx; border-bottom: 1rpx solid var(--good-line); }
+.good-progress__label { display: flex; flex-direction: column; gap: 7rpx; font-size: 29rpx; line-height: 1.5; }
+.good-progress__caption { color: var(--good-muted); font-size: 28rpx; }
+.good-progress__value { position: relative; min-width: 110rpx; text-align: right; }
+.good-progress__number { display: inline-block; color: var(--good-gold); font: 64rpx/1.2 Georgia, serif; }
+.good-progress__number--celebrate { animation: good-number-rise .5s ease; }
+.good-progress__plus { position: absolute; top: -25rpx; right: 0; white-space: nowrap; color: var(--good-gold); font-size: 25rpx; animation: good-plus-rise 1s ease forwards; }
+.good-all-complete { padding-top: 22rpx; color: var(--good-gold); font-size: 28rpx; line-height: 1.6; }
+.good-storage-message { display: flex; flex-wrap: wrap; align-items: center; gap: 10rpx; margin-top: 20rpx; padding: 18rpx 22rpx; border: 1rpx solid var(--good-line); border-radius: 14rpx; color: var(--good-muted); font-size: 28rpx; line-height: 1.6; }
+.good-storage-retry { margin: 0; padding: 10rpx 16rpx; min-height: 80rpx; color: var(--good-gold); background: transparent; font-size: 28rpx; }
+.good-library { margin-top: 52rpx; }
+.good-section-title { display: block; margin-top: 12rpx; font: 500 42rpx/1.4 "Songti SC", "STSong", SimSun, serif; }
+.good-categories { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14rpx; margin-top: 27rpx; }
+.good-category { display: flex; align-items: center; gap: 14rpx; width: 100%; min-height: 92rpx; margin: 0; padding: 13rpx 18rpx; border: 1rpx solid var(--good-line); border-radius: 12rpx; background: transparent; color: var(--good-ink); text-align: left; font-size: 28rpx; line-height: 1.4; }
+.good-category__number { color: var(--good-gold); font: 23rpx Georgia, serif; }
+.good-category--selected { background: var(--good-soft); border-color: var(--good-gold); }
+.good-category--pressed { background: var(--good-soft); }
+.good-list-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 18rpx; margin-top: 42rpx; padding-bottom: 16rpx; border-bottom: 1rpx solid var(--good-line); font: 500 34rpx/1.5 "Songti SC", "STSong", SimSun, serif; }
+.good-list-heading text:last-child { color: var(--good-muted); font: 26rpx Georgia, serif; }
+.good-list-item { display: flex; align-items: center; gap: 17rpx; width: 100%; min-height: 106rpx; margin: 0; padding: 21rpx 4rpx; border: 0; border-bottom: 1rpx solid var(--good-line); border-radius: 0; background: transparent; color: var(--good-ink); text-align: left; line-height: 1.6; }
+.good-list-item__number { flex: 0 0 33rpx; color: var(--good-muted); font: 24rpx Georgia, serif; }
+.good-list-item__text { flex: 1; min-width: 0; font-size: 29rpx; overflow-wrap: break-word; }
+.good-list-item__status { flex: 0 0 32rpx; color: var(--good-muted); text-align: center; font-size: 34rpx; }
+.good-list-item__status--done { color: var(--good-gold); font-size: 28rpx; }
+.good-list-item--selected, .good-list-item--pressed { background: var(--good-soft); }
+.good-list .good-list-item,
+.good-categories .good-category {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  margin: 0;
+  font-weight: 400;
+}
+.good-footer { display: flex; justify-content: space-between; gap: 22rpx; margin-top: 50rpx; color: var(--good-muted); font: 22rpx/1.5 Georgia, serif; letter-spacing: .12em; }
+@keyframes good-number-rise { 50% { transform: translateY(-5rpx); } }
+@keyframes good-plus-rise { 0% { opacity: 0; transform: translateY(8rpx); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-15rpx); } }
+@media (prefers-color-scheme: dark) {
+  .good-page { --good-canvas: #292621; --good-paper: #332f28; --good-ink: #f5f0e5; --good-muted: #c8bdab; --good-gold: #d8bc83; --good-line: #625646; --good-soft: #463d30; }
+  .good-gift__body { background: linear-gradient(125deg, #d6c39d, #ad9160); color: #3c2e1b; }
+  .good-gift__lid { background: linear-gradient(110deg, #e0cea6, #b19a70); }
+}
+@media (max-width: 360px) {
+  .good-shell { padding-right: 26rpx; padding-left: 26rpx; }
+  .good-title { font-size: 46rpx; }
+  .good-draw { padding-right: 24rpx; padding-left: 24rpx; }
+  .good-category { padding-right: 12rpx; padding-left: 12rpx; gap: 10rpx; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .good-gift__lid { transition: none; }
+  .good-progress__number--celebrate, .good-progress__plus { animation: none; }
+}

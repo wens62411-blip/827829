@@ -1,7 +1,6 @@
 <view class="timeline" aria-role="region" aria-label="本人申请状态路径">
   <view class="timeline__heading">
-    <text class="timeline__title">申请状态路径</text>
-    <text class="timeline__disclaimer">非 ReviewLog，不推断审核时间</text>
+    <text class="timeline__title">申请进度</text>
   </view>
 
   <view wx:for="{{steps}}" wx:key="key" class="timeline__step timeline__step--{{item.tone}}">
@@ -21,7 +20,7 @@
   </view>
   <view class="timeline__fact">
     <text class="timeline__fact-label">已提交材料</text>
-    <text>{{evidenceCount}} 份（原件地址不展示）</text>
+    <text>{{evidenceCount}} 份</text>
   </view>
   <view wx:if="{{reviewerNote}}" class="timeline__note" aria-role="note">
     <text class="timeline__fact-label">审核意见</text>

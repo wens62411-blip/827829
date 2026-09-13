@@ -253,7 +253,7 @@ Page({
     this.updateMaterial(material.localId, { status: 'UPLOADING', statusLabel: '上传中' });
     try {
       const info = await getSha256FileInfo(material.tempFilePath);
-      if (info.size > MAX_LOCAL_BYTES) throw new Error('材料超过客户端 5 MB 限制。');
+      if (info.size > MAX_LOCAL_BYTES) throw new Error('材料不能超过 5 MB。');
       const policy = await callSocialAction('verification.uploadPolicy', {
         verificationRequestId: requestId,
         mediaType: material.mediaType,

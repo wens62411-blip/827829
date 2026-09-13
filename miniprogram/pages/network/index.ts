@@ -104,7 +104,7 @@ Page({
         acceptedPreview: [],
         incomingLoadedCount: 0,
         acceptedLoadedCount: 0,
-        errorMessage: '当前模式未连接正式人脉服务；不会显示合成关系或伪造申请结果。',
+        errorMessage: '此功能暂未开放。',
       });
       wx.stopPullDownRefresh();
       return;
@@ -135,6 +135,6 @@ Page({
   },
 
   onDemoRequest() {
-    wx.showToast({ title: '本机预览：未提交申请', icon: 'none', duration: 2400 });
+    wx.showToast({ title: '申请暂未开放', icon: 'none', duration: 2400 });
   },
 });

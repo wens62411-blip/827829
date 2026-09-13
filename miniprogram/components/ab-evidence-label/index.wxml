@@ -1,1 +1,1 @@
-<text class="evidence evidence--{{tone}}" aria-label="运行状态 {{label}}">{{label}}</text>
+<text wx:if="{{mode === 'DEGRADED'}}" class="evidence evidence--degraded">服务暂不可用</text>

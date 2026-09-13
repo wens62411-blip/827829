@@ -120,6 +120,7 @@ function createCanvas(label) {
     fillRect() {},
     fillText() {},
     beginPath() {},
+    closePath() {},
     arc() {},
     fill() {},
     moveTo() {},
@@ -350,7 +351,7 @@ test('one page unloading cannot clear another page canvas or block its album sav
     await pageA.savePosterToAlbum.call(pageA);
 
     assert.deepEqual(savedPaths, ['tmp://A.png']);
-    assert.equal(pageA.data.posterMessage, '微信已确认图片保存到相册。');
+    assert.equal(pageA.data.posterMessage, '已保存到相册');
   } finally {
     delete globalThis.__AB_OWNER_SHARE_TEST_HOOKS__;
     delete globalThis.Page;
@@ -385,7 +386,7 @@ test('first-time offline users must establish their own card before sharing', as
     assert.equal(page.data.demoMode, true);
     assert.equal(page.data.localIdentityReady, false);
     assert.equal(page.data.card, null);
-    assert.match(page.data.pageError, /请先建立自己的名片/);
+    assert.match(page.data.pageError, /请先创建自己的名片/);
     assert.equal(page.data.localNotice, '');
     assert.equal(calls.filter(([name]) => name === 'showShareMenu').length, 0);
     assert.equal(cloudReads, 0, 'first-time offline sharing must not read from cloud');

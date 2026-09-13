@@ -92,7 +92,7 @@ test('home has no slogan, public group QR, feed metrics, or direct-chat affordan
   assert.deepEqual(errors, []);
 });
 
-test('Me page exposes the supported city list and keeps only the profile edit entry', () => {
+test('Me page exposes the supported city list and a single card view plus edit entry', () => {
   const template = read('miniprogram/pages/me/index.wxml');
   const actions = interactiveMarkup(template);
   const errors = [];
@@ -101,8 +101,8 @@ test('Me page exposes the supported city list and keeps only the profile edit en
   if (!actions.some((markup) => /编辑/.test(markup) && /url="\/packageCard\/pages\/edit\/index"/.test(markup))) {
     errors.push('“我的”页缺少个人资料编辑入口');
   }
-  if (actions.some((markup) => /url="\/pages\/card\/index"/.test(markup))) {
-    errors.push('“我的”页仍保留重复的我的名片入口');
+  if (actions.filter((markup) => /url="\/pages\/card\/index"/.test(markup)).length !== 1) {
+    errors.push('“我的”页应提供一个查看我的名片入口');
   }
   if (actions.some((markup) => /申请加入|申请进入|加入城市群|提交加入意向|切换城市/.test(markup))) {
     errors.push('“我的”页不应暴露城市群申请或切换城市动作');
@@ -130,7 +130,7 @@ test('city-group UI directs users to the confirmed operator without claiming an 
   if (!groupSurface) {
     errors.push('无法定位“我的”页城市群区块，因而无法验证能力边界');
   } else {
-    if (!/以上城市均设有微信群，入群请添加负责人微信/.test(groupSurface)) {
+    if (!/加入各地微信群，请添加负责人/.test(groupSurface)) {
       errors.push('城市群区块未说明通过负责人加入用户已确认存在的微信群');
     }
     if (!/bindtap="copyCommunityWechat"/.test(groupSurface) || !/communityWechatId:\s*'ABclub1'/.test(pageSource)) {

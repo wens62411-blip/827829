@@ -1,9 +1,4 @@
 {
   "navigationBarTitleText": "AB Club 活动",
-  "enablePullDownRefresh": true,
-  "backgroundTextStyle": "dark",
-  "usingComponents": {
-    "ab-event-card": "/components/ab-event-card/index",
-    "ab-event-state": "/components/ab-event-state/index"
-  }
+  "backgroundTextStyle": "dark"
 }

@@ -1,12 +1,11 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
-import { fileURLToPath } from 'node:url';
+import { readFileSync, existsSync } from 'node:fs';
 import test from 'node:test';
-import { build } from 'esbuild';
 
-const read = (path) => readFileSync(new URL(`../../../${path}`, import.meta.url), 'utf8');
+const root = new URL('../../../', import.meta.url).pathname.replace(/^\/(?:[A-Za-z]:)/, (value) => value.slice(1)).replace(/\/$/, '');
+const read = (path) => readFileSync(`${root}/${path}`, 'utf8');
 
-test('activity discovery is a branded independent surface with restrained phase-one positioning', () => {
+test('activity一级页 is a three-entry AB Club index with bilingual labels', () => {
   const source = read('miniprogram/pages/events/index.ts');
   const template = read('miniprogram/pages/events/index.wxml');
   const styles = read('miniprogram/pages/events/index.wxss');
@@ -14,121 +13,81 @@ test('activity discovery is a branded independent surface with restrained phase-
 
   assert.equal(config.navigationBarTitleText, 'AB Club 活动');
   assert.match(template, /src="\/assets\/brand\/ab-club-crest\.png"/);
-  assert.match(template, /GLOBAL GATHERINGS/);
-  assert.match(template, /活动是数字名片连接后的轻量延伸/);
-  assert.match(template, /本月精选/);
-  assert.match(template, /近期方向/);
-  assert.match(template, /城市主题/);
-  assert.match(template, /活动逐步开放，先以名片连接彼此/);
-  assert.match(source, /listActivityDemoEvents/);
-  assert.match(source, /buildDemoSections/);
-  assert.match(styles, /--canvas:\s*#f4efe5/i);
-  assert.match(styles, /--ink:\s*#211e1a/i);
-  assert.match(styles, /--gold:\s*#8a6538/i);
-  assert.doesNotMatch(styles, /#(?:173c32|102821|1d463b|7ac9a5|246b4a)|--ab-color-green/i);
-});
-
-test('top city rail exposes the frozen thirteen-city directory without inventing operations', () => {
-  const source = read('miniprogram/pages/events/index.ts');
-  const template = read('miniprogram/pages/events/index.wxml');
-
-  assert.match(source, /const frontRow = CITY_DIRECTORY\.filter\(\(city\) =>/);
-  assert.match(source, /const rest = CITY_DIRECTORY\.filter\(/);
-  assert.match(source, /\[\.\.\.frontRow, \.\.\.rest\]\.map\(\(city\) =>/);
-  assert.doesNotMatch(source, /PENDING_CITY_FILTERS|cn-taipei|台北/);
-  assert.match(source, /cityFilters:\s*buildCityFilters\(DEFAULT_CITY\.id\)/);
-  assert.match(template, /wx:for="\{\{cityFilters\}\}"/);
-  assert.match(template, /查看 7 国 13 城完整目录/);
-  assert.match(template, /城市目录为展示用，当地节点陆续开放中/);
-  assert.doesNotMatch(template, /运营中|已开放|席位|余位|立即报名/);
-});
-
-test('activity cards only use local images and preserve the selected-city directory route contract', () => {
-  const source = read('miniprogram/pages/events/index.ts');
-  const template = read('miniprogram/pages/events/index.wxml');
-  const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
-
-  assert.doesNotMatch(`${source}\n${demoSource}`, /https?:\/\//);
-  assert.match(demoSource, /\['\/assets\/editorial-events\//);
-  assert.match(template, /cover-src="\{\{item\.coverSrc\}\}"/);
-  assert.match(template, /cover-alt="\{\{item\.coverAlt\}\}"/);
-  assert.match(source, /url:\s*`\/packageEvents\/pages\/city\/index\?cityId=\$\{encodeURIComponent\(this\.data\.selectedCityId\)\}`/);
-});
-
-test('DEMO_ONLY and no-registration boundaries remain explicit but no transaction CTA is rendered', () => {
-  const source = read('miniprogram/pages/events/index.ts');
-  const template = read('miniprogram/pages/events/index.wxml');
-
-  assert.match(template, /本机预览/);
-  assert.match(template, /当前不开放报名/);
-  assert.match(template, /活动逐步开放，先以名片连接彼此/);
-  assert.match(source, /正式请求失败后不会回退为合成活动/);
-  assert.doesNotMatch(template, /<button[^>]*>[^<]*(?:报名|支付|购买|登记兴趣)/s);
-});
-
-test('city and category controls rebuild all three event modules from one stable demo catalog', () => {
-  const source = read('miniprogram/pages/events/index.ts');
-  const template = read('miniprogram/pages/events/index.wxml');
-  const demoSource = read('miniprogram/components/ab-event-card/demo-data.ts');
-
-  for (const label of ['全部', '艺术', '古董', '珠宝', '商业交流']) {
-    assert.match(source, new RegExp(`label: '${label}'`));
+  for (const [english, chinese] of [
+    ['GLOBAL ART CALENDAR', '全球艺术日历'],
+    ['SPIRIT PEARLS', '灵气珍珠'],
+    ['PUBLIC GOOD', '公益'],
+  ]) {
+    assert.match(source, new RegExp(english));
+    assert.match(source, new RegExp(chinese));
+    assert.match(template, /wx:for="\{\{portals\}\}"/);
   }
-  assert.match(source, /selectCity[\s\S]*applyDemoFilters\(cityId, this\.data\.selectedCategoryId\)/);
-  assert.match(source, /selectCategory[\s\S]*applyDemoFilters\(this\.data\.selectedCityId, categoryId\)/);
-  assert.match(source, /safeSetStorageSync\('ab-events-city-id', city\.id\)/);
-  assert.match(source, /featuredEvents:[\s\S]*upcomingEvents:[\s\S]*cityThemeEvents:/);
-  assert.match(demoSource, /demo:activity:\$\{city\.id\}:\$\{category\[0\]\}:\$\{section\[0\]\}/);
-  assert.match(demoSource, /getDemoEventById[\s\S]*listActivityDemoEvents\(\)\.find/);
-  assert.equal((template.match(/bind:open="openEvent"/g) ?? []).length, 1);
-  assert.equal((template.match(/detail-available="\{\{item\.detailAvailable\}\}"/g) ?? []).length, 1);
-  assert.equal((template.match(/<template is="event-list"/g) ?? []).length, 3);
-});
-
-test('activity layout protects small screens, long copy, dark mode, reduced motion, and the safe bottom', () => {
-  const template = read('miniprogram/pages/events/index.wxml');
-  const styles = read('miniprogram/pages/events/index.wxss');
-  const detailStyles = read('miniprogram/packageEvents/pages/event/index.wxss');
-
-  assert.match(template, /class="events-page ab-safe-bottom"/);
-  assert.match(styles, /overflow-x:\s*hidden/);
-  assert.match(styles, /padding-bottom:\s*calc\([^;]*env\(safe-area-inset-bottom\)/);
-  assert.match(styles, /overflow-wrap:\s*anywhere/);
-  assert.match(styles, /@media\s*\(max-width:\s*360px\)/);
-  assert.match(styles, /\.city-directory-note[\s\S]*flex-direction:\s*column/);
-  assert.match(styles, /font-family:\s*Georgia,\s*"Songti SC",\s*"STSong",\s*SimSun,\s*serif/);
-  assert.match(styles, /prefers-color-scheme:\s*dark/);
+  assert.equal((source.match(/id: '(?:calendar|pearls|public-good)'/g) ?? []).length, 3);
+  assert.match(source, /wx\.navigateTo\(\{ url: '\/packageEvents\/pages\/calendar\/index' \}\)/);
+  assert.match(template, /class="portal-entry portal-entry--\{\{item\.id\}\}"/);
+  assert.equal((template.match(/bindtap="openPortal"/g) ?? []).length, 1);
+  assert.doesNotMatch(template, /ab-event-card|城市筛选|活动分类|本月精选|近期方向|城市主题/);
+  assert.doesNotMatch(source, /callCloudAction|listActivityDemoEvents|CITY_DIRECTORY/);
+  assert.match(styles, /--canvas:\s*#24211e/i);
+  assert.match(styles, /--gold:\s*#d8bd84/i);
+  assert.match(styles, /prefers-color-scheme:\s*light/);
   assert.match(styles, /prefers-reduced-motion:\s*reduce/);
-  assert.match(detailStyles, /overflow-x:\s*hidden/);
-  assert.match(detailStyles, /env\(safe-area-inset-bottom\)/);
-  assert.match(detailStyles, /overflow-wrap:\s*anywhere/);
 });
 
-test('every generated city-category-section ID resolves to the same stable demo detail', async () => {
-  const entryPoint = fileURLToPath(new URL(
-    '../../../miniprogram/components/ab-event-card/demo-data.ts',
-    import.meta.url,
-  ));
-  const result = await build({
-    entryPoints: [entryPoint],
-    bundle: true,
-    format: 'esm',
-    platform: 'node',
-    target: 'es2022',
-    write: false,
-    logLevel: 'silent',
-  });
-  const bundled = result.outputFiles[0]?.text;
-  assert.ok(bundled);
-  const moduleUrl = `data:text/javascript;base64,${Buffer.from(bundled).toString('base64')}`;
-  const catalog = await import(moduleUrl);
-  const events = catalog.listActivityDemoEvents();
+test('global art calendar route is registered as a second-level page only', () => {
+  const app = JSON.parse(read('miniprogram/app.json'));
+  const eventsPackage = app.subpackages.find((entry) => entry.root === 'packageEvents');
+  assert.ok(eventsPackage);
+  assert.ok(eventsPackage.pages.includes('pages/calendar/index'));
+  assert.equal(app.tabBar.list.filter((item) => item.pagePath === 'pages/events/index').length, 1);
+  assert.equal(app.tabBar.list.length, 3);
 
-  assert.equal(events.length, 13 * 4 * 3);
-  assert.equal(new Set(events.map((event) => event.eventId)).size, events.length);
-  for (const event of events) {
-    assert.equal(event.eventId, `demo:activity:${event.cityId}:${event.categoryId}:${event.sectionId}`);
-    assert.deepEqual(catalog.getDemoEventById(event.eventId), event);
-    assert.match(event.summary, /^活动方向/);
+  for (const extension of ['.ts', '.json', '.wxml', '.wxss']) {
+    assert.equal(existsSync(`${root}/miniprogram/packageEvents/pages/calendar/index${extension}`), true);
   }
+});
+
+test('calendar page presents a JAN-to-DEC timeline with bilingual event facts and light interaction', () => {
+  const source = read('miniprogram/packageEvents/pages/calendar/index.ts');
+  const template = read('miniprogram/packageEvents/pages/calendar/index.wxml');
+  const styles = read('miniprogram/packageEvents/pages/calendar/index.wxss');
+  const config = JSON.parse(read('miniprogram/packageEvents/pages/calendar/index.json'));
+
+  assert.equal(config.navigationBarTitleText, 'GLOBAL ART CALENDAR');
+  assert.match(template, /GLOBAL ART CALENDAR/);
+  assert.match(template, /全球艺术日历/);
+  assert.match(template, /scroll-into-view="\{\{activeMonthAnchor\}\}"/);
+  assert.match(template, /wx:for="\{\{monthNav\}\}"/);
+  assert.match(template, /wx:for="\{\{months\}\}"/);
+  assert.match(template, /wx:for-item="calendarEvent"/);
+  assert.match(template, /calendarEvent\.titleEn/);
+  assert.match(template, /calendarEvent\.titleZh/);
+  assert.match(template, /calendarEvent\.date/);
+  assert.match(template, /calendarEvent\.venue/);
+  assert.match(template, /bindtap="openCalendarEvent"/);
+  assert.match(source, /jumpToMonth\(/);
+  assert.match(source, /wx\.showModal/);
+  assert.match(styles, /--canvas:\s*#24211e/i);
+  assert.match(styles, /calendar-event--featured/);
+  assert.doesNotMatch(styles, /prefers-color-scheme:\s*light/);
+  assert.equal(config.navigationBarBackgroundColor, '#24211e');
+  assert.equal(config.navigationBarTextStyle, 'white');
+  assert.match(styles, /prefers-reduced-motion:\s*reduce/);
+  assert.doesNotMatch(`${source}\n${template}`, /日期待定|票务|支付|报名|价格|SKU/);
+});
+
+test('calendar data keeps exactly the supplied 2026 dates and featured hierarchy', () => {
+  const source = read('miniprogram/packageEvents/data/calendar.ts');
+
+  assert.equal((source.match(/month\('/g) ?? []).length, 12);
+  assert.equal((source.match(/event\('calendar-2026-/g) ?? []).length, 20);
+  assert.equal((source.match(/'calendar-2026-[^']+'[^\n]*true\)/g) ?? []).length, 7);
+  for (const date of [
+    '22–31 JAN 2026', '23–25 JAN 2026', '26 FEB–1 MAR 2026', '14–19 MAR 2026',
+    '27–29 MAR 2026', '25–29 MAR 2026', '23–29 MAR 2026', '14–17 MAY 2026',
+    '7–10 MAY 2026', '9 MAY–22 NOV 2026', '21–24 MAY 2026', '22–31 MAY 2026',
+    '18–21 JUN 2026', '2–5 SEP 2026', '2–6 SEP 2026', '24–27 SEP 2026',
+    '14–18 OCT 2026', '14–18 OCT 2026', '23–25 OCT 2026', '4–6 DEC 2026',
+  ]) assert.match(source, new RegExp(date));
+  assert.doesNotMatch(source, /待定|TBD|日期待确认/);
 });

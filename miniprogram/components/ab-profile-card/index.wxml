@@ -17,12 +17,13 @@
       <text wx:else class="profile-card__crest-fallback">AB</text>
       <view class="profile-card__edition">
         <text class="profile-card__edition-title">AB Club</text>
-        <text class="profile-card__edition-meta">GLOBAL CHINESE COMMUNITY</text>
       </view>
-      <text class="profile-card__viewer">{{viewerLabel}}</text>
     </view>
 
     <view class="profile-card__cover" aria-hidden="true">
+      <view class="profile-card__corner profile-card__corner--left"></view>
+      <view class="profile-card__corner profile-card__corner--right"></view>
+      <view class="profile-card__ornament"><view class="profile-card__ornament-rule"></view><text class="profile-card__ornament-diamond">◇</text><view class="profile-card__ornament-rule"></view></view>
       <view class="profile-card__cover-line"></view>
     </view>
 
@@ -43,7 +44,6 @@
       </view>
 
       <view class="profile-card__identity">
-        <text class="profile-card__eyebrow">DIGITAL INTRODUCTION</text>
         <text class="profile-card__name" user-select="{{true}}">{{safeCard.displayName}}</text>
         <text wx:if="{{safeCard.headline}}" class="profile-card__headline">{{safeCard.headline}}</text>
         <view wx:if="{{cityLabel || safeCard.cityId}}" class="profile-card__city-line">
@@ -68,10 +68,8 @@
 
     <view wx:if="{{safePublicLabels.length}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="公开个人标签，未经人工认证">
       <view class="profile-card__section-heading">
-        <text>人物标签</text>
-        <text class="profile-card__section-count">{{safePublicLabels.length}} 项</text>
+        <text>个人标签</text>
       </view>
-      <text class="profile-card__section-note">本人自定义 · 未经人工认证</text>
       <view class="profile-card__tag-list">
         <text wx:for="{{safePublicLabels}}" wx:key="*this" class="profile-card__self-tag">{{item}}</text>
       </view>
@@ -80,7 +78,6 @@
     <view wx:if="{{safeFields.length}}" class="profile-card__section profile-card__fields-section" aria-role="list" aria-label="名片资料">
       <view class="profile-card__section-heading">
         <text>资料</text>
-        <text class="profile-card__section-count">{{safeFields.length}} 项</text>
       </view>
       <view class="profile-card__fields">
         <view wx:for="{{safeFields}}" wx:key="key" class="profile-card__field" aria-role="listitem">
@@ -90,22 +87,18 @@
       </view>
     </view>
 
-    <view wx:if="{{isSelf}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="本人自选标签，未经人工认证">
+    <view wx:if="{{isSelf && safeSelectedLabels.length}}" class="profile-card__section profile-card__selected-labels" aria-role="group" aria-label="本人自选标签，未经人工认证">
       <view class="profile-card__section-heading">
         <text>我的标签</text>
-        <text class="profile-card__section-count">{{safeSelectedLabels.length}} 项</text>
       </view>
-      <text class="profile-card__section-note">自选内容 · 未认证 · 当前未保存到公开名片</text>
       <view wx:if="{{safeSelectedLabels.length}}" class="profile-card__tag-list">
         <text wx:for="{{safeSelectedLabels}}" wx:key="*this" class="profile-card__self-tag">{{item}}</text>
       </view>
-      <text wx:else class="profile-card__empty-note">尚未添加自选标签。</text>
     </view>
 
-    <view wx:if="{{isSelf}}" class="profile-card__section profile-card__gallery-section" aria-role="group" aria-label="本人图片预览">
+    <view wx:if="{{isSelf && safeGallery.length}}" class="profile-card__section profile-card__gallery-section" aria-role="group" aria-label="本人图片">
       <view class="profile-card__section-heading">
         <text>图片</text>
-        <text class="profile-card__section-count">{{safeGallery.length}} 张</text>
       </view>
       <view wx:if="{{safeGallery.length}}" class="profile-card__gallery">
         <view wx:for="{{safeGallery}}" wx:key="key" class="profile-card__gallery-item">
@@ -122,10 +115,6 @@
           <view wx:else class="profile-card__gallery-fallback" aria-label="图片暂不可用"><text>图片暂不可用</text></view>
         </view>
       </view>
-      <view wx:else class="profile-card__gallery-empty" aria-role="note">
-        <text class="profile-card__gallery-empty-title">尚未添加图片</text>
-        <text class="profile-card__gallery-empty-copy">可在编辑名片中添加生活、作品或收藏图片。本机临时图片只用于本人预览，当前不会自动保存。</text>
-      </view>
     </view>
 
     <view wx:if="{{safeClaims.length}}" class="profile-card__section profile-card__claims" aria-role="group" aria-label="人工审核通过标签">
@@ -133,7 +122,6 @@
         <text>人工认证标签</text>
         <text class="profile-card__section-count">{{safeClaims.length}} 项</text>
       </view>
-      <text class="profile-card__section-note">仅显示人工审核通过、公开且仍在有效期内的标签。</text>
       <view class="profile-card__claim-strip">
         <block wx:for="{{safeClaims}}" wx:key="key">
           <ab-verified-tag
@@ -174,7 +162,7 @@
 
   <view wx:else class="profile-card__empty" aria-live="polite">
     <text class="profile-card__empty-title">名片暂不可用</text>
-    <text class="profile-card__empty-copy">请稍后重试；不会使用模拟资料代替真实结果。</text>
+    <text class="profile-card__empty-copy">请稍后重试。</text>
     <button class="profile-card__action profile-card__action--retry" plain="{{true}}" bindtap="handleRetry">重新加载</button>
     <slot name="empty"></slot>
   </view>

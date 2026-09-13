@@ -12,7 +12,6 @@
     />
     <view wx:else class="card__fallback ab-image-fallback" aria-role="img" aria-label="{{coverAlt}}加载失败">
       <text class="card__fallback-mark">图片待补充</text>
-      <text>不使用城市图冒充活动封面</text>
     </view>
     <text class="card__evidence">{{evidenceLabel}}</text>
   </view>
@@ -32,7 +31,7 @@
         <text class="card__timezone">{{timezone}}</text>
       </view>
       <view class="card__fact">
-        <text class="card__fact-label">当前阶段</text>
+        <text class="card__fact-label">报名</text>
         <text class="card__fact-value">{{registrationLabel}}</text>
       </view>
     </view>

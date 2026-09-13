@@ -183,7 +183,7 @@ test('offline editor adds, removes, previews, and saves custom labels without a 
 
     await page.saveProfile.call(page);
     assert.equal(page.data.status, 'SAVED');
-    assert.match(page.data.message, /本机预览/);
+    assert.equal(page.data.message, '已保存');
     const persisted = [...storage.values()].find((value) => value?.contractVersion === 1);
     assert.ok(persisted);
     assert.deepEqual(persisted.selectedLabels, page.data.selectedLabels);
@@ -338,7 +338,7 @@ test('editor saves the latest card before sharing, ignores double taps, and stay
     const storageFailure = await navigationFailurePage.onShareAppMessage.call(navigationFailurePage).promise;
     assert.equal(navigationFailurePage.data.status, 'ERROR');
     assert.equal(navigationFailurePage.data.saveAndShareBusy, false);
-    assert.equal(navigationFailurePage.data.message, '本机名片保存失败，请检查存储空间后重试。');
+    assert.equal(navigationFailurePage.data.message, '保存失败，请检查存储空间后重试。');
     assert.equal(storageFailure.path, '/pages/card-share/index?invalid=1');
     assert.equal(redirects.length, 0);
   } finally {
@@ -353,7 +353,7 @@ test('preview, edit, and share stay in one centered white-gold action row while 
   const source = read('miniprogram/packageCard/pages/edit/index.ts');
   const toolbarPosition = template.indexOf('card-editor-header__toolbar');
   const tabsPosition = template.indexOf('card-editor-tabs');
-  const actionRow = template.slice(tabsPosition, template.indexOf('card-editor-evidence'));
+  const actionRow = template.slice(tabsPosition, template.indexOf('</view>', tabsPosition));
   const savebar = template.slice(template.indexOf('<view class="card-editor-savebar">'));
   const savePosition = savebar.indexOf('bindtap="saveProfile"');
   const sharePosition = savebar.indexOf('open-type="share"');
@@ -367,7 +367,7 @@ test('preview, edit, and share stay in one centered white-gold action row while 
   assert.equal((template.match(/class="card-status/g) ?? []).length, 1, '状态提示应只在顶部操作区渲染一次');
   assert.match(source, /showShareToast\(needsEditing \? '请检查必填信息' : '请查看页面提示'\)/);
   assert.ok(savePosition >= 0 && savePosition < sharePosition && sharePosition < previewPosition);
-  assert.match(savebar, /open-type="share"[^>]*loading="\{\{saveAndShareBusy\}\}"[^>]*disabled="\{\{!shareDraftValid \|\| status === 'SAVING' \|\| saveAndShareBusy \|\| generatingIntroduction\}\}"[^>]*>分享我的名片<\/button>/);
+  assert.match(savebar, /open-type="share"[^>]*loading="\{\{saveAndShareBusy\}\}"[^>]*disabled="\{\{!shareDraftValid \|\| status === 'SAVING' \|\| saveAndShareBusy\}\}"[^>]*>分享我的名片<\/button>/);
   assert.equal((template.match(/open-type="share"/g) ?? []).length, 3, 'toolbar, completed preview and savebar share directly');
   assert.match(styles, /\.card-editor-tabs\s*\{[^}]*grid-template-columns:\s*repeat\(3, minmax\(0, 1fr\)\);[^}]*background:\s*#fffaf0;/);
   assert.match(styles, /\.card-editor-tab\s*\{[^}]*display:\s*flex;[^}]*align-items:\s*center;[^}]*justify-content:\s*center;[^}]*text-align:\s*center;[^}]*white-space:\s*nowrap;/);

@@ -87,8 +87,8 @@ Page({
     ...frozenShareEntry.data,
     runtimeMode: 'OFFLINE_DEMO',
     state: 'LOADING' as ShareState,
-    stateTitle: '正在核验分享入口',
-    stateDescription: '正在检查入口状态与当前可见范围。',
+    stateTitle: '正在加载名片',
+    stateDescription: '',
     allowRetry: true,
     allowForward: false,
     card: null as PublicCardProjection | null,
@@ -131,15 +131,15 @@ Page({
     setNavigationTitle(DEFAULT_VISITOR_TITLE);
     wx.hideShareMenu({ menus: ['shareAppMessage', 'shareTimeline'] });
     if ([options.local === '1', options.demo === '1', Boolean(options.token), Boolean(options.scene)].filter(Boolean).length > 1) {
-      this.setData({ state: 'ERROR', stateTitle: '入口不可用', stateDescription: '分享入口参数冲突，请让分享者重新发送。', allowRetry: false, allowForward: false, card: null, cityLabel: '' });
+      this.setData({ state: 'ERROR', stateTitle: '入口不可用', stateDescription: '名片无法打开，请让分享者重新发送。', allowRetry: false, allowForward: false, card: null, cityLabel: '' });
       return;
     }
     if (options.local === '1') {
       if (!isOfflineDemo(runtime)) {
         this.setData({
           state: 'ERROR',
-          stateTitle: '离线名片入口不可用',
-          stateDescription: '当前运行环境不接受该离线入口，请让分享者重新发送。',
+          stateTitle: '名片暂时不可用',
+          stateDescription: '请让分享者重新发送名片。',
           allowRetry: false,
           allowForward: false,
           card: null,
@@ -152,7 +152,7 @@ Page({
         this.setData({
           state: 'ERROR',
           stateTitle: '名片内容无法读取',
-          stateDescription: '这张名片的公开快照不完整、类型不符或被修改，请让分享者重新发送。',
+          stateDescription: '名片内容无法读取，请让分享者重新发送。',
           allowRetry: false,
           allowForward: false,
           localIdentityMode: true,
@@ -169,7 +169,7 @@ Page({
       this.setData({
         state: 'SUCCESS',
         stateTitle: visitorTitle,
-        stateDescription: '以下资料由分享者填写并选择公开，尚未经过平台认证。',
+        stateDescription: '',
         allowRetry: false,
         allowForward: true,
         localIdentityMode: true,
@@ -189,8 +189,8 @@ Page({
       if (!isOfflineDemo(runtime)) {
         this.setData({
           state: 'ERROR',
-          stateTitle: '示例入口不可用',
-          stateDescription: '当前运行环境不接受示例名片入口，请由名片本人重新生成安全分享。',
+          stateTitle: '名片暂时不可用',
+          stateDescription: '请让分享者重新发送名片。',
           allowRetry: false,
           allowForward: false,
           card: null,
@@ -204,8 +204,8 @@ Page({
       if (!decoded.ok || decoded.snapshot.source !== 'DEMO') {
         this.setData({
           state: 'ERROR',
-          stateTitle: '示例名片已损坏',
-          stateDescription: '这张示例名片的公开快照不完整或被修改，请让分享者重新发送。',
+          stateTitle: '名片无法读取',
+          stateDescription: '名片内容无法读取，请让分享者重新发送。',
           allowRetry: false,
           allowForward: false,
           demoMode: true,
@@ -225,7 +225,7 @@ Page({
       this.setData({
         state: 'SUCCESS',
         stateTitle: visitorTitle,
-        stateDescription: '这张名片来自本机预览，人物与资料均为合成示例，不代表真实会员或审核状态。',
+        stateDescription: '',
         allowRetry: false,
         allowForward: true,
         demoMode: true,
@@ -257,8 +257,8 @@ Page({
     this.shareReference = normalized.reference;
     this.setData({
       state: 'LOADING',
-      stateTitle: '正在核验分享入口',
-      stateDescription: '正在检查入口状态与当前可见范围。',
+      stateTitle: '正在加载名片',
+      stateDescription: '',
       allowRetry: true,
       allowForward: false,
       card: null,
@@ -305,8 +305,8 @@ Page({
     );
     this.setData({
       state: 'LOADING',
-      stateTitle: '正在重新核验',
-      stateDescription: '每次返回页面都会重新检查权限，不沿用旧页面结果。',
+      stateTitle: '正在刷新名片',
+      stateDescription: '',
       card: null,
       cityLabel: '',
       visitorTitle: DEFAULT_VISITOR_TITLE,
@@ -353,7 +353,7 @@ Page({
       this.setData({
         state: 'SUCCESS',
         stateTitle: visitorTitle,
-        stateDescription: '以下是分享者选择向你展示的名片资料。',
+        stateDescription: '',
         allowRetry: true,
         allowForward: true,
         card,
@@ -368,7 +368,7 @@ Page({
       this.setData({
         state: 'ERROR',
         stateTitle: '暂时无法打开',
-        stateDescription: '分享入口核验未完成，未展示任何未经核验的名片内容。请稍后重试。',
+        stateDescription: '名片暂时无法打开，请稍后重试。',
         allowRetry: true,
         allowForward: false,
         card: null,
@@ -391,8 +391,10 @@ Page({
   async prepareVisitorShareCover() {
     const card = this.data.card;
     if (!card || this.data.state !== 'SUCCESS') return;
+    const theme = this.data.cardTheme;
     const generation = ++this.shareCoverGeneration;
     const image = await prepareNativeShareCardCover(this, {
+      theme,
       displayName: card.displayName,
       headline: card.headline,
       biography: card.biography,
@@ -401,7 +403,7 @@ Page({
       email: (this.data.demoMode || this.data.localIdentityMode) ? this.data.demoFields.find((field) => field.key === 'email')?.value : '',
       demoMode: this.data.demoMode,
     });
-    if (!this.shareUnloaded && generation === this.shareCoverGeneration && this.data.card === card) this.shareCoverPath = image || '';
+    if (!this.shareUnloaded && generation === this.shareCoverGeneration && this.data.card === card && this.data.cardTheme === theme) this.shareCoverPath = image || '';
   },
 
   async refreshSelfCardState() {

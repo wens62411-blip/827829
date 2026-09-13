@@ -16,7 +16,7 @@ Component({
     'recordOrigin,evidenceScope'(recordOrigin: string, evidenceScope: string) {
       this.setData({
         recordOriginLabel: recordOrigin === 'SYNTHETIC'
-          ? '合成示例'
+          ? '示例资料'
           : recordOrigin === 'REAL'
             ? '公开记录'
             : '来源待确认',

@@ -99,7 +99,7 @@ cities: INITIAL_CITIES as DirectoryCityView[],
 regions: buildRegions(INITIAL_CITIES),
 selectedCityId: INITIAL_SELECTED.id as string,
 hero: makeHero(INITIAL_SELECTED),
-nodeLabel: 'AB Club 节点未建立或未经当前证据核验',
+nodeLabel: '城市服务筹备中',
 nodeOperationalLabel: '筹备中',
 nodeOrganizerLabel: '主理人未提供',
 },
@@ -148,7 +148,7 @@ safeSetStorageSync('ab-events-city-id', city.id);
 this.setData({
 selectedCityId: city.id,
 hero: makeHero(city, LOCAL_RUNTIME.cloudEnvironmentConfigured),
-nodeLabel: 'AB Club 节点未建立或未经当前证据核验',
+nodeLabel: '城市服务筹备中',
 nodeOperationalLabel: city.operationalLabel,
 nodeOrganizerLabel: '主理人未提供',
 });
@@ -167,7 +167,7 @@ cityId: city.id,
 if (!isCurrent()) return;
 if (!result.apiResult.ok || !result.apiResult.data.node) {
 this.setData({
-nodeLabel: 'AB Club 节点未建立或未经当前证据核验',
+nodeLabel: '城市服务筹备中',
 nodeOperationalLabel: city.operationalLabel,
 nodeOrganizerLabel: '主理人未提供',
 });
@@ -181,7 +181,7 @@ nodeOrganizerLabel: node.organizer?.name.zh ?? '主理人未提供',
 });
 } catch {
 if (isCurrent()) this.setData({
-nodeLabel: 'AB Club 节点读取失败',
+nodeLabel: '城市服务暂不可用',
 nodeOperationalLabel: city.operationalLabel,
 nodeOrganizerLabel: '主理人未提供',
 });

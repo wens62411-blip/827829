@@ -27,14 +27,15 @@ test('offline fixtures are visibly synthetic and never fabricate approval', asyn
   assert.equal(demo.OFFLINE_DEMO_CARD.verificationState, 'USER_DECLARED');
   assert.deepEqual(demo.OFFLINE_DEMO_CARD.claims, []);
   assert.match(demo.OFFLINE_DEMO_CARD.displayName, /示例/);
-  assert.match(demo.OFFLINE_DEMO_CARD.biography, /合成资料|不对应任何真实用户/);
+  assert.ok(demo.OFFLINE_DEMO_CARD.biography.length > 0);
+  assert.doesNotMatch(demo.OFFLINE_DEMO_CARD.biography, /审核流程|预览数字名片/);
   assert.equal(JSON.stringify(demo.OFFLINE_DEMO_REVIEW_ITEMS).includes('APPROVED'), false);
   assert.equal(JSON.stringify(demo.OFFLINE_DEMO_REVIEW_ITEMS).includes('HUMAN_REVIEWED'), false);
   assert.equal(demo.isOfflineDemo({ runtimeMode: 'OFFLINE_DEMO', cloudConfigured: false }), true);
   assert.equal(demo.isOfflineDemo({ runtimeMode: 'LIVE', cloudConfigured: true }), false);
 });
 
-test('offline card surfaces label state, editable preview, and explicitly labelled native sharing', () => {
+test('offline card surfaces keep runtime boundaries internally and expose concise customer actions', () => {
   const cardSource = read('miniprogram/pages/card/index.ts');
   const meSource = read('miniprogram/pages/me/index.ts');
   const identitySource = read('miniprogram/pages/card/services/identity-client.ts');
@@ -45,21 +46,16 @@ test('offline card surfaces label state, editable preview, and explicitly labell
   const sharePage = read('miniprogram/packageCard/pages/share/index.wxml');
 
   for (const source of [cardPage, sharePage]) {
-    assert.match(source, /本机预览|此设备保存的名片|当前为合成示例/);
-    assert.doesNotMatch(source, /体验版|DEMO_ONLY|仅供预览/);
+    assert.doesNotMatch(source, /本机预览|此设备保存的名片|当前为合成示例|体验版|DEMO_ONLY|仅供预览/);
   }
   assert.doesNotMatch(mePage, /体验版|DEMO_ONLY|示例内容/);
-  assert.match(mePage, /尚未建立云端账户/);
   assert.match(meSource, /materializeLocalIdentityProfile/);
   assert.doesNotMatch(meSource, /OFFLINE_DEMO_PROFILE|readOfflineDemoDraft/);
-  assert.match(cardPage, /标签必须先经过人工审核/);
-  assert.match(mePage, /公开标签状态/);
-  assert.match(editSource, /已保存到本机预览草稿[\s\S]*?未写入云端/);
-  assert.match(shareSource, /未创建分享：[\s\S]*?本机预览/);
-  assert.match(shareSource, /本机预览[\s\S]*?合成示例[\s\S]*?drawPublicPoster\(canvas, posterCard, this\.data\.demoMode\)/);
-  assert.match(sharePage, /<button\b[^>]*open-type="share"[^>]*>/);
-  assert.match(sharePage, /微信转发和本地海报可以试用/);
-  assert.match(sharePage, /不会产生真实会员、审核或人脉记录/);
+  assert.match(editSource, /writeOfflineDemoDraft\(draft\)/);
+  assert.match(shareSource, /if \(this\.data\.demoMode\) \{[\s\S]*?return;/);
+  assert.match(sharePage, /bindtap="generatePoster"/);
+  assert.match(sharePage, /bindtap="savePosterToAlbum"/);
+  assert.match(cardPage, /<button\b[^>]*open-type="share"[^>]*>/);
   assert.doesNotMatch(sharePage, /demoMode[^\n]*分享成功/);
   for (const source of [cardSource, meSource]) {
     assert.doesNotMatch(source, /^import\s+\{[^\n]*\}\s+from\s+['"][^'"]*identity-client['"]/m);

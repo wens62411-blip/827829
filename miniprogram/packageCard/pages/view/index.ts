@@ -205,7 +205,7 @@ Page({
           viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
           localIdentityReady: true,
           message: this.data.demoVisitorPreview
-            ? '分享者公开资料 · 离线访客预览'
+            ? ''
             : '名片仅保存在这台设备',
           visitorTitle,
         });
@@ -229,8 +229,8 @@ Page({
         viewerMode: this.data.demoVisitorPreview ? 'STRANGER' : 'SELF',
         localIdentityReady: false,
         message: this.data.demoVisitorPreview
-          ? '合成示例 · 访客视角'
-          : '合成示例',
+          ? ''
+          : '',
         visitorTitle,
       });
       setNavigationTitle(visitorTitle);
@@ -361,6 +361,7 @@ Page({
   async prepareOwnerShare() {
     if (this.data.viewerMode !== 'SELF' || this.viewedOwnerUserId || !this.data.card || this.viewUnloaded) return;
     const generation = ++this.ownerShareGeneration;
+    const theme = this.data.cardTheme;
     this.ownerSharePayload = undefined;
     this.ownerShareTokenId = undefined;
     this.setData({ ownerShareReady: false, ownerSharePreparing: true, ownerShareMessage: '' });
@@ -372,10 +373,10 @@ Page({
       if (this.data.demoMode) {
         const local = readLocalIdentity();
         const draft = local || readOfflineDemoDraft();
-        const result = local ? buildLocalIdentitySharePath(local, this.data.cardTheme) : buildOfflineDemoSharePath(draft, this.data.cardTheme);
+        const result = local ? buildLocalIdentitySharePath(local, theme) : buildOfflineDemoSharePath(draft, theme);
         if (!result.ok) throw new Error('名片内容较长，请精简简介后重试。');
         path = result.path;
-        const snapshot = local ? createLocalIdentityShareSnapshot(local, this.data.cardTheme) : createOfflineDemoShareSnapshot(draft, this.data.cardTheme);
+        const snapshot = local ? createLocalIdentityShareSnapshot(local, theme) : createOfflineDemoShareSnapshot(draft, theme);
         card = snapshot.card;
         fields = snapshot.fields;
         labels = snapshot.publicLabels;
@@ -390,16 +391,17 @@ Page({
         rememberShareForRevocation(result.data.shareTokenId);
         if (this.viewUnloaded || generation !== this.ownerShareGeneration) return;
         this.ownerShareTokenId = result.data.shareTokenId;
-        path = `/pages/card-share/index?token=${encodeURIComponent(result.data.token)}&theme=${this.data.cardTheme}`;
+        path = `/pages/card-share/index?token=${encodeURIComponent(result.data.token)}&theme=${theme}`;
         labels = card.claims.map((claim) => claim.labelText.zh);
       }
       const imageUrl = await prepareNativeShareCardCover(this, {
+        theme,
         displayName: card.displayName, headline: card.headline, biography: card.biography, labels,
         phone: fields.find((field) => field.key === 'phone')?.value,
         email: fields.find((field) => field.key === 'email')?.value,
         demoMode: this.data.demoMode && !this.data.localIdentityReady,
       });
-      if (this.viewUnloaded || generation !== this.ownerShareGeneration) return;
+      if (this.viewUnloaded || generation !== this.ownerShareGeneration || this.data.cardTheme !== theme) return;
       this.ownerSharePayload = { title: safeShareTitle(card.displayName), path, imageUrl: imageUrl || '/assets/brand/ab-club-brand-share.jpg' };
       this.setData({ ownerShareReady: true, ownerSharePreparing: false, ownerShareMessage: '' });
       if (typeof wx.showShareMenu === 'function') wx.showShareMenu({ menus: ['shareAppMessage'] });

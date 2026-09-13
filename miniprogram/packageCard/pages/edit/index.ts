@@ -12,7 +12,6 @@ import {
   updateMyProfile,
 } from '../../../pages/card/services/identity-client';
 import { cityDisplayName, isSafeShareBearer, safeShareTitle, shareExpiry } from '../../../pages/card/services/card-presenter';
-import { createEditableIntroduction } from '../../../pages/card/services/introduction-draft';
 import { OFFLINE_DEMO_PROFILE, isOfflineDemo } from '../../../pages/card/services/offline-demo';
 import {
   readCardThemePreference,
@@ -232,8 +231,6 @@ Page({
     localAvatarPath: '',
     localAvatarUsable: false,
     avatarDraftPending: false,
-    generatingIntroduction: false,
-    introductionNote: '',
   },
 
   syncPreview(overrides: Partial<DraftInput>) {
@@ -383,7 +380,7 @@ Page({
         previewSelectedLabels: [],
         previewPublicLabels: showTags ? selectedLabels : [],
         ...makePreview(myDraft),
-        message: localReady ? '' : '第一次建立名片：填写后将保存在这台设备。',
+        message: '',
       });
       this.refreshNativeShareAvailability();
       return;
@@ -427,7 +424,7 @@ Page({
         previewSelectedLabels: [],
         previewPublicLabels: storedDraft.showTags ? selectedLabels : [],
         ...makePreview(demoDraft),
-        message: '本机预览：当前为合成示例，可保存到这台设备，不会写入云端。',
+        message: '',
       });
       this.refreshNativeShareAvailability();
       return;
@@ -681,7 +678,7 @@ Page({
         this.setData({
           galleryImages,
           previewGalleryImages: this.data.showGallery ? galleryImages : [],
-          galleryNote: '图片已加入本页预览；当前不会上传或公开。',
+          galleryNote: '仅自己可见',
         });
       },
     });
@@ -695,35 +692,6 @@ Page({
       galleryImages,
       previewGalleryImages: this.data.showGallery ? galleryImages : [],
       galleryNote: '',
-    });
-  },
-
-  async generateIntroductionDraft() {
-    if (this.data.generatingIntroduction || this.data.status === 'SAVING' || this.data.saveAndShareBusy) return;
-    const generation = this.saveOperationGeneration;
-    const cityId = this.data.cityIndex >= 0 ? CITY_IDS[this.data.cityIndex] : undefined;
-    this.setData({ generatingIntroduction: true, introductionNote: '正在准备可编辑草稿…' });
-    const draft = await createEditableIntroduction({
-      displayName: this.data.displayName,
-      cityName: cityDisplayName(cityId),
-      education: '',
-      profession: this.data.profession,
-      interests: this.data.selectedLabels.join('、'),
-    });
-    if (!this.isEditorOperationActive(generation)) return;
-    const biography = compactDraftText(
-      draft.text,
-      this.data.localIdentityReady || this.data.registerMode
-        ? LOCAL_BIOGRAPHY_LIMIT
-        : 240,
-    );
-    this.syncPreview({ biography });
-    this.setData({
-      generatingIntroduction: false,
-      biographyLength: biography.length,
-      introductionNote: draft.source === 'AI'
-        ? '已生成可编辑草稿，请在保存前确认内容。'
-        : '已根据你填写的身份和标签整理出可编辑草稿。',
     });
   },
 
@@ -774,12 +742,12 @@ Page({
       if (!sharePreflight.ok) {
         this.setData({
           status: 'ERROR',
-          message: '名片内容超出微信分享路径预算，请精简个人简介后再保存。',
+          message: '名片内容过长，请精简个人简介后重试。',
         });
         return false;
       }
       if (!saveLocalIdentity(identity)) {
-        this.setData({ status: 'ERROR', message: '本机名片保存失败，请检查存储空间后重试。' });
+        this.setData({ status: 'ERROR', message: '保存失败，请检查存储空间后重试。' });
         return false;
       }
       this.setData({
@@ -791,7 +759,7 @@ Page({
         phone,
         email,
         contactMessage: '',
-        message: '已保存到本机名片，仅保存在这台设备。',
+        message: '已保存',
       });
       return true;
     }
@@ -825,12 +793,12 @@ Page({
       if (!sharePreflight.ok) {
         this.setData({
           status: 'ERROR',
-          message: '名片内容超出微信分享路径预算，请精简个人简介后再保存。',
+          message: '名片内容过长，请精简个人简介后重试。',
         });
         return false;
       }
       if (!writeOfflineDemoDraft(draft)) {
-        this.setData({ status: 'ERROR', message: '本机名片草稿保存失败，请检查存储空间后重试。' });
+        this.setData({ status: 'ERROR', message: '保存失败，请检查存储空间后重试。' });
         return false;
       }
       this.setData({
@@ -839,7 +807,7 @@ Page({
         phone,
         email,
         contactMessage: '',
-        message: '已保存到本机预览草稿；未写入云端。',
+        message: '已保存',
       });
       return true;
     }
@@ -865,7 +833,7 @@ Page({
       return false;
     }
     if (!biography) {
-      this.setData({ status: 'ERROR', message: '请填写自由介绍，或先使用 AI 辅助润色。' });
+      this.setData({ status: 'ERROR', message: '请填写个人简介。' });
       return false;
     }
 
@@ -926,15 +894,16 @@ Page({
       status: 'SAVED',
       editorMode: 'PREVIEW',
       message: this.data.avatarDraftPending || this.data.selectedLabels.length || this.data.galleryImages.length
-        ? '称呼、城市和自由介绍已保存；标签、图片与本地头像仍只在本页预览。'
-        : '名片已保存并更新公开展示。',
+        ? '基本信息已保存；标签与图片仅自己可见。'
+        : '已保存',
     });
     return true;
   },
 
   async saveAndOpenShare(deadline = Date.now() + 2500): Promise<NativeShareResult> {
-    if (this.data.status === 'LOADING' || this.data.status === 'SAVING' || this.data.saveAndShareBusy || this.data.generatingIntroduction) return UNAVAILABLE_SHARE;
+    if (this.data.status === 'LOADING' || this.data.status === 'SAVING' || this.data.saveAndShareBusy) return UNAVAILABLE_SHARE;
     const saveGeneration = this.saveOperationGeneration;
+    const theme = this.data.cardTheme;
     if (!this.isEditorOperationActive(saveGeneration)) return UNAVAILABLE_SHARE;
     this.setData({ saveAndShareBusy: true });
     const active = () => this.isEditorOperationActive(saveGeneration) && Date.now() < deadline;
@@ -953,13 +922,14 @@ Page({
         if (this.data.localIdentityReady && !localIdentity) throw new Error('Saved identity missing');
         const draft = localIdentity ? null : readOfflineDemoDraft();
         const path = localIdentity
-          ? buildLocalIdentitySharePath(localIdentity, this.data.cardTheme)
-          : buildOfflineDemoSharePath(draft!, this.data.cardTheme);
+          ? buildLocalIdentitySharePath(localIdentity, theme)
+          : buildOfflineDemoSharePath(draft!, theme);
         if (!path.ok) throw new Error('Share path too long');
         const snapshot = localIdentity
-          ? createLocalIdentityShareSnapshot(localIdentity, this.data.cardTheme)
-          : createOfflineDemoShareSnapshot(draft!, this.data.cardTheme);
+          ? createLocalIdentityShareSnapshot(localIdentity, theme)
+          : createOfflineDemoShareSnapshot(draft!, theme);
         const imageUrl = await prepareNativeShareCardCover(this, {
+          theme,
           displayName: snapshot.card.displayName,
           headline: snapshot.card.headline,
           biography: snapshot.card.biography,
@@ -984,7 +954,7 @@ Page({
       rememberShareForRevocation(share.data.shareTokenId);
       return {
         title: safeShareTitle(),
-        path: `/pages/card-share/index?token=${encodeURIComponent(share.data.token)}&theme=${this.data.cardTheme}`,
+        path: `/pages/card-share/index?token=${encodeURIComponent(share.data.token)}&theme=${theme}`,
         imageUrl: BRAND_SHARE_COVER,
       };
     } catch (_error) {

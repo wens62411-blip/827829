@@ -5,7 +5,7 @@
     <text class="card-panel__title">资料暂时不可用</text>
     <text class="card-panel__text">{{message}}</text>
     <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadProfile">重试</button>
-    <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">创建或完善最小资料</navigator>
+    <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">编辑名片</navigator>
   </view>
 
   <block wx:elif="{{status === 'READY'}}">
@@ -14,12 +14,10 @@
       <view class="me-profile__identity">
         <text class="me-profile__name">{{profile ? profile.displayName : '先建立你的名片'}}</text>
         <text class="me-profile__meta">{{profile ? ((hasProfileCity ? cityName : '尚未选择城市') + ' · 我的名片') : '填写称呼、城市和自我介绍'}}</text>
-        <text class="me-profile__completion">{{profile ? (localIdentityReady ? '本机名片 · 完整度 ' + completionPercent + '%' : '资料完整度 ' + completionPercent + '%') : '保存后仅保存在本机'}}</text>
       </view>
       <navigator wx:if="{{profile}}" class="me-profile__edit" url="/packageCard/pages/edit/index" hover-class="me-pressed" aria-label="编辑我的名片资料"><image class="me-profile__edit-icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>编辑</text></navigator>
       <navigator wx:else class="me-profile__edit" url="/packageCard/pages/edit/index?register=1" hover-class="me-pressed" aria-label="建立我的名片"><image class="me-profile__edit-icon" src="/assets/icons/ui-edit.png" mode="aspectFit" aria-hidden="true" /><text>建立</text></navigator>
     </view>
-    <view wx:if="{{profile && profile.phoneMasked}}" class="me-private-note" aria-role="note">手机号仅显示脱敏值 {{profile.phoneMasked}}，不会进入公开名片。</view>
   </block>
 
   <view class="me-city-group" aria-role="region" aria-label="AB Club 支持的城市清单">
@@ -33,24 +31,18 @@
         binderror="handleCityImageError"
       />
       <view class="me-city-group__shade"></view>
-        <text class="me-city-group__city">AB CLUB · GLOBAL COMMUNITY</text>
     </view>
     <view wx:else class="me-city-group__art me-city-group__art--fallback">
       <image class="me-city-group__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
-      <text class="me-city-group__city">SUPPORTED CITIES · AB CLUB</text>
     </view>
 
     <view class="me-city-group__body">
-      <view class="me-city-group__masthead">
-        <text class="me-city-group__kicker">SUPPORTED CITIES</text>
-        <text class="me-city-group__evidence">13 城 · 微信群</text>
-      </view>
       <text class="me-city-group__title">{{cityGroupTitle}}</text>
       <view class="me-city-group__copy" aria-label="{{supportedCities}}">
         <text wx:for="{{supportedCityNames}}" wx:key="*this" class="me-city-group__city-token">{{item}}{{index === supportedCityNames.length - 1 ? '' : '、'}}</text>
       </view>
       <view class="me-city-group__boundary">
-        <text>以上城市均设有微信群，入群请添加负责人微信：</text>
+        <text>加入各地微信群，请添加负责人</text>
         <view class="me-city-group__contact">
           <text class="me-city-group__wechat" user-select="{{true}}">{{communityWechatId}}</text>
           <button class="me-city-group__copy-button" bindtap="copyCommunityWechat" disabled="{{copyingCommunityWechat}}" hover-class="me-pressed" aria-label="复制负责人微信号 ABclub1">复制微信号</button>
@@ -60,26 +52,21 @@
   </view>
 
   <view class="me-section-heading">
-    <text class="me-section-heading__kicker">CARD SETTINGS</text>
-    <text class="me-section-heading__title">资料与设置</text>
+    <text class="me-section-heading__title">我的名片</text>
   </view>
   <view class="me-link-group me-link-group--settings" aria-role="region" aria-label="资料与设置">
-    <navigator class="me-link-row" url="/packageCard/pages/privacy/index" hover-class="me-pressed">
-      <image class="me-link-row__icon" src="/assets/icons/ui-privacy.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">隐私与分享范围</text><text class="me-link-row__note">查看逐字段规则</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+    <navigator wx:if="{{profile}}" class="me-link-row" url="/pages/card/index" hover-class="me-pressed">
+      <image class="me-link-row__icon" src="/assets/icons/ui-card.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">查看我的名片</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
     <navigator wx:if="{{localIdentityReady}}" class="me-link-row" url="/packageCard/pages/share/index" hover-class="me-pressed">
-      <image class="me-link-row__icon" src="/assets/icons/ui-share.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">分享入口与撤销</text><text class="me-link-row__note">管理限时名片入口</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+      <image class="me-link-row__icon" src="/assets/icons/ui-share.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">名片海报</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
     <navigator wx:else class="me-link-row" url="/packageCard/pages/edit/index?register=1" hover-class="me-pressed">
-      <image class="me-link-row__icon" src="/assets/icons/ui-share.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">先建立名片后分享</text><text class="me-link-row__note">保存自己的名片后即可管理分享</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+      <image class="me-link-row__icon" src="/assets/icons/ui-share.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">创建我的名片</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
     <navigator wx:if="{{!demoMode && profile}}" class="me-link-row" url="/packageSocial/pages/tag-status/index" hover-class="me-pressed">
-      <image class="me-link-row__icon" src="/assets/icons/ui-tag.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">公开标签状态</text><text class="me-link-row__note">可选 · 不影响创建或交换名片</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
+      <image class="me-link-row__icon" src="/assets/icons/ui-tag.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">我的认证</text></view><image class="me-link-row__arrow-image" src="/assets/icons/ui-chevron.png" mode="aspectFit" aria-hidden="true" />
     </navigator>
-    <view wx:else class="me-link-row" aria-disabled="true">
-      <image class="me-link-row__icon" src="/assets/icons/ui-tag.png" mode="aspectFit" aria-hidden="true" /><view class="me-link-row__copy"><text class="me-link-row__title">公开标签状态</text><text class="me-link-row__note">正式账户接入后开放</text></view>
-    </view>
   </view>
 
-  <view class="me-evidence-footer" aria-role="note">{{localIdentityReady ? '本机保存 · 电话与邮箱不会随分享发送。' : (demoMode ? '当前资料尚未建立；保存后仅保存在本机，尚未建立云端账户。' : '资料读取失败时不会用其他内容替代；城市节点开放状态以后续公告为准。')}}</view>
 </view>

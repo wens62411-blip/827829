@@ -67,8 +67,6 @@ test('negative boundary wording is preserved and is not mistaken for a prohibite
   assert.match(executableSource, /不提供[^。'"`\n]{0,80}(?:真伪)?鉴定/);
   assert.match(executableSource, /不构成[^。'"`\n]{0,80}(?:保值|收益)/);
   assert.match(`${executableSource}\n${sharedEventDemoSource}`, /不代表[^。'"`\n]{0,80}官方合作|非官方合作/);
-  assert.match(executableSource, /意向不是订单，不锁定库存，不构成成交或付款/);
-  assert.match(executableSource, /不提供交易、竞拍、库存承诺、收益预测或 AI 真伪鉴定/);
   assert.doesNotMatch(executableSource, /保证真品|平台鉴定为真|官方认证真品|承诺保值|保证收益|官方合作方/);
 });
 

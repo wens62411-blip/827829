@@ -17,7 +17,7 @@ export const OFFLINE_DEMO_CARD = {
   displayName: 'AB Club 示例会员',
   headline: '全球商业连接 · 艺术与珠宝交流',
   cityId: CityId.CH_ZURICH,
-  biography: '合成资料，仅用于预览数字名片的层级、隐私与审核流程；不对应任何真实用户。',
+  biography: '关注跨文化交流、艺术收藏与城市生活。',
   visibility: Visibility.PUBLIC,
   claims: [],
   origin: RecordOrigin.SYNTHETIC,
@@ -39,11 +39,11 @@ export const OFFLINE_DEMO_PROFILE = {
 } satisfies ProfilePrivateDto;
 
 export const OFFLINE_DEMO_FIELDS = [
-  { key: 'education', label: '教育', value: '艺术史与全球商业（合成示例）' },
-  { key: 'profession', label: '职业', value: '跨城市品牌与文化项目（合成示例）' },
+  { key: 'education', label: '教育', value: '艺术史与全球商业' },
+  { key: 'profession', label: '职业', value: '跨城市品牌与文化项目' },
   { key: 'industry', label: '方向', value: '全球商业 · 艺术文化' },
   { key: 'company', label: '机构', value: 'AB Atelier（虚构示例）' },
-  { key: 'position', label: '角色', value: '跨城市连接者（示例）' },
+  { key: 'position', label: '角色', value: '跨城市文化交流' },
   { key: 'experience', label: '关注', value: '品牌出海 · 同城活动 · 私人收藏' },
   { key: 'interests', label: '兴趣', value: ['当代艺术', '古董', '珠宝', '城市漫游'] },
 ] as const;

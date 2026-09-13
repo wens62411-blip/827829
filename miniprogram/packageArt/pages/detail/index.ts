@@ -51,7 +51,7 @@ Page({
     runtimeMode: RuntimeMode.OFFLINE_DEMO as string,
     state: 'LOADING' as 'LOADING' | 'READY' | 'ERROR',
     stateTitle: '正在读取内容详情',
-    stateDescription: '正在核对公开状态、来源和图片权利。',
+    stateDescription: '',
     retryable: false,
     weakNetwork: false,
     content: null as ArtContentDetail | null,
@@ -133,7 +133,7 @@ Page({
       runtimeMode: runtime.runtimeMode,
       state: 'LOADING',
       stateTitle: '正在读取内容详情',
-      stateDescription: '正在核对公开状态、来源和图片权利。',
+      stateDescription: '',
       retryable: false,
       weakNetwork: false,
       content: null,
@@ -163,7 +163,7 @@ Page({
         this.setData({
           state: 'ERROR',
           stateTitle: '内容不存在',
-          stateDescription: '该内容不在本机预览目录中。',
+          stateDescription: '请返回艺术频道重新选择。',
           retryable: false,
           weakNetwork: false,
         });
@@ -173,7 +173,7 @@ Page({
         content,
         creator,
         listDemoRelatedEvents(contentId).map(toRelatedEventView),
-        '相关活动为活动方向，不代表真实排期。',
+        '活动筹备中',
       );
       return;
     }
@@ -183,8 +183,8 @@ Page({
       clearWeakNetworkTimer();
       this.setData({
         state: 'ERROR',
-        stateTitle: '内容服务尚未连接',
-        stateDescription: '当前运行模式无法读取正式详情；不会使用合成示例替代。',
+        stateTitle: '内容暂不可用',
+        stateDescription: '请稍后再试。',
         retryable: false,
         weakNetwork: false,
       });

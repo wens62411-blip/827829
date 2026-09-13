@@ -1,0 +1,8 @@
+# These text assets have byte-level integrity checks. Preserve their original LF bytes on Windows.
+*.svg text eol=lf
+tests/components/art/static-render.html text eol=lf
+cloudfunctions/**/*.ts text eol=lf
+cloudfunctions/**/*.js text eol=lf
+miniprogram/shared/contracts/** text eol=lf
+miniprogram/shared/types/** text eol=lf
+miniprogram/shared/constants/** text eol=lf

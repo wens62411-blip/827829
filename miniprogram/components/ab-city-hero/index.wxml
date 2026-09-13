@@ -13,7 +13,7 @@
     <view wx:else class="hero__fallback ab-image-fallback" aria-role="img" aria-label="{{imageAlt}}加载失败，已显示文字替代">
       <text class="hero__fallback-mark">CITY</text>
       <text class="hero__fallback-city">{{cityName || '城市图片不可用'}}</text>
-      <text class="hero__fallback-note">本地图片加载失败</text>
+      <text class="hero__fallback-note">图片暂不可用</text>
     </view>
     <view class="hero__shade" aria-hidden="true"></view>
     <view class="hero__copy">
@@ -27,7 +27,7 @@
   <view class="hero__facts" aria-role="group" aria-label="目录与运营事实">
     <view class="hero__fact">
       <text class="hero__fact-label">城市入口</text>
-      <text class="hero__fact-value">{{catalogLabel}}</text>
+      <text class="hero__fact-value">{{catalogLabel === 'ACTIVE' ? '可选择' : '暂不可选'}}</text>
     </view>
     <view class="hero__fact hero__fact--bordered">
       <text class="hero__fact-label">节点运营</text>
@@ -38,9 +38,4 @@
       <text class="hero__fact-value hero__fact-value--timezone">{{timezone}}</text>
     </view>
   </view>
-  <view class="hero__evidence" aria-role="note">
-    <text>{{operationEvidence}}</text>
-    <text class="hero__evidence-right">素材 {{mediaRightsLabel}}</text>
-  </view>
-  <text class="hero__alt">图片说明：{{imageAlt}}</text>
 </view>

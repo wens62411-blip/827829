@@ -46,7 +46,7 @@ test('Discover v3 leads with brand and a restrained hero card action', () => {
   assert.doesNotMatch(template, /url="\/(?:pages\/card|packageCard\/pages\/(?:edit|view|share))\//);
   assert.doesNotMatch(template, /discover-card__profile|discover-card__avatar|AB Club 示例名片/);
   assert.doesNotMatch(template, /discover-journey|discover-hero__image/);
-  assert.match(template, /class="discover-primary-action__label">生成我的 AI 赛博名片<\/text>/);
+  assert.match(template, /class="discover-primary-action__label">创建我的数字名片<\/text>/);
   assert.match(styles, /\.discover-topbar\s*\{[^}]*box-sizing:\s*border-box;/);
   assert.match(styles, /\.discover-primary-action__label\s*\{[^}]*text-align:\s*center;[^}]*white-space:\s*nowrap;/);
 });
@@ -56,8 +56,6 @@ test('Discover v3 keeps people, gathering, art, and city modules intentionally l
 
   assert.equal(eventDetailLinks(template).length, 1, '首页只应保留一张精选活动卡');
   assert.doesNotMatch(template, /wx:for="\{\{secondaryEvents\}\}"|class="discover-event-list"/);
-  assert.match(template, /本机预览/);
-  assert.match(template, /内容预览/);
   assert.doesNotMatch(template, /体验版|DEMO_ONLY|仅供预览|仅做数据示例/);
   assert.match(template, /7国13城 · 逐步开放/);
 });
@@ -95,7 +93,7 @@ test('Discover v3 keeps truthful capability copy and readable restrained styling
   assert.match(styles, /var\(--ab-color-ivory\)/);
   assert.ok(contrastRatio('5f5a52', 'f4efe6') >= 4.5);
   assert.ok(contrastRatio('725126', 'ebe3d6') >= 4.5);
-  assert.doesNotMatch(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/, '首页保持品牌浅色画布，墨黑只由用户选择的名片主题触发');
+  assert.match(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/);
   assert.match(styles, /--discover-accent:\s*#725126/, '首页主色应保持高对比香槟金');
   assert.match(styles, /@media\s*\(prefers-reduced-motion:\s*reduce\)/);
   assert.doesNotMatch(styles, /\bgreen\b|--[\w-]*green/i);

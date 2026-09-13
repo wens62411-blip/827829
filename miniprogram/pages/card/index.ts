@@ -168,7 +168,7 @@ Page({
         demoSelectedLabels: publicLabelsForDraft(draft),
         cityLabel: cityDisplayName(demoCard.cityId),
         status: 'READY',
-        message: '本机预览 · 当前为合成示例，不会写入云端。',
+        message: '',
       });
       await this.prepareWechatShare();
       if (fromPullDown) wx.stopPullDownRefresh();
@@ -245,6 +245,7 @@ Page({
     }
     if (!card) return;
     const cover = await prepareNativeShareCardCover(this, {
+      theme,
       displayName: card.displayName,
       headline: card.headline,
       biography: card.biography,
@@ -270,7 +271,7 @@ Page({
       shareRevoking: false,
       shareReady: false,
       shareRevokePending: false,
-      shareHint: '该分享入口已在入口管理中撤销，请重新准备后再分享。',
+      shareHint: '分享已停止，请重新准备后再分享。',
     });
     return true;
   },
@@ -306,15 +307,15 @@ Page({
         sharePreparing: false,
         shareReady: sharePath.ok,
         shareHint: sharePath.ok
-          ? '名片已准备好，点击“分享名片”将直接打开微信转发面板。'
-          : '当前名片内容超过微信分享路径限制，请返回编辑页精简后重试。',
+          ? ''
+          : '名片内容过长，请精简后重试。',
       });
       if (sharePath.ok && typeof wx.showShareMenu === 'function') {
         wx.showShareMenu({ menus: ['shareAppMessage'] });
       }
       return;
     }
-    this.setData({ sharePreparing: true, shareReady: false, shareHint: '正在创建一次安全分享入口…' });
+    this.setData({ sharePreparing: true, shareReady: false, shareHint: '正在准备分享…' });
     const { createCardShare } = loadIdentityClient();
     const result = await createCardShare(
       card.cardId,
@@ -337,7 +338,7 @@ Page({
       this.setData({
         sharePreparing: false,
         shareReady: false,
-        shareHint: result.ok ? '服务返回的分享入口格式不安全或目标不匹配，请重试。' : result.message,
+        shareHint: result.ok ? '暂时无法分享，请重试。' : result.message,
       });
       return;
     }
@@ -353,8 +354,8 @@ Page({
       shareReady: true,
       shareRevokePending: false,
       shareHint: revocationRemembered
-        ? '安全入口已准备。点击下方按钮打开微信转发面板；是否送达以微信界面为准。'
-        : '安全入口已准备，但本机未能保存撤销指针。请在离开本页前撤销，或等待入口自动过期。',
+        ? ''
+        : '分享管理暂时不可用，请先停止分享后重试。',
     });
     if (typeof wx.showShareMenu === 'function') {
       wx.showShareMenu({ menus: ['shareAppMessage'] });
@@ -364,14 +365,14 @@ Page({
   async revokePreparedShare() {
     if (this.data.shareRevoking || !this.data.card || !this.activeShare) return;
     if (this.data.demoMode) {
-      this.setData({ shareHint: '本机预览：没有可撤销的真实分享入口。' });
+      this.setData({ shareHint: '暂无可停止的分享。' });
       return;
     }
     const pageGeneration = this.cardPageGeneration;
     const shareGeneration = ++this.shareOperationGeneration;
     const card = this.data.card;
     const share = this.activeShare;
-    this.setData({ shareRevoking: true, shareReady: false, shareHint: '正在请求撤销当前入口…' });
+    this.setData({ shareRevoking: true, shareReady: false, shareHint: '正在停止分享…' });
     const { revokeCardShare } = loadIdentityClient();
     const result = await revokeCardShare(share.shareTokenId, card.version);
     const revokeConfirmed = result.ok && result.data.shareTokenId === share.shareTokenId;
@@ -402,7 +403,7 @@ Page({
       shareRevoking: false,
       shareReady: false,
       shareRevokePending: false,
-      shareHint: '服务端已确认撤销当前入口。历史页面下次刷新时将无法继续访问。',
+      shareHint: '分享已停止。',
     });
   },
 
@@ -429,7 +430,7 @@ Page({
           imageUrl: SAFE_CARD_SHARE_COVER,
         };
       }
-      this.setData({ shareHint: '微信转发面板已请求打开；是否真正发送以微信系统界面为准。' });
+      this.setData({ shareHint: '' });
       return {
         title: safeShareTitle(card.displayName),
         path: sharePath.path,
@@ -438,14 +439,14 @@ Page({
     }
     const share = this.activeShare;
     if (!share || !card || !this.data.shareReady) {
-      wx.showToast({ title: '请先准备安全分享入口', icon: 'none' });
+      wx.showToast({ title: '请重新准备分享', icon: 'none' });
       return {
         title: 'AB Club 数字名片',
         path: '/pages/card-share/index?invalid=1',
         imageUrl: SAFE_CARD_SHARE_COVER,
       };
     }
-    this.setData({ shareHint: '微信转发面板已请求打开；本页不会伪造“分享成功”。' });
+    this.setData({ shareHint: '' });
     return {
       title: safeShareTitle(card.displayName),
       path: `/pages/card-share/index?token=${encodeURIComponent(share.token)}${this.data.cardTheme === 'ivory' ? '' : `&theme=${encodeURIComponent(this.data.cardTheme)}`}`,

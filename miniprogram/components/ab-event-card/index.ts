@@ -19,14 +19,14 @@ coverAlt: { type: String, value: '活动所在城市图片' },
 detailAvailable: { type: Boolean, value: false },
 },
 data: {
-evidenceLabel: '合成示例',
+evidenceLabel: '策展构想',
 imageFailed: false,
 },
 observers: {
 'origin, verificationState'(origin: string, verificationState: string) {
 let evidenceLabel = '公开内容 · 待核验';
 if (origin === RecordOrigin.SYNTHETIC) {
-evidenceLabel = '合成示例';
+evidenceLabel = '策展构想';
 } else if (verificationState === VerificationState.HUMAN_REVIEWED) {
 evidenceLabel = '已人工核验';
 }

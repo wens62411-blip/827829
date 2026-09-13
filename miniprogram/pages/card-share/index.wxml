@@ -1,16 +1,9 @@
 <view class="card-page share-entry-page">
   <view class="personal-share-canvas-stage" aria-hidden="true"><canvas type="2d" id="nativeCardShareCover" class="personal-share-canvas"></canvas></view>
   <view class="share-entry-header">
-    <view>
-      <text class="card-kicker">SHARED DIGITAL INTRODUCTION</text>
-      <text class="card-title">{{visitorTitle}}</text>
-      <text class="card-subtitle">查看分享者选择公开的资料。</text>
-    </view>
-    <image class="share-entry-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
+    <text class="share-entry-header__brand">AB CLUB</text>
+    <view class="share-entry-header__rule" aria-hidden="true"></view>
   </view>
-
-  <view wx:if="{{localIdentityMode}}" class="card-demo-ribbon">离线分享 · 分享者公开资料 · 用户自填</view>
-  <view wx:elif="{{demoMode}}" class="card-demo-ribbon">演示名片 · 合成示例 · 非真实会员资料</view>
 
   <ab-share-state
     wx:if="{{state !== 'SUCCESS'}}"
@@ -39,12 +32,7 @@
     <button class="share-entry-forward" open-type="share">转发这张名片</button>
   </view>
 
-  <view wx:if="{{state === 'SUCCESS' && card}}" class="card-status">仅展示分享者选择公开的资料；页面刷新时会重新检查当前可见内容。</view>
-
   <view class="share-entry-conversion">
-    <text class="share-entry-conversion__kicker">YOUR AB CLUB CARD</text>
-    <text class="share-entry-conversion__title">{{selfCardState === 'HAS_CARD' ? '继续管理你的数字名片' : (selfCardState === 'NO_CARD' ? '创建一张属于你的数字名片' : '进入你的数字名片空间')}}</text>
-    <text class="share-entry-conversion__copy">{{selfCardState === 'HAS_CARD' ? '返回后仍可继续查看当前分享者的名片。' : (selfCardState === 'NO_CARD' ? '自主填写内容与公开范围，完成后即可分享。' : '进入后可查看现有名片，或开始创建自己的名片。')}}</text>
     <button class="share-entry-conversion__button" bindtap="openMyCardEntry">{{selfCardState === 'HAS_CARD' ? '查看我的名片' : (selfCardState === 'NO_CARD' ? '创建我的数字名片' : '进入我的名片')}}</button>
   </view>
 </view>

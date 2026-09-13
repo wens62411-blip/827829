@@ -10,8 +10,8 @@
   --card-line: #d8d1c6;
   --card-accent: #80602d;
   --card-accent-soft: #e5d4b2;
-  --card-cover-a: #d2ccc1;
-  --card-cover-b: #f0ece4;
+  --card-cover-a: #e6dcc9;
+  --card-cover-b: #faf7ef;
   --card-avatar-paper: #fffdf8;
   --card-avatar-ink: #725126;
   position: relative;
@@ -19,48 +19,49 @@
   min-width: 0;
   overflow: hidden;
   border: 2rpx solid var(--card-line);
-  border-radius: 28rpx;
+  border-radius: 18rpx;
   background: var(--card-paper);
   color: var(--card-ink);
 }
 
 .profile-card--theme-ink {
-  --card-paper: #211e1a;
+  --card-paper: #39342e;
   --card-ink: #fffaf0;
   --card-muted: #c8c0b4;
-  --card-line: #5d554b;
+  --card-line: #766a57;
   --card-accent: #e5d4b2;
   --card-accent-soft: #aa8448;
-  --card-cover-a: #39342e;
-  --card-cover-b: #1c1a17;
+  --card-cover-a: #685a46;
+  --card-cover-b: #403a32;
+  --card-avatar-paper: #eae2d3;
 }
 
 .profile-card--theme-champagne {
-  --card-paper: #efe2c7;
+  --card-paper: #f4ecda;
   --card-ink: #211e1a;
   --card-muted: #5c554b;
   --card-line: #cdb887;
   --card-accent: #6d501f;
   --card-accent-soft: #d0b274;
-  --card-cover-a: #c6a86f;
-  --card-cover-b: #f5ead5;
+  --card-cover-a: #d5c099;
+  --card-cover-b: #f7f0e1;
 }
 
 .profile-card--theme-stone {
-  --card-paper: #d8d3ca;
+  --card-paper: #e8e4dc;
   --card-ink: #211e1a;
   --card-muted: #5e5952;
   --card-line: #b2aa9f;
   --card-accent: #755929;
   --card-accent-soft: #c5b28e;
-  --card-cover-a: #9f998f;
-  --card-cover-b: #e0dcd4;
+  --card-cover-a: #c1baad;
+  --card-cover-b: #f0ede6;
 }
 
 .profile-card__masthead {
   display: flex;
   min-width: 0;
-  min-height: 104rpx;
+  min-height: 84rpx;
   align-items: center;
   gap: 16rpx;
   padding: 12rpx 28rpx;
@@ -69,9 +70,9 @@
 
 .profile-card__crest,
 .profile-card__crest-fallback {
-  width: 60rpx;
-  height: 60rpx;
-  flex: 0 0 60rpx;
+  width: 44rpx;
+  height: 44rpx;
+  flex: 0 0 44rpx;
 }
 
 .profile-card__crest {
@@ -137,7 +138,7 @@
 
 .profile-card__cover {
   position: relative;
-  height: 236rpx;
+  height: 194rpx;
   background:
     linear-gradient(125deg, rgba(170, 132, 72, .2), transparent 48%),
     linear-gradient(160deg, var(--card-cover-a), var(--card-cover-b) 68%);
@@ -148,9 +149,17 @@
   right: 0;
   bottom: 0;
   left: 0;
-  height: 6rpx;
-  background: var(--card-accent);
+  height: 4rpx;
+  border-top: 1rpx solid var(--card-accent-soft);
+  border-bottom: 1rpx solid var(--card-accent);
 }
+
+.profile-card__corner { position: absolute; top: 20rpx; width: 74rpx; height: 52rpx; border-top: 3rpx double var(--card-accent); opacity: .38; }
+.profile-card__corner--left { left: 20rpx; border-left: 3rpx double var(--card-accent); }
+.profile-card__corner--right { right: 20rpx; border-right: 3rpx double var(--card-accent); }
+.profile-card__ornament { display: flex; align-items: center; justify-content: center; gap: 16rpx; padding-top: 66rpx; color: var(--card-accent); opacity: .6; }
+.profile-card__ornament-rule { width: 70rpx; height: 4rpx; border-top: 1rpx solid var(--card-accent); border-bottom: 1rpx solid var(--card-accent-soft); }
+.profile-card__ornament-diamond { font-size: 24rpx; line-height: 1; }
 
 .profile-card__main {
   position: relative;

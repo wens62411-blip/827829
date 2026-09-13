@@ -5,8 +5,8 @@ Component({
   },
   properties: {
     eyebrow: { type: String, value: 'AB Club' },
-    title: { type: String, value: '模块待接入' },
-    description: { type: String, value: '当前仅提供接口和导航骨架。' },
+    title: { type: String, value: '敬请期待' },
+    description: { type: String, value: '' },
     runtimeMode: { type: String, value: 'OFFLINE_DEMO' },
   },
 });

@@ -46,7 +46,7 @@ Page({
     runtimeMode: RuntimeMode.OFFLINE_DEMO as string,
     state: 'LOADING' as 'LOADING' | 'READY' | 'ERROR',
     stateTitle: '正在读取内容摘要',
-    stateDescription: '联系意向只会绑定当前内容与当前登录用户。',
+    stateDescription: '',
     retryable: false,
     weakNetwork: false,
     contentId: '',
@@ -98,7 +98,7 @@ Page({
       runtimeMode: runtime.runtimeMode,
       state: 'LOADING',
       stateTitle: '正在读取内容摘要',
-      stateDescription: '联系意向只会绑定当前内容与当前登录用户。',
+      stateDescription: '',
       retryable: false,
       weakNetwork: false,
       feedback: '',
@@ -124,7 +124,7 @@ Page({
         this.setData({
           state: 'ERROR',
           stateTitle: '内容不存在',
-          stateDescription: '该内容不在本机预览目录中。',
+          stateDescription: '请返回内容详情重新选择。',
           retryable: false,
           weakNetwork: false,
         });
@@ -148,8 +148,8 @@ Page({
       clearWeakNetworkTimer();
       this.setData({
         state: 'ERROR',
-        stateTitle: '内容服务尚未连接',
-        stateDescription: '当前模式不会提交真实意向，也不会显示虚假的成功结果。',
+        stateTitle: '内容暂不可用',
+        stateDescription: '请稍后再试。',
         retryable: false,
         weakNetwork: false,
       });
@@ -204,7 +204,7 @@ Page({
       this.setData({
         submitting: false,
         intentState: 'NONE',
-        feedback: '本机预览：未提交、未创建任何联系意向；接入正式服务并完成登录后才能发送。',
+        feedback: '联系意向暂未开放。',
         feedbackTone: 'error',
       });
       return;
@@ -213,7 +213,7 @@ Page({
     if (runtime.runtimeMode !== RuntimeMode.LIVE || !runtime.cloudConfigured) {
       this.setData({
         submitting: false,
-        feedback: '当前未连接正式服务，未创建任何意向。',
+        feedback: '暂时无法提交，请稍后再试。',
         feedbackTone: 'error',
       });
       return;
@@ -239,7 +239,7 @@ Page({
       submitting: false,
       intentState: result.data.intent.state,
       purpose: result.data.intent.purpose,
-      feedback: '当前 ACTIVE 联系意向已确认；可能是本次新建或恢复既有状态，不代表订单或成交。',
+      feedback: '联系意向已登记。',
       feedbackTone: 'success',
     });
   },
@@ -250,7 +250,7 @@ Page({
     this.setData({ submitting: true, feedback: '', feedbackTone: 'neutral' });
 
     if (runtime.runtimeMode !== RuntimeMode.LIVE || !runtime.cloudConfigured) {
-      this.setData({ submitting: false, feedback: '当前未连接正式服务，未变更任何意向。', feedbackTone: 'error' });
+      this.setData({ submitting: false, feedback: '暂时无法取消，请稍后再试。', feedbackTone: 'error' });
       return;
     }
 

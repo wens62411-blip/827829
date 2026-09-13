@@ -148,7 +148,7 @@ Page({
     if (!selected?.canWithdraw || this.data.busyAction) return;
     const confirm = await wx.showModal({
       title: '撤回并删除申请？',
-      content: '冻结协议规定：草稿或已提交申请会被物理删除，并追加审计与认证投影失效事件。此操作不可撤销。',
+      content: '撤回后将删除这份申请，操作不可撤销。',
       confirmText: '撤回删除',
       confirmColor: '#9D3F36',
     });

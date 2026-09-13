@@ -1,9 +1,8 @@
 <view class="card-page">
   <view class="personal-share-canvas-stage" aria-hidden="true"><canvas type="2d" id="nativeCardShareCover" class="personal-share-canvas"></canvas></view>
   <view class="card-hero-row">
-    <view><text class="card-kicker">AB CLUB · DIGITAL CARD</text><text class="card-title">我的数字名片</text></view>
+    <view><text class="card-kicker">AB CLUB</text><text class="card-title">我的数字名片</text></view>
   </view>
-  <text class="card-subtitle">一张简洁、私密可控的数字名片。先完成资料，再把公开内容分享给对方。</text>
 
   <view wx:if="{{status === 'LOADING'}}" class="card-skeleton" aria-label="正在加载名片"></view>
 
@@ -11,7 +10,7 @@
     <text class="card-panel__title">名片暂时不可用</text>
     <text class="card-panel__text">{{message}}</text>
     <button class="card-button-secondary" style="margin-top: 24rpx" bindtap="loadCard">重试</button>
-    <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">完善最小资料</navigator>
+    <navigator class="card-link-button" style="margin-top: 18rpx" url="/packageCard/pages/edit/index" hover-class="none">编辑名片</navigator>
   </view>
 
   <ab-profile-card
@@ -39,14 +38,6 @@
   </view>
 
   <view wx:if="{{card}}" class="card-secondary-tools" aria-label="名片管理">
-    <navigator class="card-secondary-tool" url="/packageCard/pages/edit/index" hover-class="none">编辑资料 <text>›</text></navigator>
-    <navigator class="card-secondary-tool" url="/packageCard/pages/privacy/index" hover-class="none">查看隐私范围 <text>›</text></navigator>
-    <button class="card-secondary-tool" bindtap="openShareManager">名片海报与入口管理 <text>›</text></button>
-    <navigator wx:if="{{demoMode}}" class="card-secondary-tool" url="/packageCard/pages/view/index?preview=STRANGER" hover-class="none">预览访客视角 <text>›</text></navigator>
-  </view>
-
-  <view wx:if="{{card}}" class="card-truth-note" aria-role="note">
-    <text>{{localIdentityReady ? '此设备保存的名片 · 当前展示你填写并选择公开的内容。' : (demoMode ? '当前为合成示例，不代表真实会员；可体验公开字段的转发效果。' : '名片按当前可见范围显示；点击分享会直接打开微信转发面板。')}}</text>
-    <text>认证完全可选；标签必须先经过人工审核，才会公开显示。</text>
+    <button class="card-secondary-tool" bindtap="openShareManager">名片海报 <text>›</text></button>
   </view>
 </view>

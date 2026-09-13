@@ -1,5 +1,5 @@
 page {
-  --ab-color-ivory: #f4efe6;
+  --ab-color-ivory: #f7f4ed;
   --ab-color-gold-brown: #98723a;
   --ab-color-gold: #aa8448;
   --ab-color-gold-soft: #dec89c;
@@ -7,13 +7,13 @@ page {
   --ab-color-paper: #fffdf8;
   --ab-color-ink: #211e1a;
   --ab-color-muted: #756f66;
-  --ab-color-border: #d8cfc0;
+  --ab-color-border: #dfd6c7;
   --ab-color-champagne-deep: #8a6a36;
-  --ab-color-dark-canvas: #161412;
-  --ab-color-dark-surface: #24211d;
+  --ab-color-dark-canvas: #302d29;
+  --ab-color-dark-surface: #3b3731;
   --ab-color-dark-text: #fffaf0;
-  --ab-color-dark-muted: #bdb4a7;
-  --ab-color-dark-border: #4b443b;
+  --ab-color-dark-muted: #cec6ba;
+  --ab-color-dark-border: #6a6155;
   --ab-font-display: Georgia, "Songti SC", "STSong", "Noto Serif CJK SC", SimSun, serif;
   --ab-font-text: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
   --ab-font-body: 32rpx;

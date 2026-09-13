@@ -1,0 +1,60 @@
+<view class="pearls-page">
+  <view class="pearls-shell">
+    <view class="pearls-header">
+      <view class="pearls-wordmark"><text>AB CLUB</text><text>SPIRIT PEARLS</text></view>
+      <view class="pearls-hero">
+        <text class="pearls-eyebrow">THE ART OF CHOOSING</text>
+        <text class="pearls-title">源头选珠</text>
+        <text class="pearls-intro">从一颗珍珠开始，找到属于你的光。</text>
+      </view>
+    </view>
+
+    <view class="pearls-section pearls-materials">
+      <view class="pearls-heading"><text class="pearls-heading__title">甄选品类</text><text class="pearls-eyebrow">01 / PEARLS</text></view>
+      <view class="pearl-category-list">
+        <view wx:for="{{categories}}" wx:key="id" class="pearl-category {{activeCategory === item.id ? 'pearl-category--selected' : ''}}">
+          <view class="pearl-category__photo">
+            <image wx:if="{{item.image && !imageFailures[item.id]}}" src="{{item.image}}" mode="aspectFill" lazy-load="{{true}}" data-id="{{item.id}}" data-src="{{item.image}}" bindtap="previewPhoto" binderror="handleImageError" aria-label="{{item.imageLabel}}，点击放大" />
+            <view wx:else class="pearl-photo-placeholder"><text>{{item.title}}</text><text>{{item.image ? '图片暂未显示' : '联系查看实拍'}}</text></view>
+          </view>
+          <button class="pearl-category__select" data-id="{{item.id}}" bindtap="chooseCategory" hover-class="pearl-pressed" aria-label="选择{{item.title}}">
+            <view class="pearl-category__titles"><text class="pearl-category__title">{{item.title}}</text><text class="pearls-eyebrow">{{item.english}}</text></view>
+            <text class="pearl-category__description">{{item.description}}</text>
+            <view class="pearl-category__foot"><text>{{item.imageLabel}}</text><text class="pearl-select-indicator">{{activeCategory === item.id ? '已选' : '选择'}}</text></view>
+          </button>
+        </view>
+      </view>
+    </view>
+
+    <view class="pearls-section pearls-styles">
+      <view class="pearls-heading"><text class="pearls-heading__title">款式灵感</text><text class="pearls-eyebrow">02 / DESIGN</text></view>
+      <text class="pearls-section-intro">耳畔、颈间与指尖，珍珠的不同表达。</text>
+      <view class="pearl-style-grid">
+        <button wx:for="{{styles}}" wx:key="id" class="pearl-style pearl-style--{{item.id}}" data-src="{{item.image}}" bindtap="previewPhoto" hover-class="pearl-pressed" aria-label="查看{{item.title}}款式参考大图">
+          <view class="pearl-style__photo">
+            <image wx:if="{{!imageFailures[item.id]}}" src="{{item.image}}" mode="aspectFill" lazy-load="{{true}}" data-id="{{item.id}}" binderror="handleImageError" />
+            <view wx:else class="pearl-photo-placeholder"><text>{{item.title}}</text><text>图片暂未显示</text></view>
+          </view>
+          <view class="pearl-style__body"><text class="pearls-eyebrow">{{item.english}}</text><text class="pearl-style__title">{{item.title}}</text><text class="pearl-style__description">{{item.description}}</text></view>
+        </button>
+      </view>
+      <text class="pearls-reference-note">图片为材质与款式参考，具体选珠及定制方案请联系沟通。</text>
+    </view>
+
+    <view class="pearls-contact" id="pearl-contact">
+      <text class="pearls-eyebrow">YOUR PERSONAL SELECTION</text>
+      <text class="pearls-contact__title">一起选一颗，属于你的珍珠。</text>
+      <text class="pearls-contact__selection">选珠意向 · {{selectionLabel}}</text>
+      <button class="pearls-contact__button" open-type="contact" session-from="{{contactContext}}" send-message-title="AB Club · {{selectionLabel}}选珠咨询" send-message-path="/packageEvents/pages/pearls/index?category={{activeCategory}}" show-message-card="{{true}}" bindcontact="handleContact" hover-class="pearl-pressed">联系选珠 / 获取报价<text>↗</text></button>
+      <view class="pearls-wechat"><text user-select="{{true}}">负责人微信 · {{contactWechat}}</text><button bindtap="copyWechat" disabled="{{copying}}" hover-class="pearl-pressed">复制微信号</button></view>
+    </view>
+
+    <view class="pearl-credits">
+      <button class="pearl-credits__toggle" bindtap="toggleImageCredits" hover-class="pearl-pressed">影像来源<text>{{showImageCredits ? '−' : '+'}}</text></button>
+      <view wx:if="{{showImageCredits}}" class="pearl-credits__list">
+        <text class="pearl-credits__intro">摄影参考来自 Wikimedia Commons。图片按原许可提供，经平台缩放；未改变珠色或形态。</text>
+        <view wx:for="{{imageCredits}}" wx:key="id" class="pearl-credit"><text class="pearl-credit__title">{{item.title}}</text><text user-select="{{true}}">{{item.author}} · {{item.license}}</text><text user-select="{{true}}" class="pearl-credit__url">{{item.sourceUrl}}</text><text user-select="{{true}}" class="pearl-credit__url">{{item.licenseUrl}}</text><button data-id="{{item.id}}" bindtap="copyImageSource" hover-class="pearl-pressed">复制原图与授权链接</button></view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -36,7 +36,10 @@
       "pages": [
         "pages/city/index",
         "pages/event/index",
-        "pages/organizer/index"
+        "pages/organizer/index",
+        "pages/calendar/index",
+        "pages/public-good/index",
+        "pages/pearls/index"
       ]
     },
     {
@@ -71,11 +74,11 @@
     }
   },
   "window": {
-    "navigationBarBackgroundColor": "#F4EFE6",
-    "navigationBarTextStyle": "black",
+    "navigationBarBackgroundColor": "@navigationBarBackgroundColor",
+    "navigationBarTextStyle": "@navigationBarTextStyle",
     "navigationBarTitleText": "AB Club",
-    "backgroundColor": "#F4EFE6",
-    "backgroundTextStyle": "dark"
+    "backgroundColor": "@backgroundColor",
+    "backgroundTextStyle": "@backgroundTextStyle"
   },
   "tabBar": {
     "custom": true,
@@ -113,5 +116,7 @@
     "loading-city": "/components/loading-city/index"
   },
   "style": "v2",
+  "darkmode": true,
+  "themeLocation": "theme.json",
   "sitemapLocation": "sitemap.json"
 }

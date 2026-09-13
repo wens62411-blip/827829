@@ -23,7 +23,7 @@ test('card editor follows the approved one-template high-control concept', () =>
   const source = read('miniprogram/packageCard/pages/edit/index.ts');
   const styles = read('miniprogram/packageCard/pages/edit/index.wxss');
 
-  assert.match(template, /自由填写内容/, '编辑器应以自由文字为核心，而不是固定简历字段表');
+  assert.match(template, /个人简介/, '编辑器应以自由文字为核心，而不是固定简历字段表');
   assert.doesNotMatch(template, />教育背景</, '教育背景不应继续作为固定必填式分区');
   assert.match(template, /卡片配色/);
   for (const theme of ['象牙白', '墨黑', '香槟金', '石灰灰']) {
@@ -39,11 +39,12 @@ test('card editor follows the approved one-template high-control concept', () =>
 
   assert.match(template, /bindtap="toggleProfileTag"/);
   assert.match(template, /bindtap="chooseGalleryImages"/);
-  assert.match(template, /标签与图片.*仅.*预览/, '不能把尚未持久化的标签和图片冒充已保存');
+  assert.match(source, /标签与图片仅自己可见/, '不能把未公开的字段宣称成已公开');
   assert.equal((template.match(/aria-pressed="\{\{editorMode === '(?:PREVIEW|EDIT)'\}\}"/g) ?? []).length, 2, '两个编辑视图都应暴露真实按下态');
   assert.doesNotMatch(template, /aria-role="tab"|aria-selected=/, '混合分享动作的按钮组不应伪装成纯 tablist');
   assert.match(styles, /\.card-editor-tab[\s\S]*min-height:\s*104rpx/);
-  assert.match(styles, /\.card-editor-ai[\s\S]*min-height:\s*var\(--ab-touch-target\)/);
+  assert.doesNotMatch(template, /AI 辅助润色|generateIntroductionDraft/);
+  assert.doesNotMatch(source, /createEditableIntroduction|generateIntroductionDraft/);
 });
 
 test('card editor theme control matches the approved live-preview geometry', () => {
@@ -64,7 +65,7 @@ test('card editor theme control matches the approved live-preview geometry', () 
   assert.match(swatchRule, /width:\s*46rpx/);
   assert.match(swatchRule, /border-radius:\s*50%/);
   assert.match(styles, /\.card-theme-option--selected \.card-theme-option__swatch\s*\{[\s\S]*?box-shadow:/);
-  assert.match(styles, /--editor-gold:\s*var\(--ab-color-gold\)/);
+  assert.match(styles, /--editor-gold:\s*#88693e/);
   assert.match(cssRule(styles, '.card-theme-option--selected', /box-shadow:/), /box-shadow:\s*inset 0 -3rpx 0 var\(--editor-gold\)/);
   assert.match(cssRule(styles, '.card-theme-option--selected .card-theme-option__swatch', /box-shadow:/), /0 0 0 6rpx var\(--editor-gold\)/);
 

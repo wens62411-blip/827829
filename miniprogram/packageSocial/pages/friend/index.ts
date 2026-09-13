@@ -187,7 +187,7 @@ Page({
     if (!friendshipId || !this.data.actions.canRemove || this.data.busyAction) return;
     const confirm = await wx.showModal({
       title: '解除 AB Club 平台关系？',
-      content: '解除后，双方的 FRIENDS_ONLY 字段访问权限会立即收回。',
+      content: '解除后，双方将无法查看仅向已认识成员展示的资料。',
       confirmText: '解除关系',
       confirmColor: '#9D3F36',
     });

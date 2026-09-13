@@ -1,13 +1,11 @@
 <view class="friend ab-safe-bottom">
-  <text class="friend__eyebrow">AB CLUB PLATFORM RELATIONSHIP</text>
   <text class="friend__title">平台关系</text>
-  <text class="friend__lead">“申请认识”只建立 AB Club 平台关系，不会添加微信好友，也不提供聊天能力。</text>
 
   <view wx:if="{{errorMessage}}" class="friend__notice" aria-role="alert">
     <text>{{errorMessage}}</text>
     <button wx:if="{{targetUserId}}" class="friend__text-button" disabled="{{loading}}" bindtap="loadRelationship">重新加载</button>
   </view>
-  <view wx:elif="{{loading && !card}}" class="friend__notice" aria-role="status">正在读取可见名片与关系投影…</view>
+  <view wx:elif="{{loading && !card}}" class="friend__notice" aria-role="status">正在加载名片…</view>
 
   <view wx:if="{{card}}" class="friend__card">
     <view class="friend__profile">
@@ -28,10 +26,6 @@
         review-status="{{item.reviewStatus}}"
         verification-state="{{item.verificationState}}"
       />
-    </view>
-    <view class="friend__permission" aria-role="note">
-      <text class="friend__permission-label">FRIENDS_ONLY 权限</text>
-      <text>{{relationship.mayViewFriendsOnlyFields ? '已开启' : '未开启'}}</text>
     </view>
   </view>
 
@@ -57,7 +51,4 @@
     <button wx:if="{{actions.canReport}}" class="friend__button friend__button--text" disabled="{{busyAction}}" bindtap="onReport">举报</button>
   </view>
 
-  <view wx:if="{{card}}" class="friend__safety" aria-role="note">
-    删除关系或拉黑后，本页会先行隐藏可能来自 FRIENDS_ONLY 的资料；服务端同时按冻结协议写入关系投影失效事件。
-  </view>
 </view>

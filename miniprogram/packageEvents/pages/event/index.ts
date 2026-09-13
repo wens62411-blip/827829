@@ -71,13 +71,13 @@ function toDemoDetail(event: DemoEventPresentation): EventDetailView {
     imageAlt: event.imageAlt ?? cover?.alt ?? '活动方向视觉参考待补充',
     imageCredit: event.imageCredit ?? cover?.credit ?? '图片归属待补充',
     evidenceLabel: '活动方向',
-    stateLabel: '方向预览 · 不是实际排期',
-    sourceLabel: '本地合成策展文案；图片来源与许可记录在 editorial-events manifest',
+    stateLabel: '筹备中 · 报名尚未开放',
+    sourceLabel: 'AB Club 策展构想',
     localTimeLabel: '日期与场地待确认',
     timezone: event.timezone,
     phaseBoundaryLabel: '第一阶段只作信息预览，不开放活动报名、支付、签到、商户入驻或交易。',
     categoryLabel: event.categoryLabel ?? '城市策展',
-    sectionLabel: event.sectionLabel ?? '方向预览',
+    sectionLabel: event.sectionLabel ?? '策展方向',
   };
 }
 
@@ -117,9 +117,9 @@ function toLiveDetail(event: PublicEventProjection): EventDetailView {
       ? '活动独立封面尚未完成媒体权利解析，因此暂不展示'
       : '该公开活动尚未提供独立封面',
     imageCredit: '',
-    evidenceLabel: realRecord && humanReviewed ? 'HUMAN_REVIEWED' : 'CONTENT_LIVE_UNVERIFIED',
-    stateLabel: `${event.state} · ${event.publicationState}`,
-    sourceLabel: realRecord ? '正式公开投影' : '非正式记录，不作为真实活动证据',
+    evidenceLabel: realRecord && humanReviewed ? '已人工核验' : '待核验',
+    stateLabel: event.state === 'COMPLETED' ? '已结束' : event.state === 'PAUSED' ? '已暂停' : '公开信息',
+    sourceLabel: realRecord ? '公开活动资料' : '示例活动',
     localTimeLabel: formatEventRange(event),
     timezone: event.timezone,
     phaseBoundaryLabel: '第一阶段仍只作公开信息展示；报名、支付与签到入口不会在本客户端开放。',
@@ -148,7 +148,7 @@ Page({
     stateKind: 'EMPTY',
     stateTitle: '请选择可公开活动',
     stateDescription: '当前没有活动方向详情可展示。',
-    stateDetail: '不会根据任意地址参数生成真实活动、排期、合作方或报名结果。',
+    stateDetail: '',
     imageFailed: false,
   },
 
@@ -166,9 +166,9 @@ Page({
     if (query.demoEventId || query.demoCityId) {
       this.setData({
         stateKind: 'EMPTY',
-        stateTitle: '活动方向参数无效',
-        stateDescription: '该活动方向不在本机预览目录中。',
-        stateDetail: '没有根据任意地址参数创建或替换活动身份。',
+        stateTitle: '活动暂不可用',
+        stateDescription: '请返回活动页重新选择。',
+        stateDetail: '',
       });
       return;
     }
@@ -179,9 +179,9 @@ Page({
     if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
       this.setData({
         stateKind: 'OFFLINE',
-        stateTitle: '正式活动详情未连接',
-        stateDescription: '当前为本机预览，未连接真实活动记录。',
-        stateDetail: '请从活动页进入已标注的活动方向。',
+        stateTitle: '活动详情暂不可用',
+        stateDescription: '请返回活动页浏览其他内容。',
+        stateDetail: '',
       });
       return;
     }
@@ -216,7 +216,7 @@ Page({
       stateKind: 'ERROR',
       stateTitle: '活动详情不可用',
       stateDescription: message,
-      stateDetail: '没有回退为合成活动，也没有生成排期、报名或支付结果。',
+      stateDetail: '',
     });
   },
 

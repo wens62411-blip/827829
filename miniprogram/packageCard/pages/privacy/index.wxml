@@ -1,53 +1,17 @@
 <view class="card-page privacy-page">
   <view class="privacy-header">
     <view class="privacy-header__copy">
-      <text class="card-kicker">YOUR CARD · YOUR CHOICE</text>
-      <text class="card-title">隐私由你决定</text>
-      <text class="card-subtitle">你不需要为了交换名片而公开所有资料。每次查看都会重新确认对方可见的范围。</text>
-    </view>
-    <image class="card-brand-crest privacy-header__crest" src="/assets/brand/ab-club-crest.png" mode="aspectFit" alt="AB Club 盾徽标志" />
-  </view>
-
-  <view class="privacy-levels" aria-role="list" aria-label="三种名片可见范围">
-    <view class="privacy-level" aria-role="listitem">
-      <text class="privacy-level__index">01</text>
-      <view><text class="privacy-level__title">所有人可见</text><text class="privacy-level__copy">通过有效名片入口查看时可以看到；入口撤销、过期或关系变化后会重新核验。</text></view>
-    </view>
-    <view class="privacy-level" aria-role="listitem">
-      <text class="privacy-level__index">02</text>
-      <view><text class="privacy-level__title">仅人脉可见</text><text class="privacy-level__copy">只有双方已建立关系且未拉黑时可见；关系解除后刷新即收回。</text></view>
-    </view>
-    <view class="privacy-level" aria-role="listitem">
-      <text class="privacy-level__index">03</text>
-      <view><text class="privacy-level__title">仅自己可见</text><text class="privacy-level__copy">不会出现在公开名片、分享入口或名片海报中。</text></view>
-    </view>
-  </view>
-
-  <view class="privacy-section">
-    <text class="privacy-section__eyebrow">PROFILE FIELDS</text>
-    <text class="privacy-section__title">名片资料</text>
-    <text class="privacy-section__copy">逐字段选择暂未开放调整。为了不让你误以为已经生效，这里先显示范围说明，不提供虚假的可点击开关。</text>
-    <view class="privacy-field-list">
-      <view wx:for="{{contractPendingFields}}" wx:key="fieldKey" class="privacy-field-row">
-        <text class="privacy-field-row__label">{{item.label}}</text>
-        <text class="privacy-field-row__state">暂未开放调整</text>
-      </view>
+      <text class="card-kicker">AB CLUB</text>
+      <text class="card-title">名片展示</text>
     </view>
   </view>
 
   <view class="privacy-section privacy-section--private">
-    <text class="privacy-section__eyebrow">PERSONAL ONLY</text>
-    <text class="privacy-section__title">始终仅自己可见</text>
-    <text class="privacy-section__copy">以下敏感资料不会进入公开名片，且不能改成对外可见。</text>
+    <text class="privacy-section__title">仅自己可见</text>
     <view class="privacy-private-chips">
       <text wx:for="{{permanentPrivateFields}}" wx:key="fieldKey" class="privacy-private-chip">{{item.label}}</text>
     </view>
   </view>
 
-  <view class="privacy-honesty" aria-live="polite">
-    <text class="privacy-honesty__title">设置尚未保存</text>
-    <text class="privacy-honesty__copy">逐字段设置正式开放前，本页不会伪装成已经保存。当前名片仍以平台确认的公开范围为准。</text>
-  </view>
-
-  <button class="card-link-button privacy-return" bindtap="returnToEditor">返回上一页</button>
+  <button class="card-link-button privacy-return" bindtap="returnToEditor">返回</button>
 </view>

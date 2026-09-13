@@ -14,11 +14,11 @@ test('share page presents the card and human-facing sharing choices', () => {
   assert.match(template, /<ab-profile-card\b[\s\S]*?card="\{\{card\}\}"/);
   assert.match(template, /viewer-mode="STRANGER"/);
   assert.match(template, /fields="\{\{demoMode \? demoFields : \[\]\}\}"/);
-  assert.match(template, /封面只使用当前公开字段/);
-  assert.match(template, /微信好友|生成名片海报|撤销/);
-  assert.match(template, /<button\b[^>]*open-type="share"[^>]*>[\s\S]*?发送示例名片到微信/);
+  assert.match(template, /bindtap="generatePoster"/);
+  assert.match(template, /bindtap="savePosterToAlbum"/);
+  assert.match(template, /bindtap="revokeShare"/);
   assert.match(template, /theme="\{\{cardTheme\}\}"/);
-  assert.match(template, /打开微信转发面板|可以试用/);
+  assert.doesNotMatch(template, /微信转发测试|示例名片|share-choice-list|createQrScene|clearLocalRevocationPointer/);
   assert.equal(config.usingComponents?.['ab-profile-card'], '/components/ab-profile-card/index');
   assert.doesNotMatch(template, /OPENID|profile ID|PUBLIC PROJECTION|小程序码 scene|Canvas 2D|高熵 token/);
 });
@@ -27,7 +27,7 @@ test('privacy page explains choices in member language, not implementation langu
   const template = read('miniprogram/packageCard/pages/privacy/index.wxml');
 
   assert.match(template, /所有人可见|仅人脉可见|仅自己可见/);
-  assert.match(template, /暂未开放调整|不会伪装成已经保存/);
+  assert.doesNotMatch(template, /<switch|保存设置|暂未开放调整/);
   assert.doesNotMatch(template, /冻结 DTO|PUBLIC|FRIENDS_ONLY|PRIVATE|OPENID|运行模式/);
 });
 
@@ -36,11 +36,11 @@ test('visitor page identifies the sender and offers a separate create-own-card e
   const source = read('miniprogram/packageCard/pages/view/index.ts');
   const ownerTemplate = read('miniprogram/pages/card/index.wxml');
 
-  assert.match(template, /查看分享者选择公开的资料/);
+  assert.match(template, /<ab-profile-card[\s\S]*card="\{\{card\}\}"/);
   assert.match(template, /创建我的数字名片/);
   assert.match(template, /bindtap="openMyCardEntry"/);
   assert.doesNotMatch(template, /交换名片|需要对方确认|添加好友|建立好友/);
-  assert.match(ownerTemplate, /view\/index\?preview=STRANGER/);
+  assert.doesNotMatch(ownerTemplate, /view\/index\?preview=STRANGER/);
   assert.match(source, /demoVisitorPreview[\s\S]*viewerMode:\s*this\.data\.demoVisitorPreview \? 'STRANGER' : 'SELF'/);
   assert.doesNotMatch(source, /import\s*\{[\s\S]*?getRuntimeEvidence[\s\S]*?\}\s*from\s*['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]/);
   assert.match(source, /function loadIdentityClient\(\)[\s\S]*require\(['"]\.\.\/\.\.\/\.\.\/pages\/card\/services\/identity-client['"]\)/);

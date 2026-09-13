@@ -233,3 +233,23 @@
 @media (prefers-reduced-motion: reduce) {
   .discover-press { opacity: 1; }
 }
+
+@media (prefers-color-scheme: dark) {
+  .discover-page {
+    --discover-paper: var(--ab-color-dark-surface);
+    --discover-ink: var(--ab-color-dark-text);
+    --discover-muted: var(--ab-color-dark-muted);
+    --discover-line: var(--ab-color-dark-border);
+    --discover-accent: var(--ab-color-gold-soft);
+    background: var(--ab-color-dark-canvas);
+  }
+
+  .discover-primary-action {
+    border: 1rpx solid rgba(216, 193, 151, 0.6);
+    background: rgba(216, 193, 151, 0.12);
+    color: var(--ab-color-dark-text);
+  }
+
+  .discover-event-feature__fallback,
+  .discover-city-media__fallback { color: var(--ab-color-ink); }
+}

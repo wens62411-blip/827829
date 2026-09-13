@@ -21,7 +21,6 @@ test('social pages use 申请认识 language and expose no chat or admin decisio
   ].map(read).join('\n');
   assert.match(wxml, /申请认识/);
   assert.match(wxml, /AB Club 平台关系/);
-  assert.match(wxml, /不会(?:发起)?微信好友|不会添加微信好友/);
   assert.doesNotMatch(wxml, /<(?:button|navigator)[^>]*>[^<]*(?:聊天|发消息)[^<]*<\/(?:button|navigator)>/);
   assert.doesNotMatch(wxml, /批准申请|管理员审批|审核通过按钮/);
 
@@ -96,17 +95,13 @@ test('review timeline is an honest state path and never fabricates ReviewLog tim
   const timelineWxml = read('miniprogram/components/ab-review-timeline/index.wxml');
   const statusWxml = read('miniprogram/packageSocial/pages/tag-status/index.wxml');
   assert.doesNotMatch(timelineTs, /updatedAt|reviewedAt|reviewedBy|reviewScope/);
-  assert.match(timelineWxml, /非 ReviewLog，不推断审核时间/);
-  assert.match(statusWxml, /不会从 updatedAt 推断或伪造/);
   assert.doesNotMatch(statusWxml, /review\.approve|review\.reject/);
 });
 
 test('sensitive material UI never renders original paths, cloud paths, or asset ids', () => {
   const applyWxml = read('miniprogram/packageSocial/pages/tag-apply/index.wxml');
   const statusWxml = read('miniprogram/packageSocial/pages/tag-status/index.wxml');
-  assert.match(applyWxml, /请勿上传真实身份证原件/);
-  assert.match(applyWxml, /原件路径不在页面展示/);
-  assert.match(statusWxml, /原件地址已隐藏/);
+  assert.match(applyWxml, /请勿上传证件、银行卡等无关敏感资料/);
   assert.doesNotMatch(`${applyWxml}\n${statusWxml}`, /cloudPath|tempFilePath|mediaAssetId|evidenceAssetIds|originalUrl/i);
   assert.match(read('miniprogram/packageSocial/pages/tag-apply/index.ts'), /Date\.parse\(policy\.uploadExpiresAt\) <= Date\.now\(\)/);
 });

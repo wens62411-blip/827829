@@ -263,7 +263,7 @@ export function toRelatedEventView(event: PublicEventProjection): RelatedEventVi
     recordOrigin: event.origin,
     title: event.title,
     cityName: cityName(event.cityId),
-    startsAt: event.startsAt,
+    startsAt: event.origin === 'SYNTHETIC' ? '日期待定' : event.startsAt,
     reservationAvailable: event.reservationAvailable,
   };
 }

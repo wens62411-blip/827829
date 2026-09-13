@@ -10,5 +10,4 @@
   </view>
   <text wx:if="{{nameEn}}" class="label__english">{{nameEn}}</text>
   <text wx:if="{{descriptionZh}}" class="label__description">{{descriptionZh}}</text>
-  <text class="label__notice">提交后进入人工审核；审核通过不等于自动公开</text>
 </button>

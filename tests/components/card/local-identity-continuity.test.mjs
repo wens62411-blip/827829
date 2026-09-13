@@ -117,17 +117,17 @@ test('local contact controls describe the privacy behavior that sharing actually
   const template = read('miniprogram/packageCard/pages/edit/index.wxml');
 
   assert.match(template, /localIdentityReady \|\| registerMode/);
-  assert.match(template, /只控制当前设备上的本机名片预览/);
-  assert.match(template, /不会进入微信分享卡片、接收页或海报/);
-  assert.match(template, /分享时自动移除/);
+  assert.match(template, /wx:if="\{\{localIdentityReady \|\| registerMode\}\}" class="card-editor-contact-visibility__note">仅自己可见/);
+  assert.match(template, /\? '显示电话' : '对外展示电话'/);
+  assert.match(template, /\? '显示邮箱' : '对外展示邮箱'/);
 });
 
 test('local registration hides image controls that cannot persist across page exits', () => {
   const template = read('miniprogram/packageCard/pages/edit/index.wxml');
 
   assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}"[^>]*open-type="chooseAvatar"/);
-  assert.match(template, /图片头像将在云端账户接入后开放/);
-  assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}" class="card-editor-section"[\s\S]*?GALLERY/);
+  assert.doesNotMatch(template, /图片头像将在云端账户接入后开放/);
+  assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}" class="card-editor-section"[\s\S]*?展示图片/);
   assert.match(template, /wx:if="\{\{!localIdentityReady && !registerMode\}\}" class="card-editor-switch-row"[\s\S]*?显示图片/);
 });
 
@@ -168,6 +168,7 @@ test('cold-start card receiver presents the sender without local-device ownershi
   assert.match(receiver, /snapshot\.source !== 'LOCAL'/);
   assert.match(receiver, /visitorTitleForCard\(snapshot\.card\)/);
   assert.match(template, /localIdentityMode/);
-  assert.match(template, /分享者公开资料/);
+  assert.match(template, /card="\{\{card\}\}"/);
+  assert.doesNotMatch(template, /card-demo-ribbon|本机预览|用户自填/);
   assert.doesNotMatch(`${receiver}\n${template}`, /本机名片/);
 });

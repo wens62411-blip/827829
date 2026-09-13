@@ -21,8 +21,8 @@ hasOrganizer: false,
 organizer: null as OrganizerView | null,
 stateKind: 'EMPTY',
 stateTitle: '主理人资料未提供',
-stateDescription: '只有服务端返回的人工 APPROVED 主理人公开投影才可展示。',
-stateDetail: 'URL 参数、用户资料字段或客户端角色声明都不能生成 organizer 身份。',
+stateDescription: '资料尚未开放。',
+stateDetail: '',
 },
 onLoad(query: Record<string, string | undefined>) {
 if (!query.organizerId) return;
@@ -32,8 +32,8 @@ async loadOrganizer(organizerId: OrganizerId) {
 if (!LOCAL_RUNTIME.cloudEnvironmentConfigured) {
 this.setData({
 stateKind: 'OFFLINE',
-stateTitle: '正式主理人资料未连接',
-stateDescription: '当前为本机预览，未连接已认证主理人资料。',
+stateTitle: '主理人资料暂不可用',
+stateDescription: '请稍后再试。',
 });
 return;
 }
@@ -80,7 +80,7 @@ organizer: null,
 stateKind: 'ERROR',
 stateTitle: '主理人资料不可用',
 stateDescription: message,
-stateDetail: '没有回退到用户声明或 AI 推断的 organizer 身份。',
+stateDetail: '',
 });
 },
 });

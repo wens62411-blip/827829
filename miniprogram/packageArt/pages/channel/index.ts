@@ -134,7 +134,7 @@ Page({
         state: items.length === 0 ? 'EMPTY' : 'READY',
         stateTitle: items.length === 0 ? '此分类暂无内容' : '',
         stateDescription: items.length === 0
-          ? '当前为本机预览，此分类没有内容，不会用其他分类内容填充。'
+          ? '可选择其他分类浏览。'
           : '',
         retryable: false,
         weakNetwork: false,
@@ -149,8 +149,8 @@ Page({
       clearWeakNetworkTimer();
       this.setData({
         state: 'ERROR',
-        stateTitle: '内容服务尚未连接',
-        stateDescription: '当前运行模式不允许读取正式内容；不会使用合成示例替代。',
+        stateTitle: '内容暂不可用',
+        stateDescription: '请稍后再试。',
         retryable: false,
         weakNetwork: false,
       });
@@ -180,7 +180,7 @@ Page({
     this.setData({
       state: cards.length === 0 ? 'EMPTY' : 'READY',
       stateTitle: cards.length === 0 ? '此分类暂时没有公开内容' : '',
-      stateDescription: cards.length === 0 ? '仅展示服务端判定为 PUBLISHED 且允许公开的记录。' : '',
+      stateDescription: cards.length === 0 ? '可选择其他分类浏览。' : '',
       retryable: cards.length === 0,
       weakNetwork: false,
       cards,

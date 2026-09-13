@@ -83,7 +83,7 @@ test('owner edit and poster management navigate independently while direct share
     assert.ok(directShareButton, 'owner card needs a direct share control');
     assert.match(directShareButton, /open-type="share"/);
     assert.doesNotMatch(directShareButton, /bindtap=|navigateTo|url=/);
-    assert.match(template, /bindtap="openShareManager"[^>]*>名片海报与入口管理/);
+    assert.match(template, /bindtap="openShareManager"[^>]*>名片海报/);
   } finally {
     delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
     delete globalThis.Page;
@@ -277,8 +277,7 @@ test('successful response keeps the bearer only in memory and emits a token-only
     assert.equal(shareUrl.searchParams.get('theme'), 'stone');
     assert.doesNotMatch(share.path, /ownerUserId|profile|permission|openid|phone/i);
     assert.equal(wxCalls.some(([name]) => name === 'showShareMenu'), true);
-    assert.match(page.data.shareHint, /面板已请求打开/);
-    assert.match(page.data.shareHint, /不会伪造.*分享成功/);
+    assert.equal(page.data.shareHint, '', '打开原生面板不应显示虚构送达状态或开发说明');
     page.onUnload.call(page);
   } finally {
     delete globalThis.__AB_CARD_PAGE_TEST_HOOKS__;
@@ -361,7 +360,7 @@ test('owner card instances keep independent secrets and stop a token revoked in 
     await revoker.revokePreparedShare.call(revoker);
     pageA.onShow.call(pageA);
     assert.equal(pageA.data.shareReady, false);
-    assert.match(pageA.data.shareHint, /已在入口管理中撤销/);
+    assert.match(pageA.data.shareHint, /分享已停止/);
     assert.equal(pageA.onShareAppMessage.call(pageA).path, '/pages/card-share/index?invalid=1');
     assert.equal(pageB.onShareAppMessage.call(pageB).path, `/pages/card-share/index?token=${bearerB}`);
     assert.equal(storage.get(registryKey).pointers.some((entry) => entry.shareTokenId === tokenIdB), true);

@@ -80,12 +80,12 @@ export function socialErrorMessage(error: unknown): string {
       case 'REVIEW_EVIDENCE_REQUIRED': return '请补齐必要材料后再提交。';
       case 'MEDIA_RIGHTS_REQUIRED': return '部分材料缺少必要授权，请重新选择。';
       case 'SERVICE_UNAVAILABLE': return '服务暂时不可用，请稍后重试。';
-      case 'NOT_IMPLEMENTED': return '当前环境尚未接入此能力。';
+      case 'NOT_IMPLEMENTED': return '此功能暂未开放。';
       default: return error.message || '操作未完成，请稍后重试。';
     }
   }
   if (error instanceof Error && error.message.includes('LOCAL_ONLY')) {
-    return '当前为 LOCAL_ONLY，未连接云环境，不会伪造成功结果。';
+    return '此功能暂未开放。';
   }
   return '操作未完成，请检查网络后重试。';
 }

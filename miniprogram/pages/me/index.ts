@@ -152,8 +152,8 @@ Page({
         ...EMPTY_CITY_GROUP,
         status: 'ERROR',
         message: result.code === 'NOT_FOUND'
-          ? '尚未建立个人资料，请先完成最小资料。'
-          : result.message,
+          ? '还没有名片'
+          : '暂时无法读取名片，请稍后重试。',
       });
       if (fromPullDown) wx.stopPullDownRefresh();
       return;
